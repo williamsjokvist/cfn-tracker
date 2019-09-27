@@ -12,6 +12,10 @@ This is primarily targeted toward streamers who want automatically updated win/l
 * You have the options to output the result to individual .txt files as well as a JSON in case you wanna do some fancy stuff ^^
 * After you've configured it to your liking, launch the .bat file. Add some text labels in OBS and use the .txt files as sources. The labels will then automatically update after a match.
 
+### Example
+
+![stream](showcase/streamexample.gif?raw=true "streamshowcase")
+
 ### Result
 
 This is how the batch file will display the data:
