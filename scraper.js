@@ -11,10 +11,10 @@ var casper = require("casper").create({
 fs = require('fs'),
     
 /*Configuration*/
-cfnProfile = casper.cli.raw.get("profile"),
+cfn = casper.cli.raw.get("profile"),
 refreshInterval = casper.cli.raw.get("refreshinterval"),
 writeAJSON = casper.cli.raw.get("writejson"), 
-jsonLocation = casper.cli.raw.get("jsonlocation"),
+jsonLoc = casper.cli.raw.get("jsonlocation"),
 
 modes = [
     {
@@ -65,7 +65,7 @@ function fetchStats() {
 }
 
 var rank = 0,
-    realLP = 0,
+    realLP = 0, /*parseInt(lp)*/
     netLP = 0,
     LPArray = [];
 
@@ -76,7 +76,7 @@ function fetchRank() {
     var rankSelector = ".playerInfo>dl:last-child>dd";
     
     casper.waitForSelector(rankSelector, function (){
-        casper.echo("\nAction: Fetching " + cfnProfile + "'s rank and LP");
+        casper.echo("\nAction: Fetching " + cfn + "'s rank and LP");
     
         rank = this.evaluate(function (selector){
             return document.querySelector(selector).innerText;
@@ -108,7 +108,7 @@ function fetchRank() {
 function updateStats(matchArr, mode){
     for (var i = 0; i < matchArr.length; i++){
         if (matchArr[i] !== modeArr[mode.num][i]){/*if new win or loss*/                          
-            casper.echo("\nAction: Fetching " + cfnProfile + "'s " + mode.type + " stats...");
+            casper.echo("\nAction: Fetching " + cfn + "'s " + mode.type + " stats...");
 
             /*Ádd to W/L counters*/
             if (matchArr[19].indexOf('on') !== -1)
@@ -125,8 +125,7 @@ function updateStats(matchArr, mode){
                 mode.ratio = Math.floor((mode.wins / (mode.wins+mode.losses)) * 100) + "%";	
                 if (mode.type === "rank")
                     fetchRank();
-            } 
-                
+            }               
             
             modeArr[mode.num] = matchArr.slice(); /*Updates the array*/
             casper.echo("\n\tWins: " + mode.wins + "\t\t\tLosses: "+ mode.losses + "\t\tWin Ratio: " + mode.ratio);
@@ -136,8 +135,7 @@ function updateStats(matchArr, mode){
             if (writeAJSON === "true")
                 writeJSON(0);
             
-            updated = 1;     
-            
+            updated = 1;                 
         }
          else {
              updated = 0;
@@ -197,7 +195,7 @@ function writeTxt (mode, wins, losses, ratio) {
  * @param {clear} clear wins, losses and ratio, only at launch
  */
 function writeJSON (clear){
-    var arr, subArr = new Array();
+    var arr, subArr = [];
     
     if (clear === 0){
         for (var i = 0; i < modes.length;i++){
@@ -216,7 +214,7 @@ function writeJSON (clear){
 
     var xhr = new XMLHttpRequest();
 
-    xhr.open('PUT', jsonLocation);
+    xhr.open('PUT', jsonLoc);
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.onload = function () {
         if (xhr.status === 200 && xhr.responseText !== arr)
@@ -232,7 +230,7 @@ function writeJSON (clear){
  * Run for your life!
  */
 function run (){
-    casper.start("https://game.capcom.com/cfn/sfv/gate/steam?rpnt=https://game.capcom.com/cfn/sfv/profile/" + cfnProfile, function () {
+    casper.start("https://game.capcom.com/cfn/sfv/gate/steam?rpnt=https://game.capcom.com/cfn/sfv/profile/" + cfn, function () {
         /*Start and agree to terms*/
         this.echo("Action: Accepting CFN Terms");
         this.click('input[value="Agree"]');
@@ -259,7 +257,7 @@ function run (){
     casper.run();
 }
 
-if ((refreshInterval < 5000 || refreshInterval === null) || cfnProfile === null){
+if ((refreshInterval < 5000 || refreshInterval === null) || cfn === null){
 	casper.echo('Your settings are misconfigured');
 	casper.exit();
 } else 
