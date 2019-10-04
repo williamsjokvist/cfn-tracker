@@ -16,7 +16,7 @@ This is primarily targeted toward streamers who want automatically updated win/l
 
 ### Example
 
-![stream](showcase/streamexample.gif?raw=true "streamshowcase")
+![stream](showcase/screenie.gif?raw=true "streamshowcase")
 
 ### Result
 
