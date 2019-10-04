@@ -16,12 +16,12 @@ This is primarily targeted toward streamers who want automatically updated win/l
 
 ### Example
 
-![stream](showcase/screenie.gif?raw=true "streamshowcase")
+![stream](showcase/streamexample.gif.gif?raw=true "streamshowcase")
 
 ### Result
 
 This is how the batch file will display the data:
-![screenshot](showcase/batchscreenshot.GIF?raw=true "screenshot")
+![screenshot](showcase/screenie.gif?raw=true "screenshot")
 
 
 Here's what the JSON looks like:
