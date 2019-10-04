@@ -64,8 +64,8 @@ function fetchStats() {
     });
 }
 
-var rank = 0,
-    realLP = 0, /*parseInt(lp)*/
+var myRank = 0,
+    myLP = 0, /*parseInt()*/
     netLP = 0,
     LPArray = [];
 
@@ -76,9 +76,7 @@ function fetchRank() {
     var rankSelector = ".playerInfo>dl:last-child>dd";
     
     casper.waitForSelector(rankSelector, function (){
-        casper.echo("\nAction: Fetching " + cfn + "'s rank and LP");
-    
-        rank = this.evaluate(function (selector){
+        myRank = this.evaluate(function (selector){
             return document.querySelector(selector).innerText;
         }, rankSelector);
 
@@ -86,9 +84,10 @@ function fetchRank() {
             return document.querySelector(".leagueInfo>dl:last-child>dd").innerText;
         }); 
         
+        myLP = parseInt(lp, 10);/*remove the "LP"*/
+        
         /*Net LP*/
-        realLP = parseInt(lp, 10)
-        LPArray.push(realLP);
+        LPArray.push(myLP);
         if (LPArray.length > 1 && (LPArray[LPArray.length-1] !== LPArray[LPArray.length-2])){
             netLP = LPArray[LPArray.length-1] - LPArray[0];
         
@@ -96,14 +95,11 @@ function fetchRank() {
                 netLP = "+" + netLP;
         }
                 
-        casper.echo("\n\trank: " + rank + "\t\tLP: " + realLP + "\t\tNet LP: " + netLP);
+        this.echo("\n\trank: " + myRank + "\t\tLP: " + myLP + " (" + getLeague(myLP) + ")\tNet LP: " + netLP);
     });
 }
   
-var today = new Date(),
-date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate(),
-time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds(),
-dateTime = date+' '+time;
+
 
 /**
  * Checks if W/L counters needs updating, and does it.
@@ -112,8 +108,10 @@ dateTime = date+' '+time;
  */
 function updateStats(matchArr, mode){
     for (var i = 0; i < matchArr.length; i++){
-        if (matchArr[i] !== modeArr[mode.num][i]){/*if new win or loss*/                          
-
+        if (matchArr[i] !== modeArr[mode.num][i]){/*if new win or loss*/    
+            var today = new Date(),
+            time = today.getHours() + ":" + today.getMinutes();
+            
             /*Ádd to W/L counters*/
             if (matchArr[19].indexOf('on') !== -1)
                 mode.wins++;
@@ -124,30 +122,92 @@ function updateStats(matchArr, mode){
             if (updateCount[mode.num] === 0 && ((mode.wins === 0 && mode.losses === 1) || (mode.wins === 1 && mode.losses === 0))){
                 mode.wins = 0;
                 mode.losses = 0;                  
-                updateCount[mode.num]++;
             } else if ((mode.losses > 0) || (mode.wins > 0)){
-                casper.echo("\n" + dateTime);
-                mode.ratio = Math.floor((mode.wins / (mode.wins+mode.losses)) * 100) + "%";	
-                if (mode.type === "rank")
+                mode.ratio = Math.floor((mode.wins / (mode.wins+mode.losses)) * 100) + "%";
+                var matchMeta = "\r\n("+ time + ") " + mode.type + " match #" + updateCount[mode.num],
+                    matchStat = "\r\n\tWins: " + mode.wins + "\t\t\tLosses: " + mode.losses + "\t\t\tWin Ratio: " + mode.ratio,
+                    cMatchStat = "Wins: " + mode.wins + ", Losses: " + mode.losses + ", Win Ratio: " + mode.ratio;
+                
+                casper.echo(matchMeta);
+                writeLog("\t" + matchMeta + "\t" + cMatchStat + "\t");
+                if (mode.type === "rank"){
+                    fetchVersus();
                     fetchRank();
-            }               
+                    casper.wait(500, function(){this.echo(matchStat);});
+                } else
+                    casper.echo(matchStat);                    
+            }
             
             modeArr[mode.num] = matchArr.slice(); /*Updates the array*/
-            casper.echo("\nAction: Fetching " + cfn + "'s " + mode.type + " stats...");
-
-            casper.echo("\n\tWins: " + mode.wins + "\t\t\tLosses: "+ mode.losses + "\t\tWin Ratio: " + mode.ratio);
-
             writeTxt(mode.type, mode.wins, mode.losses, mode.ratio);
             
             if (writeAJSON === "true")
                 writeJSON(0);
             
-            updated = 1;           
+            updated = 1;     
+            updateCount[mode.num]++;
         }
-         else {
-             updated = 0;
-         }
+        else {
+            updated = 0;
+        }
     }
+}
+
+/*
+* Fetch the opponents name and LP as well as the characters used
+*/
+function fetchVersus(){
+    casper.waitForSelector(".recentbox .fighter", function (){
+        var opName = this.evaluate(function (){
+            return document.querySelectorAll(".recentbox>.fId>dd")[0].innerText;
+        }),
+        opLp = this.evaluate(function (){
+            return document.querySelectorAll(".recentbox>.league>dd")[0].innerText;
+        }),
+        opChar = this.evaluate(function (){
+            return (document.querySelectorAll(".recentbox>.fav>dd")[0].innerText);
+        }),
+        myChar = this.evaluate(function (){
+            return (document.querySelectorAll(".leagueWrap dl>dd>a")[0].innerText);
+        }),
+        string = cfn + " (" + globalizeChar(myChar) + ") " + "(" + getLeague(myLP) + ") vs. " + opName + " (" + globalizeChar(opChar) + ") " + "(" + getLeague(opLp) + ")";
+        
+        this.echo("\t" + string);
+        writeLog("\n" + string);
+    });
+}
+
+function globalizeChar(string){
+    if (string === "VEGA") return "Boxer";
+    else if (string === "M. BISON") return "Claw";/*they never fixed this*/
+    else if (string === "BALROG") return "Dictator";    
+    else return string.charAt(0) + string.slice(1).toLowerCase();/*return capitalized string*/
+}
+
+function getLeague (lp){
+    var league = "";
+    if (lp >= 300000) league = "Warlord";
+    else if (lp >= 100000) league = "Ultimate Grand Master";
+    else if (lp >= 35000) league = "Grand Master";
+    else if (lp >= 30000) league = "Master";
+    else if (lp >= 25000) league = "Ultra Diamond";
+    else if (lp >= 20000) league = "Super Diamond";
+    else if (lp >= 14000) league = "Diamond";
+    else if (lp >= 12000) league = "Ultra Platinum";
+    else if (lp >= 10000) league = "Super Platinum";
+    else if (lp >= 7500) league = "Platinum";
+    else if (lp >= 6500) league = "Ultra Gold";
+    else if (lp >= 4500) league = "Super Gold";
+    else if (lp >= 4000) league = "Gold";
+    else if (lp >= 3500) league = "Ultra Silver";
+    else if (lp >= 3000) league = "Super Silver";
+    else if (lp >= 2000) league = "Silver";
+    else if (lp >= 1500) league = "Ultra Bronze";
+    else if (lp >= 1000) league = "Super Bronze";
+    else if (lp >= 500) league = "Bronze";
+    else if (lp < 500) league = "Rookie";
+    
+    return league;
 }
 
 /**
@@ -191,9 +251,16 @@ function writeTxt (mode, wins, losses, ratio) {
     fs.write(fs.pathJoin('result/' + mode, 'wins.txt'), wins);
     fs.write(fs.pathJoin('result/' + mode, 'losses.txt'), losses);
     fs.write(fs.pathJoin('result/' + mode, 'ratio.txt'), ratio);
-    fs.write(fs.pathJoin('result/rank.txt'), rank);
-    fs.write(fs.pathJoin('result/LP.txt'), realLP);
+    fs.write(fs.pathJoin('result/rank.txt'), myRank);
+    fs.write(fs.pathJoin('result/LP.txt'), myLP);
     fs.write(fs.pathJoin('result/netLP.txt'), netLP);
+}
+/**
+ * Generate log file / append to log file
+ * @param {data} data to append
+ */
+function writeLog(data){
+    fs.write("LOGFiLE.log", data, 'a');
 }
 	
 /**
@@ -216,7 +283,7 @@ function writeJSON (clear){
         }
     }
     
-    arr = '{"account":{"rank":' + rank + ',"lp":' + realLP + ',"net":"' + netLP + '"},' + subArr[0] + ", " + subArr[1] + ", " + subArr[2] + "}";
+    arr = '{"account":{"rank":' + myRank + ',"lp":' + myLP + ',"net":"' + netLP + '"},' + subArr[0] + ", " + subArr[1] + ", " + subArr[2] + "}";
 
     var xhr = new XMLHttpRequest();
 
@@ -236,7 +303,10 @@ function writeJSON (clear){
  * Run for your life!
  */
 function run (){
-    casper.echo(dateTime);
+    var today = new Date(),
+    date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+    casper.echo(date);
+    writeLog(date);
     casper.start("https://game.capcom.com/cfn/sfv/gate/steam?rpnt=https://game.capcom.com/cfn/sfv/profile/" + cfn, function () {
         /*Start and agree to terms*/
         this.echo("Action: Accepting CFN Terms");
@@ -245,16 +315,17 @@ function run (){
 
     casper.waitForSelector("form input[name='username']", function () {
         /*Fill form and log in*/
+        this.echo("Action: Logging in to " + this.getTitle());
         this.fillSelectors('form#loginForm', {
             'input[name = username ]': casper.cli.raw.get("steamid"),
             'input[name = password ]': casper.cli.raw.get("steampass")
         }, true);
 
         this.click('input#imageLogin');
-        this.echo("Action: Logging in to " + this.getTitle());
+        this.echo("Success");
         this.wait(3000);
     });
-    
+
     fetchRank();
     fetchStats();
     
