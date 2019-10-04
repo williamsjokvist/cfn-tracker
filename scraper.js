@@ -100,6 +100,11 @@ function fetchRank() {
     });
 }
   
+var today = new Date(),
+date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate(),
+time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds(),
+dateTime = date+' '+time;
+
 /**
  * Checks if W/L counters needs updating, and does it.
  * @param {matchArr} the mode's match array
@@ -108,7 +113,6 @@ function fetchRank() {
 function updateStats(matchArr, mode){
     for (var i = 0; i < matchArr.length; i++){
         if (matchArr[i] !== modeArr[mode.num][i]){/*if new win or loss*/                          
-            casper.echo("\nAction: Fetching " + cfn + "'s " + mode.type + " stats...");
 
             /*Ádd to W/L counters*/
             if (matchArr[19].indexOf('on') !== -1)
@@ -117,17 +121,20 @@ function updateStats(matchArr, mode){
                 mode.losses++;
             
             /*Ignore first fetch*/
-            if (updateCount[mode.num] === 0 && (mode.wins === 0 && mode.losses === 1) || (mode.wins === 1 && mode.losses === 0)){
+            if (updateCount[mode.num] === 0 && ((mode.wins === 0 && mode.losses === 1) || (mode.wins === 1 && mode.losses === 0))){
                 mode.wins = 0;
                 mode.losses = 0;                  
                 updateCount[mode.num]++;
-            } else if (mode.losses > 0 || mode.wins > 0){
+            } else if ((mode.losses > 0) || (mode.wins > 0)){
+                casper.echo("\n" + dateTime);
                 mode.ratio = Math.floor((mode.wins / (mode.wins+mode.losses)) * 100) + "%";	
                 if (mode.type === "rank")
                     fetchRank();
             }               
             
             modeArr[mode.num] = matchArr.slice(); /*Updates the array*/
+            casper.echo("\nAction: Fetching " + cfn + "'s " + mode.type + " stats...");
+
             casper.echo("\n\tWins: " + mode.wins + "\t\t\tLosses: "+ mode.losses + "\t\tWin Ratio: " + mode.ratio);
 
             writeTxt(mode.type, mode.wins, mode.losses, mode.ratio);
@@ -135,7 +142,7 @@ function updateStats(matchArr, mode){
             if (writeAJSON === "true")
                 writeJSON(0);
             
-            updated = 1;                 
+            updated = 1;           
         }
          else {
              updated = 0;
@@ -149,7 +156,6 @@ function updateStats(matchArr, mode){
 function reload(){
     casper.wait(refreshInterval, function(){
         this.reload(function(){
-            this.echo("\nRefreshing...");       
             fetchStats();            
         });
     });
@@ -230,6 +236,7 @@ function writeJSON (clear){
  * Run for your life!
  */
 function run (){
+    casper.echo(dateTime);
     casper.start("https://game.capcom.com/cfn/sfv/gate/steam?rpnt=https://game.capcom.com/cfn/sfv/profile/" + cfn, function () {
         /*Start and agree to terms*/
         this.echo("Action: Accepting CFN Terms");
