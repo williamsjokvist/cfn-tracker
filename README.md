@@ -6,8 +6,8 @@ This is primarily targeted toward streamers who want automatically updated win/l
 
 ### Configuration and setting it up
 
-* Get [PhantomJS](https://phantomjs.org/download.html) and put the .exe in the master directory. 
-* Get [CasperJS](http://casperjs.org/), change the name of the folder inside the .zip file to "casperjs" and put it in the directory as well. It should now look like [this](showcase/folder-structure.jpg? "folder-structure").
+* Get [PhantomJS](https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.1.1-windows.zip) and put the .exe in the master directory. 
+* Get [CasperJS](https://github.com/casperjs/casperjs/archive/refs/tags/1.1.4-2.zip), change the name of the folder inside the .zip file to "casperjs" and put it in the directory as well. It should now look like [this](showcase/folder-structure.jpg? "folder-structure").
 * Set up a Steam account with Steam Guard **disabled** – this is because logging in is required to view CFN profiles. :unamused: 
   The password cannot contain a '%'.
 * In the _config.ini_ you will need to specify the Steam ID and Password for the account, as well as the target CFN account. Make sure there are no spaces after the =.
