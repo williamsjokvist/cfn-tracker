@@ -48,7 +48,7 @@ func init() {
 	err := godotenv.Load(".env")
 
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		log.Fatal("Error loading environment variables. Are you missing a .env file?")
 	}
 }
 
@@ -63,13 +63,13 @@ func login(profile string, page *rod.Page) chan int {
 	r := make(chan int)
 
 	go func() {
-		page.MustNavigate(`https://game.capcom.com/cfn/sfv/gate/steam?rpnt=` + profileURL).MustWaitLoad()
+		page.MustNavigate(`https://game.capcom.com/cfn/sfv/consent/steam`).MustWaitLoad()
 
 		fmt.Println("Accepting CFN terms")
+		wait := page.MustWaitLoad().MustWaitRequestIdle()
 		page.MustElement(`input[type="submit"]`).MustClick()
+		wait()
 		fmt.Println("Accepted CFN terms")
-
-		page.MustWaitLoad().MustWaitRequestIdle()
 
 		// If Steam opens (not already logged in)
 		page.WaitElementsMoreThan(`#loginForm`, 0)
@@ -86,15 +86,20 @@ func login(profile string, page *rod.Page) chan int {
 			passwordElement := page.MustElement(`#loginForm input[name="password"]`)
 			usernameElement.MustInput(os.Getenv("STEAM_USERNAME"))
 			passwordElement.MustInput(os.Getenv("STEAM_PASSWORD"))
+			wait := page.MustWaitLoad().MustWaitRequestIdle()
+
 			page.MustElement(`input#imageLogin`).Click(proto.InputMouseButtonLeft, 2)
-		} else {
-			page.MustNavigate(profileURL).MustWaitLoad()
+			fmt.Println("Clicked log in")
+			wait()
+		}
 
-			isNotLoggedIn, _, _ := page.Has(`.bg_account>.account>h3`)
+		fmt.Println("Awaiting profile load")
+		page.MustNavigate(profileURL).MustWaitLoad()
+		isNotLoggedIn, _, _ := page.Has(`.bg_account>.account>h3`)
 
-			if isNotLoggedIn {
-				failLogin()
-			}
+		if isNotLoggedIn {
+			failLogin()
+			r <- 0
 		}
 
 		page.MustWaitElementsMoreThan(`.leagueInfo>dl:last-child>dd`, 0)
@@ -102,6 +107,10 @@ func login(profile string, page *rod.Page) chan int {
 	}()
 
 	return r
+}
+
+func logMatchHistory() {
+	fmt.Println("["+time.Now().Format(`15:04`)+"] LP:", matchHistory.lp, "/ Gain:", matchHistory.lpGain, "/ Wins:", matchHistory.wins, "/ Losses:", matchHistory.losses, "/ Winrate:", matchHistory.winrate, `%`)
 }
 
 func refreshData(page *rod.Page) {
@@ -133,35 +142,28 @@ func refreshData(page *rod.Page) {
 		return
 	}
 
-	// First fetch
-	if matchHistory.lp == 0 {
-		matchHistory.totalWins = totalWins
-		matchHistory.totalLosses = totalLosses
-		matchHistory.totalMatches = totalMatches
-		matchHistory.lp = newLp
-		fmt.Println("["+time.Now().Format(`15:04`)+"] LP:", matchHistory.lp, "/ Gain:", matchHistory.lpGain, "/ Wins:", matchHistory.wins, "/ Losses:", matchHistory.losses, "/ Winrate:", matchHistory.winrate, "%")
+	isFirstFetch := matchHistory.lp == 0
+	hasNewMatch := totalMatches != matchHistory.totalMatches
 
+	// Return if no new data
+	if !(isFirstFetch || hasNewMatch) {
 		return
 	}
 
 	// Matches have been played since first fetch
-	if totalMatches != matchHistory.totalMatches {
-		matchHistory.wins = matchHistory.wins + int(math.Abs(float64(matchHistory.totalWins-totalWins)))
-		matchHistory.losses = matchHistory.losses + int(math.Abs(float64(matchHistory.totalLosses-totalLosses)))
+	if hasNewMatch && !isFirstFetch {
+		matchHistory.wins = matchHistory.wins + int(math.Abs(float64(matchHistory.totalWins)-float64(totalWins)))
+		matchHistory.losses = matchHistory.losses + int(math.Abs(float64(matchHistory.totalLosses)-float64(totalLosses)))
 		matchHistory.lpGain = matchHistory.lpGain + (newLp - matchHistory.lp)
-
-		matchHistory.totalWins = totalWins
-		matchHistory.totalLosses = totalLosses
-		matchHistory.totalMatches = totalMatches
-		matchHistory.lp = newLp
-
-		totalSessionMatches := matchHistory.wins + matchHistory.losses
-		fmt.Println("["+time.Now().Format(`15:04`)+"] LP:", matchHistory.lp, "/ Gain:", matchHistory.lpGain, "/ Wins:", matchHistory.wins, "/ Losses:", matchHistory.losses, "/ Winrate:", matchHistory.winrate, "%")
-
-		fmt.Println((matchHistory.wins / totalSessionMatches) * 100)
-		matchHistory.winrate = int((float32(matchHistory.wins) / float32(totalSessionMatches)) * 100)
-
+		matchHistory.winrate = int((float64(matchHistory.wins) / float64(matchHistory.wins+matchHistory.losses)) * 100)
 	}
+
+	matchHistory.totalWins = totalWins
+	matchHistory.totalLosses = totalLosses
+	matchHistory.totalMatches = totalMatches
+	matchHistory.lp = newLp
+
+	logMatchHistory()
 }
 
 func main() {
@@ -187,7 +189,7 @@ func main() {
 
 	profile = config.CFN
 
-	u := launcher.New().Leakless(false).Headless(false).MustLaunch()
+	u := launcher.New().Leakless(false).Headless(true).MustLaunch()
 	page := rod.New().ControlURL(u).MustConnect().MustPage("")
 	rut := page.HijackRequests()
 
@@ -216,7 +218,7 @@ func main() {
 
 	if <-isLoggedIn == 1 {
 		fmt.Println("Setup complete, now started tracking")
-		for c := time.Tick(10 * time.Second); ; {
+		for c := time.Tick(30 * time.Second); ; {
 			refreshData(page)
 			select {
 			case <-c:
