@@ -1,17 +1,16 @@
 # CFN Scraper
-This tool scrapes any CFN profile for its wins, losses, rank, LP as well as your Net LP.
+This tool tracks any CFN account for its ranked match wins, losses, rank, LP as well as LP gain (since the tracking started)
 
 ### Who is this for? 
 This is primarily targeted toward streamers who want automatically updated win/loss counters. It can also be useful if you wanna keep track of your LP gain during a session.
 
 ### Usage
 
-* Download the zip file from the Releases page and unzip it to an appropriate location
-* Set your CFN name in `config.toml` 
-* Add your CFN name to the file
+* Download the zip file from the Releases page for your operating system and unzip it to an appropriate location
+* Set your CFN name in `config.toml`
 * Launch the executable `scraper.exe`
 
-.txt files will be generated in a folder called "result". Use them as sources for your labels and they'll update after every match.
+Text files will be generated in a `results` folder. Use them as sources for your labels and they'll update after every match.
 
 ### Example
 

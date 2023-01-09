@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/BurntSushi/toml"
+	"github.com/briandowns/spinner"
 	"github.com/go-rod/rod"
 	"github.com/go-rod/rod/lib/launcher"
 	"github.com/go-rod/rod/lib/proto"
@@ -43,21 +44,22 @@ var matchHistory = MatchHistory{
 }
 
 var profile string
+var progressBar = spinner.New(spinner.CharSets[9], 100*time.Millisecond)
 
 func init() {
 	err := godotenv.Load(".env")
 
 	if err != nil {
-		log.Fatal("Error loading environment variables. Are you missing a .env file?")
+		LogError(`Error loading environment variables. Are you missing a .env file?`)
 	}
 }
 
-func failLogin() {
-	fmt.Println("Failed to log in  in to CFN")
-	os.Exit(1)
+func LogError(errorMessage string) {
+	progressBar.Stop()
+	log.Fatal(errorMessage)
 }
 
-func login(profile string, page *rod.Page) chan int {
+func Login(profile string, page *rod.Page) chan int {
 	profileURL := `https://game.capcom.com/cfn/sfv/profile/` + profile
 
 	r := make(chan int)
@@ -65,55 +67,65 @@ func login(profile string, page *rod.Page) chan int {
 	go func() {
 		page.MustNavigate(`https://game.capcom.com/cfn/sfv/consent/steam`).MustWaitLoad()
 
-		fmt.Println("Accepting CFN terms")
+		progressBar.Suffix = ` Accepting CFN terms`
 		wait := page.MustWaitLoad().MustWaitRequestIdle()
 		page.MustElement(`input[type="submit"]`).MustClick()
 		wait()
-		fmt.Println("Accepted CFN terms")
+		progressBar.Suffix = ` Terms accepted`
 
-		// If Steam opens (not already logged in)
-		page.WaitElementsMoreThan(`#loginForm`, 0)
+		// If CFN opens (already logged in)
+		if page.MustInfo().URL != `https://game.capcom.com/cfn/sfv/` {
+			page.WaitElementsMoreThan(`#loginForm`, 0)
+		}
 
 		isSteamOpen, _, _ := page.Has(`#loginForm`)
 
 		if isSteamOpen {
-			fmt.Println("Passing the gateway")
+			progressBar.Suffix = " Passing the gateway"
 			if page.MustInfo().URL == `https://game.capcom.com/cfn/sfv/` {
-				failLogin()
+				LogError(LoginError.message)
 			}
 
 			usernameElement := page.MustElement(`#loginForm input[name="username"]`)
 			passwordElement := page.MustElement(`#loginForm input[name="password"]`)
 			usernameElement.MustInput(os.Getenv("STEAM_USERNAME"))
 			passwordElement.MustInput(os.Getenv("STEAM_PASSWORD"))
-			wait := page.MustWaitLoad().MustWaitRequestIdle()
 
 			page.MustElement(`input#imageLogin`).Click(proto.InputMouseButtonLeft, 2)
-			fmt.Println("Clicked log in")
-			wait()
+			for {
+				if page.MustInfo().URL == `https://game.capcom.com/cfn/sfv/` {
+					progressBar.Suffix = " Gateway passed"
+					break
+				}
+				time.Sleep(time.Second)
+			}
 		}
 
-		fmt.Println("Awaiting profile load")
+		progressBar.Suffix = " Loading profile"
 		page.MustNavigate(profileURL).MustWaitLoad()
 		isNotLoggedIn, _, _ := page.Has(`.bg_account>.account>h3`)
+		hasData, _, _ := page.Has(`.leagueInfo>dl:last-child>dd`)
 
 		if isNotLoggedIn {
-			failLogin()
+			LogError(LoginError.message)
+		}
+
+		if !hasData {
+			LogError(ProfileError.message)
 			r <- 0
 		}
 
-		page.MustWaitElementsMoreThan(`.leagueInfo>dl:last-child>dd`, 0)
 		r <- 1
 	}()
 
 	return r
 }
 
-func logMatchHistory() {
+func LogMatchHistory() {
 	fmt.Println("["+time.Now().Format(`15:04`)+"] LP:", matchHistory.lp, "/ Gain:", matchHistory.lpGain, "/ Wins:", matchHistory.wins, "/ Losses:", matchHistory.losses, "/ Winrate:", matchHistory.winrate, `%`)
 }
 
-func refreshData(page *rod.Page) {
+func RefreshData(page *rod.Page) {
 	if page.MustInfo().URL != `https://game.capcom.com/cfn/sfv/profile/`+profile {
 		return
 	}
@@ -127,7 +139,7 @@ func refreshData(page *rod.Page) {
 	lpEl, e := page.Element(`.leagueInfo>dl:last-child>dd`)
 
 	if e != nil {
-		fmt.Println("Error parsing CFN profile", e)
+		LogError(ParseError.message)
 		return
 	}
 
@@ -138,7 +150,7 @@ func refreshData(page *rod.Page) {
 	totalMatches, e := strconv.Atoi(totalMatchesEl.MustText())
 
 	if e != nil {
-		fmt.Println("Error parsing CFN profile", e)
+		LogError(ParseError.message)
 		return
 	}
 
@@ -163,10 +175,15 @@ func refreshData(page *rod.Page) {
 	matchHistory.totalMatches = totalMatches
 	matchHistory.lp = newLp
 
-	logMatchHistory()
+	SaveMatchHistory(matchHistory)
+	LogMatchHistory()
 }
 
 func main() {
+	progressBar.Start()
+	progressBar.HideCursor = true
+	progressBar.Color(`yellow`)
+
 	f := "config.toml"
 	if _, err := os.Stat(f); err != nil {
 		f = "config.toml"
@@ -182,8 +199,7 @@ func main() {
 	}
 
 	if config.CFN == "" {
-		fmt.Fprintln(os.Stderr, "CFN profile not set")
-		os.Exit(1)
+		LogError(`CFN profile not set`)
 		return
 	}
 
@@ -203,23 +219,24 @@ func main() {
 		}
 
 		// Only check for scripts on non-steam requests
-		/*
-			if !strings.Contains(ctx.Request.URL().Hostname(), `steam`) &&
-				ctx.Request.Type() == proto.NetworkResourceTypeScript {
-				ctx.Response.Fail(proto.NetworkErrorReasonBlockedByClient)
-				return
-			}*/
+		if !strings.Contains(ctx.Request.URL().Hostname(), `steam`) &&
+			ctx.Request.Type() == proto.NetworkResourceTypeScript {
+			ctx.Response.Fail(proto.NetworkErrorReasonBlockedByClient)
+			return
+		}
 
 		ctx.ContinueRequest(&proto.FetchContinueRequest{})
 	})
 
 	go rut.Run()
-	isLoggedIn := login(profile, page)
+	isLoggedIn := Login(profile, page)
 
 	if <-isLoggedIn == 1 {
-		fmt.Println("Setup complete, now started tracking")
+		progressBar.FinalMSG = `Started tracking ` + profile + "\n"
+		time.Sleep(3 * time.Second)
+		progressBar.Stop()
 		for c := time.Tick(30 * time.Second); ; {
-			refreshData(page)
+			RefreshData(page)
 			select {
 			case <-c:
 				continue
@@ -227,10 +244,5 @@ func main() {
 		}
 	}
 
-	// time.Sleep(121 * time.Second)
-	//ticker.Stop()
-	// done <- true
-	// fmt.Println("Ticker stopped")
-
-	// defer page.MustClose()
+	defer page.Browser().Close()
 }
