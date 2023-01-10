@@ -6,7 +6,7 @@ require github.com/go-rod/rod v0.112.2
 
 require github.com/BurntSushi/toml v1.2.1
 
-require github.com/joho/godotenv v1.4.0 // indirect
+require github.com/joho/godotenv v1.4.0
 
 require (
 	github.com/briandowns/spinner v1.20.0

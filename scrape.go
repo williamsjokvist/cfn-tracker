@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"math"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -40,7 +41,6 @@ func LogMatchHistory() {
 
 func Login(profile string, page *rod.Page, steamUsername string, steamPassword string) chan int {
 	profileURL := `https://game.capcom.com/cfn/sfv/profile/` + profile
-
 	r := make(chan int)
 
 	go func() {
@@ -60,24 +60,30 @@ func Login(profile string, page *rod.Page, steamUsername string, steamPassword s
 		isSteamOpen, _, _ := page.Has(`#loginForm`)
 
 		if isSteamOpen {
-			progressBar.Suffix = " Passing the gateway"
+			progressBar.Suffix = ` Passing the gateway`
 			if page.MustInfo().URL == `https://game.capcom.com/cfn/sfv/` {
 				r <- LoginError.returnCode
 			}
 
-			usernameElement := page.MustElement(`#loginForm input[name="username"]`)
-			passwordElement := page.MustElement(`#loginForm input[name="password"]`)
-			usernameElement.MustInput(steamUsername)
-			passwordElement.MustInput(steamPassword)
+			usernameElement, e := page.Element(`#loginForm input[name="username"]`)
+			passwordElement, e := page.Element(`#loginForm input[name="password"]`)
+			buttonElement, e := page.Element(`input#imageLogin`)
 
-			page.MustElement(`input#imageLogin`).Click(proto.InputMouseButtonLeft, 2)
+			if e != nil {
+				r <- LoginError.returnCode
+			}
 
+			usernameElement.Input(steamUsername)
+			passwordElement.Input(steamPassword)
+			buttonElement.Click(proto.InputMouseButtonLeft, 2)
+			errorElement := page.MustElement(`#error_display`)
+
+			var secondsWaited time.Duration = 0
 			for {
 				if page.MustInfo().URL == `https://game.capcom.com/cfn/sfv/` {
-					progressBar.Suffix = " Gateway passed"
+					progressBar.Suffix = ` Gateway passed`
 					break
 				}
-				errorElement := page.MustElement(`#error_display`)
 				errorText, e := errorElement.Text()
 
 				if e != nil || len(errorText) > 0 {
@@ -85,6 +91,8 @@ func Login(profile string, page *rod.Page, steamUsername string, steamPassword s
 				}
 
 				time.Sleep(time.Second)
+				secondsWaited += time.Second
+				progressBar.Suffix = ` Passing the gateway (` + strconv.Itoa(int(secondsWaited.Seconds())) + `s)` + errorText
 			}
 		}
 
@@ -158,7 +166,7 @@ func RefreshData(profile string, page *rod.Page) {
 }
 
 func SetupBrowser() (*rod.Page, *rod.HijackRouter) {
-	u := launcher.New().Leakless(true).Headless(true).MustLaunch()
+	u := launcher.New().Leakless(true).Headless(false).MustLaunch()
 	page := rod.New().ControlURL(u).MustConnect().MustPage("")
 	router := page.HijackRequests()
 
@@ -187,6 +195,13 @@ func SetupBrowser() (*rod.Page, *rod.HijackRouter) {
 
 func StartTracking(profile string) {
 	page, router := SetupBrowser()
+	user := os.Getenv(`STEAM_USERNAME`)
+	pass := os.Getenv(`STEAM_PASSWORD`)
+
+	if user != `` && pass != `` {
+		steamUsername = user
+		steamPassword = pass
+	}
 
 	loginStatus := Login(profile, page, steamUsername, steamPassword)
 

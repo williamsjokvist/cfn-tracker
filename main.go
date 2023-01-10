@@ -31,20 +31,8 @@ func IsDevRun() bool {
 }
 
 func init() {
-	user, steamUserSet := os.LookupEnv(`STEAM_USERNAME`)
-	pass, steamPassSet := os.LookupEnv(`STEAM_PASSWORD`)
-
-	if steamUserSet && steamPassSet {
-		steamUsername = user
-		steamPassword = pass
-	}
-
-	if IsDevRun() {
-		err := godotenv.Load(".env")
-
-		if err != nil {
-			LogError(MissingEnvError)
-		}
+	if !IsBuildRun() && !IsTestRun() {
+		godotenv.Load(`.env`)
 	}
 }
 
