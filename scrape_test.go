@@ -10,7 +10,7 @@ import (
 func TestLogin(t *testing.T) {
 	assert := assert.New(t)
 
-	page := SetupBrowser()
+	page, _ := SetupBrowser()
 
 	// With false login information
 	//isLoggedIn := Login(`GreenSoap`, page, `1234234`, `12341234`)

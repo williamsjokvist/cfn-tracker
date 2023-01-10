@@ -72,18 +72,18 @@ func Login(profile string, page *rod.Page, steamUsername string, steamPassword s
 			passwordElement.MustInput(steamPassword)
 
 			page.MustElement(`input#imageLogin`).Click(proto.InputMouseButtonLeft, 2)
-			errorElement := page.MustElement(`#error_display`)
+			//errorElement := page.MustElement(`#error_display`)
 
 			for {
 				if page.MustInfo().URL == `https://game.capcom.com/cfn/sfv/` {
 					progressBar.Suffix = " Gateway passed"
 					break
 				}
-				errorText, e := errorElement.Text()
+				/*errorText, e := errorElement.Text()
 
 				if e != nil || len(errorText) > 0 {
 					r <- CaptchaError.returnCode
-				}
+				}*/
 
 				time.Sleep(time.Second)
 			}
@@ -158,13 +158,13 @@ func RefreshData(profile string, page *rod.Page) {
 	LogMatchHistory()
 }
 
-func SetupBrowser() *rod.Page {
-	u := launcher.New().Leakless(false).Headless(true).MustLaunch()
+func SetupBrowser() (*rod.Page, *rod.HijackRouter) {
+	u := launcher.New().Leakless(true).Headless(true).MustLaunch()
 	page := rod.New().ControlURL(u).MustConnect().MustPage("")
-	rut := page.HijackRequests()
+	router := page.HijackRequests()
 
 	// Block all images, stylesheets, fonts and unessential scripts
-	rut.MustAdd("*", func(ctx *rod.Hijack) {
+	router.MustAdd("*", func(ctx *rod.Hijack) {
 		if ctx.Request.Type() == proto.NetworkResourceTypeImage ||
 			ctx.Request.Type() == proto.NetworkResourceTypeStylesheet ||
 			ctx.Request.Type() == proto.NetworkResourceTypeFont {
@@ -182,13 +182,12 @@ func SetupBrowser() *rod.Page {
 		ctx.ContinueRequest(&proto.FetchContinueRequest{})
 	})
 
-	go rut.Run()
-
-	return page
+	go router.Run()
+	return page, router
 }
 
 func StartTracking(profile string) {
-	page := SetupBrowser()
+	page, router := SetupBrowser()
 	loginStatus := Login(profile, page, os.Getenv(`STEAM_USERNAME`), os.Getenv(`STEAM_PASSWORD`))
 
 	if <-loginStatus == 1 {
@@ -210,5 +209,6 @@ func StartTracking(profile string) {
 		LogError(CaptchaError)
 	}
 
-	defer page.Browser().Close()
+	router.Stop()
+	page.Browser().Close()
 }
