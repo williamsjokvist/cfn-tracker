@@ -15,20 +15,41 @@ type Config struct {
 }
 
 var progressBar = spinner.New(spinner.CharSets[9], 100*time.Millisecond)
+var steamUsername string
+var steamPassword string
+
+func IsTestRun() bool {
+	return os.Getenv(`EXECUTION_ENVIRONMENT`) == `test`
+}
+
+func IsBuildRun() bool {
+	return os.Getenv(`EXECUTION_ENVIRONMENT`) == `build`
+}
+
+func IsDevRun() bool {
+	return os.Getenv(`EXECUTION_ENVIRONMENT`) == `dev`
+}
 
 func init() {
-	if os.Getenv(`TESTING`) == `true` {
-		return
+	user, steamUserSet := os.LookupEnv(`STEAM_USERNAME`)
+	pass, steamPassSet := os.LookupEnv(`STEAM_PASSWORD`)
+
+	if steamUserSet && steamPassSet {
+		steamUsername = user
+		steamPassword = pass
 	}
 
-	err := godotenv.Load(".env")
+	if IsDevRun() {
+		err := godotenv.Load(".env")
 
-	if err != nil {
-		LogError(MissingEnvError)
+		if err != nil {
+			LogError(MissingEnvError)
+		}
 	}
 }
 
 func main() {
+	fmt.Println(`CFN Scraper v2 by @greensoap_`)
 	f := `cfn-scraper-config.toml`
 	if _, err := os.Stat(f); err != nil {
 		f = `cfn-scraper-config.toml`

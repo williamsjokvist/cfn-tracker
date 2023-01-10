@@ -11,8 +11,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-go@v3
-      - uses: n8maninger/action-golang-test@v1
+      - run: go test
         env:
           STEAM_USERNAME: ${{ secrets.STEAM_USERNAME }} 
           STEAM_PASSWORD: ${{ secrets.STEAM_PASSWORD }} 
-          TESTING: 'true'
+          EXECUTION_ENVIRONMENT: 'test'

@@ -25,3 +25,7 @@ go.work
 results
 
 cfn-scraper-config.toml
+cfnscraper.exe
+cfnscraper.sh
+
+.DS_Store

@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"math"
-	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -72,24 +71,24 @@ func Login(profile string, page *rod.Page, steamUsername string, steamPassword s
 			passwordElement.MustInput(steamPassword)
 
 			page.MustElement(`input#imageLogin`).Click(proto.InputMouseButtonLeft, 2)
-			//errorElement := page.MustElement(`#error_display`)
 
 			for {
 				if page.MustInfo().URL == `https://game.capcom.com/cfn/sfv/` {
 					progressBar.Suffix = " Gateway passed"
 					break
 				}
-				/*errorText, e := errorElement.Text()
+				errorElement := page.MustElement(`#error_display`)
+				errorText, e := errorElement.Text()
 
 				if e != nil || len(errorText) > 0 {
 					r <- CaptchaError.returnCode
-				}*/
+				}
 
 				time.Sleep(time.Second)
 			}
 		}
 
-		progressBar.Suffix = ` Loading profile`
+		progressBar.Suffix = ` Loading profile ` + profile
 		page.MustNavigate(profileURL).MustWaitLoad()
 		isNotLoggedIn, _, _ := page.Has(`.bg_account>.account>h3`)
 		hasData, _, _ := page.Has(`.leagueInfo>dl:last-child>dd`)
@@ -188,7 +187,8 @@ func SetupBrowser() (*rod.Page, *rod.HijackRouter) {
 
 func StartTracking(profile string) {
 	page, router := SetupBrowser()
-	loginStatus := Login(profile, page, os.Getenv(`STEAM_USERNAME`), os.Getenv(`STEAM_PASSWORD`))
+
+	loginStatus := Login(profile, page, steamUsername, steamPassword)
 
 	if <-loginStatus == 1 {
 		progressBar.FinalMSG = `Started tracking ` + profile + "\n"

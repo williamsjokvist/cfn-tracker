@@ -6,8 +6,10 @@ require github.com/go-rod/rod v0.112.2
 
 require github.com/BurntSushi/toml v1.2.1
 
+require github.com/joho/godotenv v1.4.0 // indirect
+
 require (
-	github.com/briandowns/spinner v1.20.0 // indirect
+	github.com/briandowns/spinner v1.20.0
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/fatih/color v1.7.0 // indirect
 	github.com/mattn/go-colorable v0.1.2 // indirect
@@ -19,7 +21,6 @@ require (
 )
 
 require (
-	github.com/joho/godotenv v1.4.0
 	github.com/stretchr/testify v1.8.1
 	github.com/ysmood/goob v0.4.0 // indirect
 	github.com/ysmood/gson v0.7.3 // indirect
