@@ -16,4 +16,5 @@ func TestLogin(t *testing.T) {
 	if !(<-loginStatus == 1 || <-loginStatus == -3) {
 		assert.True(false, <-loginStatus)
 	}
+	page.Browser().Close()
 }
