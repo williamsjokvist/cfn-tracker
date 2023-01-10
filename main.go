@@ -17,6 +17,10 @@ type Config struct {
 var progressBar = spinner.New(spinner.CharSets[9], 100*time.Millisecond)
 
 func init() {
+	if os.Getenv(`TESTING`) == `true` {
+		return
+	}
+
 	err := godotenv.Load(".env")
 
 	if err != nil {
