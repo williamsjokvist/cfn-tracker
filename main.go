@@ -26,30 +26,37 @@ func init() {
 }
 
 func main() {
-	progressBar.Start()
-	progressBar.HideCursor = true
-	progressBar.Color(`yellow`)
-
-	f := `config.toml`
+	f := `cfn-scraper-config.toml`
 	if _, err := os.Stat(f); err != nil {
-		f = `config.toml`
+		f = `cfn-scraper-config.toml`
 	}
 
 	var config Config
 
 	_, err := toml.DecodeFile(f, &config)
+
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
-		return
+		fmt.Println(`No CFN account configured, please input a valid CFN account to track. You can change it later in the config file.`)
+		var inputText string
+
+		_, err := fmt.Scanln(&inputText)
+
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+			return
+		}
+
+		profile = inputText
+
+		SaveTextToFile(``, `cfn-scraper-config.toml`, `CFN = "`+profile+`"`)
+	} else {
+		profile = config.CFN
 	}
 
-	if config.CFN == "" {
-		LogError(`CFN profile not set`)
-		return
-	}
-
-	profile = config.CFN
+	progressBar.Start()
+	progressBar.HideCursor = true
+	progressBar.Color(`yellow`)
 
 	StartTracking(profile)
 }

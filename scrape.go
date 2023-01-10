@@ -165,7 +165,7 @@ func RefreshData(page *rod.Page) {
 }
 
 func SetupBrowser() *rod.Page {
-	u := launcher.New().Leakless(false).Headless(false).MustLaunch()
+	u := launcher.New().Leakless(false).Headless(true).MustLaunch()
 	page := rod.New().ControlURL(u).MustConnect().MustPage("")
 	rut := page.HijackRequests()
 
