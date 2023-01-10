@@ -10,7 +10,6 @@ func SaveMatchHistory(matchHistory MatchHistory) {
 	SaveTextToFile(`results`, `losses.txt`, strconv.Itoa(matchHistory.losses))
 	SaveTextToFile(`results`, `lp-gain.txt`, strconv.Itoa(matchHistory.lpGain))
 	SaveTextToFile(`results`, `lp.txt`, strconv.Itoa(matchHistory.lp))
-
 }
 
 func SaveTextToFile(directory string, fileName string, text string) {
@@ -29,6 +28,6 @@ func SaveTextToFile(directory string, fileName string, text string) {
 	_, err = file.WriteString(text)
 
 	if err != nil {
-		LogError(SaveErrror.message)
+		LogError(SaveError)
 	}
 }

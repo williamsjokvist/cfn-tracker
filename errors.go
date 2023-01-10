@@ -1,5 +1,14 @@
 package main
 
+import (
+	"log"
+)
+
+func LogError(err AppError) {
+	progressBar.Stop()
+	log.Fatal(err.message)
+}
+
 type AppError struct {
 	message    string
 	returnCode int
@@ -25,7 +34,12 @@ var ParseError = AppError{
 	returnCode: -4,
 }
 
-var SaveErrror = AppError{
+var SaveError = AppError{
 	message:    `Could not save data`,
 	returnCode: -5,
+}
+
+var MissingEnvError = AppError{
+	message:    `Error loading environment variables from .env file`,
+	returnCode: -6,
 }

@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"math"
 	"os"
 	"strconv"
@@ -34,11 +33,6 @@ var matchHistory = MatchHistory{
 	totalLosses:  0,
 	totalMatches: 0,
 	winrate:      0,
-}
-
-func LogError(errorMessage string) {
-	progressBar.Stop()
-	log.Fatal(errorMessage)
 }
 
 func LogMatchHistory() {
@@ -124,7 +118,7 @@ func RefreshData(profile string, page *rod.Page) {
 	lpEl, e := page.Element(`.leagueInfo>dl:last-child>dd`)
 
 	if e != nil {
-		LogError(ParseError.message)
+		LogError(ParseError)
 		return
 	}
 
@@ -135,7 +129,7 @@ func RefreshData(profile string, page *rod.Page) {
 	totalMatches, e := strconv.Atoi(totalMatchesEl.MustText())
 
 	if e != nil {
-		LogError(ParseError.message)
+		LogError(ParseError)
 		return
 	}
 
@@ -209,11 +203,11 @@ func StartTracking(profile string) {
 			}
 		}
 	} else if <-loginStatus == LoginError.returnCode {
-		LogError(LoginError.message)
+		LogError(LoginError)
 	} else if <-loginStatus == ProfileError.returnCode {
-		LogError(ProfileError.message)
+		LogError(ProfileError)
 	} else if <-loginStatus == CaptchaError.returnCode {
-		LogError(CaptchaError.message)
+		LogError(CaptchaError)
 	}
 
 	defer page.Browser().Close()

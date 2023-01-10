@@ -24,7 +24,7 @@ func init() {
 	err := godotenv.Load(".env")
 
 	if err != nil {
-		LogError(`Error loading environment variables. Are you missing a .env file?`)
+		LogError(MissingEnvError)
 	}
 }
 
