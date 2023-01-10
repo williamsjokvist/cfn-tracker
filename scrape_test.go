@@ -22,5 +22,5 @@ func TestLogin(t *testing.T) {
 
 	// With correct info
 	isLoggedIn := Login(`GreenSoap`, page, os.Getenv(`STEAM_USERNAME`), os.Getenv(`STEAM_PASSWORD`))
-	assert.Equal(<-isLoggedIn, <-isLoggedIn)
+	assert.Equal(1, <-isLoggedIn)
 }
