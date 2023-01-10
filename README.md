@@ -15,8 +15,3 @@ Text files will be generated in a `results` folder after every match is played. 
 ### Example
 
 ![stream](showcase/streamexample2.gif?raw=true "streamshowcase")
-
-### Result
-
-This is how the batch file will display the data:
-![screenshot](showcase/screenie.gif?raw=true "screenshot")
