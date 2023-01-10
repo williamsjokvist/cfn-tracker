@@ -1,20 +1,17 @@
 name: CFNScraper Pipeline
-env:
-
 on:
-  push:
-    branches: [ "master" ]
   pull_request:
-    branches: [ "master" ]
+    branches: [ master ]
+  push:
+    branches: [ master ]
 
 jobs:
-
-  build:
+  test:
     runs-on: ubuntu-latest
-  steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-go@v3
-    - uses: n8maninger/action-golang-test@v1
-      env:
-        STEAM_USERNAME: ${{ secrets.STEAM_USERNAME }} 
-        STEAM_PASSWORD: ${{ secrets.STEAM_PASSWORD }} 
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
+      - uses: n8maninger/action-golang-test@v1
+        env:
+          STEAM_USERNAME: ${{ secrets.STEAM_USERNAME }} 
+          STEAM_PASSWORD: ${{ secrets.STEAM_PASSWORD }} 
