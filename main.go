@@ -14,7 +14,6 @@ type Config struct {
 	CFN string
 }
 
-var profile string
 var progressBar = spinner.New(spinner.CharSets[9], 100*time.Millisecond)
 
 func init() {
@@ -32,6 +31,7 @@ func main() {
 	}
 
 	var config Config
+	var profile string
 
 	_, err := toml.DecodeFile(f, &config)
 

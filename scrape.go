@@ -110,7 +110,7 @@ func Login(profile string, page *rod.Page, steamUsername string, steamPassword s
 	return r
 }
 
-func RefreshData(page *rod.Page) {
+func RefreshData(profile string, page *rod.Page) {
 	if page.MustInfo().URL != `https://game.capcom.com/cfn/sfv/profile/`+profile {
 		return
 	}
@@ -202,7 +202,7 @@ func StartTracking(profile string) {
 		time.Sleep(3 * time.Second)
 		progressBar.Stop()
 		for c := time.Tick(30 * time.Second); ; {
-			RefreshData(page)
+			RefreshData(profile, page)
 			select {
 			case <-c:
 				continue
