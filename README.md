@@ -7,10 +7,10 @@ This is primarily targeted toward streamers who want automatically updated win/l
 ### Usage
 
 * Download the executable for your operating system from the Releases page
-* On first launch the program will ask for the CFN to track, and is saved to `cfn-scraper-config.toml` in the same location. It can be edited later.
-* Launch the executable `scraper.exe`
+* Launch the executable
+* On first launch the program will prompt for a CFN to track; this is then saved to `cfn-scraper-config.toml` in the same location. It can be edited later.
 
-Text files will be generated in a `results` folder. Use them as sources for your labels and they'll update after every match.
+Text files will be generated in a `results` folder after every match is played. Use them as sources for your labels and they'll update after every match.
 
 ### Example
 
