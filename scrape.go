@@ -103,9 +103,9 @@ func Login(profile string, page *rod.Page, steamUsername string, steamPassword s
 
 		if !hasData || isNotLoggedIn {
 			r <- LoginError.returnCode
+		} else {
+			r <- 1
 		}
-
-		r <- 1
 	}()
 
 	return r
@@ -166,7 +166,7 @@ func RefreshData(profile string, page *rod.Page) {
 }
 
 func SetupBrowser() (*rod.Page, *rod.HijackRouter) {
-	u := launcher.New().Leakless(true).Headless(true).MustLaunch()
+	u := launcher.New().Leakless(true).Headless(false).MustLaunch()
 	page := rod.New().ControlURL(u).MustConnect().MustPage("")
 	router := page.HijackRequests()
 
