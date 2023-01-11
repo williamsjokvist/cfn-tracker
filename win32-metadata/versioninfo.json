@@ -38,6 +38,6 @@
           "CharsetID": "04B0"
       }
   },
-  "IconPath": "",
-  "ManifestPath": ""
+  "IconPath": "./images/icon.ico",
+  "ManifestPath": "./win32-metadata/cfntracker.exe.manifest"
 }

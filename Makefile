@@ -2,8 +2,9 @@
 
 # Requirements
 # go
-# upx
+# mac/linux: upx
 # you can install these with e.g: scoop (windows), brew (mac) or your linux pkg manager
+# windows: go install github.com/josephspurrier/goversioninfo/cmd/goversioninfo@latest
 # .env file following example.env
 
 ifneq (,$(wildcard ./.env))
@@ -25,5 +26,5 @@ macos:
 
 # Build for windows
 windows:
-	go generate
-	go build -ldflags="-s -w ${LDFLAGS}" -o cfntracker.exe
+	goversioninfo win32-metadata/versioninfo.json
+	env GOOS=windows GOARCH=amd64 go build -ldflags="-s -w ${LDFLAGS}" -o cfntracker.exe
