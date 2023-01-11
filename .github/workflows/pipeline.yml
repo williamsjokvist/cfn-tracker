@@ -16,3 +16,4 @@ jobs:
           STEAM_USERNAME: ${{ secrets.STEAM_USERNAME }} 
           STEAM_PASSWORD: ${{ secrets.STEAM_PASSWORD }} 
           EXECUTION_ENVIRONMENT: 'test'
+          GITHUB_TEST: 'true'

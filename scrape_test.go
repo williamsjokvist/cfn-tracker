@@ -12,5 +12,11 @@ func TestLogin(t *testing.T) {
 	page, _ := SetupBrowser()
 
 	loginStatus := Login(`GreenSoap`, page, os.Getenv(`STEAM_USERNAME`), os.Getenv(`STEAM_PASSWORD`))
-	assert.Equal(1, <-loginStatus)
+
+	// Expect to run into CAPTCHA on github
+	if os.Getenv(`GITHUB_TEST`) == `true` {
+		assert.Equal(-3, <-loginStatus)
+	} else {
+		assert.Equal(1, <-loginStatus)
+	}
 }
