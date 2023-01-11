@@ -44,7 +44,7 @@ func Login(profile string, page *rod.Page, steamUsername string, steamPassword s
 	r := make(chan int)
 
 	go func() {
-		page.MustNavigate(`https://game.capcom.com/cfn/sfv/consent/steam`).MustWaitLoad()
+		page.MustNavigate(`https://game.capcom.com/cfn/sfv/gate/steam?rpnt=`+profileURL).MustWaitLoad()
 
 		progressBar.Suffix = ` Accepting CFN terms`
 		wait := page.MustWaitLoad().MustWaitRequestIdle()
@@ -52,8 +52,9 @@ func Login(profile string, page *rod.Page, steamUsername string, steamPassword s
 		wait()
 		progressBar.Suffix = ` Terms accepted`
 
-		// If CFN opens (already logged in)
-		if page.MustInfo().URL != `https://game.capcom.com/cfn/sfv/` {
+		// If Steam opens (not already logged in)
+		url := page.MustInfo().URL
+		if url != `https://game.capcom.com/cfn/sfv/` || url != profileURL  {
 			page.WaitElementsMoreThan(`#loginForm`, 0)
 		}
 
@@ -169,7 +170,7 @@ func RefreshData(profile string, page *rod.Page) {
 }
 
 func SetupBrowser() (*rod.Page, *rod.HijackRouter) {
-	u := launcher.New().Leakless(false).Headless(true).MustLaunch()
+	u := launcher.New().Leakless(false).Headless(false).MustLaunch()
 	page := rod.New().ControlURL(u).MustConnect().MustPage("")
 	router := page.HijackRequests()
 
