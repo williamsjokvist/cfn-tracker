@@ -39,10 +39,10 @@ func init() {
 }
 
 func main() {
-	fmt.Println(`CFN Scraper v2 by @greensoap_`)
-	f := `cfn-scraper-config.toml`
+	fmt.Println(`CFN Tracker v2 by @greensoap_`)
+	f := `cfn-tracker-config.toml`
 	if _, err := os.Stat(f); err != nil {
-		f = `cfn-scraper-config.toml`
+		f = `cfn-tracker-config.toml`
 	}
 
 	var config Config
@@ -64,7 +64,7 @@ func main() {
 
 		profile = inputText
 
-		SaveTextToFile(``, `cfn-scraper-config.toml`, `CFN = "`+profile+`"`)
+		SaveTextToFile(``, `cfn-tracker-config.toml`, `CFN = "`+profile+`"`)
 	} else {
 		profile = config.CFN
 	}
