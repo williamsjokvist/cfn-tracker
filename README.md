@@ -1,4 +1,4 @@
-<img src="images/logo.png" height="100px" align="right"/>
+<img src="images/logo.png" height="150px" align="right"/>
 
 # CFN Scraper
 This tool tracks any CFN account for its ranked match wins, losses, rank, LP as well as LP gain (since the tracking started)
