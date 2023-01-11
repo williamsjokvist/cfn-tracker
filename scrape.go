@@ -96,6 +96,8 @@ func Login(profile string, page *rod.Page, steamUsername string, steamPassword s
 			}
 		}
 
+		page.MustWaitLoad()
+
 		progressBar.Suffix = ` Loading profile ` + profile
 		page.MustNavigate(profileURL).MustWaitLoad()
 		isNotLoggedIn, _, _ := page.Has(`.bg_account>.account>h3`)
@@ -103,9 +105,10 @@ func Login(profile string, page *rod.Page, steamUsername string, steamPassword s
 
 		if !hasData || isNotLoggedIn {
 			r <- LoginError.returnCode
-		} else {
-			r <- 1
-		}
+			return
+		} 
+
+		r <- 1
 	}()
 
 	return r
@@ -195,6 +198,9 @@ func SetupBrowser() (*rod.Page, *rod.HijackRouter) {
 
 func StartTracking(profile string) {
 	page, router := SetupBrowser()
+	defer router.Stop()
+	defer page.Browser().Close()
+
 	user := os.Getenv(`STEAM_USERNAME`)
 	pass := os.Getenv(`STEAM_PASSWORD`)
 
@@ -223,7 +229,4 @@ func StartTracking(profile string) {
 	} else if <-loginStatus == CaptchaError.returnCode {
 		LogError(CaptchaError)
 	}
-
-	router.Stop()
-	page.Browser().Close()
 }
