@@ -44,17 +44,17 @@ func Login(profile string, page *rod.Page, steamUsername string, steamPassword s
 	r := make(chan int)
 
 	go func() {
-		page.MustNavigate(`https://game.capcom.com/cfn/sfv/gate/steam?rpnt=`+profileURL).MustWaitLoad()
+		page.MustNavigate(`https://game.capcom.com/cfn/sfv/consent/steam`).MustWaitLoad()
 
 		progressBar.Suffix = ` Accepting CFN terms`
 		wait := page.MustWaitLoad().MustWaitRequestIdle()
 		page.MustElement(`input[type="submit"]`).MustClick()
 		wait()
-		progressBar.Suffix = ` Terms accepted`
+		progressBar.Suffix = ` Accepted CFN terms  `
 
-		// If Steam opens (not already logged in)
+		// If CFN already opened
 		url := page.MustInfo().URL
-		if url != `https://game.capcom.com/cfn/sfv/` || url != profileURL  {
+		if url != `https://game.capcom.com/cfn/sfv/` {
 			page.WaitElementsMoreThan(`#loginForm`, 0)
 		}
 
@@ -97,17 +97,15 @@ func Login(profile string, page *rod.Page, steamUsername string, steamPassword s
 			}
 		}
 
-		page.MustWaitLoad()
-
 		progressBar.Suffix = ` Loading profile ` + profile
 		page.MustNavigate(profileURL).MustWaitLoad()
-		isNotLoggedIn, _, _ := page.Has(`.bg_account>.account>h3`)
-		hasData, _, _ := page.Has(`.leagueInfo>dl:last-child>dd`)
+		progressBar.Suffix = ` Loaded profile ` + profile
 
-		if !hasData || isNotLoggedIn {
+		isNotLoggedIn, _, _ := page.Has(`.bg_account>.account>h3`)
+
+		if isNotLoggedIn {
 			r <- LoginError.returnCode
-			return
-		} 
+		}
 
 		r <- 1
 	}()
@@ -199,8 +197,6 @@ func SetupBrowser() (*rod.Page, *rod.HijackRouter) {
 
 func StartTracking(profile string) {
 	page, router := SetupBrowser()
-	defer router.Stop()
-	defer page.Browser().Close()
 
 	user := os.Getenv(`STEAM_USERNAME`)
 	pass := os.Getenv(`STEAM_PASSWORD`)
@@ -229,5 +225,12 @@ func StartTracking(profile string) {
 		LogError(ProfileError)
 	} else if <-loginStatus == CaptchaError.returnCode {
 		LogError(CaptchaError)
+	} else {
+		progressBar.FinalMSG = `Failed to track ` + profile + "\n"
+		time.Sleep(3 * time.Second)
+		progressBar.Stop()
 	}
+
+	router.Stop()
+	page.Browser().Close()
 }
