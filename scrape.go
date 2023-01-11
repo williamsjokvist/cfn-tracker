@@ -105,9 +105,9 @@ func Login(profile string, page *rod.Page, steamUsername string, steamPassword s
 
 		if isNotLoggedIn {
 			r <- LoginError.returnCode
+		} else {
+			r <- 1
 		}
-
-		r <- 1
 	}()
 
 	return r

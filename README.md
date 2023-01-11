@@ -1,3 +1,5 @@
+<img src="images/logo.png" height="100px" align="right"/>
+
 # CFN Scraper
 This tool tracks any CFN account for its ranked match wins, losses, rank, LP as well as LP gain (since the tracking started)
 
@@ -14,4 +16,4 @@ Text files will be generated in a `results` folder after every match is played. 
 
 ### Example
 
-![stream](showcase/streamexample2.gif?raw=true "streamshowcase")
+![stream](images/streamexample2.gif?raw=true "streamshowcase")
