@@ -24,8 +24,9 @@ go.work
 
 results
 
-cfn-scraper-config.toml
-cfnscraper.exe
-cfnscraper.sh
+cfn-tracker-config.toml
+*.exe
+cfntracker.sh
+resource.syso
 
 .DS_Store

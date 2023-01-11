@@ -100,13 +100,6 @@ func Login(profile string, page *rod.Page, steamUsername string, steamPassword s
 		progressBar.Suffix = ` Loading profile ` + profile
 		page.MustNavigate(profileURL).MustWaitLoad()
 		progressBar.Suffix = ` Loaded profile ` + profile
-
-		isNotLoggedIn, _, _ := page.Has(`.bg_account>.account>h3`)
-
-		if isNotLoggedIn {
-			r <- LoginError.returnCode
-		}
-
 		r <- 1
 	}()
 
@@ -231,6 +224,9 @@ func StartTracking(profile string) {
 		progressBar.Stop()
 	}
 
+	progressBar.FinalMSG = `Shutting down... `
+	time.Sleep(3 * time.Second)
+	progressBar.Stop()
 	router.Stop()
 	page.Browser().Close()
 }

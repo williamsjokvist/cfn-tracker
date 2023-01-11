@@ -2,8 +2,9 @@
 
 # Requirements
 # go
-# upx
+# mac/linux: upx
 # you can install these with e.g: scoop (windows), brew (mac) or your linux pkg manager
+# windows: go install github.com/josephspurrier/goversioninfo/cmd/goversioninfo@latest
 # .env file following example.env
 
 ifneq (,$(wildcard ./.env))
@@ -16,13 +17,15 @@ EXECUTION_ENVIRONMENT=build
 
 # MacOS
 macos: 
-	rm -f cfnscraper-sw.sh
-	rm -f cfnscraper.sh
-	env GOOS=darwin GOARCH=amd64 EXECUTION_ENVIRONMENT=${EXECUTION_ENVIRONMENT} go build -ldflags="-s -w ${LDFLAGS}" -o cfnscraper-sw.sh
-	upx -9 -o cfnscraper.sh cfnscraper-sw.sh
-	chmod +x cfnscraper.sh
-	rm cfnscraper-sw.sh
+	rm -f cfntracker-sw.sh
+	rm -f cfntracker.sh
+	env GOOS=darwin GOARCH=amd64 EXECUTION_ENVIRONMENT=${EXECUTION_ENVIRONMENT} go build -ldflags="-s -w ${LDFLAGS}" -o cfntracker-sw.sh
+	upx -9 -o cfntracker.sh cfntracker-sw.sh
+	chmod +x cfntracker.sh
+	rm cfntracker-sw.sh
 
 # Build for windows
 windows:
-	go build -ldflags="-s -w ${LDFLAGS}" -o cfnscraper.exe
+	goversioninfo win32-metadata/versioninfo.json
+	env GOOS=windows GOARCH=amd64 go build -ldflags="-s -w ${LDFLAGS}" -o cfntracker.exe
+	mv cfntracker.exe "CFN Tracker.exe"

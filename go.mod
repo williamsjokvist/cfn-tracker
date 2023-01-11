@@ -9,6 +9,11 @@ require github.com/BurntSushi/toml v1.2.1
 require github.com/joho/godotenv v1.4.0
 
 require (
+	github.com/akavel/rsrc v0.10.2 // indirect
+	github.com/josephspurrier/goversioninfo v1.4.0 // indirect
+)
+
+require (
 	github.com/briandowns/spinner v1.20.0
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/fatih/color v1.7.0 // indirect
