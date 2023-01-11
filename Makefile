@@ -16,13 +16,14 @@ EXECUTION_ENVIRONMENT=build
 
 # MacOS
 macos: 
-	rm -f cfnscraper-sw.sh
-	rm -f cfnscraper.sh
-	env GOOS=darwin GOARCH=amd64 EXECUTION_ENVIRONMENT=${EXECUTION_ENVIRONMENT} go build -ldflags="-s -w ${LDFLAGS}" -o cfnscraper-sw.sh
-	upx -9 -o cfnscraper.sh cfnscraper-sw.sh
-	chmod +x cfnscraper.sh
-	rm cfnscraper-sw.sh
+	rm -f cfntracker-sw.sh
+	rm -f cfntracker.sh
+	env GOOS=darwin GOARCH=amd64 EXECUTION_ENVIRONMENT=${EXECUTION_ENVIRONMENT} go build -ldflags="-s -w ${LDFLAGS}" -o cfntracker-sw.sh
+	upx -9 -o cfntracker.sh cfntracker-sw.sh
+	chmod +x cfntracker.sh
+	rm cfntracker-sw.sh
 
 # Build for windows
 windows:
-	go build -ldflags="-s -w ${LDFLAGS}" -o cfnscraper.exe
+	go generate
+	go build -ldflags="-s -w ${LDFLAGS}" -o cfntracker.exe

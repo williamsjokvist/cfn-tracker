@@ -1,3 +1,5 @@
+//go:generate goversioninfo -icon=win32-metadata/icon.ico -manifest=win32-metadata/cfntracker.exe.manfiest
+
 package main
 
 import (

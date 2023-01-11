@@ -1,7 +1,7 @@
 <img src="images/logo.png" height="150px" align="right"/>
 
-# CFN Scraper
-This tool tracks any CFN account for its ranked match wins, losses, rank, LP as well as LP gain (since the tracking started)
+# CFN Tracker
+This tool tracks any CFN account for its ranked match wins, losses, rank, LP as well as LP gain.
 
 ### Who is this for? 
 This is primarily targeted toward streamers who want automatically updated win/loss counters. It can also be useful if you wanna keep track of your LP gain during a session.
@@ -16,4 +16,4 @@ Text files will be generated in a `results` folder after every match is played. 
 
 ### Example
 
-![stream](images/streamexample2.gif?raw=true "streamshowcase")
+![stream](images/stream-example-2.gif?raw=true "streamshowcase")
