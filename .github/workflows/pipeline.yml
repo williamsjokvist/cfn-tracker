@@ -1,7 +1,7 @@
 name: CFNScraper Pipeline
 on:
   pull_request:
-    branches: [ master ]
+    branches: [ ]
   push:
     branches: [ master, development ]
 

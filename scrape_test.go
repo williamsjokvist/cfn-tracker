@@ -12,8 +12,5 @@ func TestLogin(t *testing.T) {
 	page, _ := SetupBrowser()
 
 	loginStatus := Login(`GreenSoap`, page, os.Getenv(`STEAM_USERNAME`), os.Getenv(`STEAM_PASSWORD`))
-
-	if !(<-loginStatus == 1 || <-loginStatus == -3) {
-		assert.True(false, <-loginStatus)
-	}
+	assert.Equal(1, <-loginStatus)
 }
