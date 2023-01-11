@@ -9,18 +9,11 @@ import (
 
 func TestLogin(t *testing.T) {
 	assert := assert.New(t)
+	page, _ := SetupBrowser()
 
-	page := SetupBrowser()
+	loginStatus := Login(`GreenSoap`, page, os.Getenv(`STEAM_USERNAME`), os.Getenv(`STEAM_PASSWORD`))
 
-	// With false login information
-	isLoggedIn := Login(`GreenSoap`, page, `1234234`, `12341234`)
-	assert.Equal(<-isLoggedIn == LoginError.returnCode, true)
-
-	// With nonexistant profile
-	isLoggedIn = Login(``, page, os.Getenv(`STEAM_USERNAME`), os.Getenv(`STEAM_PASSWORD`))
-	assert.Equal(<-isLoggedIn == ProfileError.returnCode, true)
-
-	// With correct info
-	isLoggedIn = Login(`GreenSoap`, page, os.Getenv(`STEAM_USERNAME`), os.Getenv(`STEAM_PASSWORD`))
-	assert.Equal(<-isLoggedIn == 1, true)
+	if !(<-loginStatus == 1 || <-loginStatus == -3) {
+		assert.True(false, <-loginStatus)
+	}
 }

@@ -15,16 +15,29 @@ type Config struct {
 }
 
 var progressBar = spinner.New(spinner.CharSets[9], 100*time.Millisecond)
+var steamUsername string
+var steamPassword string
+
+func IsTestRun() bool {
+	return os.Getenv(`EXECUTION_ENVIRONMENT`) == `test`
+}
+
+func IsBuildRun() bool {
+	return os.Getenv(`EXECUTION_ENVIRONMENT`) == `build`
+}
+
+func IsDevRun() bool {
+	return os.Getenv(`EXECUTION_ENVIRONMENT`) == `dev`
+}
 
 func init() {
-	err := godotenv.Load(".env")
-
-	if err != nil {
-		LogError(`Error loading environment variables. Are you missing a .env file?`)
+	if !IsBuildRun() && !IsTestRun() {
+		godotenv.Load(`.env`)
 	}
 }
 
 func main() {
+	fmt.Println(`CFN Scraper v2 by @greensoap_`)
 	f := `cfn-scraper-config.toml`
 	if _, err := os.Stat(f); err != nil {
 		f = `cfn-scraper-config.toml`

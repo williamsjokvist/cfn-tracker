@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"math"
 	"os"
 	"strconv"
@@ -36,22 +35,16 @@ var matchHistory = MatchHistory{
 	winrate:      0,
 }
 
-func LogError(errorMessage string) {
-	progressBar.Stop()
-	log.Fatal(errorMessage)
-}
-
 func LogMatchHistory() {
 	fmt.Println("["+time.Now().Format(`15:04`)+"] LP:", matchHistory.lp, "/ Gain:", matchHistory.lpGain, "/ Wins:", matchHistory.wins, "/ Losses:", matchHistory.losses, "/ Winrate:", matchHistory.winrate, `%`)
 }
 
 func Login(profile string, page *rod.Page, steamUsername string, steamPassword string) chan int {
 	profileURL := `https://game.capcom.com/cfn/sfv/profile/` + profile
-
 	r := make(chan int)
 
 	go func() {
-		page.MustNavigate(`https://game.capcom.com/cfn/sfv/consent/steam`).MustWaitLoad()
+		page.MustNavigate(`https://game.capcom.com/cfn/sfv/gate/steam?rpnt=`+profileURL).MustWaitLoad()
 
 		progressBar.Suffix = ` Accepting CFN terms`
 		wait := page.MustWaitLoad().MustWaitRequestIdle()
@@ -59,30 +52,37 @@ func Login(profile string, page *rod.Page, steamUsername string, steamPassword s
 		wait()
 		progressBar.Suffix = ` Terms accepted`
 
-		// If CFN opens (already logged in)
-		if page.MustInfo().URL != `https://game.capcom.com/cfn/sfv/` {
+		// If Steam opens (not already logged in)
+		url := page.MustInfo().URL
+		if url != `https://game.capcom.com/cfn/sfv/` || url != profileURL  {
 			page.WaitElementsMoreThan(`#loginForm`, 0)
 		}
 
 		isSteamOpen, _, _ := page.Has(`#loginForm`)
 
 		if isSteamOpen {
-			progressBar.Suffix = " Passing the gateway"
+			progressBar.Suffix = ` Passing the gateway`
 			if page.MustInfo().URL == `https://game.capcom.com/cfn/sfv/` {
 				r <- LoginError.returnCode
 			}
 
-			usernameElement := page.MustElement(`#loginForm input[name="username"]`)
-			passwordElement := page.MustElement(`#loginForm input[name="password"]`)
-			usernameElement.MustInput(steamUsername)
-			passwordElement.MustInput(steamPassword)
+			usernameElement, e := page.Element(`#loginForm input[name="username"]`)
+			passwordElement, e := page.Element(`#loginForm input[name="password"]`)
+			buttonElement, e := page.Element(`input#imageLogin`)
 
-			page.MustElement(`input#imageLogin`).Click(proto.InputMouseButtonLeft, 2)
+			if e != nil {
+				r <- LoginError.returnCode
+			}
+
+			usernameElement.Input(steamUsername)
+			passwordElement.Input(steamPassword)
+			buttonElement.Click(proto.InputMouseButtonLeft, 2)
 			errorElement := page.MustElement(`#error_display`)
 
+			var secondsWaited time.Duration = 0
 			for {
 				if page.MustInfo().URL == `https://game.capcom.com/cfn/sfv/` {
-					progressBar.Suffix = " Gateway passed"
+					progressBar.Suffix = ` Gateway passed`
 					break
 				}
 				errorText, e := errorElement.Text()
@@ -92,17 +92,22 @@ func Login(profile string, page *rod.Page, steamUsername string, steamPassword s
 				}
 
 				time.Sleep(time.Second)
+				secondsWaited += time.Second
+				progressBar.Suffix = ` Passing the gateway (` + strconv.Itoa(int(secondsWaited.Seconds())) + `s)` + errorText
 			}
 		}
 
-		progressBar.Suffix = ` Loading profile`
+		page.MustWaitLoad()
+
+		progressBar.Suffix = ` Loading profile ` + profile
 		page.MustNavigate(profileURL).MustWaitLoad()
 		isNotLoggedIn, _, _ := page.Has(`.bg_account>.account>h3`)
 		hasData, _, _ := page.Has(`.leagueInfo>dl:last-child>dd`)
 
 		if !hasData || isNotLoggedIn {
 			r <- LoginError.returnCode
-		}
+			return
+		} 
 
 		r <- 1
 	}()
@@ -124,7 +129,7 @@ func RefreshData(profile string, page *rod.Page) {
 	lpEl, e := page.Element(`.leagueInfo>dl:last-child>dd`)
 
 	if e != nil {
-		LogError(ParseError.message)
+		LogError(ParseError)
 		return
 	}
 
@@ -135,7 +140,7 @@ func RefreshData(profile string, page *rod.Page) {
 	totalMatches, e := strconv.Atoi(totalMatchesEl.MustText())
 
 	if e != nil {
-		LogError(ParseError.message)
+		LogError(ParseError)
 		return
 	}
 
@@ -164,13 +169,13 @@ func RefreshData(profile string, page *rod.Page) {
 	LogMatchHistory()
 }
 
-func SetupBrowser() *rod.Page {
+func SetupBrowser() (*rod.Page, *rod.HijackRouter) {
 	u := launcher.New().Leakless(false).Headless(true).MustLaunch()
 	page := rod.New().ControlURL(u).MustConnect().MustPage("")
-	rut := page.HijackRequests()
+	router := page.HijackRequests()
 
 	// Block all images, stylesheets, fonts and unessential scripts
-	rut.MustAdd("*", func(ctx *rod.Hijack) {
+	router.MustAdd("*", func(ctx *rod.Hijack) {
 		if ctx.Request.Type() == proto.NetworkResourceTypeImage ||
 			ctx.Request.Type() == proto.NetworkResourceTypeStylesheet ||
 			ctx.Request.Type() == proto.NetworkResourceTypeFont {
@@ -188,14 +193,24 @@ func SetupBrowser() *rod.Page {
 		ctx.ContinueRequest(&proto.FetchContinueRequest{})
 	})
 
-	go rut.Run()
-
-	return page
+	go router.Run()
+	return page, router
 }
 
 func StartTracking(profile string) {
-	page := SetupBrowser()
-	loginStatus := Login(profile, page, os.Getenv(`STEAM_USERNAME`), os.Getenv(`STEAM_PASSWORD`))
+	page, router := SetupBrowser()
+	defer router.Stop()
+	defer page.Browser().Close()
+
+	user := os.Getenv(`STEAM_USERNAME`)
+	pass := os.Getenv(`STEAM_PASSWORD`)
+
+	if user != `` && pass != `` {
+		steamUsername = user
+		steamPassword = pass
+	}
+
+	loginStatus := Login(profile, page, steamUsername, steamPassword)
 
 	if <-loginStatus == 1 {
 		progressBar.FinalMSG = `Started tracking ` + profile + "\n"
@@ -209,12 +224,10 @@ func StartTracking(profile string) {
 			}
 		}
 	} else if <-loginStatus == LoginError.returnCode {
-		LogError(LoginError.message)
+		LogError(LoginError)
 	} else if <-loginStatus == ProfileError.returnCode {
-		LogError(ProfileError.message)
+		LogError(ProfileError)
 	} else if <-loginStatus == CaptchaError.returnCode {
-		LogError(CaptchaError.message)
+		LogError(CaptchaError)
 	}
-
-	defer page.Browser().Close()
 }
