@@ -28,3 +28,4 @@ macos:
 windows:
 	goversioninfo win32-metadata/versioninfo.json
 	env GOOS=windows GOARCH=amd64 go build -ldflags="-s -w ${LDFLAGS}" -o cfntracker.exe
+	mv cfntracker.exe "CFN Tracker.exe"

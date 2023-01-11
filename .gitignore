@@ -25,7 +25,7 @@ go.work
 results
 
 cfn-tracker-config.toml
-cfntracker.exe
+*.exe
 cfntracker.sh
 resource.syso
 
