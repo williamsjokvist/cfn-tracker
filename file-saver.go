@@ -9,6 +9,8 @@ func SaveMatchHistory(matchHistory MatchHistory) {
 	SaveTextToFile(`results`, `wins.txt`, strconv.Itoa(matchHistory.wins))
 	SaveTextToFile(`results`, `losses.txt`, strconv.Itoa(matchHistory.losses))
 	SaveTextToFile(`results`, `lp-gain.txt`, strconv.Itoa(matchHistory.lpGain))
+	SaveTextToFile(`results`, `win-rate.txt`, strconv.Itoa(matchHistory.winrate)+`%`)
+
 	SaveTextToFile(`results`, `lp.txt`, strconv.Itoa(matchHistory.lp))
 }
 
