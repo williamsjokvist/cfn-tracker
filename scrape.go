@@ -78,12 +78,9 @@ func Login(profile string, page *rod.Page, steamUsername string, steamPassword s
 
 		var secondsWaited time.Duration = 0
 		for {
-			if page.MustInfo().URL == `https://game.capcom.com/cfn/sfv/` {
-				progressBar.Suffix = ` Gateway passed`
-				break
-			}
-			errorElement, e := page.Element(`#error_display`)
-			if e != nil {
+			body := page.MustElement(`body`)
+			errorElement, _ := body.Element(`#error_display`)
+			if errorElement != nil {
 				errorText, e := errorElement.Text()
 
 				if e != nil || len(errorText) > 0 {
@@ -94,6 +91,10 @@ func Login(profile string, page *rod.Page, steamUsername string, steamPassword s
 			time.Sleep(time.Second)
 			secondsWaited += time.Second
 			progressBar.Suffix = ` Passing the gateway (` + strconv.Itoa(int(secondsWaited.Seconds())) + `s)`
+			if !strings.Contains(page.MustInfo().URL, `steam`) {
+				progressBar.Suffix = ` Gateway passed`
+				break
+			}
 		}
 	}
 
@@ -158,7 +159,7 @@ func RefreshData(profile string, page *rod.Page) {
 }
 
 func SetupBrowser() (*rod.Page, *rod.HijackRouter) {
-	u := launcher.New().Leakless(false).Headless(true).MustLaunch()
+	u := launcher.New().Leakless(false).Headless(false).MustLaunch()
 	page := rod.New().ControlURL(u).MustConnect().MustPage("")
 	router := page.HijackRequests()
 
