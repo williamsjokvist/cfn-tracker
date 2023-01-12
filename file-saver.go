@@ -19,10 +19,10 @@ func SaveTextToFile(directory string, fileName string, text string) {
 	var err error
 
 	if directory != `` {
-		err = os.Mkdir(`results`, os.FileMode(0755))
-		file, err = os.Create(directory + `/` + fileName)
+		_ = os.Mkdir(`results`, os.FileMode(0755))
+		file, _ = os.Create(directory + `/` + fileName)
 	} else {
-		file, err = os.Create(fileName)
+		file, _ = os.Create(fileName)
 	}
 
 	defer file.Close()

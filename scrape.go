@@ -64,8 +64,8 @@ func Login(profile string, page *rod.Page, steamUsername string, steamPassword s
 			return LoginError.returnCode
 		}
 
-		usernameElement, e := page.Element(`#loginForm input[name="username"]`)
-		passwordElement, e := page.Element(`#loginForm input[name="password"]`)
+		usernameElement, _ := page.Element(`#loginForm input[name="username"]`)
+		passwordElement, _ := page.Element(`#loginForm input[name="password"]`)
 		buttonElement, e := page.Element(`input#imageLogin`)
 
 		if e != nil {
@@ -112,9 +112,9 @@ func RefreshData(profile string, page *rod.Page) {
 	page.Reload()
 
 	// Read from DOM
-	totalMatchesEl, e := page.Element(`.battleNumber>.total>dd`)
-	totalWinsEl, e := page.Element(`.battleNumber>.win>dd`)
-	totalLossesEl, e := page.Element(`.battleNumber>.lose>dd`)
+	totalMatchesEl, _ := page.Element(`.battleNumber>.total>dd`)
+	totalWinsEl, _ := page.Element(`.battleNumber>.win>dd`)
+	totalLossesEl, _ := page.Element(`.battleNumber>.lose>dd`)
 	lpEl, e := page.Element(`.leagueInfo>dl:last-child>dd`)
 
 	if e != nil {
@@ -123,9 +123,9 @@ func RefreshData(profile string, page *rod.Page) {
 	}
 
 	// Convert to ints
-	newLp, e := strconv.Atoi(strings.TrimSuffix(lpEl.MustText(), `LP`))
-	totalWins, e := strconv.Atoi(totalWinsEl.MustText())
-	totalLosses, e := strconv.Atoi(totalLossesEl.MustText())
+	newLp, _ := strconv.Atoi(strings.TrimSuffix(lpEl.MustText(), `LP`))
+	totalWins, _ := strconv.Atoi(totalWinsEl.MustText())
+	totalLosses, _ := strconv.Atoi(totalLossesEl.MustText())
 	totalMatches, e := strconv.Atoi(totalMatchesEl.MustText())
 
 	if e != nil {
@@ -205,10 +205,7 @@ func StartTracking(profile string) {
 		progressBar.Stop()
 		for c := time.Tick(30 * time.Second); ; {
 			RefreshData(profile, page)
-			select {
-			case <-c:
-				continue
-			}
+			<-c
 		}
 	} else if loginStatus == LoginError.returnCode {
 		LogError(LoginError)
