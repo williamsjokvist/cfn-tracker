@@ -15,8 +15,8 @@ func TestLogin(t *testing.T) {
 
 	// Expect to run into CAPTCHA on github
 	if os.Getenv(`GITHUB_TEST`) == `true` {
-		assert.Equal(-3, <-loginStatus)
+		assert.Equal(CaptchaError.returnCode, loginStatus)
 	} else {
-		assert.Equal(1, <-loginStatus)
+		assert.Equal(1, loginStatus)
 	}
 }
