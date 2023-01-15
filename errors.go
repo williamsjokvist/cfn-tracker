@@ -5,7 +5,6 @@ import (
 )
 
 func LogError(err AppError) {
-	progressBar.Stop()
 	log.Fatal(err.message)
 }
 

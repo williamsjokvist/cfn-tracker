@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: 'League Spartan', sans-serif;
+  background-color: #181a3b;
+  overflow: hidden;
+}
+
+.logo-pattern {
+  opacity: 0.025;
+  filter: grayscale(1) blur(0px);
+  transform: rotate(-35deg);
+  width: 264%;
+  background-size: 50px;
+  height: 288%;
+  top: -601px;
+  left: -600px;
+}
+
+::-webkit-scrollbar-track
+{
+	border-radius: 10px;
+	background-color: #555;
+}
+
+::-webkit-scrollbar
+{
+	width: 5px;
+	background-color: #555;
+}
+
+::-webkit-scrollbar-thumb
+{
+	border-radius: 10px;
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+	background-color: #F5F5F5;
+}
