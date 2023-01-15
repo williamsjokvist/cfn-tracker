@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { GiDeerTrack } from "react-icons/gi";
 import { FaStop } from "react-icons/fa";
-import { SetCFN, IsTracking, StopTracking  } from "../../wailsjs/go/main/App";
+import { Track, IsTracking, StopTracking  } from "../../wailsjs/go/main/App";
 
 const Root = () => {
   const { t } = useTranslation();
@@ -14,7 +14,6 @@ const Root = () => {
 
     const fetchIsTracking = async () => {
       const getIsTracking = await IsTracking();
-      console.log(getIsTracking);
       setTracking(getIsTracking);
     };
 
@@ -61,11 +60,14 @@ const Root = () => {
               setLoading(true);
 
               const x = async () => {
-                const res = await SetCFN(cfn);
-                console.log(res);
-                const getIsTracking = await IsTracking();
-                console.log(getIsTracking);
-                setTracking(getIsTracking);
+                const isTracking = await Track(cfn);
+                setTracking(isTracking);
+                if (isTracking == false) {
+                  alert("Failed to track CFN")
+                } else {
+                  console.log('is Tracking')
+                  setTracking(true)
+                }
                 setLoading(false);
               };
               x();

@@ -216,12 +216,14 @@ func StartTracking(profile string) {
 	if isInitialized == false {
 		return
 	}
-
 	fmt.Println("Loading profile")
 	pageInstance.MustNavigate(`https://game.capcom.com/cfn/sfv/profile/` + profile).MustWaitLoad()
-	fmt.Println("Profile loaded")
 	isTracking = true
+	fmt.Println("Profile loaded")
 	time.Sleep(3 * time.Second)
+
+	ResetSaveData()
+
 	for {
 		if isTracking == false {
 			fmt.Println("Stopped tracking")

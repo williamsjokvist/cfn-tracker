@@ -5,6 +5,19 @@ import (
 	"strconv"
 )
 
+func ResetSaveData() {
+	SaveMatchHistory(MatchHistory{
+		lp:           0,
+		lpGain:       0,
+		wins:         0,
+		losses:       0,
+		totalWins:    0,
+		totalLosses:  0,
+		totalMatches: 0,
+		winrate:      0,
+	})
+}
+
 func SaveMatchHistory(matchHistory MatchHistory) {
 	SaveTextToFile(`results`, `wins.txt`, strconv.Itoa(matchHistory.wins))
 	SaveTextToFile(`results`, `losses.txt`, strconv.Itoa(matchHistory.losses))

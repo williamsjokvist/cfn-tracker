@@ -6,10 +6,10 @@ export function IsTracking() {
   return window['go']['main']['App']['IsTracking']();
 }
 
-export function SetCFN(arg1) {
-  return window['go']['main']['App']['SetCFN'](arg1);
-}
-
 export function StopTracking() {
   return window['go']['main']['App']['StopTracking']();
+}
+
+export function Track(arg1) {
+  return window['go']['main']['App']['Track'](arg1);
 }

@@ -3,6 +3,6 @@
 
 export function IsTracking():Promise<boolean>;
 
-export function SetCFN(arg1:string):Promise<string>;
-
 export function StopTracking():Promise<void>;
+
+export function Track(arg1:string):Promise<boolean>;

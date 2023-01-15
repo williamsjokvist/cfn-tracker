@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 )
 
 // App struct
@@ -39,9 +38,9 @@ func (a *App) shutdown(ctx context.Context) {
 	pageInstance.Browser().Close()
 }
 
-func (a *App) SetCFN(cfnName string) string {
-	StartTracking(cfnName)
-	return fmt.Sprintf("Hello %s, It's show time!", cfnName)
+func (a *App) Track(cfnName string) bool {
+	go StartTracking(cfnName)
+	return isInitialized
 }
 
 func (a *App) IsTracking() bool {
