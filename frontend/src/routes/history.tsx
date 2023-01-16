@@ -8,11 +8,13 @@ const History = () => {
   const { t } = useTranslation();
 
   return (
-    <>
-      <div className="w-full max-w-lg z-40 grid gap-4">
-        <h2 className="uppercase text-sm tracking-widest">
+    <div className=''>
+      <header className='border-b border-slate-50 border-opacity-10 --wails-draggable'>
+        <h2 className="pt-4 px-8 pl-12 flex items-center justify-between gap-5 uppercase text-sm tracking-widest mb-4">
           {t('history')}
         </h2>
+      </header>
+      <div className="w-full z-40 grid justify-items-center justify-center pt-10">
         <ul className="space-y-3 animate-pulse min-w-[525px] max-h-[300px] overflow-y-scroll">
           <Match />
           <Match />
@@ -26,7 +28,7 @@ const History = () => {
           <Match />
         </ul>
       </div>
-    </>
+    </div>
   );
 };
 

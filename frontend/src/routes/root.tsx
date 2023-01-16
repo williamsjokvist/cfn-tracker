@@ -21,20 +21,21 @@ const Root = () => {
   }, []);
 
   return (
-    <>
-      <div className="w-fit max-w-md z-40 select-none">
-        <h2 className="flex items-center gap-5 uppercase text-sm tracking-widest mb-4">
-          {isCurrentlyTracking || isLoading ? "Tracking" : t("startTracking")}
-          {(isCurrentlyTracking || isLoading) && (
-            <div
-              className="animate-spin inline-block w-8 h-8 border-[3px] border-current border-t-transparent text-pink-600 rounded-full"
-              role="status"
-              aria-label="loading"
-            >
-              <span className="sr-only">Loading...</span>
-            </div>
-          )}
-        </h2>
+    <div className='grid grid-rows-[0fr_1fr]'>
+      <header className='border-b border-slate-50 border-opacity-10 --wails-draggable'>
+        <h2 className="pt-4 px-8 pl-12 flex items-center justify-between gap-5 uppercase text-sm tracking-widest mb-4">
+            {isCurrentlyTracking || isLoading ? "Tracking" : t("startTracking")}
+            {(isCurrentlyTracking || isLoading) && (
+              <div
+                className="animate-spin inline-block w-5 h-5 border-[3px] border-current border-t-transparent text-pink-600 rounded-full"
+                role="status"
+                aria-label="loading"
+              >
+              </div>
+            )}
+          </h2>
+      </header>
+      <div className="z-40 h-full select-none grid place-items-center">
         {isCurrentlyTracking && (
           <button
             onClick={(() => {
@@ -42,17 +43,16 @@ const Root = () => {
               setTracking(false)
               setLoading(false)
             }
-
             )}
             type="button"
-            className="justify-self-end flex items-center justify-between gap-3 bg-[rgba(255,10,10,.1)] rounded-md px-5 py-3 border-[#FF3D51] hover:bg-[#FF3D51] border-[1px] transition-colors font-semibold text-md"
+            className="mt-10 flex items-center justify-between bg-[rgba(255,10,10,.1)] rounded-md px-5 py-3 border-[#FF3D51] hover:bg-[#FF3D51] border-[1px] transition-colors font-semibold text-md"
           >
-            <FaStop /> Stop
+            <FaStop className='mr-3'/> Stop
           </button>
         )}
         {!(isCurrentlyTracking || isLoading) && (
           <form
-            className="grid gap-4 justify-items-start"
+            className="grid justify-items-start mt-10"
             onSubmit={(e) => {
               e.preventDefault();
               const cfn = (e.target as any).cfn.value;
@@ -83,14 +83,14 @@ const Root = () => {
             <button
               disabled={isLoading}
               type="submit"
-              className="justify-self-end flex items-center justify-between gap-3 bg-[rgba(255,10,10,.1)] rounded-md px-5 py-3 border-[#FF3D51] hover:bg-[#FF3D51] border-[1px] transition-colors font-semibold text-md"
+              className="mt-5 justify-self-end flex items-center justify-between bg-[rgba(255,10,10,.1)] rounded-md px-5 py-3 border-[#FF3D51] hover:bg-[#FF3D51] border-[1px] transition-colors font-semibold text-md"
             >
-              <GiDeerTrack /> {t("start")}
+              <GiDeerTrack className='mr-3'/> {t("start")}
             </button>
           </form>
         )}
       </div>
-    </>
+    </div>
   );
 };
 

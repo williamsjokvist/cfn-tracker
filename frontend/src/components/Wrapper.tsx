@@ -5,7 +5,7 @@ const Wrapper = ({ children }: any) => {
   return (
     <div className="flex">
       <Sidebar />
-      <div className="z-40 flex-1 min-h-screen text-white grid grid-rows-[1fr_0fr] place-items-center justify-items-center mx-auto">
+      <div className="z-40 flex-1 min-h-screen text-white mx-auto">
         <main>
           {children}
         </main>

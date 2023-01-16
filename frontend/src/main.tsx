@@ -13,15 +13,15 @@ import Wrapper from './components/Wrapper';
 const router = createHashRouter([
   {
     path: "/",
-    element: <Root />,
+    element: <Wrapper><Root /></Wrapper>,
   },
   {
     path: "/tracking",
-    element: <Root />,
+    element:<Wrapper><Root /></Wrapper>,
   },
   {
     path: "/history",
-    element: <History />,
+    element: <Wrapper><History /></Wrapper>,
   },
 ]);
 
@@ -29,8 +29,6 @@ const router = createHashRouter([
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <Wrapper>
-      <RouterProvider router={router} />
-    </Wrapper>
+    <RouterProvider router={router} />
   </React.StrictMode>
 );
