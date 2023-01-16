@@ -1,29 +1,37 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
 	"os"
 	"strconv"
 )
 
 func ResetSaveData() {
 	SaveMatchHistory(MatchHistory{
-		lp:           0,
-		lpGain:       0,
-		wins:         0,
-		losses:       0,
-		totalWins:    0,
-		totalLosses:  0,
-		totalMatches: 0,
-		winrate:      0,
+		LP:           0,
+		LPGain:       0,
+		Wins:         0,
+		Losses:       0,
+		TotalWins:    0,
+		TotalLosses:  0,
+		TotalMatches: 0,
+		WinRate:      0,
 	})
 }
 
 func SaveMatchHistory(matchHistory MatchHistory) {
-	SaveTextToFile(`results`, `wins.txt`, strconv.Itoa(matchHistory.wins))
-	SaveTextToFile(`results`, `losses.txt`, strconv.Itoa(matchHistory.losses))
-	SaveTextToFile(`results`, `lp-gain.txt`, strconv.Itoa(matchHistory.lpGain))
-	SaveTextToFile(`results`, `win-rate.txt`, strconv.Itoa(matchHistory.winrate)+`%`)
-	SaveTextToFile(`results`, `lp.txt`, strconv.Itoa(matchHistory.lp))
+	SaveTextToFile(`results`, `wins.txt`, strconv.Itoa(matchHistory.Wins))
+	SaveTextToFile(`results`, `losses.txt`, strconv.Itoa(matchHistory.Losses))
+	SaveTextToFile(`results`, `lp-gain.txt`, strconv.Itoa(matchHistory.LPGain))
+	SaveTextToFile(`results`, `win-rate.txt`, strconv.Itoa(matchHistory.WinRate)+`%`)
+	SaveTextToFile(`results`, `lp.txt`, strconv.Itoa(matchHistory.LP))
+
+	mhMarshalled, err := json.Marshal(&matchHistory)
+	if err == nil {
+		fmt.Println(string(mhMarshalled))
+		SaveTextToFile(`results`, `match-history.json`, string(mhMarshalled))
+	}
 }
 
 func SaveTextToFile(directory string, fileName string, text string) {

@@ -50,3 +50,7 @@ func (a *App) IsTracking() bool {
 func (a *App) StopTracking() {
 	isTracking = false
 }
+
+func (a *App) GetMatchHistory() MatchHistory {
+	return matchHistory
+}

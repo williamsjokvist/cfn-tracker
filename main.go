@@ -54,9 +54,10 @@ func main() {
 		CSSDragProperty:   `--wails-draggable`,
 		BackgroundColour:  &options.RGBA{R: 33, G: 37, B: 43, A: 255},
 		Windows: &windows.Options{
-			WebviewIsTransparent: true,
-			WindowIsTranslucent:  true,
-			DisableWindowIcon:    false,
+			WebviewIsTransparent:              true,
+			WindowIsTranslucent:               false,
+			Theme:                             windows.Theme(windows.Dark),
+			DisableFramelessWindowDecorations: true,
 		},
 		Mac: &mac.Options{
 			TitleBar:             mac.TitleBarHiddenInset(),

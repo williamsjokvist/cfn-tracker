@@ -8,8 +8,8 @@ const History = () => {
   const { t } = useTranslation();
 
   return (
-    <div className=''>
-      <header className='border-b border-slate-50 border-opacity-10 --wails-draggable'>
+    <main className="grid grid-rows-[0fr_1fr] min-h-screen">
+      <header className='border-b border-slate-50 border-opacity-10 --wails-draggable select-none'>
         <h2 className="pt-4 px-8 pl-12 flex items-center justify-between gap-5 uppercase text-sm tracking-widest mb-4">
           {t('history')}
         </h2>
@@ -28,7 +28,7 @@ const History = () => {
           <Match />
         </ul>
       </div>
-    </div>
+    </main>
   );
 };
 

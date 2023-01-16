@@ -80,7 +80,7 @@ const Sidebar = () => {
         </header>
         <nav className="mt-5 w-full">
           <ul className="">
-            <Link Icon={RiSearch2Line} link="tracking" name={t('tracking')} isSelected={(location.pathname == '/tracking')} SelectedIcon={RiSearch2Fill}/>
+            <Link Icon={RiSearch2Line} link="" name={t('tracking')} isSelected={(location.pathname == '/')} SelectedIcon={RiSearch2Fill}/>
             <Link Icon={IoDocumentTextOutline} link="history" name={t('history')} isSelected={(location.pathname == '/history')} SelectedIcon={IoDocumentText}/>
           </ul>
         </nav>

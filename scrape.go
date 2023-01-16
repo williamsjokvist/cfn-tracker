@@ -13,25 +13,25 @@ import (
 )
 
 type MatchHistory struct {
-	lp           int
-	lpGain       int
-	wins         int
-	totalWins    int
-	totalLosses  int
-	totalMatches int
-	losses       int
-	winrate      int
+	LP           int `json:"lp"`
+	LPGain       int `json:"lpGain"`
+	Wins         int `json:"wins"`
+	TotalWins    int `json:"totalWins"`
+	TotalLosses  int `json:"totalLosses"`
+	TotalMatches int `json:"totalMatches"`
+	Losses       int `json:"losses"`
+	WinRate      int `json:"winRate"`
 }
 
 var matchHistory = MatchHistory{
-	lp:           0,
-	lpGain:       0,
-	wins:         0,
-	losses:       0,
-	totalWins:    0,
-	totalLosses:  0,
-	totalMatches: 0,
-	winrate:      0,
+	LP:           0,
+	LPGain:       0,
+	Wins:         0,
+	Losses:       0,
+	TotalWins:    0,
+	TotalLosses:  0,
+	TotalMatches: 0,
+	WinRate:      0,
 }
 
 var (
@@ -41,7 +41,7 @@ var (
 )
 
 func LogMatchHistory() {
-	fmt.Println("["+time.Now().Format(`15:04`)+"] LP:", matchHistory.lp, "/ Gain:", matchHistory.lpGain, "/ Wins:", matchHistory.wins, "/ Losses:", matchHistory.losses, "/ Winrate:", matchHistory.winrate, `%`)
+	fmt.Println("["+time.Now().Format(`15:04`)+"] LP:", matchHistory.LP, "/ Gain:", matchHistory.LPGain, "/ Wins:", matchHistory.Wins, "/ Losses:", matchHistory.Losses, "/ Winrate:", matchHistory.WinRate, `%`)
 }
 
 func Login(profile string, page *rod.Page, steamUsername string, steamPassword string) (int, *rod.Page) {
@@ -107,7 +107,7 @@ func Login(profile string, page *rod.Page, steamUsername string, steamPassword s
 }
 
 func RefreshData(profile string, page *rod.Page) {
-	isFirstFetch := matchHistory.lp == 0
+	isFirstFetch := matchHistory.LP == 0
 	if !isFirstFetch && page.MustInfo().URL != `https://game.capcom.com/cfn/sfv/profile/`+profile {
 		return
 	}
@@ -139,7 +139,7 @@ func RefreshData(profile string, page *rod.Page) {
 		return
 	}
 
-	hasNewMatch := totalMatches != matchHistory.totalMatches
+	hasNewMatch := totalMatches != matchHistory.TotalMatches
 
 	// Return if no new data
 	if !(isFirstFetch || hasNewMatch) {
@@ -148,16 +148,16 @@ func RefreshData(profile string, page *rod.Page) {
 
 	// Matches have been played since first fetch
 	if hasNewMatch && !isFirstFetch {
-		matchHistory.wins = matchHistory.wins + int(math.Abs(float64(matchHistory.totalWins)-float64(totalWins)))
-		matchHistory.losses = matchHistory.losses + int(math.Abs(float64(matchHistory.totalLosses)-float64(totalLosses)))
-		matchHistory.lpGain = matchHistory.lpGain + (newLp - matchHistory.lp)
-		matchHistory.winrate = int((float64(matchHistory.wins) / float64(matchHistory.wins+matchHistory.losses)) * 100)
+		matchHistory.Wins = matchHistory.Wins + int(math.Abs(float64(matchHistory.TotalWins)-float64(totalWins)))
+		matchHistory.Losses = matchHistory.Losses + int(math.Abs(float64(matchHistory.TotalLosses)-float64(totalLosses)))
+		matchHistory.LPGain = matchHistory.LPGain + (newLp - matchHistory.LP)
+		matchHistory.WinRate = int((float64(matchHistory.Wins) / float64(matchHistory.Wins+matchHistory.Losses)) * 100)
 	}
 
-	matchHistory.totalWins = totalWins
-	matchHistory.totalLosses = totalLosses
-	matchHistory.totalMatches = totalMatches
-	matchHistory.lp = newLp
+	matchHistory.TotalWins = totalWins
+	matchHistory.TotalLosses = totalLosses
+	matchHistory.TotalMatches = totalMatches
+	matchHistory.LP = newLp
 
 	SaveMatchHistory(matchHistory)
 	LogMatchHistory()

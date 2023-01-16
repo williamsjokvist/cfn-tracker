@@ -16,10 +16,6 @@ const router = createHashRouter([
     element: <Wrapper><Root /></Wrapper>,
   },
   {
-    path: "/tracking",
-    element:<Wrapper><Root /></Wrapper>,
-  },
-  {
     path: "/history",
     element: <Wrapper><History /></Wrapper>,
   },
