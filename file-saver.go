@@ -9,6 +9,7 @@ import (
 
 func ResetSaveData() {
 	SaveMatchHistory(MatchHistory{
+		CFN:          ``,
 		LP:           0,
 		LPGain:       0,
 		Wins:         0,

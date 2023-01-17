@@ -9,19 +9,13 @@ import {
   GetMatchHistory,
 } from "../../wailsjs/go/main/App";
 import { PieChart } from 'react-minimal-pie-chart';
+import { useStatStore } from "../store/use-stat-store";
 
 const Root = () => {
   const { t } = useTranslation();
   const [isLoading, setLoading] = useState(false);
   const [isCurrentlyTracking, setTracking] = useState(false);
-  const [cfn, setCFN] = useState('');
-  const [matchHistory, setMatchHistory] = useState<{
-    wins: number;
-    losses: number;
-    winRate: any;
-    lpGain: any;
-    lp: number;
-  } | null>(null);
+  const {matchHistory, setMatchHistory, resetMatchHistory} = useStatStore();
 
   useEffect(() => {
     if (isCurrentlyTracking == true) return;
@@ -37,18 +31,17 @@ const Root = () => {
   useEffect(() => {
     let interval: number | null = null;
     if (isCurrentlyTracking) {
-      console.log("gooo");
       interval = setInterval(async () => {
         const mh = await GetMatchHistory();
         console.log(mh)
         setMatchHistory({
+          cfn: mh.cfn,
           wins: mh.wins,
           losses: mh.losses,
           winRate: mh.winRate,
           lpGain: mh.lpGain,
           lp: mh.lp
         });
-        setCFN(mh.cfn)
       }, 3000);
     }
 
@@ -74,48 +67,48 @@ const Root = () => {
         </h2>
       </header>
       <div className="z-40 h-full flex justify-between items-center px-8 py-4">
-        {matchHistory && (
+        {matchHistory && isCurrentlyTracking && (
           <>
             <div className="relative grid grid-rows-[0fr_1fr]">
               <h3 className="text-3xl mr-8 pr-8 border-r border-slate-50 border-opacity-10">
                 <span className="text-sm block">CFN</span>
-                {cfn && cfn}
+                {matchHistory.cfn}
               </h3>
               <h4 className="text-3xl">
                 <span className="text-sm block">LP</span>
                 {matchHistory && matchHistory.lp && matchHistory.lp}
               </h4>
               <dl className="stat-grid-item w-full mt-4  relative text-center text-xl max-w-[265px] whitespace-nowrap">
-                  <div className="mb-2 flex gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl backdrop-blur">
-                    <dt className="tracking-wider font-extralight">Wins</dt>
-                    <dd className="text-5xl font-semibold">
-                      {matchHistory.wins}
-                    </dd>
-                  </div>
-                  <div className="mb-2 flex gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl backdrop-blur">
-                    <dt className="tracking-wide font-extralight">Losses</dt>
-                    <dd className="text-5xl font-semibold">
-                      {matchHistory.losses}
-                    </dd>
-                  </div>
-                  <div className="mb-2 flex gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl backdrop-blur">
-                    <dt className="tracking-wide font-extralight">Win Ratio</dt>
-                    <dd className="text-5xl font-semibold">
-                      {matchHistory.winRate}%
-                    </dd>
-                  </div>
-                  <div className="mb-2 flex gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl backdrop-blur">
-                    <dt className="tracking-wide font-extralight">LP Gain</dt>
-                    <dd className="text-5xl font-semibold">
-                      {matchHistory.lpGain}
-                    </dd>
-                  </div>
-                </dl>
+                <div className="mb-2 flex gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl backdrop-blur">
+                  <dt className="tracking-wider font-extralight">Wins</dt>
+                  <dd className="text-5xl font-semibold">
+                    {matchHistory.wins}
+                  </dd>
+                </div>
+                <div className="mb-2 flex gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl backdrop-blur">
+                  <dt className="tracking-wide font-extralight">Losses</dt>
+                  <dd className="text-5xl font-semibold">
+                    {matchHistory.losses}
+                  </dd>
+                </div>
+                <div className="mb-2 flex gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl backdrop-blur">
+                  <dt className="tracking-wide font-extralight">Win Ratio</dt>
+                  <dd className="text-5xl font-semibold">
+                    {matchHistory.winRate}%
+                  </dd>
+                </div>
+                <div className="mb-2 flex gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl backdrop-blur">
+                  <dt className="tracking-wide font-extralight">LP Gain</dt>
+                  <dd className="text-5xl font-semibold">
+                    {matchHistory.lpGain}
+                  </dd>
+                </div>
+              </dl>
             </div>
-            {matchHistory && (
+            {matchHistory && isCurrentlyTracking && (
               <div className='relative mr-16 h-full'>
                 <PieChart
-                  className='pie-chart max-w-[160px] max-h-[160px] mt-12 backdrop-blur'
+                  className='pie-chart animate-enter max-w-[160px] max-h-[160px] mt-12 backdrop-blur'
                   animate={true}
                   lineWidth={75}
                   paddingAngle={0}
@@ -123,9 +116,6 @@ const Root = () => {
                   viewBoxSize={[60, 60]}
                   center={[30, 30]}
                   animationEasing={'ease-in-out'}
-                  segmentsStyle={{
-                    
-                  }}
                   data={[
                     { title: 'Wins', value: matchHistory.wins, color: 'rgba(0, 255, 77, .65)' },
                     { title: 'Losses', value: matchHistory.losses, color: 'rgba(251, 73, 73, 0.25)' },
@@ -160,12 +150,11 @@ const Root = () => {
         )}
         {!(isCurrentlyTracking || isLoading) && (
           <form
-            className="mt-10 mx-auto"
+            className="mx-auto"
             onSubmit={(e) => {
               e.preventDefault();
               const cfn = (e.target as any).cfn.value;
               if (cfn == "") return;
-              setCFN(cfn)
               setLoading(true);
 
               const x = async () => {
@@ -176,6 +165,7 @@ const Root = () => {
                 } else {
                   console.log("is Tracking");
                   setTracking(true);
+                  resetMatchHistory()
                 }
                 setLoading(false);
               };

@@ -224,7 +224,17 @@ func StartTracking(profile string) {
 	fmt.Println("Profile loaded")
 	time.Sleep(3 * time.Second)
 
-	matchHistory.CFN = profile
+	matchHistory = MatchHistory{
+		CFN:          profile,
+		LP:           0,
+		LPGain:       0,
+		Wins:         0,
+		Losses:       0,
+		TotalWins:    0,
+		TotalLosses:  0,
+		TotalMatches: 0,
+		WinRate:      0,
+	}
 
 	ResetSaveData()
 
