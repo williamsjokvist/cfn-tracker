@@ -8,6 +8,7 @@ import {
   StopTracking,
   GetMatchHistory,
 } from "../../wailsjs/go/main/App";
+import { PieChart } from 'react-minimal-pie-chart';
 
 const Root = () => {
   const { t } = useTranslation();
@@ -72,11 +73,11 @@ const Root = () => {
           )}
         </h2>
       </header>
-      <div className="z-40 h-full flex justify-between px-12 py-4">
-        {isCurrentlyTracking && (
+      <div className="z-40 h-full flex justify-between items-center px-8 py-4">
+        {matchHistory && (
           <>
-            <div className="relative">
-              <h3 className="text-3xl">
+            <div className="relative grid grid-rows-[0fr_1fr]">
+              <h3 className="text-3xl mr-8 pr-8 border-r border-slate-50 border-opacity-10">
                 <span className="text-sm block">CFN</span>
                 {cfn && cfn}
               </h3>
@@ -84,45 +85,76 @@ const Root = () => {
                 <span className="text-sm block">LP</span>
                 {matchHistory && matchHistory.lp && matchHistory.lp}
               </h4>
-              <button
-                onClick={() => {
-                  StopTracking();
-                  setTracking(false);
-                  setLoading(false);
-                }}
-                type="button"
-                className="absolute bottom-8 left-8 flex items-center justify-between bg-[rgba(255,10,10,.1)] rounded-md px-5 py-3 border-[#FF3D51] hover:bg-[#FF3D51] border-[1px] transition-colors font-semibold text-md"
-              >
-                <FaStop className="mr-3" /> Stop
-              </button>
+              <dl className="stat-grid-item w-full mt-4  relative text-center text-xl max-w-[265px] whitespace-nowrap">
+                  <div className="mb-2 flex gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl backdrop-blur">
+                    <dt className="tracking-wider font-extralight">Wins</dt>
+                    <dd className="text-5xl font-semibold">
+                      {matchHistory.wins}
+                    </dd>
+                  </div>
+                  <div className="mb-2 flex gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl backdrop-blur">
+                    <dt className="tracking-wide font-extralight">Losses</dt>
+                    <dd className="text-5xl font-semibold">
+                      {matchHistory.losses}
+                    </dd>
+                  </div>
+                  <div className="mb-2 flex gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl backdrop-blur">
+                    <dt className="tracking-wide font-extralight">Win Ratio</dt>
+                    <dd className="text-5xl font-semibold">
+                      {matchHistory.winRate}%
+                    </dd>
+                  </div>
+                  <div className="mb-2 flex gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl backdrop-blur">
+                    <dt className="tracking-wide font-extralight">LP Gain</dt>
+                    <dd className="text-5xl font-semibold">
+                      {matchHistory.lpGain}
+                    </dd>
+                  </div>
+                </dl>
             </div>
             {matchHistory && (
-              <dl className="relative text-center grid gap-2 text-xl max-w-[250px] whitespace-nowrap">
-                <div className="flex gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 rounded-xl backdrop-blur">
-                  <dt className="tracking-wider font-extralight">Wins</dt>
-                  <dd className="text-5xl font-semibold">
-                    {matchHistory.wins}
-                  </dd>
-                </div>
-                <div className="flex gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 rounded-xl backdrop-blur">
-                  <dt className="tracking-wide font-extralight">Losses</dt>
-                  <dd className="text-5xl font-semibold">
-                    {matchHistory.losses}
-                  </dd>
-                </div>
-                <div className="flex gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 rounded-xl backdrop-blur">
-                  <dt className="tracking-wide font-extralight">Win Ratio</dt>
-                  <dd className="text-5xl font-semibold">
-                    {matchHistory.winRate}
-                  </dd>
-                </div>
-                <div className="flex gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 rounded-xl backdrop-blur">
-                  <dt className="tracking-wide font-extralight">LP Gain</dt>
-                  <dd className="text-5xl font-semibold">
-                    {matchHistory.lpGain}
-                  </dd>
-                </div>
-              </dl>
+              <div className='relative mr-16 h-full'>
+                <PieChart
+                  className='pie-chart max-w-[160px] max-h-[160px] mt-12 backdrop-blur'
+                  animate={true}
+                  lineWidth={75}
+                  paddingAngle={0}
+                  animationDuration={10}
+                  viewBoxSize={[60, 60]}
+                  center={[30, 30]}
+                  animationEasing={'ease-in-out'}
+                  segmentsStyle={{
+                    
+                  }}
+                  data={[
+                    { title: 'Wins', value: matchHistory.wins, color: 'rgba(0, 255, 77, .65)' },
+                    { title: 'Losses', value: matchHistory.losses, color: 'rgba(251, 73, 73, 0.25)' },
+                  ]}
+                >
+                  <defs>
+                    <linearGradient id="blue-gradient" direction={-65}>
+                      <stop offset="0%" stopColor="#20BF55" />
+                      <stop offset="100%" stopColor="#347fd0" />
+                    </linearGradient>
+                    <linearGradient id="red-gradient" direction={120}>
+                      <stop offset="0%" stopColor="#EC9F05" />
+                      <stop offset="100%" stopColor="#EE9617" />
+                    </linearGradient>
+                  </defs>
+                </PieChart>
+
+                <button
+                  onClick={() => {
+                    StopTracking();
+                    setTracking(false);
+                    setLoading(false);
+                  }}
+                  type="button"
+                  className="backdrop-blur absolute bottom-8 right-8 flex items-center justify-between bg-[rgba(255,10,10,.1)] rounded-md px-5 py-3 border-[#FF3D51] hover:bg-[#FF3D51] border-[1px] transition-colors font-semibold text-md"
+                >
+                  <FaStop className="mr-3" /> Stop
+                </button>
+              </div>
             )}
           </>
         )}

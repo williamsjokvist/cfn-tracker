@@ -22,6 +22,17 @@ body {
   left: -600px;
 }
 
+.stat-grid-item {
+  grid-row-start: 2;
+  grid-column-start: 1;
+  grid-row-end: 3;
+  grid-column-end: 3;
+}
+
+.pie-chart {
+  clip-path: circle(50% at 50% 50%);
+}
+
 ::-webkit-scrollbar-track
 {
 	border-radius: 10px;
