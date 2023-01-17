@@ -58,7 +58,7 @@ const Root = () => {
 
   return (
     <main className="grid grid-rows-[0fr_1fr] min-h-screen max-h-screen z-40 flex-1 text-white mx-auto">
-      <header className="border-b border-slate-50 backdrop-blur border-opacity-10 --wails-draggable select-none " style={{
+      <header className="border-b border-slate-50 backdrop-blur border-opacity-10 select-none " style={{
         '--wails-draggable': 'drag'
       } as React.CSSProperties}>
         <h2 className="pt-4 px-8 pl-12 flex items-center justify-between gap-5 uppercase text-sm tracking-widest mb-4">
@@ -155,7 +155,7 @@ const Root = () => {
               disabled={isLoading}
               type="text"
               name="cfn"
-              className="py-3 px-4 block w-full border-gray-200 rounded-md text-lg focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400"
+              className="py-3 px-4 block w-full border-gray-200 rounded-md text-lg focus:border-orange-500 focus:ring-orange-500 dark:bg-gray-900 dark:border-gray-800 dark:text-gray-300"
               placeholder={t("cfnName")!}
             />
             <div className="flex justify-end">

@@ -13,8 +13,8 @@ import (
 )
 
 var (
-	steamUsername string
-	steamPassword string
+	steamUsername string = ``
+	steamPassword string = ``
 	profile       string
 )
 
@@ -25,7 +25,7 @@ var assets embed.FS
 var icon []byte
 
 func init() {
-	if os.Getenv(`EXECUTION_ENVIRONMENT`) != "test" && os.Getenv(`EXECUTION_ENVIRONMENT`) != "build" {
+	if steamUsername == `` && steamPassword == `` {
 		err := godotenv.Load(`.env`)
 		if err != nil {
 			log.Fatal(err)
@@ -48,11 +48,11 @@ func main() {
 		MinHeight:         450,
 		DisableResize:     true,
 		Fullscreen:        false,
-		Frameless:         false,
+		Frameless:         true,
 		StartHidden:       false,
 		HideWindowOnClose: false,
+		BackgroundColour:  options.NewRGBA(0, 0, 0, 0),
 		CSSDragProperty:   `--wails-draggable`,
-		BackgroundColour:  &options.RGBA{R: 33, G: 37, B: 43, A: 255},
 		Windows: &windows.Options{
 			WebviewIsTransparent:              true,
 			WindowIsTranslucent:               false,
@@ -61,16 +61,18 @@ func main() {
 		},
 		Mac: &mac.Options{
 			TitleBar:             mac.TitleBarHiddenInset(),
-			Appearance:           mac.NSAppearanceNameAccessibilityHighContrastVibrantDark,
 			WebviewIsTransparent: true,
 			WindowIsTranslucent:  true,
+			Appearance:           mac.AppearanceType(mac.NSAppearanceNameAccessibilityHighContrastDarkAqua),
 			About: &mac.AboutInfo{
 				Title:   "CFN Tracker v2",
 				Message: "Version 2.0.0 © 2022 William Sjökvist <william.sjokvist@gmail.com>",
 			},
 		},
-		OnStartup:  app.startup,
-		OnShutdown: app.shutdown,
+		OnStartup:     app.startup,
+		OnDomReady:    app.domReady,
+		OnShutdown:    app.shutdown,
+		OnBeforeClose: app.beforeClose,
 		Bind: []interface{}{
 			app,
 		},

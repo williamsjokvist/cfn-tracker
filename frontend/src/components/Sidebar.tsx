@@ -14,10 +14,10 @@ const Link = (props: { Icon: any, link: string; name: string, isSelected?: boole
     <li className="">
       <a
         href={'#/' + link}
-        className="text-lg text-slate-50 text-opacity-80 rounded py-2 px-1 mx-2 group flex items-center justify-between hover:!text-[#d6d4ff] hover:bg-slate-50 hover:bg-opacity-5 transition-colors"
+        className="text-lg text-[#bfbcff] text-opacity-80 rounded py-2 px-1 mx-2 group flex items-center justify-between hover:!text-white hover:bg-slate-50 hover:bg-opacity-5 transition-colors"
         style={{
           fontWeight: isSelected ? '600' : '200',
-          color: isSelected ? '#d6d4ff' : 'rgb(248 250 252)'
+          color: isSelected ? '#d6d4ff' : '#bfbcff'
         }}
       >
         <span className="flex items-center justify-between">
@@ -41,7 +41,7 @@ const Sidebar = () => {
   return (
 
     <aside
-      className="relative z-50 h-screen overflow-auto scrollbar-none grid grid-rows-[0fr_1fr_0fr] py-2 bg-[#222338] text-white whitespace-nowrap transition-all border-slate-900 border-opacity-10 dark:border-slate-50 dark:border-opacity-10"
+      className="border-r border-slate-50 border-opacity-10 backdrop-blur relative z-50 h-screen overflow-auto scrollbar-none grid grid-rows-[0fr_1fr_0fr] py-2 text-white whitespace-nowrap transition-all dark:border-slate-50 dark:border-opacity-10"
       style={{
         width: isOpen ? "190px" : "0px",
         overflow: isOpen ? 'visible' : 'hidden'
@@ -51,12 +51,12 @@ const Sidebar = () => {
         '--wails-draggable': 'drag'
       } as React.CSSProperties}>
         <div className='flex justify-start'>
-          <div className='group py-2 group flex ml-4 mb-3'>
-            <button aria-label='close' className='mr-[10px] p-[2px] w-4 h-4 group-hover:bg-red-500 bg-slate-600 flex items-center justify-center rounded-full' onClick={() => Quit()}>
-              <VscChromeClose className='text-red-800 group-hover:opacity-100 opacity-0' />
+          <div className='group mt-2 group flex ml-4 mb-3'>
+            <button aria-label='close' className='mr-[10px] p-[2px] w-4 h-4 group-hover:bg-red-500 bg-slate-600 flex items-center justify-center rounded-full transition-all' onClick={() => Quit()}>
+              <VscChromeClose className='text-red-800 group-hover:opacity-100 opacity-0 transition-all' />
             </button>
-            <button aria-label='close' className='p-[2px] w-4 h-4 group-hover:bg-yellow-500 bg-slate-600 flex items-center justify-center rounded-full' onClick={() => WindowMinimise()}>
-              <VscChromeMinimize className='text-yellow-800 group-hover:opacity-100 opacity-0 ' />
+            <button aria-label='close' className='p-[2px] w-4 h-4 group-hover:bg-yellow-500 bg-slate-600 flex items-center justify-center rounded-full transition-all' onClick={() => WindowMinimise()}>
+              <VscChromeMinimize className='text-yellow-800 group-hover:opacity-100 opacity-0 transition-all' />
             </button>
           </div>
         </div>

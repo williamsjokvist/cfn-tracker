@@ -13,17 +13,19 @@ import (
 )
 
 type MatchHistory struct {
-	LP           int `json:"lp"`
-	LPGain       int `json:"lpGain"`
-	Wins         int `json:"wins"`
-	TotalWins    int `json:"totalWins"`
-	TotalLosses  int `json:"totalLosses"`
-	TotalMatches int `json:"totalMatches"`
-	Losses       int `json:"losses"`
-	WinRate      int `json:"winRate"`
+	CFN          string `json:"cfn"`
+	LP           int    `json:"lp"`
+	LPGain       int    `json:"lpGain"`
+	Wins         int    `json:"wins"`
+	TotalWins    int    `json:"totalWins"`
+	TotalLosses  int    `json:"totalLosses"`
+	TotalMatches int    `json:"totalMatches"`
+	Losses       int    `json:"losses"`
+	WinRate      int    `json:"winRate"`
 }
 
 var matchHistory = MatchHistory{
+	CFN:          ``,
 	LP:           0,
 	LPGain:       0,
 	Wins:         0,
@@ -221,6 +223,8 @@ func StartTracking(profile string) {
 	isTracking = true
 	fmt.Println("Profile loaded")
 	time.Sleep(3 * time.Second)
+
+	matchHistory.CFN = profile
 
 	ResetSaveData()
 
