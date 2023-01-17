@@ -47,6 +47,7 @@ const Root = () => {
           lpGain: mh.lpGain,
           lp: mh.lp
         });
+        setCFN(mh.cfn)
       }, 3000);
     }
 
@@ -56,8 +57,10 @@ const Root = () => {
   }, [isCurrentlyTracking]);
 
   return (
-    <main className="grid grid-rows-[0fr_1fr] min-h-screen max-h-screen">
-      <header className="border-b border-slate-50 backdrop-blur border-opacity-10 --wails-draggable select-none ">
+    <main className="grid grid-rows-[0fr_1fr] min-h-screen max-h-screen z-40 flex-1 text-white mx-auto">
+      <header className="border-b border-slate-50 backdrop-blur border-opacity-10 --wails-draggable select-none " style={{
+        '--wails-draggable': 'drag'
+      } as React.CSSProperties}>
         <h2 className="pt-4 px-8 pl-12 flex items-center justify-between gap-5 uppercase text-sm tracking-widest mb-4">
           {isCurrentlyTracking || isLoading ? "Tracking" : t("startTracking")}
           {(isCurrentlyTracking || isLoading) && (
@@ -97,25 +100,25 @@ const Root = () => {
               <dl className="relative text-center grid gap-2 text-xl max-w-[250px] whitespace-nowrap">
                 <div className="flex gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 rounded-xl backdrop-blur">
                   <dt className="tracking-wider font-extralight">Wins</dt>
-                  <dd className="self-end text-5xl font-semibold">
+                  <dd className="text-5xl font-semibold">
                     {matchHistory.wins}
                   </dd>
                 </div>
                 <div className="flex gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 rounded-xl backdrop-blur">
                   <dt className="tracking-wide font-extralight">Losses</dt>
-                  <dd className="text-5xl font-semibold self-end">
+                  <dd className="text-5xl font-semibold">
                     {matchHistory.losses}
                   </dd>
                 </div>
                 <div className="flex gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 rounded-xl backdrop-blur">
                   <dt className="tracking-wide font-extralight">Win Ratio</dt>
-                  <dd className="text-5xl font-semibold self-end">
+                  <dd className="text-5xl font-semibold">
                     {matchHistory.winRate}
                   </dd>
                 </div>
                 <div className="flex gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 rounded-xl backdrop-blur">
                   <dt className="tracking-wide font-extralight">LP Gain</dt>
-                  <dd className="text-5xl font-semibold self-end">
+                  <dd className="text-5xl font-semibold">
                     {matchHistory.lpGain}
                   </dd>
                 </div>

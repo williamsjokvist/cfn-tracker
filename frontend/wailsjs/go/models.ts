@@ -1,6 +1,7 @@
 export namespace main {
 	
 	export class MatchHistory {
+	    cfn: string;
 	    lp: number;
 	    lpGain: number;
 	    wins: number;
@@ -16,6 +17,7 @@ export namespace main {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.cfn = source["cfn"];
 	        this.lp = source["lp"];
 	        this.lpGain = source["lpGain"];
 	        this.wins = source["wins"];
