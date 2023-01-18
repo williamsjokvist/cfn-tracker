@@ -12,7 +12,7 @@ const History = () => {
       <header className='border-b border-slate-50 border-opacity-10 backdrop-blur select-none' style={{
         '--wails-draggable': 'drag'
       } as React.CSSProperties}>
-        <h2 className="pt-4 px-8 pl-12 flex items-center justify-between gap-5 uppercase text-sm tracking-widest mb-4">
+        <h2 className="pt-4 px-8 flex items-center justify-between gap-5 uppercase text-sm tracking-widest mb-4">
           {t('history')}
         </h2>
       </header>

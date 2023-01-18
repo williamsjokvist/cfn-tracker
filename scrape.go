@@ -10,18 +10,22 @@ import (
 	"github.com/go-rod/rod"
 	"github.com/go-rod/rod/lib/launcher"
 	"github.com/go-rod/rod/lib/proto"
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 type MatchHistory struct {
-	CFN          string `json:"cfn"`
-	LP           int    `json:"lp"`
-	LPGain       int    `json:"lpGain"`
-	Wins         int    `json:"wins"`
-	TotalWins    int    `json:"totalWins"`
-	TotalLosses  int    `json:"totalLosses"`
-	TotalMatches int    `json:"totalMatches"`
-	Losses       int    `json:"losses"`
-	WinRate      int    `json:"winRate"`
+	CFN               string `json:"cfn"`
+	LP                int    `json:"lp"`
+	LPGain            int    `json:"lpGain"`
+	Wins              int    `json:"wins"`
+	TotalWins         int    `json:"totalWins"`
+	TotalLosses       int    `json:"totalLosses"`
+	TotalMatches      int    `json:"totalMatches"`
+	Losses            int    `json:"losses"`
+	WinRate           int    `json:"winRate"`
+	Opponent          string `json:"opponent"`
+	OpponentCharacter string `json:"opponentCharacter"`
+	OpponentLP        string `json:"opponentLP"`
 }
 
 var matchHistory = MatchHistory{
@@ -124,11 +128,18 @@ func RefreshData(profile string, page *rod.Page) {
 	totalWinsEl, e := page.Element(`.battleNumber>.win>dd`)
 	totalLossesEl, e := page.Element(`.battleNumber>.lose>dd`)
 	lpEl, e := page.Element(`.leagueInfo>dl:last-child>dd`)
+	opponentEl, e := page.Element(`.battleHistoryBox li:first-child .fId>dd`)
+	opponentLPEl, e := page.Element(`.battleHistoryBox li:first-child .league>dd`)
+	opponentCharacterEl, e := page.Element(`.battleHistoryBox li:first-child .fav>dd`)
 
 	if e != nil {
 		LogError(ParseError)
 		return
 	}
+
+	opponent := opponentEl.MustText()
+	opponentLP := opponentLPEl.MustText()
+	opponentCharacter := opponentCharacterEl.MustText()
 
 	// Convert to ints
 	newLp, _ := strconv.Atoi(strings.TrimSuffix(lpEl.MustText(), `LP`))
@@ -154,6 +165,9 @@ func RefreshData(profile string, page *rod.Page) {
 		matchHistory.Losses = matchHistory.Losses + int(math.Abs(float64(matchHistory.TotalLosses)-float64(totalLosses)))
 		matchHistory.LPGain = matchHistory.LPGain + (newLp - matchHistory.LP)
 		matchHistory.WinRate = int((float64(matchHistory.Wins) / float64(matchHistory.Wins+matchHistory.Losses)) * 100)
+		matchHistory.Opponent = opponent
+		matchHistory.OpponentLP = opponentLP
+		matchHistory.OpponentCharacter = opponentCharacter
 	}
 
 	matchHistory.TotalWins = totalWins
@@ -163,6 +177,7 @@ func RefreshData(profile string, page *rod.Page) {
 
 	SaveMatchHistory(matchHistory)
 	LogMatchHistory()
+	runtime.EventsEmit(WailsApp.ctx, `cfn-data`, matchHistory)
 }
 
 func SetupBrowser() *rod.Page {

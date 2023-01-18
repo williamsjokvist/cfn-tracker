@@ -9,55 +9,54 @@ import {
   GetMatchHistory,
 } from "../../wailsjs/go/main/App";
 import { PieChart } from 'react-minimal-pie-chart';
+import { EventsOn, EventsOff } from "../../wailsjs/runtime"
+
 import { useStatStore } from "../store/use-stat-store";
+
+interface IMatchHistory {
+  cfn: string,
+  losses: number,
+  lp: number,
+  lpGain: number,
+  opponent: string,
+  opponentCharacter: string,
+  opponentLP: string,
+  totalLosses: number,
+  totalMatches: number,
+  totalWins: number,
+  winRate: number,
+  wins: number
+}
 
 const Root = () => {
   const { t } = useTranslation();
   const [isLoading, setLoading] = useState(false);
-  const [isCurrentlyTracking, setTracking] = useState(false);
-  const {matchHistory, setMatchHistory, resetMatchHistory} = useStatStore();
+  const { matchHistory, setMatchHistory, resetMatchHistory, setTracking, isTracking } = useStatStore();
 
   useEffect(() => {
-    if (isCurrentlyTracking == true) return;
-
-    const fetchIsTracking = async () => {
-      const getIsTracking = await IsTracking();
-      setTracking(getIsTracking);
-    };
-
-    fetchIsTracking();
-  }, []);
-
-  useEffect(() => {
-    let interval: number | null = null;
-    if (isCurrentlyTracking) {
-      interval = setInterval(async () => {
-        const mh = await GetMatchHistory();
-        console.log(mh)
-        setMatchHistory({
-          cfn: mh.cfn,
-          wins: mh.wins,
-          losses: mh.losses,
-          winRate: mh.winRate,
-          lpGain: mh.lpGain,
-          lp: mh.lp
-        });
-      }, 3000);
-    }
-
+    if (isTracking == true) return;
+    EventsOn(`cfn-data`, (mh: IMatchHistory) => {
+      console.log(mh)
+      setMatchHistory(mh);
+      setTracking(true);
+      setLoading(false)
+    })
     return () => {
-      interval && clearInterval(interval);
-    };
-  }, [isCurrentlyTracking]);
+      EventsOff(`cfn-data`)
+    }
+  }, []);
 
   return (
     <main className="grid grid-rows-[0fr_1fr] min-h-screen max-h-screen z-40 flex-1 text-white mx-auto">
       <header className="border-b border-slate-50 backdrop-blur border-opacity-10 select-none " style={{
         '--wails-draggable': 'drag'
       } as React.CSSProperties}>
-        <h2 className="pt-4 px-8 pl-12 flex items-center justify-between gap-5 uppercase text-sm tracking-widest mb-4">
-          {isCurrentlyTracking || isLoading ? "Tracking" : t("startTracking")}
-          {(isCurrentlyTracking || isLoading) && (
+        <h2 className="pt-4 px-8 flex items-center justify-between gap-5 uppercase text-sm tracking-widest mb-4">
+          {isTracking && "Tracking"}
+          {isLoading && 'Loading'}
+
+          {!isTracking && !isLoading && t("startTracking")}
+          {(isTracking || isLoading) && (
             <div
               className="animate-spin inline-block w-5 h-5 border-[3px] border-current border-t-transparent text-pink-600 rounded-full"
               role="status"
@@ -67,7 +66,7 @@ const Root = () => {
         </h2>
       </header>
       <div className="z-40 h-full flex justify-between items-center px-8 py-4">
-        {matchHistory && isCurrentlyTracking && (
+        {matchHistory && isTracking && (
           <>
             <div className="relative grid grid-rows-[0fr_1fr]">
               <h3 className="text-3xl mr-8 pr-8 border-r border-slate-50 border-opacity-10">
@@ -100,12 +99,13 @@ const Root = () => {
                 <div className="mb-2 flex gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl backdrop-blur">
                   <dt className="tracking-wide font-extralight">LP Gain</dt>
                   <dd className="text-5xl font-semibold">
+                    {(matchHistory.lpGain > 0) && '+'}
                     {matchHistory.lpGain}
                   </dd>
                 </div>
               </dl>
             </div>
-            {matchHistory && isCurrentlyTracking && (
+            {matchHistory && isTracking && (
               <div className='relative mr-16 h-full'>
                 <PieChart
                   className='pie-chart animate-enter max-w-[160px] max-h-[160px] mt-12 backdrop-blur'
@@ -148,7 +148,7 @@ const Root = () => {
             )}
           </>
         )}
-        {!(isCurrentlyTracking || isLoading) && (
+        {!(isTracking || isLoading) && (
           <form
             className="mx-auto"
             onSubmit={(e) => {
@@ -156,18 +156,13 @@ const Root = () => {
               const cfn = (e.target as any).cfn.value;
               if (cfn == "") return;
               setLoading(true);
-
               const x = async () => {
                 const isTracking = await Track(cfn);
-                setTracking(isTracking);
                 if (isTracking == false) {
                   alert("Failed to track CFN");
                 } else {
-                  console.log("is Tracking");
-                  setTracking(true);
                   resetMatchHistory()
                 }
-                setLoading(false);
               };
               x();
             }}
@@ -184,7 +179,7 @@ const Root = () => {
               <button
                 disabled={isLoading}
                 type="submit"
-                className="mt-4 flex select-none items-center justify-between bg-[rgba(255,10,10,.1)] rounded-md px-5 py-3 border-[#FF3D51] hover:bg-[#FF3D51] border-[1px] transition-colors font-semibold text-md"
+                className="backdrop-blur mt-4 flex select-none items-center justify-between bg-[rgba(255,10,10,.1)] rounded-md px-5 py-3 border-[#FF3D51] hover:bg-[#FF3D51] border-[1px] transition-colors font-semibold text-md"
               >
                 <GiDeerTrack className="mr-3" /> {t("start")}
               </button>

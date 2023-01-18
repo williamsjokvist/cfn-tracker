@@ -10,6 +10,9 @@ export namespace main {
 	    totalMatches: number;
 	    losses: number;
 	    winRate: number;
+	    opponent: string;
+	    opponentCharacter: string;
+	    opponentLP: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new MatchHistory(source);
@@ -26,6 +29,9 @@ export namespace main {
 	        this.totalMatches = source["totalMatches"];
 	        this.losses = source["losses"];
 	        this.winRate = source["winRate"];
+	        this.opponent = source["opponent"];
+	        this.opponentCharacter = source["opponentCharacter"];
+	        this.opponentLP = source["opponentLP"];
 	    }
 	}
 

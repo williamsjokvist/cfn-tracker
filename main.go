@@ -24,6 +24,8 @@ var assets embed.FS
 //go:embed build/appicon.png
 var icon []byte
 
+var WailsApp *App
+
 func init() {
 	if steamUsername == `` && steamPassword == `` {
 		err := godotenv.Load(`.env`)
@@ -37,7 +39,7 @@ func init() {
 
 func main() {
 	// Create an instance of the app structure
-	app := NewApp()
+	WailsApp = NewApp()
 
 	err := wails.Run(&options.App{
 		Title:             `CFN Tracker v2`,
@@ -69,12 +71,12 @@ func main() {
 				Message: "Version 2.0.0 © 2022 William Sjökvist <william.sjokvist@gmail.com>",
 			},
 		},
-		OnStartup:     app.startup,
-		OnDomReady:    app.domReady,
-		OnShutdown:    app.shutdown,
-		OnBeforeClose: app.beforeClose,
+		OnStartup:     WailsApp.startup,
+		OnDomReady:    WailsApp.domReady,
+		OnShutdown:    WailsApp.shutdown,
+		OnBeforeClose: WailsApp.beforeClose,
 		Bind: []interface{}{
-			app,
+			WailsApp,
 		},
 	})
 
