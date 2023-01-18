@@ -34,7 +34,6 @@ const Root = () => {
   const { matchHistory, setMatchHistory, resetMatchHistory, setTracking, isTracking } = useStatStore();
 
   useEffect(() => {
-    if (isTracking == true) return;
     EventsOn(`cfn-data`, (mh: IMatchHistory) => {
       console.log(mh)
       setMatchHistory(mh);
