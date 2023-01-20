@@ -175,9 +175,9 @@ func RefreshData(profile string, page *rod.Page) {
 	matchHistory.TotalMatches = totalMatches
 	matchHistory.LP = newLp
 
+	runtime.EventsEmit(WailsApp.ctx, `cfn-data`, matchHistory)
 	SaveMatchHistory(matchHistory)
 	LogMatchHistory()
-	runtime.EventsEmit(WailsApp.ctx, `cfn-data`, matchHistory)
 }
 
 func SetupBrowser() *rod.Page {

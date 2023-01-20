@@ -4,6 +4,8 @@ import {main} from '../models';
 
 export function GetMatchHistory():Promise<main.MatchHistory>;
 
+export function GetMatchLog():Promise<Array<main.MatchHistory>>;
+
 export function IsTracking():Promise<boolean>;
 
 export function OpenResultsDirectory():Promise<void>;

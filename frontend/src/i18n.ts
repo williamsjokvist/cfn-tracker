@@ -22,6 +22,18 @@ i18n
           startTracking: 'Start Tracking',
           cfnName: 'CFN Name',
           start: 'Start',
+          opponent: 'Opponent',
+          character: 'Character',
+          lpGain: 'LP Gain',
+          delete: 'Clear Log',
+          goBack: 'Go back',
+          loading: 'Loading',
+          wins: 'Wins',
+          losses: 'Losses',
+          winRate: 'Win Rate',
+          stop: 'Stop',
+          openResultFolder: 'Results Folder',
+          enterCfnName: 'Enter your CFN name'
         }
       },
       fr: {
@@ -32,6 +44,18 @@ i18n
           startTracking: 'Démarrer le suivi',
           cfnName: 'Nom CFN',
           start: 'Début',
+          opponent: 'Ennemi',
+          character: 'Caractère',
+          lpGain: 'Gain LP',
+          delete: 'Supprimer le journal',
+          goBack: 'Retourner',
+          loading: 'Chargement, veuillez patienter',
+          wins: 'Gagne',
+          losses: 'Pertes',
+          winRate: 'Taux de réussite',
+          stop: 'Arrêter',
+          openResultFolder: 'Dossier des résultats',
+          enterCfnName: 'Entrez votre nom CFN'
         }
       },
       jp: {
@@ -42,6 +66,18 @@ i18n
           startTracking: '追跡を開始',
           cfnName: 'CFN名',
           start: '始める',
+          opponent: '敵',
+          character: 'キャラクター',
+          lpGain: 'LP得',
+          delete: '日誌を削除',
+          goBack: '戻る',
+          loading: 'お待ちください',
+          wins: '勝つ',
+          losses: '損失',
+          winRate: '勝率',
+          stop: 'やめろ',
+          openResultFolder: '結果フォルダ',
+          enterCfnName: 'CFN名を入力してください'
         }
       }
     }

@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"encoding/json"
+	"os"
 	"runtime"
 
 	"os/exec"
@@ -68,4 +70,13 @@ func (a *App) OpenResultsDirectory() {
 	}
 
 	cmd.Run()
+}
+
+func (a *App) GetMatchLog() []MatchHistory {
+	var matchLog []MatchHistory
+
+	pastMatches, _ := os.ReadFile(`results/match-history.json`)
+	_ = json.Unmarshal(pastMatches, &matchLog)
+
+	return matchLog
 }

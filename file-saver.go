@@ -24,17 +24,25 @@ func ResetSaveData() {
 func SaveMatchHistory(matchHistory MatchHistory) {
 	SaveTextToFile(`results`, `wins.txt`, strconv.Itoa(matchHistory.Wins))
 	SaveTextToFile(`results`, `losses.txt`, strconv.Itoa(matchHistory.Losses))
-	SaveTextToFile(`results`, `lp-gain.txt`, strconv.Itoa(matchHistory.LPGain))
 	SaveTextToFile(`results`, `win-rate.txt`, strconv.Itoa(matchHistory.WinRate)+`%`)
 	SaveTextToFile(`results`, `lp.txt`, strconv.Itoa(matchHistory.LP))
+	gain := strconv.Itoa(matchHistory.LPGain)
+	if matchHistory.LPGain > 0 {
+		gain = `+` + gain
+	}
+	SaveTextToFile(`results`, `lp-gain.txt`, gain)
 
+	// Do not save match result if there is no opponent
+	if matchHistory.Opponent == `` {
+		return
+	}
 	mhMarshalled, err := json.Marshal(&matchHistory)
 
 	if err != nil {
 		return
 	}
 
-	var arr []string
+	var arr []MatchHistory
 	pastMatches, err := os.ReadFile(`results/match-history.json`)
 	if err != nil {
 		// No past matches
@@ -48,11 +56,13 @@ func SaveMatchHistory(matchHistory MatchHistory) {
 		return
 	}
 
-	fmt.Println(string(mhMarshalled))
-	slice := append(pastMatches, mhMarshalled...)
-	fmt.Println(string(slice))
-	fmt.Println(string(pastMatches))
-	SaveTextToFile(`results`, `match-history.json`, string(slice))
+	newArr := append(arr, matchHistory)
+	newArrMarshalled, err := json.Marshal(&newArr)
+	if err != nil {
+		return
+	}
+	fmt.Println(string(newArrMarshalled))
+	SaveTextToFile(`results`, `match-history.json`, string(newArrMarshalled))
 }
 
 func SaveTextToFile(directory string, fileName string, text string) {

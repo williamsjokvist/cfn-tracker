@@ -4,45 +4,27 @@ import { GiDeerTrack } from "react-icons/gi";
 import { FaStop } from "react-icons/fa";
 import {
   Track,
-  IsTracking,
   StopTracking,
-  GetMatchHistory,
-  OpenResultsDirectory
+  OpenResultsDirectory,
+  IsTracking
 } from "../../wailsjs/go/main/App";
 import { PieChart } from 'react-minimal-pie-chart';
-import { EventsOn, EventsOff } from "../../wailsjs/runtime"
+import { AiFillFolderOpen } from 'react-icons/ai'
 
 import { useStatStore } from "../store/use-stat-store";
 
-interface IMatchHistory {
-  cfn: string,
-  losses: number,
-  lp: number,
-  lpGain: number,
-  opponent: string,
-  opponentCharacter: string,
-  opponentLP: string,
-  totalLosses: number,
-  totalMatches: number,
-  totalWins: number,
-  winRate: number,
-  wins: number
-}
 
 const Root = () => {
   const { t } = useTranslation();
-  const [isLoading, setLoading] = useState(false);
-  const { matchHistory, setMatchHistory, resetMatchHistory, setTracking, isTracking } = useStatStore();
+  const { matchHistory, resetMatchHistory, setTracking, isTracking, isLoading, setLoading } = useStatStore();
 
   useEffect(() => {
-    EventsOn(`cfn-data`, (mh: IMatchHistory) => {
-      console.log(mh)
-      setMatchHistory(mh);
-      setTracking(true);
-      setLoading(false)
-    })
-    return () => {
-      EventsOff(`cfn-data`)
+    if (!isTracking) {
+      const getIsTracking = async () => {
+        const trackStatus = await IsTracking()
+        setTracking(trackStatus)
+      }
+      getIsTracking()
     }
   }, []);
 
@@ -52,8 +34,8 @@ const Root = () => {
         '--wails-draggable': 'drag'
       } as React.CSSProperties}>
         <h2 className="pt-4 px-8 flex items-center justify-between gap-5 uppercase text-sm tracking-widest mb-4">
-          {isTracking && "Tracking"}
-          {isLoading && 'Loading'}
+          {isTracking && t('tracking')}
+          {isLoading && t('loading')}
 
           {!isTracking && !isLoading && t("startTracking")}
           {(isTracking || isLoading) && (
@@ -79,25 +61,25 @@ const Root = () => {
               </h4>
               <dl className="stat-grid-item w-full mt-8 relative text-center text-xl whitespace-nowrap">
                 <div className="mb-2 flex gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl backdrop-blur">
-                  <dt className="tracking-wider font-extralight">Wins</dt>
+                  <dt className="tracking-wider font-extralight">{t('wins')}</dt>
                   <dd className="text-5xl font-semibold">
                     {matchHistory.wins}
                   </dd>
                 </div>
                 <div className="mb-2 flex gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl backdrop-blur">
-                  <dt className="tracking-wide font-extralight">Losses</dt>
+                  <dt className="tracking-wide font-extralight">{t('losses')}</dt>
                   <dd className="text-5xl font-semibold">
                     {matchHistory.losses}
                   </dd>
                 </div>
                 <div className="mb-2 flex gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl backdrop-blur">
-                  <dt className="tracking-wide font-extralight">Win Ratio</dt>
+                  <dt className="tracking-wide font-extralight">{t('winRate')}</dt>
                   <dd className="text-5xl font-semibold">
                     {matchHistory.winRate}%
                   </dd>
                 </div>
                 <div className="mb-2 flex gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl backdrop-blur">
-                  <dt className="tracking-wide font-extralight">LP Gain</dt>
+                  <dt className="tracking-wide font-extralight">{t('lpGain')}</dt>
                   <dd className="text-5xl font-semibold">
                     {(matchHistory.lpGain > 0) && '+'}
                     {matchHistory.lpGain}
@@ -133,7 +115,7 @@ const Root = () => {
                   </defs>
                 </PieChart>
 
-                <div className='relative bottom-[-20px]'>
+                <div className='relative bottom-[-20px] right-[-10px]'>
                   <button
                     onClick={() => {
                       OpenResultsDirectory()
@@ -142,9 +124,10 @@ const Root = () => {
                       filter: 'hue-rotate(-120deg)'
                     }}
                     type="button"
-                    className="backdrop-blur mb-2 flex items-center justify-between bg-[rgba(255,10,10,.1)] rounded-md px-5 py-3 border-[#FF3D51] hover:bg-[#FF3D51] border-[1px] transition-colors font-semibold text-md"
+                    className="whitespace-nowrap backdrop-blur mb-2 flex items-center justify-between bg-[rgba(255,10,10,.1)] rounded-md px-5 py-3 border-[#FF3D51] hover:bg-[#FF3D51] border-[1px] transition-colors font-semibold text-md"
                   >
-                    Open Results Folder
+                    <AiFillFolderOpen className='w-4 h-4 mr-2'/>
+                    {t('openResultFolder')}
                   </button>
 
                   <button
@@ -156,7 +139,7 @@ const Root = () => {
                     type="button"
                     className="float-right backdrop-blur bottom-2 flex items-center justify-between bg-[rgba(255,10,10,.1)] rounded-md px-5 py-3 border-[#FF3D51] hover:bg-[#FF3D51] border-[1px] transition-colors font-semibold text-md"
                   >
-                    <FaStop className="mr-3" /> Stop
+                    <FaStop className="mr-3" /> {t('stop')}
                   </button>
                 </div>
               </div>
@@ -182,7 +165,7 @@ const Root = () => {
               x();
             }}
           >
-            <h3 className="mb-2">Enter your CFN name</h3>
+            <h3 className="mb-2">{t('enterCfnName')}</h3>
             <input
               disabled={isLoading}
               type="text"
@@ -198,6 +181,9 @@ const Root = () => {
               <button
                 disabled={isLoading}
                 type="submit"
+                style={{
+                  filter: 'hue-rotate(92deg)'
+                }}
                 className="backdrop-blur mt-4 flex select-none items-center justify-between bg-[rgba(255,10,10,.1)] rounded-md px-5 py-3 border-[#FF3D51] hover:bg-[#FF3D51] border-[1px] transition-colors font-semibold text-md"
               >
                 <GiDeerTrack className="mr-3" /> {t("start")}

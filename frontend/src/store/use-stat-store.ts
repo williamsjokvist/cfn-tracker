@@ -20,12 +20,14 @@ const initialState: MatchHistory = {
 
 type State = {
     matchHistory: MatchHistory | null,
-    isTracking: boolean
+    isTracking: boolean,
+    isLoading: boolean
 }
 
 type Actions = {
     setMatchHistory: (mh: MatchHistory) => void
     setTracking: (isTracking: boolean) => void 
+    setLoading: (isLoading: boolean) => void 
     resetMatchHistory: () => void
 }
 
@@ -40,6 +42,8 @@ export const useStatStore = create<State & Actions>(
             lp: 0
         },
         isTracking: false,
+        isLoading: false,
+        setLoading: (isLoading) => set((state) => ({ isLoading: isLoading }) ),
         setMatchHistory: (mh) => set((state) => ({ matchHistory: mh }) ),
         setTracking: (isTracking) => set((state) => ({ isTracking: isTracking }) ),
         resetMatchHistory: () => set((state) => ({ matchHistory: initialState}))

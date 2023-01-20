@@ -6,6 +6,10 @@ export function GetMatchHistory() {
   return window['go']['main']['App']['GetMatchHistory']();
 }
 
+export function GetMatchLog() {
+  return window['go']['main']['App']['GetMatchLog']();
+}
+
 export function IsTracking() {
   return window['go']['main']['App']['IsTracking']();
 }
