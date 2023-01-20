@@ -7,6 +7,7 @@ import {
   IsTracking,
   StopTracking,
   GetMatchHistory,
+  OpenResultsDirectory
 } from "../../wailsjs/go/main/App";
 import { PieChart } from 'react-minimal-pie-chart';
 import { EventsOn, EventsOff } from "../../wailsjs/runtime"
@@ -67,16 +68,16 @@ const Root = () => {
       <div className="z-40 h-full flex justify-between items-center px-8 py-4">
         {matchHistory && isTracking && (
           <>
-            <div className="relative grid grid-rows-[0fr_1fr]">
-              <h3 className="text-3xl mr-8 pr-8 border-r border-slate-50 border-opacity-10">
+            <div className="relative w-full h-full grid grid-rows-[0fr_1fr] max-w-[320px]">
+              <h3 className="whitespace-nowrap overflow-hidden max-w-[145px] text-2xl">
                 <span className="text-sm block">CFN</span>
                 {matchHistory.cfn}
               </h3>
-              <h4 className="text-3xl">
+              <h4 className="text-2xl">
                 <span className="text-sm block">LP</span>
                 {matchHistory && matchHistory.lp && matchHistory.lp}
               </h4>
-              <dl className="stat-grid-item w-full mt-4  relative text-center text-xl max-w-[265px] whitespace-nowrap">
+              <dl className="stat-grid-item w-full mt-8 relative text-center text-xl whitespace-nowrap">
                 <div className="mb-2 flex gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl backdrop-blur">
                   <dt className="tracking-wider font-extralight">Wins</dt>
                   <dd className="text-5xl font-semibold">
@@ -105,7 +106,7 @@ const Root = () => {
               </dl>
             </div>
             {matchHistory && isTracking && (
-              <div className='relative mr-16 h-full'>
+              <div className='relative mr-4 h-full grid justify-items-center'>
                 <PieChart
                   className='pie-chart animate-enter max-w-[160px] max-h-[160px] mt-12 backdrop-blur'
                   animate={true}
@@ -132,17 +133,32 @@ const Root = () => {
                   </defs>
                 </PieChart>
 
-                <button
-                  onClick={() => {
-                    StopTracking();
-                    setTracking(false);
-                    setLoading(false);
-                  }}
-                  type="button"
-                  className="backdrop-blur absolute bottom-8 right-8 flex items-center justify-between bg-[rgba(255,10,10,.1)] rounded-md px-5 py-3 border-[#FF3D51] hover:bg-[#FF3D51] border-[1px] transition-colors font-semibold text-md"
-                >
-                  <FaStop className="mr-3" /> Stop
-                </button>
+                <div className='relative bottom-[-20px]'>
+                  <button
+                    onClick={() => {
+                      OpenResultsDirectory()
+                    }}
+                    style={{
+                      filter: 'hue-rotate(-120deg)'
+                    }}
+                    type="button"
+                    className="backdrop-blur mb-2 flex items-center justify-between bg-[rgba(255,10,10,.1)] rounded-md px-5 py-3 border-[#FF3D51] hover:bg-[#FF3D51] border-[1px] transition-colors font-semibold text-md"
+                  >
+                    Open Results Folder
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      StopTracking();
+                      setTracking(false);
+                      setLoading(false);
+                    }}
+                    type="button"
+                    className="float-right backdrop-blur bottom-2 flex items-center justify-between bg-[rgba(255,10,10,.1)] rounded-md px-5 py-3 border-[#FF3D51] hover:bg-[#FF3D51] border-[1px] transition-colors font-semibold text-md"
+                  >
+                    <FaStop className="mr-3" /> Stop
+                  </button>
+                </div>
               </div>
             )}
           </>
@@ -173,6 +189,10 @@ const Root = () => {
               name="cfn"
               className="py-3 px-4 block w-full border-gray-200 rounded-md text-lg focus:border-orange-500 focus:ring-orange-500 dark:bg-gray-900 dark:border-gray-800 dark:text-gray-300"
               placeholder={t("cfnName")!}
+              autoCapitalize='off'
+              autoComplete='off'
+              autoCorrect='off'
+              autoSave='off'
             />
             <div className="flex justify-end">
               <button

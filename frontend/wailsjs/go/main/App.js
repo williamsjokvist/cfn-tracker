@@ -10,6 +10,10 @@ export function IsTracking() {
   return window['go']['main']['App']['IsTracking']();
 }
 
+export function OpenResultsDirectory() {
+  return window['go']['main']['App']['OpenResultsDirectory']();
+}
+
 export function StopTracking() {
   return window['go']['main']['App']['StopTracking']();
 }

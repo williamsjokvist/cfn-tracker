@@ -6,6 +6,8 @@ export function GetMatchHistory():Promise<main.MatchHistory>;
 
 export function IsTracking():Promise<boolean>;
 
+export function OpenResultsDirectory():Promise<void>;
+
 export function StopTracking():Promise<void>;
 
 export function Track(arg1:string):Promise<boolean>;

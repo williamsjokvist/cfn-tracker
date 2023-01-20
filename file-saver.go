@@ -29,10 +29,30 @@ func SaveMatchHistory(matchHistory MatchHistory) {
 	SaveTextToFile(`results`, `lp.txt`, strconv.Itoa(matchHistory.LP))
 
 	mhMarshalled, err := json.Marshal(&matchHistory)
-	if err == nil {
-		fmt.Println(string(mhMarshalled))
-		SaveTextToFile(`results`, `match-history.json`, string(mhMarshalled))
+
+	if err != nil {
+		return
 	}
+
+	var arr []string
+	pastMatches, err := os.ReadFile(`results/match-history.json`)
+	if err != nil {
+		// No past matches
+		str := "[" + string(mhMarshalled) + "]"
+		SaveTextToFile(`results`, `match-history.json`, str)
+		return
+	}
+
+	err = json.Unmarshal(pastMatches, &arr)
+	if err != nil {
+		return
+	}
+
+	fmt.Println(string(mhMarshalled))
+	slice := append(pastMatches, mhMarshalled...)
+	fmt.Println(string(slice))
+	fmt.Println(string(pastMatches))
+	SaveTextToFile(`results`, `match-history.json`, string(slice))
 }
 
 func SaveTextToFile(directory string, fileName string, text string) {

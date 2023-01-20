@@ -2,6 +2,9 @@ package main
 
 import (
 	"context"
+	"runtime"
+
+	"os/exec"
 )
 
 // App struct
@@ -53,4 +56,16 @@ func (a *App) StopTracking() {
 
 func (a *App) GetMatchHistory() MatchHistory {
 	return matchHistory
+}
+
+func (a *App) OpenResultsDirectory() {
+	var cmd *exec.Cmd
+
+	if runtime.GOOS == `darwin` {
+		cmd = exec.Command(`Open`, `./results`)
+	} else {
+		cmd = exec.Command(`explorer.exe`, `./results`)
+	}
+
+	cmd.Run()
 }
