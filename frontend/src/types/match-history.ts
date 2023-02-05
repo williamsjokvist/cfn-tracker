@@ -10,5 +10,7 @@ export interface IMatchHistory {
     totalMatches: number,
     totalWins: number,
     winRate: number,
-    wins: number
+    wins: number,
+    result: boolean,
+    timestamp: string
   }

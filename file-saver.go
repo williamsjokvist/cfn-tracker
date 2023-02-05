@@ -18,6 +18,7 @@ func ResetSaveData() {
 		TotalLosses:  0,
 		TotalMatches: 0,
 		WinRate:      0,
+		IsWin:        false,
 	})
 }
 

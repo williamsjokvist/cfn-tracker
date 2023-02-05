@@ -13,6 +13,8 @@ export namespace main {
 	    opponent: string;
 	    opponentCharacter: string;
 	    opponentLP: string;
+	    result: boolean;
+	    timestamp: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new MatchHistory(source);
@@ -32,6 +34,8 @@ export namespace main {
 	        this.opponent = source["opponent"];
 	        this.opponentCharacter = source["opponentCharacter"];
 	        this.opponentLP = source["opponentLP"];
+	        this.result = source["result"];
+	        this.timestamp = source["timestamp"];
 	    }
 	}
 

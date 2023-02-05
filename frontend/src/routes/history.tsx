@@ -4,7 +4,8 @@ import { FaChevronLeft } from "react-icons/fa";
 import { MdOutlineDelete } from 'react-icons/md'
 import { IMatchHistory } from '../types/match-history'
 import {
-  GetMatchLog
+  GetMatchLog,
+  DeleteMatchLog
 } from "../../wailsjs/go/main/App";
 
 const History = () => {
@@ -33,7 +34,7 @@ const History = () => {
           {t('history')}
         </h2>
       </header>
-      <div className="relative w-full pt-2 pb-4 z-40 pb-4">
+      <div className="relative w-full pt-2 z-40 pb-4">
         <div className='px-8 mb-2 h-10 border-b border-slate-50 border-opacity-10 '>
           {isSpecified && (
             <>
@@ -46,18 +47,24 @@ const History = () => {
             </>
           )}
           <button onClick={() => {
-
+            DeleteMatchLog()
+            setTimeout(() => {
+              setMatchLog([])
+            }, 50)
           }} className='backdrop-blur leading-4 h-8 inline-block float-right rounded-xl transition-all items-center border-transparent hover:border-white border-opacity-5 border-[1px] px-3 py-1'>
             <MdOutlineDelete className='w-4 h-4 inline mr-2' />
             {t('delete')}
           </button>
         </div>
         <div className='overflow-y-scroll max-h-[320px] h-full px-8'>
-          <table className="w-full border-spacing-y-1 border-separate min-w-[525px] h-full">
+          <table className="w-full border-spacing-y-1 border-separate min-w-[525px]">
             <thead>
               <tr>
+                <th className='text-left px-3 whitespace-nowrap'>{t('time')}</th>
+                <th className='text-left px-3 whitespace-nowrap'>CFN</th>
                 <th className='text-left px-3 whitespace-nowrap'>{t('opponent')}</th>
                 <th className='text-left px-3 whitespace-nowrap'>{t('character')}</th>
+                <th className='text-left px-3 whitespace-nowrap'>{t('result')}</th>
                 <th className='text-left px-3 whitespace-nowrap'>{t('lpGain')}</th>
               </tr>
             </thead>
@@ -65,6 +72,20 @@ const History = () => {
               {matchLog && matchLog.map((log, index) => {
                 return (
                   <tr key={index} className="w-full backdrop-blur">
+                    <td className='whitespace-nowrap text-center rounded-l-xl rounded-r-none bg-slate-50 bg-opacity-5 px-3 py-2'>
+                      {log.timestamp}
+                    </td>
+                    <td
+                      onClick={() => {
+                        setMatchLog([])
+                        setTimeout(() => {
+                          setMatchLog(matchLog.filter(ml => ml.cfn == log.cfn))
+                          setSpecified(true)
+                        }, 50)
+                      }}
+                      className='whitespace-nowrap rounded-none bg-slate-50 bg-opacity-5 px-3 py-2 hover:underline cursor-pointer'>
+                      {log.cfn}
+                    </td>
                     <td
                       onClick={() => {
                         setMatchLog([])
@@ -73,7 +94,7 @@ const History = () => {
                           setSpecified(true)
                         }, 50)
                       }}
-                      className='w-full rounded-l-xl rounded-r-none bg-slate-50 bg-opacity-5 px-3 py-2 hover:underline cursor-pointer'>
+                      className='whitespace-nowrap w-full rounded-none bg-slate-50 bg-opacity-5 px-3 py-2 hover:underline cursor-pointer'>
                       {log.opponent}
                     </td>
                     <td
@@ -84,10 +105,15 @@ const History = () => {
                           setSpecified(true)
                         }, 50)
                       }}
-                      className='rounded-none bg-slate-50 bg-opacity-5 px-3 py-2 hover:underline cursor-pointer'>
+                      className='rounded-none bg-slate-50 bg-opacity-5 px-3 py-2 text-center hover:underline cursor-pointer'>
                       {log.opponentCharacter}
                     </td>
-                    <td className='rounded-r-xl rounded-l-none bg-slate-50 bg-opacity-5 px-3 py-2'>
+                    <td className='rounded-none bg-slate-50 bg-opacity-5 px-3 py-2 text-center' style={{
+                      color: log.result == true ? 'lime' : 'red'
+                    }}>
+                      {log.result == true ? 'W' : 'L'}
+                    </td>
+                    <td className='rounded-r-xl rounded-l-none bg-slate-50 bg-opacity-5 px-3 py-2 text-center'>
                       {(log.lpGain > 0) && '+'}
                       {log.lpGain}
                     </td>

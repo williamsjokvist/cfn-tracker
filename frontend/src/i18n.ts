@@ -2,6 +2,29 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 
+interface CFNTrackerTranslation {
+  tracking: string,
+  history: string,
+  language: string,
+  startTracking: string,
+  cfnName: string,
+  start: string,
+  opponent: string,
+  character: string,
+  lpGain: string,
+  delete: string,
+  goBack: string,
+  loading: string,
+  wins: string,
+  losses: string,
+  winRate: string,
+  stop: string,
+  openResultFolder: string,
+  enterCfnName: string,
+  result: string,
+  time: string
+}
+
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
@@ -33,8 +56,10 @@ i18n
           winRate: 'Win Rate',
           stop: 'Stop',
           openResultFolder: 'Results Folder',
-          enterCfnName: 'Enter your CFN name'
-        }
+          enterCfnName: 'Enter your CFN name',
+          result: 'Result',
+          time: 'Time'
+        } as CFNTrackerTranslation
       },
       fr: {
         translation: {
@@ -55,8 +80,10 @@ i18n
           winRate: 'Taux de réussite',
           stop: 'Arrêter',
           openResultFolder: 'Dossier des résultats',
-          enterCfnName: 'Entrez votre nom CFN'
-        }
+          enterCfnName: 'Entrez votre nom CFN',
+          result: 'Dossier',
+          time: 'Temps'
+        } as CFNTrackerTranslation
       },
       jp: {
         translation: {
@@ -75,10 +102,12 @@ i18n
           wins: '勝つ',
           losses: '損失',
           winRate: '勝率',
-          stop: 'やめろ',
+          stop: 'やめる',
           openResultFolder: '結果フォルダ',
-          enterCfnName: 'CFN名を入力してください'
-        }
+          enterCfnName: 'CFN名を入力してください',
+          result: '結果',
+          time: '時間'
+        } as CFNTrackerTranslation
       }
     }
   });

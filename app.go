@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"os"
 	"runtime"
 
@@ -52,6 +53,10 @@ func (a *App) IsTracking() bool {
 	return isTracking
 }
 
+func (a *App) IsInitialized() bool {
+	return isInitialized
+}
+
 func (a *App) StopTracking() {
 	isTracking = false
 }
@@ -79,4 +84,11 @@ func (a *App) GetMatchLog() []MatchHistory {
 	_ = json.Unmarshal(pastMatches, &matchLog)
 
 	return matchLog
+}
+
+func (a *App) DeleteMatchLog() {
+	err := os.Remove(`results/match-history.json`)
+	if err != nil {
+		fmt.Println(err)
+	}
 }

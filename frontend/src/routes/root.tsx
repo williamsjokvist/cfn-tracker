@@ -6,7 +6,8 @@ import {
   Track,
   StopTracking,
   OpenResultsDirectory,
-  IsTracking
+  IsTracking,
+  IsInitialized
 } from "../../wailsjs/go/main/App";
 import { PieChart } from 'react-minimal-pie-chart';
 import { AiFillFolderOpen } from 'react-icons/ai'
@@ -51,9 +52,9 @@ const Root = () => {
         {matchHistory && isTracking && (
           <>
             <div className="relative w-full h-full grid grid-rows-[0fr_1fr] max-w-[320px]">
-              <h3 className="whitespace-nowrap overflow-hidden max-w-[145px] text-2xl">
+              <h3 className="whitespace-nowrap max-w-[145px] text-2xl">
                 <span className="text-sm block">CFN</span>
-                {matchHistory.cfn}
+                <span className='text-ellipsis block overflow-hidden'>{matchHistory.cfn}</span>
               </h3>
               <h4 className="text-2xl">
                 <span className="text-sm block">LP</span>
@@ -151,10 +152,17 @@ const Root = () => {
             className="mx-auto"
             onSubmit={(e) => {
               e.preventDefault();
+
               const cfn = (e.target as any).cfn.value;
               if (cfn == "") return;
               setLoading(true);
-              const x = async () => {
+              const startTrack = async () => {
+                const isInitialized = await IsInitialized()
+                if (isInitialized == false) {
+                  setLoading(false)
+                  return
+                }
+
                 const isTracking = await Track(cfn);
                 if (isTracking == false) {
                   alert("Failed to track CFN");
@@ -162,7 +170,7 @@ const Root = () => {
                   resetMatchHistory()
                 }
               };
-              x();
+              startTrack();
             }}
           >
             <h3 className="mb-2">{t('enterCfnName')}</h3>

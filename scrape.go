@@ -26,6 +26,8 @@ type MatchHistory struct {
 	Opponent          string `json:"opponent"`
 	OpponentCharacter string `json:"opponentCharacter"`
 	OpponentLP        string `json:"opponentLP"`
+	IsWin             bool   `json:"result"`
+	TimeStamp         string `json:"timestamp"`
 }
 
 var matchHistory = MatchHistory{
@@ -38,6 +40,8 @@ var matchHistory = MatchHistory{
 	TotalLosses:  0,
 	TotalMatches: 0,
 	WinRate:      0,
+	IsWin:        false,
+	TimeStamp:    ``,
 }
 
 var (
@@ -63,10 +67,10 @@ func Login(profile string, page *rod.Page, steamUsername string, steamPassword s
 	// If CFN already opened
 	url := page.MustInfo().URL
 	if url != `https://game.capcom.com/cfn/sfv/` {
-		page.WaitElementsMoreThan(`#loginForm`, 0)
+		page.WaitElementsMoreThan(`#loginModals`, 0)
 	}
 
-	isSteamOpen, _, _ := page.Has(`#loginForm`)
+	isSteamOpen, _, _ := page.Has(`#loginModals`)
 
 	if isSteamOpen {
 		fmt.Println("Passing the gateway")
@@ -74,9 +78,9 @@ func Login(profile string, page *rod.Page, steamUsername string, steamPassword s
 			return LoginError.returnCode, nil
 		}
 
-		usernameElement, _ := page.Element(`#loginForm input[name="username"]`)
-		passwordElement, _ := page.Element(`#loginForm input[name="password"]`)
-		buttonElement, e := page.Element(`input#imageLogin`)
+		usernameElement, _ := page.Element(`.page_content form>div:first-child input`)
+		passwordElement, _ := page.Element(`.page_content form>div:nth-child(2) input`)
+		buttonElement, e := page.Element(`.page_content form>div:nth-child(4) button`)
 
 		if e != nil {
 			return LoginError.returnCode, nil
@@ -87,6 +91,7 @@ func Login(profile string, page *rod.Page, steamUsername string, steamPassword s
 		buttonElement.Click(proto.InputMouseButtonLeft, 2)
 
 		var secondsWaited time.Duration = 0
+		hasClickedAccept := false
 		for {
 			body := page.MustElement(`body`)
 			errorElement, _ := body.Element(`#error_display`)
@@ -103,6 +108,15 @@ func Login(profile string, page *rod.Page, steamUsername string, steamPassword s
 			if !strings.Contains(page.MustInfo().URL, `steam`) {
 				// Gateway passed
 				break
+			}
+
+			isConfirmPageOpen, _, _ := page.Has(`#imageLogin`)
+			if isConfirmPageOpen && !hasClickedAccept {
+				buttonElement, e := page.Element(`#imageLogin`)
+				if e == nil {
+					buttonElement.Click(proto.InputMouseButtonLeft, 2)
+					hasClickedAccept = true
+				}
 			}
 		}
 	}
@@ -159,6 +173,8 @@ func RefreshData(profile string, page *rod.Page) {
 		return
 	}
 
+	isWin := totalWins > matchHistory.TotalWins
+
 	// Matches have been played since first fetch
 	if hasNewMatch && !isFirstFetch {
 		matchHistory.Wins = matchHistory.Wins + int(math.Abs(float64(matchHistory.TotalWins)-float64(totalWins)))
@@ -168,12 +184,14 @@ func RefreshData(profile string, page *rod.Page) {
 		matchHistory.Opponent = opponent
 		matchHistory.OpponentLP = opponentLP
 		matchHistory.OpponentCharacter = opponentCharacter
+		matchHistory.IsWin = isWin
 	}
 
 	matchHistory.TotalWins = totalWins
 	matchHistory.TotalLosses = totalLosses
 	matchHistory.TotalMatches = totalMatches
 	matchHistory.LP = newLp
+	matchHistory.TimeStamp = time.Now().Format(`15:04`)
 
 	runtime.EventsEmit(WailsApp.ctx, `cfn-data`, matchHistory)
 	SaveMatchHistory(matchHistory)
@@ -182,25 +200,27 @@ func RefreshData(profile string, page *rod.Page) {
 
 func SetupBrowser() *rod.Page {
 	fmt.Println("Setting up browser")
-	u := launcher.New().Leakless(false).Headless(true).MustLaunch()
+	u := launcher.New().Leakless(false).Headless(false).MustLaunch()
 	page := rod.New().ControlURL(u).MustConnect().MustPage("")
 	router := page.HijackRequests()
 
 	// Block all images, stylesheets, fonts and unessential scripts
 	router.MustAdd("*", func(ctx *rod.Hijack) {
-		if ctx.Request.Type() == proto.NetworkResourceTypeImage ||
-			ctx.Request.Type() == proto.NetworkResourceTypeStylesheet ||
-			ctx.Request.Type() == proto.NetworkResourceTypeFont {
-			ctx.Response.Fail(proto.NetworkErrorReasonBlockedByClient)
-			return
-		}
+		/*
+			if ctx.Request.Type() == proto.NetworkResourceTypeImage ||
+				ctx.Request.Type() == proto.NetworkResourceTypeStylesheet ||
+				ctx.Request.Type() == proto.NetworkResourceTypeFont {
+				ctx.Response.Fail(proto.NetworkErrorReasonBlockedByClient)
+				return
+			}
 
-		// Only check for scripts on non-steam requests
-		if !strings.Contains(ctx.Request.URL().Hostname(), `steam`) &&
-			ctx.Request.Type() == proto.NetworkResourceTypeScript {
-			ctx.Response.Fail(proto.NetworkErrorReasonBlockedByClient)
-			return
-		}
+			// Only check for scripts on non-steam requests
+
+				if !strings.Contains(ctx.Request.URL().Hostname(), `steam`) &&
+					ctx.Request.Type() == proto.NetworkResourceTypeScript {
+					ctx.Response.Fail(proto.NetworkErrorReasonBlockedByClient)
+					return
+				}*/
 
 		ctx.ContinueRequest(&proto.FetchContinueRequest{})
 	})
@@ -249,6 +269,7 @@ func StartTracking(profile string) {
 		TotalLosses:  0,
 		TotalMatches: 0,
 		WinRate:      0,
+		IsWin:        false,
 	}
 
 	ResetSaveData()
