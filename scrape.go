@@ -28,6 +28,7 @@ type MatchHistory struct {
 	OpponentLP        string `json:"opponentLP"`
 	IsWin             bool   `json:"result"`
 	TimeStamp         string `json:"timestamp"`
+	WinStreak         int    `json:"winStreak"`
 }
 
 var matchHistory = MatchHistory{
@@ -40,6 +41,7 @@ var matchHistory = MatchHistory{
 	TotalLosses:  0,
 	TotalMatches: 0,
 	WinRate:      0,
+	WinStreak:    0,
 	IsWin:        false,
 	TimeStamp:    ``,
 }
@@ -71,11 +73,13 @@ func Login(profile string, page *rod.Page, steamUsername string, steamPassword s
 	}
 
 	isSteamOpen, _, _ := page.Has(`#loginModals`)
+	isConfirmPageOpen, _, _ := page.Has(`#imageLogin`)
 
-	if isSteamOpen {
+	if isSteamOpen && !isConfirmPageOpen {
 		fmt.Println("Passing the gateway")
 		if page.MustInfo().URL == `https://game.capcom.com/cfn/sfv/` {
-			return LoginError.returnCode, nil
+			fmt.Println("Gateway passed")
+			return 1, page
 		}
 
 		usernameElement, _ := page.Element(`.page_content form>div:first-child input`)
@@ -93,8 +97,7 @@ func Login(profile string, page *rod.Page, steamUsername string, steamPassword s
 		var secondsWaited time.Duration = 0
 		hasClickedAccept := false
 		for {
-			body := page.MustElement(`body`)
-			errorElement, _ := body.Element(`#error_display`)
+			errorElement, _ := page.Element(`#error_display`)
 			if errorElement != nil {
 				errorText, e := errorElement.Text()
 
@@ -185,6 +188,12 @@ func RefreshData(profile string, page *rod.Page) {
 		matchHistory.OpponentLP = opponentLP
 		matchHistory.OpponentCharacter = opponentCharacter
 		matchHistory.IsWin = isWin
+
+		if isWin {
+			matchHistory.WinStreak++
+		} else if matchHistory.Wins > 0 {
+			matchHistory.WinStreak--
+		}
 	}
 
 	matchHistory.TotalWins = totalWins
@@ -206,13 +215,15 @@ func SetupBrowser() *rod.Page {
 
 	// Block all images, stylesheets, fonts and unessential scripts
 	router.MustAdd("*", func(ctx *rod.Hijack) {
+		if ctx.Request.Type() == proto.NetworkResourceTypeImage ||
+			ctx.Request.Type() == proto.NetworkResourceTypeStylesheet ||
+			ctx.Request.Type() == proto.NetworkResourceTypeFont {
+			ctx.Response.Fail(proto.NetworkErrorReasonBlockedByClient)
+			return
+		}
+
 		/*
-			if ctx.Request.Type() == proto.NetworkResourceTypeImage ||
-				ctx.Request.Type() == proto.NetworkResourceTypeStylesheet ||
-				ctx.Request.Type() == proto.NetworkResourceTypeFont {
-				ctx.Response.Fail(proto.NetworkErrorReasonBlockedByClient)
-				return
-			}
+
 
 			// Only check for scripts on non-steam requests
 
@@ -238,6 +249,8 @@ func Initialize() int {
 	pageInstance = page
 	loginStatus, page := Login(profile, page, steamUsername, steamPassword)
 	isInitialized = (loginStatus == 1)
+	runtime.EventsEmit(WailsApp.ctx, `initialized`, isInitialized)
+
 	if loginStatus == LoginError.returnCode {
 		LogError(LoginError)
 	} else if loginStatus == ProfileError.returnCode {

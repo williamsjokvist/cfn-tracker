@@ -34,7 +34,6 @@ const Link = (props: { Icon: any, link: string; name: string, isSelected?: boole
   );
 };
 const Sidebar = () => {
-  const [isOpen, setIsOpen] = useState(true);
   const { t } = useTranslation();
   const location = useLocation();
 
@@ -43,8 +42,8 @@ const Sidebar = () => {
     <aside
       className="border-r border-slate-50 border-opacity-10 backdrop-blur relative z-50 h-screen overflow-auto scrollbar-none grid grid-rows-[0fr_1fr_0fr] py-2 text-white whitespace-nowrap transition-all dark:border-slate-50 dark:border-opacity-10"
       style={{
-        width: isOpen ? "190px" : "0px",
-        overflow: isOpen ? 'visible' : 'hidden'
+        width: '190px',
+        overflow: 'visible'
       }}
     >
       <header style={{
@@ -85,7 +84,12 @@ const Sidebar = () => {
             style={{ transform: "rotate(45deg)" }}
           />
         </a>
-        <small className='text-sm mt-4 font-extralight'>CFN Tracker v2.1.0</small>
+        <a 
+          target='#'     
+          className='text-sm mt-4 font-extralight cursor-pointer hover:underline'      
+          onClick={() => {
+            BrowserOpenURL('https://github.com/GreenSoap/cfn-tracker/releases')
+          }}>CFN Tracker v2.1.0</a>
       </footer>
     </aside>
   );

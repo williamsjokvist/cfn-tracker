@@ -22,7 +22,8 @@ interface CFNTrackerTranslation {
   openResultFolder: string,
   enterCfnName: string,
   result: string,
-  time: string
+  time: string,
+  winStreak: string
 }
 
 i18n
@@ -58,7 +59,8 @@ i18n
           openResultFolder: 'Results Folder',
           enterCfnName: 'Enter your CFN name',
           result: 'Result',
-          time: 'Time'
+          time: 'Time',
+          winStreak: 'Win Streak'
         } as CFNTrackerTranslation
       },
       fr: {
@@ -82,7 +84,8 @@ i18n
           openResultFolder: 'Dossier des résultats',
           enterCfnName: 'Entrez votre nom CFN',
           result: 'Dossier',
-          time: 'Temps'
+          time: 'Temps',
+          winStreak: 'Série de victoires'
         } as CFNTrackerTranslation
       },
       jp: {
@@ -106,7 +109,8 @@ i18n
           openResultFolder: '結果フォルダ',
           enterCfnName: 'CFN名を入力してください',
           result: '結果',
-          time: '時間'
+          time: '時間',
+          winStreak: 'ストリークを獲得'
         } as CFNTrackerTranslation
       }
     }

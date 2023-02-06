@@ -17,16 +17,25 @@ import { useStatStore } from "../store/use-stat-store";
 
 const Root = () => {
   const { t } = useTranslation();
-  const { matchHistory, resetMatchHistory, setTracking, isTracking, isLoading, setLoading } = useStatStore();
+  const { matchHistory, resetMatchHistory, setTracking, isTracking, isLoading, setLoading, setInitialized, isInitialized } = useStatStore();
 
   useEffect(() => {
-    if (!isTracking) {
-      const getIsTracking = async () => {
-        const trackStatus = await IsTracking()
-        setTracking(trackStatus)
-      }
+    const getIsTracking = async () => {
+      const trackStatus = await IsTracking()
+      setTracking(trackStatus)
+    }
+
+    const getIsInitialized = async () => {
+      const initialized = await IsInitialized()
+      setInitialized(initialized)
+    }
+
+    if (!isInitialized) {
+      getIsInitialized()
+    } else if (!isTracking) {
       getIsTracking()
     }
+    
   }, []);
 
   return (
@@ -37,9 +46,10 @@ const Root = () => {
         <h2 className="pt-4 px-8 flex items-center justify-between gap-5 uppercase text-sm tracking-widest mb-4">
           {isTracking && t('tracking')}
           {isLoading && t('loading')}
+          {!isInitialized && t('loading')}
 
-          {!isTracking && !isLoading && t("startTracking")}
-          {(isTracking || isLoading) && (
+          {!isTracking && isInitialized && !isLoading && t("startTracking")}
+          {(isTracking || isLoading || !isInitialized) && (
             <div
               className="animate-spin inline-block w-5 h-5 border-[3px] border-current border-t-transparent text-pink-600 rounded-full"
               role="status"
@@ -60,28 +70,34 @@ const Root = () => {
                 <span className="text-sm block">LP</span>
                 {matchHistory && matchHistory.lp && matchHistory.lp}
               </h4>
-              <dl className="stat-grid-item w-full mt-8 relative text-center text-xl whitespace-nowrap">
+              <dl className="stat-grid-item w-full mt-2 relative text-center text-lg whitespace-nowrap">
                 <div className="mb-2 flex gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl backdrop-blur">
                   <dt className="tracking-wider font-extralight">{t('wins')}</dt>
-                  <dd className="text-5xl font-semibold">
+                  <dd className="text-4xl font-semibold">
                     {matchHistory.wins}
                   </dd>
                 </div>
                 <div className="mb-2 flex gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl backdrop-blur">
                   <dt className="tracking-wide font-extralight">{t('losses')}</dt>
-                  <dd className="text-5xl font-semibold">
+                  <dd className="text-4xl font-semibold">
                     {matchHistory.losses}
                   </dd>
                 </div>
                 <div className="mb-2 flex gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl backdrop-blur">
                   <dt className="tracking-wide font-extralight">{t('winRate')}</dt>
-                  <dd className="text-5xl font-semibold">
+                  <dd className="text-4xl font-semibold">
                     {matchHistory.winRate}%
                   </dd>
                 </div>
                 <div className="mb-2 flex gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl backdrop-blur">
+                  <dt className="tracking-wide font-extralight">{t('winStreak')}</dt>
+                  <dd className="text-4xl font-semibold">
+                    {matchHistory.winStreak}
+                  </dd>
+                </div>
+                <div className="mb-2 flex gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl backdrop-blur">
                   <dt className="tracking-wide font-extralight">{t('lpGain')}</dt>
-                  <dd className="text-5xl font-semibold">
+                  <dd className="text-4xl font-semibold">
                     {(matchHistory.lpGain > 0) && '+'}
                     {matchHistory.lpGain}
                   </dd>
@@ -125,7 +141,7 @@ const Root = () => {
                       filter: 'hue-rotate(-120deg)'
                     }}
                     type="button"
-                    className="whitespace-nowrap backdrop-blur mb-2 flex items-center justify-between bg-[rgba(255,10,10,.1)] rounded-md px-5 py-3 border-[#FF3D51] hover:bg-[#FF3D51] border-[1px] transition-colors font-semibold text-md"
+                    className="whitespace-nowrap mb-2 flex items-center justify-between bg-[rgba(255,10,10,.1)] rounded-md px-5 py-3 border-[#FF3D51] hover:bg-[#FF3D51] border-[1px] transition-colors font-semibold text-md"
                   >
                     <AiFillFolderOpen className='w-4 h-4 mr-2'/>
                     {t('openResultFolder')}
@@ -138,7 +154,7 @@ const Root = () => {
                       setLoading(false);
                     }}
                     type="button"
-                    className="float-right backdrop-blur bottom-2 flex items-center justify-between bg-[rgba(255,10,10,.1)] rounded-md px-5 py-3 border-[#FF3D51] hover:bg-[#FF3D51] border-[1px] transition-colors font-semibold text-md"
+                    className="float-right bottom-2 flex items-center justify-between bg-[rgba(255,10,10,.1)] rounded-md px-5 py-3 border-[#FF3D51] hover:bg-[#FF3D51] border-[1px] transition-colors font-semibold text-md"
                   >
                     <FaStop className="mr-3" /> {t('stop')}
                   </button>
@@ -147,7 +163,7 @@ const Root = () => {
             )}
           </>
         )}
-        {!(isTracking || isLoading) && (
+        {!(isTracking || isLoading || !isInitialized) && (
           <form
             className="mx-auto"
             onSubmit={(e) => {
@@ -190,9 +206,9 @@ const Root = () => {
                 disabled={isLoading}
                 type="submit"
                 style={{
-                  filter: 'hue-rotate(92deg)'
+                  filter: 'hue-rotate(156deg)'
                 }}
-                className="backdrop-blur mt-4 flex select-none items-center justify-between bg-[rgba(255,10,10,.1)] rounded-md px-5 py-3 border-[#FF3D51] hover:bg-[#FF3D51] border-[1px] transition-colors font-semibold text-md"
+                className="mt-4 flex select-none items-center justify-between bg-[rgba(255,10,10,.1)] rounded-md px-5 py-3 border-[#FF3D51] hover:bg-[#FF3D51] border-[1px] transition-colors font-semibold text-md"
               >
                 <GiDeerTrack className="mr-3" /> {t("start")}
               </button>

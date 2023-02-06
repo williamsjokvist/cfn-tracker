@@ -1,48 +1,47 @@
 import { create } from 'zustand'
+import { IMatchHistory } from '../types/match-history'
 
-interface MatchHistory {
-    cfn: string;
-    wins: number;
-    losses: number;
-    winRate: any;
-    lpGain: any;
-    lp: number;
-}
 
-const initialState: MatchHistory = {
+const initialState: IMatchHistory = {
     cfn: '',
     wins: 0,
     losses: 0,
     winRate: 0,
     lpGain: 0,
-    lp: 0
+    lp: 0,
+    opponent: '',
+    opponentCharacter: '',
+    opponentLP: '',
+    totalLosses: 0,
+    totalMatches: 0,
+    totalWins: 0,
+    result: false,
+    winStreak: 0,
+    timestamp: ''
 }
 
 type State = {
-    matchHistory: MatchHistory | null,
+    matchHistory: IMatchHistory | null,
     isTracking: boolean,
-    isLoading: boolean
+    isLoading: boolean,
+    isInitialized: boolean
 }
 
 type Actions = {
-    setMatchHistory: (mh: MatchHistory) => void
+    setMatchHistory: (mh: IMatchHistory) => void
     setTracking: (isTracking: boolean) => void 
     setLoading: (isLoading: boolean) => void 
+    setInitialized: (isInitialized: boolean) => void 
     resetMatchHistory: () => void
 }
 
 export const useStatStore = create<State & Actions>(
     (set) => ({
-        matchHistory: {
-            cfn: '',
-            wins: 0,
-            losses: 0,
-            winRate: 0,
-            lpGain: 0,
-            lp: 0
-        },
+        matchHistory: initialState,
         isTracking: false,
         isLoading: false,
+        isInitialized: false,
+        setInitialized: (isInitialized) => set((state) => ({ isInitialized: isInitialized }) ),
         setLoading: (isLoading) => set((state) => ({ isLoading: isLoading }) ),
         setMatchHistory: (mh) => set((state) => ({ matchHistory: mh }) ),
         setTracking: (isTracking) => set((state) => ({ isTracking: isTracking }) ),

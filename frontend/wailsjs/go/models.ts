@@ -15,6 +15,7 @@ export namespace main {
 	    opponentLP: string;
 	    result: boolean;
 	    timestamp: string;
+	    winStreak: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new MatchHistory(source);
@@ -36,6 +37,7 @@ export namespace main {
 	        this.opponentLP = source["opponentLP"];
 	        this.result = source["result"];
 	        this.timestamp = source["timestamp"];
+	        this.winStreak = source["winStreak"];
 	    }
 	}
 

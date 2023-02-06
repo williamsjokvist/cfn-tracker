@@ -71,7 +71,7 @@ func (a *App) OpenResultsDirectory() {
 	if runtime.GOOS == `darwin` {
 		cmd = exec.Command(`Open`, `./results`)
 	} else {
-		cmd = exec.Command(`explorer.exe`, `./results`)
+		cmd = exec.Command(`explorer.exe`, `.\results`)
 	}
 
 	cmd.Run()
