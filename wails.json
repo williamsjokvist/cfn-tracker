@@ -1,4 +1,5 @@
 {
+  "$schema": "https://wails.io/schemas/config.v2.json",
   "name": "CFN Tracker",
   "outputfilename": "CFN Tracker",
   "frontend:install": "npm install",

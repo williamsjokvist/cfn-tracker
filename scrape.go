@@ -97,17 +97,23 @@ func Login(profile string, page *rod.Page, steamUsername string, steamPassword s
 		var secondsWaited time.Duration = 0
 		hasClickedAccept := false
 		for {
-			errorElement, _ := page.Element(`#error_display`)
-			if errorElement != nil {
-				errorText, e := errorElement.Text()
+			if hasClickedAccept == true {
+				page.MustWaitLoad()
+			} else {
+				errorElement, _ := page.Element(`#error_display`)
+				if errorElement != nil {
+					errorText, e := errorElement.Text()
 
-				if e != nil || len(errorText) > 0 {
-					return CaptchaError.returnCode, nil
+					if e != nil || len(errorText) > 0 {
+						return CaptchaError.returnCode, nil
+					}
 				}
+
+				time.Sleep(time.Second)
+				secondsWaited += time.Second
 			}
 
-			time.Sleep(time.Second)
-			secondsWaited += time.Second
+			fmt.Println(`Waiting for gateway to pass...`, secondsWaited)
 			if !strings.Contains(page.MustInfo().URL, `steam`) {
 				// Gateway passed
 				break
@@ -191,8 +197,8 @@ func RefreshData(profile string, page *rod.Page) {
 
 		if isWin {
 			matchHistory.WinStreak++
-		} else if matchHistory.Wins > 0 {
-			matchHistory.WinStreak--
+		} else {
+			matchHistory.WinStreak = 0
 		}
 	}
 
@@ -209,19 +215,23 @@ func RefreshData(profile string, page *rod.Page) {
 
 func SetupBrowser() *rod.Page {
 	fmt.Println("Setting up browser")
-	u := launcher.New().Leakless(false).Headless(false).MustLaunch()
+	u := launcher.New().Leakless(false).Headless(true).MustLaunch()
 	page := rod.New().ControlURL(u).MustConnect().MustPage("")
 	router := page.HijackRequests()
 
 	// Block all images, stylesheets, fonts and unessential scripts
 	router.MustAdd("*", func(ctx *rod.Hijack) {
 		if ctx.Request.Type() == proto.NetworkResourceTypeImage ||
-			ctx.Request.Type() == proto.NetworkResourceTypeStylesheet ||
 			ctx.Request.Type() == proto.NetworkResourceTypeFont {
 			ctx.Response.Fail(proto.NetworkErrorReasonBlockedByClient)
 			return
 		}
 
+		if !strings.Contains(ctx.Request.URL().Hostname(), `steam`) &&
+			ctx.Request.Type() == proto.NetworkResourceTypeStylesheet {
+			ctx.Response.Fail(proto.NetworkErrorReasonBlockedByClient)
+			return
+		}
 		/*
 
 

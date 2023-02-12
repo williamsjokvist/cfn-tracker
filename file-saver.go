@@ -44,7 +44,10 @@ func SaveMatchHistory(matchHistory MatchHistory) {
 	}
 
 	var arr []MatchHistory
-	pastMatches, err := os.ReadFile(`results/match-history.json`)
+
+	dbFilePath := `results/` + profile + `/match-history.json`
+
+	pastMatches, err := os.ReadFile(dbFilePath)
 	if err != nil {
 		// No past matches
 		str := "[" + string(mhMarshalled) + "]"
@@ -63,7 +66,7 @@ func SaveMatchHistory(matchHistory MatchHistory) {
 		return
 	}
 	fmt.Println(string(newArrMarshalled))
-	SaveTextToFile(`results`, `match-history.json`, string(newArrMarshalled))
+	SaveTextToFile(`results`, dbFilePath, string(newArrMarshalled))
 }
 
 func SaveTextToFile(directory string, fileName string, text string) {

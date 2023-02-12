@@ -36,12 +36,13 @@ func (a App) domReady(ctx context.Context) {
 // either by clicking the window close button or calling runtime.Quit.
 // Returning true will cause the application to continue, false will continue shutdown as normal.
 func (a *App) beforeClose(ctx context.Context) (prevent bool) {
+	pageInstance.Browser().Close()
 	return false
 }
 
 // shutdown is called at application termination
 func (a *App) shutdown(ctx context.Context) {
-	pageInstance.Browser().Close()
+
 }
 
 func (a *App) Track(cfnName string) bool {
