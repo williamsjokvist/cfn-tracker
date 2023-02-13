@@ -4,8 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"runtime"
+	"strings"
 
 	"os/exec"
 )
@@ -78,17 +80,40 @@ func (a *App) OpenResultsDirectory() {
 	cmd.Run()
 }
 
-func (a *App) GetMatchLog() []MatchHistory {
+func (a *App) GetMatchLog(cfn string) []MatchHistory {
 	var matchLog []MatchHistory
 
-	pastMatches, _ := os.ReadFile(`results/match-history.json`)
+	pastMatches, _ := os.ReadFile(`results/` + cfn + `-log.json`)
 	_ = json.Unmarshal(pastMatches, &matchLog)
 
 	return matchLog
 }
 
-func (a *App) DeleteMatchLog() {
-	err := os.Remove(`results/match-history.json`)
+func (a *App) GetAvailableLogs() []string {
+	files, err := ioutil.ReadDir("results")
+	if err != nil {
+		fmt.Println(`Failed to read result directory`, err)
+	}
+
+	cfns := []string{}
+
+	for _, file := range files {
+		fileName := file.Name()
+
+		if !strings.Contains(fileName, `-log.json`) {
+			continue
+		}
+
+		fmt.Println(fileName)
+		cfn := strings.Split(fileName, `-log.json`)[0]
+		cfns = append(cfns, cfn)
+	}
+
+	return cfns
+}
+
+func (a *App) DeleteMatchLog(cfn string) {
+	err := os.Remove(`results/` + cfn + `-log.json`)
 	if err != nil {
 		fmt.Println(err)
 	}

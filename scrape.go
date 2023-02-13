@@ -47,9 +47,10 @@ var matchHistory = MatchHistory{
 }
 
 var (
-	isTracking    = false
-	isInitialized = false
-	pageInstance  *rod.Page
+	firstLPRecorded = 0
+	isTracking      = false
+	isInitialized   = false
+	pageInstance    *rod.Page
 )
 
 func LogMatchHistory() {
@@ -177,6 +178,15 @@ func RefreshData(profile string, page *rod.Page) {
 
 	hasNewMatch := totalMatches != matchHistory.TotalMatches
 
+	if isFirstFetch {
+		firstLPRecorded = newLp
+	}
+
+	// Revalidate LP gain, because of CFN revalidations
+	if matchHistory.LP != newLp {
+		matchHistory.LPGain = newLp - firstLPRecorded
+	}
+
 	// Return if no new data
 	if !(isFirstFetch || hasNewMatch) {
 		return
@@ -188,7 +198,6 @@ func RefreshData(profile string, page *rod.Page) {
 	if hasNewMatch && !isFirstFetch {
 		matchHistory.Wins = matchHistory.Wins + int(math.Abs(float64(matchHistory.TotalWins)-float64(totalWins)))
 		matchHistory.Losses = matchHistory.Losses + int(math.Abs(float64(matchHistory.TotalLosses)-float64(totalLosses)))
-		matchHistory.LPGain = matchHistory.LPGain + (newLp - matchHistory.LP)
 		matchHistory.WinRate = int((float64(matchHistory.Wins) / float64(matchHistory.Wins+matchHistory.Losses)) * 100)
 		matchHistory.Opponent = opponent
 		matchHistory.OpponentLP = opponentLP

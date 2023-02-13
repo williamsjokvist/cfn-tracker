@@ -13,6 +13,7 @@ body {
 
 .logo-pattern {
   opacity: 0.025;
+  background-image: url('/assets/logo.png');
   filter: grayscale(1) blur(0px);
   transform: rotate(-35deg);
   width: 264%;

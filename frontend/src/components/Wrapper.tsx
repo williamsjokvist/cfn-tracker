@@ -29,7 +29,7 @@ const Wrapper = ({ children }: any) => {
     <>
       <Sidebar />
       {children}
-      <div className='logo-pattern absolute filter-[grayscale(1)] bg-[url(src/assets/logo.png)] bg-center'/>
+      <div className={`logo-pattern absolute filter-[grayscale(1)] bg-center`}/>
     </>
   );
 };

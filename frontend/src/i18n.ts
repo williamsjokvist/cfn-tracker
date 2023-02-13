@@ -51,7 +51,7 @@ i18n
           lpGain: 'LP Gain',
           delete: 'Clear Log',
           goBack: 'Go back',
-          loading: 'Loading',
+          loading: 'Loading, please wait',
           wins: 'Wins',
           losses: 'Losses',
           winRate: 'Win Rate',

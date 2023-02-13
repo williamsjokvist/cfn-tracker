@@ -1,11 +1,11 @@
 package main
 
 import (
-	"log"
+	"fmt"
 )
 
 func LogError(err AppError) {
-	log.Fatal(err.message)
+	fmt.Println(err.message)
 }
 
 type AppError struct {

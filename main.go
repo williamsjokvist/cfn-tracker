@@ -56,7 +56,7 @@ func main() {
 		BackgroundColour:  options.NewRGBA(0, 0, 0, 0),
 		CSSDragProperty:   `--wails-draggable`,
 		Windows: &windows.Options{
-			WebviewIsTransparent:              true,
+			WebviewIsTransparent:              false,
 			WindowIsTranslucent:               false,
 			Theme:                             windows.Theme(windows.Dark),
 			DisableFramelessWindowDecorations: true,
@@ -68,7 +68,7 @@ func main() {
 			Appearance:           mac.AppearanceType(mac.NSAppearanceNameAccessibilityHighContrastDarkAqua),
 			About: &mac.AboutInfo{
 				Title:   "CFN Tracker v2",
-				Message: "Version 2.0.0 © 2022 William Sjökvist <william.sjokvist@gmail.com>",
+				Message: "Version 2.1.0 © 2022 William Sjökvist <william.sjokvist@gmail.com>",
 			},
 		},
 		OnStartup:     WailsApp.startup,

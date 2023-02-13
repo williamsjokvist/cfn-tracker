@@ -20,7 +20,7 @@ const LanguageSelector = () => {
       </button>
       <div className="absolute left-[98%] flex group-hover:opacity-100 group-hover:visible invisible opacity-0 transition-all">
         <FaChevronLeft
-          className="text-white w-3 h-3 relative right-4 top-1"
+          className="text-white w-3 h-3 relative right-4 top-2"
           style={{ transform: "rotate(180deg)" }}
         />
         <ul className="text-[16px] uppercase flex bg-black px-3 py-2 relative bottom-2 rounded-lg">
