@@ -47,8 +47,12 @@ func (a *App) shutdown(ctx context.Context) {
 
 }
 
-func (a *App) Track(cfnName string) bool {
-	go StartTracking(cfnName)
+func (a *App) GetAppVersion() string {
+	return appVersion.Original()
+}
+
+func (a *App) Track(cfnName string, resetData bool) bool {
+	go StartTracking(cfnName, resetData)
 	return isInitialized
 }
 

@@ -43,6 +43,7 @@ require (
 )
 
 require (
+	github.com/hashicorp/go-version v1.6.0
 	github.com/stretchr/testify v1.8.1
 	github.com/ysmood/goob v0.4.0 // indirect
 	github.com/ysmood/gson v0.7.3 // indirect

@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/hashicorp/go-version"
 	"github.com/joho/godotenv"
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
@@ -13,6 +14,7 @@ import (
 )
 
 var (
+	appVersion, _        = version.NewVersion(`1.9.0`)
 	steamUsername string = ``
 	steamPassword string = ``
 	profile       string
@@ -67,8 +69,8 @@ func main() {
 			WindowIsTranslucent:  true,
 			Appearance:           mac.AppearanceType(mac.NSAppearanceNameAccessibilityHighContrastDarkAqua),
 			About: &mac.AboutInfo{
-				Title:   "CFN Tracker v2",
-				Message: "Version 2.1.0 © 2022 William Sjökvist <william.sjokvist@gmail.com>",
+				Title:   "CFN Tracker " + appVersion.Original(),
+				Message: "Version " + appVersion.Original() + " © 2022 William Sjökvist <william.sjokvist@gmail.com>",
 			},
 		},
 		OnStartup:     WailsApp.startup,

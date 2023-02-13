@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { GiDeerTrack } from "react-icons/gi";
-import { FaStop } from "react-icons/fa";
+import { FaStop, FaPauseCircle, FaPlay } from "react-icons/fa";
 import {
   Track,
   StopTracking,
@@ -17,7 +17,7 @@ import { useStatStore } from "../store/use-stat-store";
 
 const Root = () => {
   const { t } = useTranslation();
-  const { matchHistory, resetMatchHistory, setTracking, isTracking, isLoading, setLoading, setInitialized, isInitialized } = useStatStore();
+  const { matchHistory, resetMatchHistory, setTracking, isTracking, isLoading, setLoading, setInitialized, isInitialized, isPaused, setPaused } = useStatStore();
 
   useEffect(() => {
     const getIsTracking = async () => {
@@ -44,7 +44,7 @@ const Root = () => {
         '--wails-draggable': 'drag'
       } as React.CSSProperties}>
         <h2 className="pt-4 px-8 flex items-center justify-between gap-5 uppercase text-sm tracking-widest mb-4">
-          {isTracking && t('tracking')}
+          {isTracking && !isLoading && t('tracking')}
           {isLoading && t('loading')}
           {!isInitialized && t('loading')}
 
@@ -132,7 +132,7 @@ const Root = () => {
                   </defs>
                 </PieChart>
 
-                <div className='relative bottom-[-20px] right-[-10px]'>
+                <div className='relative gap-2 items-center bottom-[10px] grid right-[-10px]'>
                   <button
                     onClick={() => {
                       OpenResultsDirectory()
@@ -146,7 +146,36 @@ const Root = () => {
                     <AiFillFolderOpen className='w-4 h-4 mr-2'/>
                     {t('openResultFolder')}
                   </button>
-
+                  <button
+                    onClick={() => {
+                      if (isPaused == false) {
+                        StopTracking();
+                        setLoading(false);
+                        setPaused(!isPaused)
+                      } else if (isPaused == true) {
+                      
+                        const startTrack = async () => {
+                          const isTracking = await Track(matchHistory.cfn, true);
+                          if (isTracking == false) {
+                            alert("Failed to track CFN");
+                          }
+                        }
+                        
+                        startTrack()
+                        setLoading(true);
+                        setPaused(false)
+                      }
+                    }}
+                    type="button"
+                    className="float-right bottom-2 flex items-center justify-between bg-[rgba(255,10,10,.1)] rounded-md px-5 py-3 border-[#FF3D51] hover:bg-[#FF3D51] border-[1px] transition-colors font-semibold text-md"
+                    style={{
+                      filter: 'hue-rotate(156deg)'
+                    }}
+                >   
+                    {!isPaused && <FaPauseCircle className="mr-3" />}
+                    {isPaused && <FaPlay className="mr-3" />}
+                    {isPaused ? t('unpause') : t('pause')}
+                  </button>
                   <button
                     onClick={() => {
                       StopTracking();
@@ -158,6 +187,7 @@ const Root = () => {
                   >
                     <FaStop className="mr-3" /> {t('stop')}
                   </button>
+
                 </div>
               </div>
             )}
@@ -179,7 +209,7 @@ const Root = () => {
                   return
                 }
 
-                const isTracking = await Track(cfn);
+                const isTracking = await Track(cfn, true);
                 if (isTracking == false) {
                   alert("Failed to track CFN");
                 } else {

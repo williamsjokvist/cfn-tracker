@@ -4,6 +4,8 @@ import {main} from '../models';
 
 export function DeleteMatchLog(arg1:string):Promise<void>;
 
+export function GetAppVersion():Promise<string>;
+
 export function GetAvailableLogs():Promise<Array<string>>;
 
 export function GetMatchHistory():Promise<main.MatchHistory>;
@@ -18,4 +20,4 @@ export function OpenResultsDirectory():Promise<void>;
 
 export function StopTracking():Promise<void>;
 
-export function Track(arg1:string):Promise<boolean>;
+export function Track(arg1:string,arg2:boolean):Promise<boolean>;

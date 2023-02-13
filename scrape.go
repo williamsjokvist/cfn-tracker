@@ -10,6 +10,7 @@ import (
 	"github.com/go-rod/rod"
 	"github.com/go-rod/rod/lib/launcher"
 	"github.com/go-rod/rod/lib/proto"
+	"github.com/hashicorp/go-version"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
@@ -222,6 +223,21 @@ func RefreshData(profile string, page *rod.Page) {
 	LogMatchHistory()
 }
 
+// TODO Error handling
+func CheckForVersionUpdate(page *rod.Page) bool {
+	page.MustNavigate(`https://github.com/GreenSoap/cfn-tracker/releases`).MustWaitLoad()
+	el, _ := page.Element(`turbo-frame div.mr-md-0:nth-child(3) > a:nth-child(1)`)
+	latestVerEl, _ := el.Text() //
+	latestVersionText := strings.Split(latestVerEl, "v")[1]
+	fmt.Println(latestVersionText)
+	latestVersion, _ := version.NewVersion(latestVersionText)
+	hasNewVersion := appVersion.LessThan(latestVersion)
+	if hasNewVersion {
+		fmt.Println(`Has new version: `, latestVersionText)
+	}
+	return hasNewVersion
+}
+
 func SetupBrowser() *rod.Page {
 	fmt.Println("Setting up browser")
 	u := launcher.New().Leakless(false).Headless(true).MustLaunch()
@@ -265,7 +281,6 @@ func Initialize() int {
 	}
 
 	page := SetupBrowser()
-	pageInstance = page
 	loginStatus, page := Login(profile, page, steamUsername, steamPassword)
 	isInitialized = (loginStatus == 1)
 	runtime.EventsEmit(WailsApp.ctx, `initialized`, isInitialized)
@@ -277,34 +292,43 @@ func Initialize() int {
 	} else if loginStatus == CaptchaError.returnCode {
 		LogError(CaptchaError)
 	}
+
+	if isInitialized == true {
+		fmt.Println("Check for new version")
+		hasNewVersion := CheckForVersionUpdate(page)
+		runtime.EventsEmit(WailsApp.ctx, `version-update`, hasNewVersion)
+	}
 	pageInstance = page
 	return loginStatus
 }
 
-func StartTracking(profile string) {
+func StartTracking(profile string, resetData bool) {
 	if isInitialized == false {
 		return
 	}
+
 	fmt.Println("Loading profile")
 	pageInstance.MustNavigate(`https://game.capcom.com/cfn/sfv/profile/` + profile).MustWaitLoad()
 	isTracking = true
 	fmt.Println("Profile loaded")
 	time.Sleep(3 * time.Second)
 
-	matchHistory = MatchHistory{
-		CFN:          profile,
-		LP:           0,
-		LPGain:       0,
-		Wins:         0,
-		Losses:       0,
-		TotalWins:    0,
-		TotalLosses:  0,
-		TotalMatches: 0,
-		WinRate:      0,
-		IsWin:        false,
-	}
+	if resetData == true {
+		matchHistory = MatchHistory{
+			CFN:          profile,
+			LP:           0,
+			LPGain:       0,
+			Wins:         0,
+			Losses:       0,
+			TotalWins:    0,
+			TotalLosses:  0,
+			TotalMatches: 0,
+			WinRate:      0,
+			IsWin:        false,
+		}
 
-	ResetSaveData()
+		ResetSaveData()
+	}
 
 	for {
 		if isTracking == false {

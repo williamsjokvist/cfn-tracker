@@ -6,6 +6,10 @@ export function DeleteMatchLog(arg1) {
   return window['go']['main']['App']['DeleteMatchLog'](arg1);
 }
 
+export function GetAppVersion() {
+  return window['go']['main']['App']['GetAppVersion']();
+}
+
 export function GetAvailableLogs() {
   return window['go']['main']['App']['GetAvailableLogs']();
 }
@@ -34,6 +38,6 @@ export function StopTracking() {
   return window['go']['main']['App']['StopTracking']();
 }
 
-export function Track(arg1) {
-  return window['go']['main']['App']['Track'](arg1);
+export function Track(arg1, arg2) {
+  return window['go']['main']['App']['Track'](arg1, arg2);
 }

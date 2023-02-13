@@ -23,7 +23,10 @@ interface CFNTrackerTranslation {
   enterCfnName: string,
   result: string,
   time: string,
-  winStreak: string
+  winStreak: string,
+  newVersionAvailable: string,
+  pause: string,
+  unpause: string
 }
 
 i18n
@@ -60,7 +63,10 @@ i18n
           enterCfnName: 'Enter your CFN name',
           result: 'Result',
           time: 'Time',
-          winStreak: 'Win Streak'
+          winStreak: 'Win Streak',
+          newVersionAvailable: 'New version available!',
+          pause: 'Pause',
+          unpause: 'Unpause'
         } as CFNTrackerTranslation
       },
       fr: {
@@ -85,7 +91,10 @@ i18n
           enterCfnName: 'Entrez votre nom CFN',
           result: 'Dossier',
           time: 'Temps',
-          winStreak: 'Série de victoires'
+          winStreak: 'Série de victoires',
+          newVersionAvailable: 'Nouvelle version disponible!',
+          pause: 'Pause',
+          unpause: 'Reprendre'
         } as CFNTrackerTranslation
       },
       jp: {
@@ -110,7 +119,10 @@ i18n
           enterCfnName: 'CFN名を入力してください',
           result: '結果',
           time: '時間',
-          winStreak: 'ストリークを獲得'
+          winStreak: 'ストリークを獲得',
+          newVersionAvailable: '利用可能な新しいバージョン!',
+          pause: '一時停止',
+          unpause: '再開'
         } as CFNTrackerTranslation
       }
     }

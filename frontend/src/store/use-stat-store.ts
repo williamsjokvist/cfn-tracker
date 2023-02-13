@@ -24,6 +24,7 @@ type State = {
     matchHistory: IMatchHistory | null,
     isTracking: boolean,
     isLoading: boolean,
+    isPaused: boolean,
     isInitialized: boolean
 }
 
@@ -31,6 +32,7 @@ type Actions = {
     setMatchHistory: (mh: IMatchHistory) => void
     setTracking: (isTracking: boolean) => void 
     setLoading: (isLoading: boolean) => void 
+    setPaused: (isPaused: boolean) => void 
     setInitialized: (isInitialized: boolean) => void 
     resetMatchHistory: () => void
 }
@@ -41,10 +43,12 @@ export const useStatStore = create<State & Actions>(
         isTracking: false,
         isLoading: false,
         isInitialized: false,
+        isPaused: false,
         setInitialized: (isInitialized) => set((state) => ({ isInitialized: isInitialized }) ),
         setLoading: (isLoading) => set((state) => ({ isLoading: isLoading }) ),
         setMatchHistory: (mh) => set((state) => ({ matchHistory: mh }) ),
         setTracking: (isTracking) => set((state) => ({ isTracking: isTracking }) ),
+        setPaused: (isPaused) => set((state) => ({ isPaused: isPaused }) ),
         resetMatchHistory: () => set((state) => ({ matchHistory: initialState}))
     })
 )
