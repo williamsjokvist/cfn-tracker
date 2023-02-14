@@ -5,8 +5,8 @@ import { RxUpdate } from "react-icons/rx";
 import {
   IoDocumentTextOutline,
   IoDocumentText,
-  IoPlay,
-  IoPlayOutline,
+  IoStatsChartOutline,
+  IoStatsChart
 } from "react-icons/io5";
 import { RiSearch2Line, RiSearch2Fill } from "react-icons/ri";
 import { VscChromeMinimize, VscChromeClose } from "react-icons/vsc";
@@ -15,7 +15,7 @@ import { useLocation } from "react-router-dom";
 import { BrowserOpenURL, Quit, WindowMinimise } from "../../wailsjs/runtime";
 import { useStatStore } from "../store/use-stat-store";
 
-import { GetAppVersion } from "../../wailsjs/go/main/App";
+import { GetAppVersion } from "../../wailsjs/go/backend/App";
 import { useAppStore } from "../store/use-app-store";
 
 const Link = (props: {
@@ -115,6 +115,13 @@ const Sidebar = () => {
             isSelected={location.pathname == "/history"}
             SelectedIcon={IoDocumentText}
           />
+          <Link
+            Icon={IoStatsChartOutline}
+            link="statistics"
+            name={t('statistics')}
+            isSelected={location.pathname == "/statistics"}
+            SelectedIcon={IoStatsChart}
+          /> 
         </ul>
       </nav>
       <footer className="grid px-5 w-full text-xl">

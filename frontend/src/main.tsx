@@ -6,6 +6,8 @@ import {
 } from "react-router-dom";
 import Root from "./routes/root";
 import History from "./routes/history";
+import Statistics from "./routes/statistics";
+
 import './i18n';
 import './index.css'
 import Wrapper from './components/Wrapper';
@@ -18,6 +20,10 @@ const router = createHashRouter([
   {
     path: "/history",
     element: <Wrapper><History /></Wrapper>,
+  },
+  {
+    path: "/statistics",
+    element: <Wrapper><Statistics /></Wrapper>,
   },
 ]);
 

@@ -8,7 +8,7 @@ import {
   OpenResultsDirectory,
   IsTracking,
   IsInitialized
-} from "../../wailsjs/go/main/App";
+} from "../../wailsjs/go/backend/App";
 import { PieChart } from 'react-minimal-pie-chart';
 import { AiFillFolderOpen } from 'react-icons/ai'
 

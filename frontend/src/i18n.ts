@@ -26,7 +26,8 @@ interface CFNTrackerTranslation {
   winStreak: string,
   newVersionAvailable: string,
   pause: string,
-  unpause: string
+  unpause: string,
+  statistics: string
 }
 
 i18n
@@ -66,7 +67,8 @@ i18n
           winStreak: 'Win Streak',
           newVersionAvailable: 'New version available!',
           pause: 'Pause',
-          unpause: 'Unpause'
+          unpause: 'Unpause',
+          statistics: 'Statistics'
         } as CFNTrackerTranslation
       },
       fr: {
@@ -94,7 +96,8 @@ i18n
           winStreak: 'Série de victoires',
           newVersionAvailable: 'Nouvelle version disponible!',
           pause: 'Pause',
-          unpause: 'Reprendre'
+          unpause: 'Reprendre',
+          statistics: 'Statistiques'
         } as CFNTrackerTranslation
       },
       jp: {
@@ -122,7 +125,8 @@ i18n
           winStreak: 'ストリークを獲得',
           newVersionAvailable: '利用可能な新しいバージョン!',
           pause: '一時停止',
-          unpause: '再開'
+          unpause: '再開',
+          statistics: '統計'
         } as CFNTrackerTranslation
       }
     }

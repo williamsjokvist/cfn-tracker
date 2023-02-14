@@ -23,7 +23,7 @@ const LanguageSelector = () => {
           className="text-white w-3 h-3 relative right-4 top-2"
           style={{ transform: "rotate(180deg)" }}
         />
-        <ul className="text-[16px] uppercase flex bg-black px-3 py-2 relative bottom-2 rounded-lg">
+        <ul className="w-[195px] text-[16px] uppercase flex bg-black px-3 py-2 relative bottom-2 rounded-lg">
           {lngs.map((lng, index) => {
             return (
               <li key={index}>

@@ -7,7 +7,7 @@ import {
   GetAvailableLogs,
   GetMatchLog,
   DeleteMatchLog,
-} from "../../wailsjs/go/main/App";
+} from "../../wailsjs/go/backend/App";
 
 const History = () => {
   const { t } = useTranslation();
