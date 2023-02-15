@@ -1,25 +1,22 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { FaBullseye, FaChevronLeft } from "react-icons/fa";
+import { FaChevronLeft } from "react-icons/fa";
 import { MdOutlineDelete } from "react-icons/md";
-import { IMatchHistory } from "../types/match-history";
 import {
   GetAvailableLogs,
   GetMatchLog,
   DeleteMatchLog,
 } from "../../wailsjs/go/backend/App";
+import { backend } from "../../wailsjs/go/models";
 
 const History = () => {
   const { t } = useTranslation();
 
   const [availableLogs, setAvailableLogs] = useState<string[]>([]);
   const [chosenLog, setLog] = useState<string>();
-  const [matchLog, setMatchLog] = useState<IMatchHistory[]>();
+  const [matchLog, setMatchLog] = useState<backend.MatchHistory[]>();
   const [isSpecified, setSpecified] = useState(false);
-
-  const [totalLP, setTotalLP] = useState<number>();
   const [totalWinRate, setTotalWinRate] = useState<number | null>(null);
-
 
   const fetchLog = async (cfn: string) => {
     const log = await GetMatchLog(cfn);
@@ -31,11 +28,12 @@ const History = () => {
   };
 
   useEffect(() => {
-
     if (matchLog) {
-      const wonMatches = matchLog.filter(log => log.result == true).length
-      const lostMatches = matchLog.filter(log => log.result == false).length
-      const winRate = Math.floor(wonMatches / (wonMatches + lostMatches) * 100);
+      const wonMatches = matchLog.filter((log) => log.result == true).length;
+      const lostMatches = matchLog.filter((log) => log.result == false).length;
+      const winRate = Math.floor(
+        (wonMatches / (wonMatches + lostMatches)) * 100
+      );
       setTotalWinRate(winRate);
     }
 
@@ -49,6 +47,17 @@ const History = () => {
     chosenLog && !matchLog && fetchLog(chosenLog);
   }, [chosenLog, matchLog]);
 
+  const filterLog = (property: string, value: string) => {
+    if (!matchLog) return;
+
+    setMatchLog([]);
+    setTimeout(() => {
+      setMatchLog(
+        matchLog.filter((ml) => (ml as any)[property] == value)
+      );
+      setSpecified(true);
+    }, 50);
+  };
   return (
     <main className="grid grid-rows-[0fr_1fr] min-h-screen max-h-screen z-40 flex-1 text-white mx-auto">
       <header
@@ -92,15 +101,17 @@ const History = () => {
         )}
       </header>
       <div className="relative w-full pt-2 z-40 pb-4">
-        {chosenLog &&
+        {chosenLog && (
           <div className="flex items-center px-8 mb-2 h-10 border-b border-slate-50 border-opacity-10 ">
-            {(totalWinRate != null) &&
-              <span>{t('winRate')}: <b>{totalWinRate}</b>%</span>
-            }
+            {totalWinRate != null && (
+              <span>
+                {t("winRate")}: <b>{totalWinRate}</b>%
+              </span>
+            )}
           </div>
-        }
+        )}
         {!chosenLog && availableLogs.length > 0 && (
-          <div className="grid justify-center">
+          <div className="grid h-full justify-center content-center overflow-y-scroll">
             {availableLogs.map((cfn, index) => {
               return (
                 <button
@@ -108,7 +119,7 @@ const History = () => {
                   key={index}
                   onClick={() => {
                     setLog(cfn);
-                    fetchLog(cfn)
+                    fetchLog(cfn);
                   }}
                 >
                   {cfn}
@@ -122,6 +133,9 @@ const History = () => {
             <table className="w-full border-spacing-y-1 border-separate min-w-[525px]">
               <thead>
                 <tr>
+                  <th className="text-left px-3 whitespace-nowrap">
+                    {t("date")}
+                  </th>
                   <th className="text-left px-3 whitespace-nowrap">
                     {t("time")}
                   </th>
@@ -144,39 +158,22 @@ const History = () => {
                   matchLog.map((log, index) => {
                     return (
                       <tr key={index} className="w-full backdrop-blur">
-                        <td className="whitespace-nowrap text-center rounded-l-xl rounded-r-none bg-slate-50 bg-opacity-5 px-3 py-2">
+                        <td 
+                          onClick={() => filterLog('date', log.date)}
+                          className="whitespace-nowrap text-center rounded-l-xl rounded-r-none bg-slate-50 bg-opacity-5 px-3 py-2 hover:underline cursor-pointer">
+                          {log.date}
+                        </td>
+                        <td className="whitespace-nowrap text-center bg-slate-50 bg-opacity-5 px-3 py-2">
                           {log.timestamp}
                         </td>
                         <td
-                          onClick={() => {
-                            setMatchLog([]);
-                            setTimeout(() => {
-                              setMatchLog(
-                                matchLog.filter(
-                                  (ml) => ml.opponent == log.opponent
-                                )
-                              );
-                              setSpecified(true);
-                            }, 50);
-                          }}
+                          onClick={() => filterLog('opponent', log.opponent)}
                           className="whitespace-nowrap w-full rounded-none bg-slate-50 bg-opacity-5 px-3 py-2 hover:underline cursor-pointer"
                         >
                           {log.opponent}
                         </td>
                         <td
-                          onClick={() => {
-                            setMatchLog([]);
-                            setTimeout(() => {
-                              setMatchLog(
-                                matchLog.filter(
-                                  (ml) =>
-                                    ml.opponentCharacter ==
-                                    log.opponentCharacter
-                                )
-                              );
-                              setSpecified(true);
-                            }, 50);
-                          }}
+                          onClick={() => filterLog('opponentCharacter', log.opponentCharacter)}
                           className="rounded-none bg-slate-50 bg-opacity-5 px-3 py-2 text-center hover:underline cursor-pointer"
                         >
                           {log.opponentCharacter}

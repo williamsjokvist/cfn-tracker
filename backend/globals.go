@@ -22,6 +22,7 @@ type MatchHistory struct {
 	OpponentLP        string `json:"opponentLP"`
 	IsWin             bool   `json:"result"`
 	TimeStamp         string `json:"timestamp"`
+	Date              string `json:"date"`
 	WinStreak         int    `json:"winStreak"`
 }
 
@@ -38,6 +39,7 @@ var CurrentMatchHistory = MatchHistory{
 	WinStreak:    0,
 	IsWin:        false,
 	TimeStamp:    ``,
+	Date:         ``,
 }
 
 var (

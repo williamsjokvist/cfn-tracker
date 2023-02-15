@@ -15,6 +15,7 @@ export namespace backend {
 	    opponentLP: string;
 	    result: boolean;
 	    timestamp: string;
+	    date: string;
 	    winStreak: number;
 	
 	    static createFrom(source: any = {}) {
@@ -37,6 +38,7 @@ export namespace backend {
 	        this.opponentLP = source["opponentLP"];
 	        this.result = source["result"];
 	        this.timestamp = source["timestamp"];
+	        this.date = source["date"];
 	        this.winStreak = source["winStreak"];
 	    }
 	}

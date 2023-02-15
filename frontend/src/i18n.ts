@@ -27,7 +27,8 @@ interface CFNTrackerTranslation {
   newVersionAvailable: string,
   pause: string,
   unpause: string,
-  statistics: string
+  statistics: string,
+  date: string,
 }
 
 i18n
@@ -68,7 +69,8 @@ i18n
           newVersionAvailable: 'New version available!',
           pause: 'Pause',
           unpause: 'Unpause',
-          statistics: 'Statistics'
+          statistics: 'Statistics',
+          date: 'Date'
         } as CFNTrackerTranslation
       },
       fr: {
@@ -97,7 +99,8 @@ i18n
           newVersionAvailable: 'Nouvelle version disponible!',
           pause: 'Pause',
           unpause: 'Reprendre',
-          statistics: 'Statistiques'
+          statistics: 'Statistiques',
+          date: 'Date'
         } as CFNTrackerTranslation
       },
       jp: {
@@ -126,7 +129,8 @@ i18n
           newVersionAvailable: '利用可能な新しいバージョン!',
           pause: '一時停止',
           unpause: '再開',
-          statistics: '統計'
+          statistics: '統計',
+          date: '日付'
         } as CFNTrackerTranslation
       }
     }

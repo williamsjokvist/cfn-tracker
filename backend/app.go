@@ -107,7 +107,6 @@ func (a *App) GetAvailableLogs() []string {
 			continue
 		}
 
-		fmt.Println(fileName)
 		cfn := strings.Split(fileName, `-log.json`)[0]
 		cfns = append(cfns, cfn)
 	}

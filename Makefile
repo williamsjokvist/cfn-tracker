@@ -13,7 +13,6 @@ ifneq (,$(wildcard ./.env))
 endif
 
 LDFLAGS=-X 'main.steamUsername=${STEAM_USERNAME}' -X 'main.steamPassword=${STEAM_PASSWORD}'
-EXECUTION_ENVIRONMENT=build
 
 # MacOS
 macos: 

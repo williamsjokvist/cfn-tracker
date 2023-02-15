@@ -136,6 +136,7 @@ func (a *App) RefreshData(profile string, page *rod.Page) {
 	CurrentMatchHistory.TotalMatches = totalMatches
 	CurrentMatchHistory.LP = newLp
 	CurrentMatchHistory.TimeStamp = time.Now().Format(`15:04`)
+	CurrentMatchHistory.Date = time.Now().Format(`2006-01-02`)
 
 	runtime.EventsEmit(a.ctx, `cfn-data`, CurrentMatchHistory)
 	SaveMatchHistory(CurrentMatchHistory)
