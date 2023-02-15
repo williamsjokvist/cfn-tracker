@@ -44,6 +44,11 @@ func SaveMatchHistory(matchHistory MatchHistory) {
 		return
 	}
 
+	// Save current results
+	SaveTextToFile(`results`, `results.json`, string(mhMarshalled))
+
+	// Now save current results to the entire log
+
 	var arr []MatchHistory
 
 	pastMatches, err := os.ReadFile(`results/` + matchHistory.CFN + `-log.json`)

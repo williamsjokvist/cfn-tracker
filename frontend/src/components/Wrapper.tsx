@@ -18,17 +18,18 @@ const Wrapper = ({ children }: any) => {
     })
 
     EventsOn(`initialized`, (init) => {
-      setInitialized(init)
+      setInitialized(init);
+      (init == true) && setLoading(false);
     })
 
-    EventsOn(`version-update`, (hasNewVersion) => { 
+    EventsOn(`version-update`, (hasNewVersion) => {
       console.log('has new version', hasNewVersion)
       setNewVersionAvailable(hasNewVersion)
     })
 
     return () => {
-      EventsOff(`cfn-data`)
-      EventsOff(`initialized`)
+      // EventsOff(`cfn-data`)
+      // EventsOff(`initialized`)
       EventsOff(`version-update`)
     }
   }, [])
@@ -37,7 +38,7 @@ const Wrapper = ({ children }: any) => {
     <>
       <Sidebar />
       {children}
-      <div className={`logo-pattern absolute filter-[grayscale(1)] bg-center`}/>
+      <div className={`logo-pattern absolute filter-[grayscale(1)] bg-center`} />
     </>
   );
 };

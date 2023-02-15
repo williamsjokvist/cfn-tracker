@@ -46,11 +46,13 @@ func (a *App) StartTracking(profile string, resetData bool) {
 	for {
 		if IsTracking == false {
 			fmt.Println("Stopped tracking")
+			IsInitialized = true
+			runtime.EventsEmit(a.ctx, `initialized`, IsInitialized)
 			break
 		}
 
 		a.RefreshData(profile, PageInstance)
-		time.Sleep(30 * time.Second)
+		time.Sleep(RefreshIntervalSeconds * time.Second)
 	}
 }
 

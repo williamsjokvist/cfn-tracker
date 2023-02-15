@@ -7,7 +7,8 @@ import {
   StopTracking,
   OpenResultsDirectory,
   IsTracking,
-  IsInitialized
+  IsInitialized,
+  GetAvailableLogs
 } from "../../wailsjs/go/backend/App";
 import { PieChart } from 'react-minimal-pie-chart';
 import { AiFillFolderOpen } from 'react-icons/ai'
@@ -18,24 +19,26 @@ import { useStatStore } from "../store/use-stat-store";
 const Root = () => {
   const { t } = useTranslation();
   const { matchHistory, resetMatchHistory, setTracking, isTracking, isLoading, setLoading, setInitialized, isInitialized, isPaused, setPaused } = useStatStore();
-
+  const [oldCfns, setOldCfns] = useState<string[] | null>(null)
+  const [inputValue, setInputValue] = useState<string>()
   useEffect(() => {
-    const getIsTracking = async () => {
-      const trackStatus = await IsTracking()
-      setTracking(trackStatus)
-    }
 
-    const getIsInitialized = async () => {
-      const initialized = await IsInitialized()
-      setInitialized(initialized)
+    if (!isTracking) {
+      GetAvailableLogs().then((logs) => {
+        setOldCfns(logs)
+      })
+
+      IsTracking().then((isTracking) => {
+        setTracking(isTracking)
+      })
     }
 
     if (!isInitialized) {
-      getIsInitialized()
-    } else if (!isTracking) {
-      getIsTracking()
+      IsInitialized().then((isInitialized) => {
+        setInitialized(isInitialized)
+      })
     }
-    
+
   }, []);
 
   return (
@@ -45,8 +48,7 @@ const Root = () => {
       } as React.CSSProperties}>
         <h2 className="pt-4 px-8 flex items-center justify-between gap-5 uppercase text-sm tracking-widest mb-4">
           {isTracking && !isLoading && t('tracking')}
-          {isLoading && t('loading')}
-          {!isInitialized && t('loading')}
+          {(isLoading || !isInitialized) && t('loading')}
 
           {!isTracking && isInitialized && !isLoading && t("startTracking")}
           {(isTracking || isLoading || !isInitialized) && (
@@ -105,9 +107,9 @@ const Root = () => {
               </dl>
             </div>
             {matchHistory && isTracking && (
-              <div className='relative mr-4 h-full grid justify-items-center'>
+              <div className='relative mr-4 h-full grid content-between justify-items-center'>
                 <PieChart
-                  className='pie-chart animate-enter max-w-[160px] max-h-[160px] mt-12 backdrop-blur'
+                  className='pie-chart animate-enter max-w-[160px] max-h-[160px] backdrop-blur'
                   animate={true}
                   lineWidth={75}
                   paddingAngle={0}
@@ -141,26 +143,30 @@ const Root = () => {
                       filter: 'hue-rotate(-120deg)'
                     }}
                     type="button"
-                    className="whitespace-nowrap mb-2 flex items-center justify-between bg-[rgba(255,10,10,.1)] rounded-md px-5 py-3 border-[#FF3D51] hover:bg-[#FF3D51] border-[1px] transition-colors font-semibold text-md"
+                    className="whitespace-nowrap flex items-center justify-between bg-[rgba(255,10,10,.1)] rounded-md px-5 py-3 border-[#FF3D51] hover:bg-[#FF3D51] border-[1px] transition-colors font-semibold text-md"
                   >
-                    <AiFillFolderOpen className='w-4 h-4 mr-2'/>
+                    <AiFillFolderOpen className='w-4 h-4 mr-2' />
                     {t('openResultFolder')}
                   </button>
                   <button
                     onClick={() => {
+
+                      if (isLoading == true && isPaused)
+                        return
+
                       if (isPaused == false) {
                         StopTracking();
-                        setLoading(false);
-                        setPaused(!isPaused)
+                        setLoading(true);
+                        setPaused(true);
                       } else if (isPaused == true) {
-                      
+
                         const startTrack = async () => {
                           const isTracking = await Track(matchHistory.cfn, true);
                           if (isTracking == false) {
                             alert("Failed to track CFN");
                           }
                         }
-                        
+
                         startTrack()
                         setLoading(true);
                         setPaused(false)
@@ -171,7 +177,7 @@ const Root = () => {
                     style={{
                       filter: 'hue-rotate(156deg)'
                     }}
-                >   
+                  >
                     {!isPaused && <FaPauseCircle className="mr-3" />}
                     {isPaused && <FaPlay className="mr-3" />}
                     {isPaused ? t('unpause') : t('pause')}
@@ -180,7 +186,8 @@ const Root = () => {
                     onClick={() => {
                       StopTracking();
                       setTracking(false);
-                      setLoading(false);
+                      setLoading(true);
+                      setInitialized(false);
                     }}
                     type="button"
                     className="float-right bottom-2 flex items-center justify-between bg-[rgba(255,10,10,.1)] rounded-md px-5 py-3 border-[#FF3D51] hover:bg-[#FF3D51] border-[1px] transition-colors font-semibold text-md"
@@ -194,56 +201,71 @@ const Root = () => {
           </>
         )}
         {!(isTracking || isLoading || !isInitialized) && (
-          <form
-            className="mx-auto"
-            onSubmit={(e) => {
-              e.preventDefault();
+          <>
+            <form
+              className="mx-auto"
+              onSubmit={(e) => {
+                e.preventDefault();
 
-              const cfn = (e.target as any).cfn.value;
-              if (cfn == "") return;
-              setLoading(true);
-              const startTrack = async () => {
-                const isInitialized = await IsInitialized()
-                if (isInitialized == false) {
-                  setLoading(false)
-                  return
-                }
+                const cfn = (e.target as any).cfn.value;
+                if (cfn == "") return;
+                setLoading(true);
+                const startTrack = async () => {
+                  const isInitialized = await IsInitialized()
+                  if (isInitialized == false) {
+                    setLoading(false)
+                    return
+                  }
 
-                const isTracking = await Track(cfn, true);
-                if (isTracking == false) {
-                  alert("Failed to track CFN");
-                } else {
-                  resetMatchHistory()
-                }
-              };
-              startTrack();
-            }}
-          >
-            <h3 className="mb-2">{t('enterCfnName')}</h3>
-            <input
-              disabled={isLoading}
-              type="text"
-              name="cfn"
-              className="py-3 px-4 block w-full border-gray-200 rounded-md text-lg focus:border-orange-500 focus:ring-orange-500 dark:bg-gray-900 dark:border-gray-800 dark:text-gray-300"
-              placeholder={t("cfnName")!}
-              autoCapitalize='off'
-              autoComplete='off'
-              autoCorrect='off'
-              autoSave='off'
-            />
-            <div className="flex justify-end">
-              <button
+                  const isTracking = await Track(cfn, true);
+                  if (isTracking == false) {
+                    alert("Failed to track CFN");
+                  } else {
+                    resetMatchHistory()
+                  }
+                };
+                startTrack();
+              }}
+            >
+              <h3 className="mb-2">{t('enterCfnName')}</h3>
+              <input
                 disabled={isLoading}
-                type="submit"
-                style={{
-                  filter: 'hue-rotate(156deg)'
-                }}
-                className="mt-4 flex select-none items-center justify-between bg-[rgba(255,10,10,.1)] rounded-md px-5 py-3 border-[#FF3D51] hover:bg-[#FF3D51] border-[1px] transition-colors font-semibold text-md"
-              >
-                <GiDeerTrack className="mr-3" /> {t("start")}
-              </button>
-            </div>
-          </form>
+                type="text"
+                name="cfn"
+                value={inputValue}
+                className="py-3 px-4 block w-full border-gray-200 rounded-md text-lg focus:border-orange-500 focus:ring-orange-500 dark:bg-gray-900 dark:border-gray-800 dark:text-gray-300"
+                placeholder={t("cfnName")!}
+                autoCapitalize='off'
+                autoComplete='off'
+                autoCorrect='off'
+                autoSave='off'
+              />
+              <div className="flex justify-end">
+                <button
+                  disabled={isLoading}
+                  type="submit"
+                  style={{
+                    filter: 'hue-rotate(156deg)'
+                  }}
+                  className="mt-4 flex select-none items-center justify-between bg-[rgba(255,10,10,.1)] rounded-md px-5 py-3 border-[#FF3D51] hover:bg-[#FF3D51] border-[1px] transition-colors font-semibold text-md"
+                >
+                  <GiDeerTrack className="mr-3" /> {t("start")}
+                </button>
+              </div>
+            </form>
+            {oldCfns && (
+              <div>
+                <p className='block mb-3'>Past tracks</p>
+                {
+                  oldCfns.map((cfn, index) => {
+                    return <button onClick={() => setInputValue(cfn)} className="bg-[rgb(255,255,255,0.075)] hover:bg-[rgb(255,255,255,0.125)]  block text-xl backdrop-blur mb-3 rounded-2xl transition-all items-center border-transparent border-opacity-5 border-[1px] px-3 py-1" type='button' key={index}>
+                      {cfn}
+                    </button>
+                  })
+                }
+              </div>
+            )}
+          </>
         )}
       </div>
     </main>

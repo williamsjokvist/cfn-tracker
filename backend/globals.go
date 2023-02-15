@@ -1,6 +1,8 @@
 package backend
 
 import (
+	"time"
+
 	"github.com/go-rod/rod"
 	"github.com/hashicorp/go-version"
 )
@@ -39,11 +41,12 @@ var CurrentMatchHistory = MatchHistory{
 }
 
 var (
-	FirstLPRecorded = 0
-	IsTracking      = false
-	IsInitialized   = false
-	PageInstance    *rod.Page
-	SteamUsername   string
-	SteamPassword   string
-	AppVersion      *version.Version
+	FirstLPRecorded        = 0
+	IsTracking             = false
+	IsInitialized          = false
+	PageInstance           *rod.Page
+	SteamUsername          string
+	SteamPassword          string
+	AppVersion             *version.Version
+	RefreshIntervalSeconds time.Duration = 30
 )
