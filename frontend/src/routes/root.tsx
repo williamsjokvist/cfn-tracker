@@ -3,17 +3,19 @@ import { useTranslation } from "react-i18next";
 import { GiDeerTrack } from "react-icons/gi";
 import { FaStop, FaPause, FaPlay } from "react-icons/fa";
 import {
-  Track,
   StopTracking,
   OpenResultsDirectory,
   IsTracking,
   IsInitialized,
   GetAvailableLogs,
+  StartTracking,
 } from "../../wailsjs/go/backend/App";
 import { PieChart } from "react-minimal-pie-chart";
 import { AiFillFolderOpen } from "react-icons/ai";
 
 import { useStatStore } from "../store/use-stat-store";
+
+// TODO refactor this mess
 
 const Root = () => {
   const { t } = useTranslation();
@@ -192,22 +194,16 @@ const Root = () => {
                     onClick={() => {
                       if (isLoading == true && isPaused) return;
 
-                      if (isPaused == false) {
-                        setLoading(true);
-                        StopTracking().then(() => {
-                          setPaused(true);
-                          setLoading(false);
-                        });
-                      } else if (isPaused == true) {
-                        setLoading(true);
+                      setLoading(true);
 
-                        Track(matchHistory.cfn, false).then((isTracking) => {
-                          if (isTracking == false) {
-                            alert("Failed to track CFN");
-                          }
+                      if (isPaused == false) {
+                        StopTracking();
+                        setTimeout(() => {
                           setLoading(false);
-                          setPaused(false);
-                        });
+                          setPaused(true);
+                        }, 30000)
+                      } else if (isPaused == true) {
+                        StartTracking(matchHistory.cfn, false)
                       }
                     }}
                     type="button"
@@ -224,8 +220,13 @@ const Root = () => {
                     disabled={isLoading}
                     onClick={() => {
                       StopTracking();
-                      setTracking(false);
                       setLoading(true);
+                      setTimeout(() => {
+                        setLoading(false);
+                        setPaused(false);
+                        setTracking(false);
+                      }, 30000)
+                      
                       setInitialized(false);
                     }}
                     type="button"
@@ -255,13 +256,7 @@ const Root = () => {
                     return;
                   }
 
-                  const isTracking = await Track(cfn, true);
-                  if (isTracking == false) {
-                    alert("Failed to track CFN");
-                  } else {
-                    resetMatchHistory();
-                    setPaused(false);
-                  }
+                  StartTracking(cfn, true);
                 };
                 startTrack();
               }}
@@ -301,14 +296,13 @@ const Root = () => {
               </div>
             </form>
             {oldCfns && (
-              <div className="grid text-center h-[80vh] overflow-y-scroll pr-3">
-                <p className="block mb-3">Past tracks</p>
+              <div className="border-l-[1px] border-[rgba(255,255,255,0.25)] pl-12 grid content-center items-center text-center h-[80vh] pr-3">
                 {oldCfns.map((cfn, index) => {
                   return (
                     <button
                       disabled={isLoading}
                       onClick={() => setInputValue(cfn)}
-                      className="bg-[rgb(255,255,255,0.075)] hover:bg-[rgb(255,255,255,0.125)]  block text-xl backdrop-blur mb-3 rounded-2xl transition-all items-center border-transparent border-opacity-5 border-[1px] px-3 py-1"
+                      className="bg-[rgb(255,255,255,0.075)] hover:bg-[rgb(255,255,255,0.125)] text-xl backdrop-blur mb-5 rounded-2xl transition-all items-center border-transparent border-opacity-5 border-[1px] px-3 py-1"
                       type="button"
                       key={index}
                     >

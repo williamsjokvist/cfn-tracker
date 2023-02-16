@@ -115,13 +115,6 @@ const Sidebar = () => {
             isSelected={location.pathname == "/history"}
             SelectedIcon={IoDocumentText}
           />
-          <Link
-            Icon={IoStatsChartOutline}
-            link="statistics"
-            name={t('statistics')}
-            isSelected={location.pathname == "/statistics"}
-            SelectedIcon={IoStatsChart}
-          /> 
         </ul>
       </nav>
       <footer className="grid px-5 w-full text-xl">

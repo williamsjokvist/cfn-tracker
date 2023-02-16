@@ -16,7 +16,7 @@ func LogMatchHistory() {
 }
 
 func (a *App) StartTracking(profile string, resetData bool) {
-	if IsInitialized == false {
+	if IsInitialized == false || IsTracking == true {
 		return
 	}
 
@@ -43,11 +43,15 @@ func (a *App) StartTracking(profile string, resetData bool) {
 		ResetSaveData()
 	}
 
+	runtime.EventsEmit(a.ctx, `started-tracking`)
+
 	for {
 		if IsTracking == false {
 			fmt.Println("Stopped tracking")
 			IsInitialized = true
+			IsTracking = false
 			runtime.EventsEmit(a.ctx, `initialized`, IsInitialized)
+			runtime.EventsEmit(a.ctx, `stopped-tracking`)
 			break
 		}
 

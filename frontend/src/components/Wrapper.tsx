@@ -8,7 +8,7 @@ import { backend } from "../../wailsjs/go/models";
 
 
 const Wrapper = ({ children }: any) => {
-  const { setMatchHistory, setTracking, setLoading, setInitialized } = useStatStore();
+  const { setMatchHistory, setTracking, setLoading, setInitialized, setPaused } = useStatStore();
   const { setNewVersionAvailable } = useAppStore();
 
   useEffect(() => {
@@ -21,6 +21,15 @@ const Wrapper = ({ children }: any) => {
     EventsOn(`initialized`, (init) => {
       setInitialized(init);
       (init == true) && setLoading(false);
+    })
+
+    EventsOn(`stopped-tracking`, () => {
+      setLoading(false)
+    })
+
+    EventsOn(`started-tracking`, () => {
+      setPaused(false)
+      setTracking(true)
     })
 
     EventsOn(`version-update`, (hasNewVersion) => {
@@ -39,7 +48,6 @@ const Wrapper = ({ children }: any) => {
     <>
       <Sidebar />
       {children}
-      <div className={`logo-pattern absolute filter-[grayscale(1)] bg-center`} />
     </>
   );
 };

@@ -53,7 +53,3 @@ export function StartTracking(arg1, arg2) {
 export function StopTracking() {
   return window['go']['backend']['App']['StopTracking']();
 }
-
-export function Track(arg1, arg2) {
-  return window['go']['backend']['App']['Track'](arg1, arg2);
-}

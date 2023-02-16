@@ -61,18 +61,18 @@ const History = () => {
   return (
     <main className="grid grid-rows-[0fr_1fr] min-h-screen max-h-screen z-40 flex-1 text-white mx-auto">
       <header
-        className="px-8 flex items-center justify-between border-b border-slate-50 border-opacity-10 backdrop-blur select-none"
+        className="px-8 flex items-center border-b border-slate-50 border-opacity-10 backdrop-blur select-none"
         style={
           {
             "--wails-draggable": "drag",
           } as React.CSSProperties
         }
       >
-        <h2 className="pt-4 flex items-center justify-between gap-5 uppercase text-sm tracking-widest mb-4">
+        <h2 className="pt-4 whitespace-nowrap flex items-center justify-between gap-5 uppercase text-sm tracking-widest mb-4">
           {t("history")}
         </h2>
         {chosenLog && (
-          <>
+          <div className='flex items-center justify-between w-full ml-4'>
             <button
               onClick={() => {
                 isSpecified && fetchLog(chosenLog);
@@ -83,10 +83,7 @@ const History = () => {
               <FaChevronLeft className="w-4 h-4 inline mr-2" />
               {t("goBack")}
             </button>
-          </>
-        )}
-        {chosenLog && (
-          <button
+            <button
             onClick={() => {
               chosenLog && DeleteMatchLog(chosenLog);
               setTimeout(() => {
@@ -98,6 +95,7 @@ const History = () => {
             <MdOutlineDelete className="w-4 h-4 inline mr-2" />
             {t("delete")}
           </button>
+          </div>
         )}
       </header>
       <div className="relative w-full pt-2 z-40 pb-4">

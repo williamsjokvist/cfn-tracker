@@ -50,11 +50,6 @@ func (a *App) GetAppVersion() string {
 	return AppVersion.Original()
 }
 
-func (a *App) Track(cfnName string, resetData bool) bool {
-	go a.StartTracking(cfnName, resetData)
-	return IsInitialized
-}
-
 func (a *App) IsTracking() bool {
 	return IsTracking
 }

@@ -11,18 +11,6 @@ body {
   border-radius: 14px;
 }
 
-.logo-pattern {
-  opacity: 0.025;
-  background-image: url('/assets/logo.png');
-  filter: grayscale(1) blur(0px);
-  transform: rotate(-35deg);
-  width: 264%;
-  background-size: 50px;
-  height: 288%;
-  top: -601px;
-  left: -600px;
-}
-
 .stat-grid-item {
   grid-row-start: 2;
   grid-column-start: 1;

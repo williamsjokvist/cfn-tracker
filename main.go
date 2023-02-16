@@ -39,7 +39,7 @@ func init() {
 }
 
 func main() {
-	appVersion, _ := version.NewVersion(`1.9.0`)
+	appVersion, _ := version.NewVersion(`2.1.0`)
 
 	// Create an instance of the app structure
 	WailsApp = backend.NewApp()

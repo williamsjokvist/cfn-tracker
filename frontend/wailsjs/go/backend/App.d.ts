@@ -30,5 +30,3 @@ export function RefreshData(arg1:string,arg2:rod.Page):Promise<void>;
 export function StartTracking(arg1:string,arg2:boolean):Promise<void>;
 
 export function StopTracking():Promise<void>;
-
-export function Track(arg1:string,arg2:boolean):Promise<boolean>;
