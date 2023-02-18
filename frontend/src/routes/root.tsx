@@ -175,7 +175,25 @@ const Root = () => {
                   </defs>
                 </PieChart>
 
-                <div className="relative gap-2 items-center bottom-[10px] grid right-[-10px]">
+                <div className="relative bottom-[10px] grid justify-items-end right-[-10px]">
+                  <button
+                    disabled={isLoading}
+                    onClick={() => {
+                      StopTracking();
+                      setLoading(true);
+                      setTimeout(() => {
+                        setLoading(false);
+                        setPaused(false);
+                        setTracking(false);
+                      }, 30000)
+
+                      setInitialized(false);
+                    }}
+                    type="button"
+                    className="flex items-center mb-2 justify-between bg-[rgba(255,10,10,.1)] rounded-md px-5 py-3 border-[#FF3D51] hover:bg-[#FF3D51] border-[1px] transition-colors font-semibold text-md"
+                  >
+                    <FaStop className="mr-3" /> {t("stop")}
+                  </button>
                   <button
                     onClick={() => {
                       OpenResultsDirectory();
@@ -189,51 +207,7 @@ const Root = () => {
                     <AiFillFolderOpen className="w-4 h-4 mr-2" />
                     {t("openResultFolder")}
                   </button>
-                  <button
-                    disabled={isLoading}
-                    onClick={() => {
-                      if (isLoading == true && isPaused) return;
 
-                      setLoading(true);
-
-                      if (isPaused == false) {
-                        StopTracking();
-                        setTimeout(() => {
-                          setLoading(false);
-                          setPaused(true);
-                        }, 30000)
-                      } else if (isPaused == true) {
-                        StartTracking(matchHistory.cfn, false)
-                      }
-                    }}
-                    type="button"
-                    className="float-right bottom-2 flex items-center justify-between bg-[rgba(255,10,10,.1)] rounded-md px-5 py-3 border-[#FF3D51] hover:bg-[#FF3D51] border-[1px] transition-colors font-semibold text-md"
-                    style={{
-                      filter: "hue-rotate(156deg)",
-                    }}
-                  >
-                    {!isPaused && <FaPause className="mr-3" />}
-                    {isPaused && <FaPlay className="mr-3" />}
-                    {isPaused ? t("unpause") : t("pause")}
-                  </button>
-                  <button
-                    disabled={isLoading}
-                    onClick={() => {
-                      StopTracking();
-                      setLoading(true);
-                      setTimeout(() => {
-                        setLoading(false);
-                        setPaused(false);
-                        setTracking(false);
-                      }, 30000)
-                      
-                      setInitialized(false);
-                    }}
-                    type="button"
-                    className="float-right bottom-2 flex items-center justify-between bg-[rgba(255,10,10,.1)] rounded-md px-5 py-3 border-[#FF3D51] hover:bg-[#FF3D51] border-[1px] transition-colors font-semibold text-md"
-                  >
-                    <FaStop className="mr-3" /> {t("stop")}
-                  </button>
                 </div>
               </div>
             )}
