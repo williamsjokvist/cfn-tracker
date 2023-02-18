@@ -13,7 +13,6 @@ import { VscChromeMinimize, VscChromeClose } from "react-icons/vsc";
 import LanguageSelector from "./LanguageSelector";
 import { useLocation } from "react-router-dom";
 import { BrowserOpenURL, Quit, WindowMinimise } from "../../wailsjs/runtime";
-import { useStatStore } from "../store/use-stat-store";
 
 import { GetAppVersion } from "../../wailsjs/go/backend/App";
 import { useAppStore } from "../store/use-app-store";
@@ -24,13 +23,14 @@ const Link = (props: {
   name: string;
   isSelected?: boolean;
   SelectedIcon?: any;
+  showArrow: boolean;
 }) => {
-  const { Icon, link, name, isSelected, SelectedIcon } = props;
+  const { Icon, link, name, isSelected, SelectedIcon, showArrow } = props;
   return (
-    <li className="">
+    <li>
       <a
         href={"#/" + link}
-        className="text-lg text-[#bfbcff] text-opacity-80 rounded py-2 px-1 mx-2 group flex items-center justify-between hover:!text-white hover:bg-slate-50 hover:bg-opacity-5 transition-colors"
+        className="text-lg text-[#bfbcff] text-opacity-80 rounded py-2 px-1 group flex items-center justify-between hover:!text-white hover:bg-slate-50 hover:bg-opacity-5 transition-colors"
         style={{
           fontWeight: isSelected ? "600" : "200",
           color: isSelected ? "#d6d4ff" : "#bfbcff",
@@ -47,7 +47,7 @@ const Link = (props: {
         </span>
         <FaChevronLeft
           className="w-3 h-3 group-hover:opacity-100 opacity-0 transition-opacity"
-          style={{ transform: "rotate(180deg)" }}
+          style={{ transform: "rotate(180deg)", display: showArrow ? 'block' : 'none' }}
         />
       </a>
     </li>
@@ -58,8 +58,11 @@ const Sidebar = () => {
   const location = useLocation();
   const [appVersion, setAppVersion] = useState("");
 
+  const [isMinimized, setMinimized] = useState(false)
+
   const { newVersionAvailable, setNewVersionAvailable } = useAppStore();
   useEffect(() => {
+    setMinimized(false)
     GetAppVersion().then((version: string) => {
       setAppVersion(version);
     });
@@ -67,10 +70,14 @@ const Sidebar = () => {
 
   return (
     <aside
-      className="border-r border-slate-50 border-opacity-10 backdrop-blur relative z-50 h-screen overflow-auto scrollbar-none grid grid-rows-[0fr_1fr_0fr] py-2 text-white whitespace-nowrap transition-all dark:border-slate-50 dark:border-opacity-10"
+      className="border-r border-slate-50 border-opacity-10 backdrop-blur relative z-50 h-screen overflow-auto scrollbar-none grid grid-rows-[0fr_1fr_0fr] py-2 text-white whitespace-nowrap dark:border-slate-50 dark:border-opacity-10"
       style={{
-        width: "190px",
+        width: isMinimized ? '73px' : "175px",
         overflow: "visible",
+        justifyContent: isMinimized ? 'center' : 'normal',
+        paddingLeft: isMinimized ? '0' : '10px',
+        paddingRight: isMinimized ? '0' : '10px'
+
       }}
     >
       <header
@@ -81,7 +88,7 @@ const Sidebar = () => {
         }
       >
         <div className="flex justify-start">
-          <div className="group mt-2 group flex ml-4 mb-3">
+          <div className="group mt-2 group ml-2 flex mb-3">
             <button
               aria-label="close"
               className="mr-[10px] p-[2px] w-4 h-4 group-hover:bg-red-500 bg-slate-600 flex items-center justify-center rounded-full transition-all"
@@ -100,41 +107,54 @@ const Sidebar = () => {
         </div>
       </header>
       <nav className="mt-5 w-full">
-        <ul className="">
+        <ul>
           <Link
             Icon={RiSearch2Line}
             link=""
-            name={t("tracking")}
+            name={isMinimized ? '' : t("tracking")}
             isSelected={location.pathname == "/"}
             SelectedIcon={RiSearch2Fill}
+            showArrow={!isMinimized}
           />
           <Link
             Icon={IoDocumentTextOutline}
             link="history"
-            name={t("history")}
+            name={isMinimized ? '' : t("history")}
             isSelected={location.pathname == "/history"}
             SelectedIcon={IoDocumentText}
+            showArrow={!isMinimized}
           />
         </ul>
       </nav>
-      <footer className="grid px-5 w-full text-xl">
-        <LanguageSelector />
+      <footer className="grid w-full text-xl px-2">
+        <LanguageSelector showText={!isMinimized} />
         <a
           target="#"
           onClick={() => {
             BrowserOpenURL("https://twitter.com/greensoap_");
           }}
-          className="cursor-pointer w-full group font-extralight flex items-center justify-between mt-1 text-[#d6d4ff] hover:text-white transition-colors"
+          className="h-[28px] cursor-pointer w-full group font-extralight flex items-center justify-between mt-1 text-[#d6d4ff] hover:text-white transition-colors"
         >
           <span className="flex items-center justify-between">
             <FaTwitter className="text-[#49b3f5] w-4 h-4 mr-2" />
-            greensoap_
+            {isMinimized ? '' : 'greensoap_'}
           </span>
           <FaArrowUp
             className="relative right-[-8px] w-3 h-3 group-hover:opacity-100 opacity-0 transition-opacity"
             style={{ transform: "rotate(45deg)" }}
           />
         </a>
+        <button className="h-[28px] cursor-pointer w-full group font-extralight flex items-center mt-1 text-[#d6d4ff] hover:text-white transition-colors"
+          onClick={() => setMinimized(!isMinimized)}>
+          <FaChevronLeft
+            className="group-hover:text-white text-[#d6d4ff] w-4 h-4 transition-all"
+            style={{ transform: isMinimized ? "rotate(-180deg)" : 'none' }}
+          />
+          {!isMinimized && (
+            <span className="ml-2">{t('minimize')}</span>
+          )}
+
+        </button>
         <a
           target="#"
           className="text-sm mt-4 font-extralight cursor-pointer hover:underline"
@@ -142,7 +162,7 @@ const Sidebar = () => {
             BrowserOpenURL("https://github.com/GreenSoap/cfn-tracker/releases");
           }}
         >
-          CFN Tracker v{appVersion}
+          {isMinimized ? 'v' + appVersion : 'CFN Tracker v' + appVersion}
         </a>
         {newVersionAvailable && (
           <a

@@ -29,6 +29,7 @@ interface CFNTrackerTranslation {
   unpause: string,
   statistics: string,
   date: string,
+  minimize: string
 }
 
 i18n
@@ -70,7 +71,8 @@ i18n
           pause: 'Pause',
           unpause: 'Unpause',
           statistics: 'Statistics',
-          date: 'Date'
+          date: 'Date',
+          minimize: 'minimize'
         } as CFNTrackerTranslation
       },
       fr: {
@@ -100,7 +102,8 @@ i18n
           pause: 'Pause',
           unpause: 'Reprendre',
           statistics: 'Statistiques',
-          date: 'Date'
+          date: 'Date',
+          minimize: 'réduire'
         } as CFNTrackerTranslation
       },
       jp: {
@@ -130,7 +133,8 @@ i18n
           pause: '一時停止',
           unpause: '再開',
           statistics: '統計',
-          date: '日付'
+          date: '日付',
+          minimize: '縮む'
         } as CFNTrackerTranslation
       }
     }
