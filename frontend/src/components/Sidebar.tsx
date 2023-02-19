@@ -5,8 +5,6 @@ import { RxUpdate } from "react-icons/rx";
 import {
   IoDocumentTextOutline,
   IoDocumentText,
-  IoStatsChartOutline,
-  IoStatsChart
 } from "react-icons/io5";
 import { RiSearch2Line, RiSearch2Fill } from "react-icons/ri";
 import { VscChromeMinimize, VscChromeClose } from "react-icons/vsc";
@@ -91,14 +89,14 @@ const Sidebar = () => {
           <div className="group mt-2 group ml-2 flex mb-3">
             <button
               aria-label="close"
-              className="mr-[10px] p-[2px] w-4 h-4 group-hover:bg-red-500 bg-slate-600 flex items-center justify-center rounded-full transition-all"
+              className="mr-[8px] p-[2px] w-[14px] h-[14px] group-hover:bg-red-500 bg-slate-600 flex items-center justify-center rounded-full transition-all"
               onClick={() => Quit()}
             >
               <VscChromeClose className="text-red-800 group-hover:opacity-100 opacity-0 transition-all" />
             </button>
             <button
               aria-label="close"
-              className="p-[2px] w-4 h-4 group-hover:bg-yellow-500 bg-slate-600 flex items-center justify-center rounded-full transition-all"
+              className="p-[2px] w-[14px] h-[14px] group-hover:bg-yellow-500 bg-slate-600 flex items-center justify-center rounded-full transition-all"
               onClick={() => WindowMinimise()}
             >
               <VscChromeMinimize className="text-yellow-800 group-hover:opacity-100 opacity-0 transition-all" />
@@ -126,25 +124,26 @@ const Sidebar = () => {
           />
         </ul>
       </nav>
-      <footer className="grid w-full text-xl px-2">
-        <LanguageSelector showText={!isMinimized} />
+      <footer className={`grid w-full text-xl px-2`}>
+        <LanguageSelector isMinimized={isMinimized} />
         <a
           target="#"
           onClick={() => {
             BrowserOpenURL("https://twitter.com/greensoap_");
           }}
-          className="h-[28px] cursor-pointer w-full group font-extralight flex items-center justify-between mt-1 text-[#d6d4ff] hover:text-white transition-colors"
+          className={`h-[28px] cursor-pointer w-full group font-extralight flex justify-between items-center mt-1 text-[#d6d4ff] hover:text-white transition-colors`}
         >
-          <span className="flex items-center justify-between">
-            <FaTwitter className="text-[#49b3f5] w-4 h-4 mr-2" />
-            {isMinimized ? '' : 'greensoap_'}
+          <span className={`flex items-center justify-between`}>
+            <FaTwitter className="text-[#49b3f5] w-4 h-4 mr-2 transition-colors group-hover:text-white" />
+            {!isMinimized && 'greensoap_'}
           </span>
           <FaArrowUp
             className="relative right-[-8px] w-3 h-3 group-hover:opacity-100 opacity-0 transition-opacity"
             style={{ transform: "rotate(45deg)" }}
           />
+
         </a>
-        <button className="h-[28px] cursor-pointer w-full group font-extralight flex items-center mt-1 text-[#d6d4ff] hover:text-white transition-colors"
+        <button className={`h-[28px] cursor-pointer w-full group font-extralight flex items-center mt-1 text-[#d6d4ff] hover:text-white transition-colors`}
           onClick={() => setMinimized(!isMinimized)}>
           <FaChevronLeft
             className="group-hover:text-white text-[#d6d4ff] w-4 h-4 transition-all"
@@ -153,7 +152,6 @@ const Sidebar = () => {
           {!isMinimized && (
             <span className="ml-2">{t('minimize')}</span>
           )}
-
         </button>
         <a
           target="#"

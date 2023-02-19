@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@tailwindcss/forms": "^0.5.3",
     "i18next": "^22.4.9",
     "i18next-browser-languagedetector": "^7.0.1",
     "localforage": "^1.10.0",

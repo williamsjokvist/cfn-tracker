@@ -235,7 +235,7 @@ const Root = () => {
                 startTrack();
               }}
             >
-              <h3 className="mb-2">{t("enterCfnName")}</h3>
+              <h3 className="mb-2">{t("enterCfnName")}:</h3>
               <input
                 disabled={isLoading}
                 type="text"
@@ -246,7 +246,7 @@ const Root = () => {
                 onChange={(e) => {
                   setInputValue(e.target.value);
                 }}
-                className="py-3 px-4 block w-full border-gray-200 rounded-md text-lg focus:border-orange-500 focus:ring-orange-500 dark:bg-gray-900 dark:border-gray-800 dark:text-gray-300"
+                className="bg-transparent border-b-2 border-0 focus-within:outline-none focus-visible:outline-none border-b-[rgba(255,255,255,0.275)] outline-none focus:outline-none hover:text-white transition-colors py-3 px-4 block w-full text-lg text-gray-300"
                 placeholder={t("cfnName")!}
                 autoCapitalize="off"
                 autoComplete="off"
@@ -256,6 +256,10 @@ const Root = () => {
                   setInputValue(null);
                 }}
               />
+              <div className={`flex items-center mt-4`}>
+                <input type="checkbox"/>
+                {`Restore previous session`}
+              </div>
               <div className="flex justify-end">
                 <button
                   disabled={isLoading}

@@ -7,17 +7,17 @@ const lngs = [
   { code: "jp", nativeName: "日本" },
 ];
 
-const LanguageSelector = (props: {showText: boolean}) => {
+const LanguageSelector = (props: { isMinimized: boolean }) => {
   const { t, i18n } = useTranslation();
-  const { showText } = props
+  const { isMinimized } = props
   return (
-    <div className="group flex">
+    <div className={`group flex`}>
       <button
         type="button"
         className="h-[28px] font-extralight lowercase relative flex justify-center items-center text-[#d6d4ff] group-hover:text-white transition-colors"
       >
         <FaGlobe className="w-4 h-4 text-[#d6d4ff] group-hover:text-white text-2xl transition-all mr-2" />
-        {showText && t("language")}
+        {!isMinimized && t("language")}
       </button>
       <div className="absolute left-[98%] flex group-hover:opacity-100 group-hover:visible invisible opacity-0 transition-all">
         <FaChevronLeft
