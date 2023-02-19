@@ -98,7 +98,7 @@ const History = () => {
           </div>
         )}
       </header>
-      <div className="relative w-full pt-2 z-40 pb-4">
+      <div className="relative w-full">
         {chosenLog && (
           <div className="flex items-center px-8 mb-2 h-10 border-b border-slate-50 border-opacity-10 ">
             {totalWinRate != null && (
@@ -127,7 +127,7 @@ const History = () => {
           </div>
         )}
         {chosenLog && (
-          <div className="overflow-y-scroll max-h-[320px] h-full px-8">
+          <div className="overflow-y-scroll max-h-[340px] h-full px-8">
             <table className="w-full border-spacing-y-1 border-separate min-w-[525px]">
               <thead>
                 <tr>

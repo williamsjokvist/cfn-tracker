@@ -29,7 +29,8 @@ interface CFNTrackerTranslation {
   unpause: string,
   statistics: string,
   date: string,
-  minimize: string
+  minimize: string,
+  restoreSession: string
 }
 
 i18n
@@ -72,7 +73,8 @@ i18n
           unpause: 'Unpause',
           statistics: 'Statistics',
           date: 'Date',
-          minimize: 'minimize'
+          minimize: 'minimize',
+          restoreSession: 'Restore last session'
         } as CFNTrackerTranslation
       },
       fr: {
@@ -103,7 +105,8 @@ i18n
           unpause: 'Reprendre',
           statistics: 'Statistiques',
           date: 'Date',
-          minimize: 'réduire'
+          minimize: 'réduire',
+          restoreSession: 'Restaurer la dernière session'
         } as CFNTrackerTranslation
       },
       jp: {
@@ -134,7 +137,8 @@ i18n
           unpause: '再開',
           statistics: '統計',
           date: '日付',
-          minimize: '縮む'
+          minimize: '縮む',
+          restoreSession: '最後のセッションを復元'
         } as CFNTrackerTranslation
       }
     }

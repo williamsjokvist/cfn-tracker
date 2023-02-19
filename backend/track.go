@@ -15,18 +15,18 @@ func LogMatchHistory() {
 	fmt.Println("["+time.Now().Format(`15:04`)+"] LP:", CurrentMatchHistory.LP, "/ Gain:", CurrentMatchHistory.LPGain, "/ Wins:", CurrentMatchHistory.Wins, "/ Losses:", CurrentMatchHistory.Losses, "/ Winrate:", CurrentMatchHistory.WinRate, `%`)
 }
 
-func (a *App) StartTracking(profile string, resetData bool) {
+func (a *App) StartTracking(profile string, restoreData bool) {
 	if IsInitialized == false || IsTracking == true {
 		return
 	}
 
-	fmt.Println("Loading profile")
-	PageInstance.MustNavigate(`https://game.capcom.com/cfn/sfv/profile/` + profile).MustWaitLoad()
-	IsTracking = true
-	fmt.Println("Profile loaded")
-	time.Sleep(3 * time.Second)
-
-	if resetData == true {
+	if restoreData == true {
+		lastSavedMatchHistory, isSuccess := GetLastSavedMatchHistory()
+		if isSuccess {
+			CurrentMatchHistory = lastSavedMatchHistory
+			profile = CurrentMatchHistory.CFN
+		}
+	} else {
 		CurrentMatchHistory = MatchHistory{
 			CFN:          profile,
 			LP:           0,
@@ -39,9 +39,14 @@ func (a *App) StartTracking(profile string, resetData bool) {
 			WinRate:      0,
 			IsWin:        false,
 		}
-
 		ResetSaveData()
 	}
+
+	fmt.Println("Loading profile")
+	PageInstance.MustNavigate(`https://game.capcom.com/cfn/sfv/profile/` + profile).MustWaitLoad()
+	IsTracking = true
+	fmt.Println("Profile loaded")
+	time.Sleep(3 * time.Second)
 
 	runtime.EventsEmit(a.ctx, `started-tracking`)
 
@@ -54,14 +59,13 @@ func (a *App) StartTracking(profile string, resetData bool) {
 			runtime.EventsEmit(a.ctx, `stopped-tracking`)
 			break
 		}
-
-		a.RefreshData(profile, PageInstance)
+		isFirstFetch := CurrentMatchHistory.LP == 0 || restoreData == true
+		a.RefreshData(profile, PageInstance, isFirstFetch)
 		time.Sleep(RefreshIntervalSeconds * time.Second)
 	}
 }
 
-func (a *App) RefreshData(profile string, page *rod.Page) {
-	isFirstFetch := CurrentMatchHistory.LP == 0
+func (a *App) RefreshData(profile string, page *rod.Page, isFirstFetch bool) {
 	if !isFirstFetch && page.MustInfo().URL != `https://game.capcom.com/cfn/sfv/profile/`+profile {
 		return
 	}
@@ -72,12 +76,12 @@ func (a *App) RefreshData(profile string, page *rod.Page) {
 	}
 
 	// Read from DOM
-	totalMatchesEl, e := page.Element(`.battleNumber>.total>dd`)
-	totalWinsEl, e := page.Element(`.battleNumber>.win>dd`)
-	totalLossesEl, e := page.Element(`.battleNumber>.lose>dd`)
-	lpEl, e := page.Element(`.leagueInfo>dl:last-child>dd`)
-	opponentEl, e := page.Element(`.battleHistoryBox li:first-child .fId>dd`)
-	opponentLPEl, e := page.Element(`.battleHistoryBox li:first-child .league>dd`)
+	totalMatchesEl, _ := page.Element(`.battleNumber>.total>dd`)
+	totalWinsEl, _ := page.Element(`.battleNumber>.win>dd`)
+	totalLossesEl, _ := page.Element(`.battleNumber>.lose>dd`)
+	lpEl, _ := page.Element(`.leagueInfo>dl:last-child>dd`)
+	opponentEl, _ := page.Element(`.battleHistoryBox li:first-child .fId>dd`)
+	opponentLPEl, _ := page.Element(`.battleHistoryBox li:first-child .league>dd`)
 	opponentCharacterEl, e := page.Element(`.battleHistoryBox li:first-child .fav>dd`)
 
 	if e != nil {

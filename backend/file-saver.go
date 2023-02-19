@@ -22,6 +22,23 @@ func ResetSaveData() {
 	})
 }
 
+func GetLastSavedMatchHistory() (MatchHistory, bool) {
+	var result MatchHistory
+
+	pastResultsFile, err := os.ReadFile(`results/results.json`)
+	if err != nil {
+		return MatchHistory{}, false
+	}
+
+	_ = json.Unmarshal(pastResultsFile, &result)
+	if err != nil {
+		fmt.Println(`Could not unmarshal match history`, err)
+		return MatchHistory{}, false
+	}
+
+	return result, true
+}
+
 func SaveMatchHistory(matchHistory MatchHistory) {
 	SaveTextToFile(`results`, `wins.txt`, strconv.Itoa(matchHistory.Wins))
 	SaveTextToFile(`results`, `losses.txt`, strconv.Itoa(matchHistory.Losses))

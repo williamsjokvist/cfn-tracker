@@ -33,6 +33,7 @@ const Root = () => {
   } = useStatStore();
   const [oldCfns, setOldCfns] = useState<string[] | null>(null);
   const [inputValue, setInputValue] = useState<string | null>(null);
+  const [isRestore, setRestore] = useState<boolean>(false);
   useEffect(() => {
     if (!isTracking) {
       GetAvailableLogs().then((logs) => {
@@ -72,7 +73,7 @@ const Root = () => {
             </>
           )}
           {!isTracking && isInitialized && !isLoading && t("startTracking")}
-          {((isTracking || isLoading || !isInitialized) && !isPaused) && (
+          {(isTracking || isLoading || !isInitialized) && !isPaused && (
             <div
               className="animate-spin inline-block w-5 h-5 border-[3px] border-current border-t-transparent text-pink-600 rounded-full"
               role="status"
@@ -81,7 +82,7 @@ const Root = () => {
           )}
         </h2>
       </header>
-      <div className="z-40 h-full flex justify-between items-center px-8 py-4">
+      <div className="z-40 h-full w-full justify-self-center flex justify-between items-center px-8 py-4">
         {matchHistory && isTracking && (
           <>
             <div className="relative w-full h-full grid grid-rows-[0fr_1fr] max-w-[320px]">
@@ -142,7 +143,7 @@ const Root = () => {
             {matchHistory && isTracking && (
               <div className="relative mr-4 h-full grid content-between justify-items-center">
                 <PieChart
-                  className="pie-chart animate-enter max-w-[160px] max-h-[160px] backdrop-blur"
+                  className="pie-chart mt-6 animate-enter max-w-[160px] max-h-[160px] backdrop-blur"
                   animate={true}
                   lineWidth={75}
                   paddingAngle={0}
@@ -185,7 +186,7 @@ const Root = () => {
                         setLoading(false);
                         setPaused(false);
                         setTracking(false);
-                      }, 30000)
+                      }, 30000);
 
                       setInitialized(false);
                     }}
@@ -207,7 +208,6 @@ const Root = () => {
                     <AiFillFolderOpen className="w-4 h-4 mr-2" />
                     {t("openResultFolder")}
                   </button>
-
                 </div>
               </div>
             )}
@@ -216,9 +216,17 @@ const Root = () => {
         {!(isTracking || isLoading || !isInitialized) && (
           <>
             <form
-              className="mx-auto"
+              className="max-w-[450px] mx-auto"
               onSubmit={(e) => {
                 e.preventDefault();
+
+                if (isRestore) {
+                  setLoading(true);
+                  StartTracking('', true).then(() => {
+                    setLoading(false);
+                  });
+                  return;
+                }
 
                 const cfn = (e.target as any).cfn.value;
                 if (cfn == "") return;
@@ -230,36 +238,68 @@ const Root = () => {
                     return;
                   }
 
-                  StartTracking(cfn, true);
+                  StartTracking(cfn, false);
                 };
                 startTrack();
               }}
             >
-              <h3 className="mb-2">{t("enterCfnName")}:</h3>
-              <input
-                disabled={isLoading}
-                type="text"
-                name="cfn"
-                {...(inputValue && {
-                  value: inputValue,
-                })}
-                onChange={(e) => {
-                  setInputValue(e.target.value);
-                }}
-                className="bg-transparent border-b-2 border-0 focus-within:outline-none focus-visible:outline-none border-b-[rgba(255,255,255,0.275)] outline-none focus:outline-none hover:text-white transition-colors py-3 px-4 block w-full text-lg text-gray-300"
-                placeholder={t("cfnName")!}
-                autoCapitalize="off"
-                autoComplete="off"
-                autoCorrect="off"
-                autoSave="off"
-                onClick={() => {
-                  setInputValue(null);
-                }}
-              />
-              <div className={`flex items-center mt-4`}>
-                <input type="checkbox"/>
-                {`Restore previous session`}
-              </div>
+              {
+                <>
+                  <h3 className="mb-2 text-lg">{t("enterCfnName")}:</h3>
+                  <input
+                    disabled={isLoading || isRestore}
+                    type="text"
+                    name="cfn"
+                    {...(inputValue && {
+                      value: inputValue,
+                    })}
+                    onChange={(e) => {
+                      setInputValue(e.target.value);
+                    }}
+                    className="bg-transparent border-b-2 border-0 focus:ring-offset-transparent focus:ring-transparent border-b-[rgba(255,255,255,0.275)] focus:border-white hover:border-white outline-none focus:outline-none hover:text-white transition-colors py-3 px-4 block w-full text-lg text-gray-300"
+                    placeholder={t("cfnName")!}
+                    autoCapitalize="off"
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoSave="off"
+                    onClick={() => {
+                      setInputValue(null);
+                    }}
+                  />
+                  {oldCfns && (
+                    <>
+                      <div className="mt-3 flex flex-wrap gap-2 content-center items-center text-center pr-3">
+                        {oldCfns.map((cfn, index) => {
+                          return (
+                            <button
+                              disabled={isLoading || isRestore}
+                              onClick={() => setInputValue(cfn)}
+                              className="whitespace-nowrap bg-[rgb(255,255,255,0.075)] hover:bg-[rgb(255,255,255,0.125)] text-base backdrop-blur rounded-2xl transition-all items-center border-transparent border-opacity-5 border-[1px] px-3 py-1"
+                              type="button"
+                              key={index}
+                            >
+                              {cfn}
+                            </button>
+                          );
+                        })}
+                      </div>
+                      <div className={`text-lg flex items-center mt-4`}>
+                        <input
+                          type="checkbox"
+                          className="w-7 h-7 rounded-md checked:border-2 checked:focus:border-[rgba(255,255,255,.25)] checked:hover:border-[rgba(255,255,255,.25)] checked:border-[rgba(255,255,255,.25)] border-2 border-[rgba(255,255,255,.25)] focus:border-2 cursor-pointer bg-transparent text-transparent focus:ring-offset-transparent focus:ring-transparent mr-4"
+                          onChange={(e) => {
+                            setRestore(e.target.checked);
+                            if (e.target.checked) {
+                              setInputValue(' ')
+                            }
+                          }}
+                        />
+                        {t('restoreSession')}
+                      </div>
+                    </>
+                  )}
+                </>
+              }
               <div className="flex justify-end">
                 <button
                   disabled={isLoading}
@@ -273,23 +313,6 @@ const Root = () => {
                 </button>
               </div>
             </form>
-            {oldCfns && (
-              <div className="border-l-[1px] border-[rgba(255,255,255,0.25)] pl-12 grid content-center items-center text-center h-[80vh] pr-3">
-                {oldCfns.map((cfn, index) => {
-                  return (
-                    <button
-                      disabled={isLoading}
-                      onClick={() => setInputValue(cfn)}
-                      className="bg-[rgb(255,255,255,0.075)] hover:bg-[rgb(255,255,255,0.125)] text-xl backdrop-blur mb-5 rounded-2xl transition-all items-center border-transparent border-opacity-5 border-[1px] px-3 py-1"
-                      type="button"
-                      key={index}
-                    >
-                      {cfn}
-                    </button>
-                  );
-                })}
-              </div>
-            )}
           </>
         )}
       </div>

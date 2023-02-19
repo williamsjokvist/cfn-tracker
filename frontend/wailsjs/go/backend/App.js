@@ -42,8 +42,8 @@ export function OpenResultsDirectory() {
   return window['go']['backend']['App']['OpenResultsDirectory']();
 }
 
-export function RefreshData(arg1, arg2) {
-  return window['go']['backend']['App']['RefreshData'](arg1, arg2);
+export function RefreshData(arg1, arg2, arg3) {
+  return window['go']['backend']['App']['RefreshData'](arg1, arg2, arg3);
 }
 
 export function StartTracking(arg1, arg2) {
