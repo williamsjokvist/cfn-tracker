@@ -1,27 +1,25 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { GiDeerTrack } from "react-icons/gi";
 import { FaStop, FaPause, FaPlay } from "react-icons/fa";
 import {
   StopTracking,
   OpenResultsDirectory,
   IsTracking,
   IsInitialized,
+  ResultsJSONExist,
   GetAvailableLogs,
   StartTracking,
 } from "../../wailsjs/go/backend/App";
 import { PieChart } from "react-minimal-pie-chart";
 import { AiFillFolderOpen } from "react-icons/ai";
-
 import { useStatStore } from "../store/use-stat-store";
 
-// TODO refactor this mess
+// TODO separate input screens and tracking screens
 
 const Root = () => {
   const { t } = useTranslation();
   const {
     matchHistory,
-    resetMatchHistory,
     setTracking,
     isTracking,
     isLoading,
@@ -34,6 +32,7 @@ const Root = () => {
   const [oldCfns, setOldCfns] = useState<string[] | null>(null);
   const [inputValue, setInputValue] = useState<string | null>(null);
   const [isRestore, setRestore] = useState<boolean>(false);
+  const [lastJSONExist, setLastJSONExist] = useState<boolean>(false);
   useEffect(() => {
     if (!isTracking) {
       GetAvailableLogs().then((logs) => {
@@ -43,6 +42,10 @@ const Root = () => {
       IsTracking().then((isTracking) => {
         setTracking(isTracking);
         isTracking && setPaused(false);
+      });
+
+      ResultsJSONExist().then((doesExist: boolean) => {
+        setLastJSONExist(doesExist);
       });
     }
 
@@ -222,7 +225,7 @@ const Root = () => {
 
                 if (isRestore) {
                   setLoading(true);
-                  StartTracking('', true).then(() => {
+                  StartTracking("", true).then(() => {
                     setLoading(false);
                   });
                   return;
@@ -267,36 +270,36 @@ const Root = () => {
                     }}
                   />
                   {oldCfns && (
-                    <>
-                      <div className="mt-3 flex flex-wrap gap-2 content-center items-center text-center pr-3">
-                        {oldCfns.map((cfn, index) => {
-                          return (
-                            <button
-                              disabled={isLoading || isRestore}
-                              onClick={() => setInputValue(cfn)}
-                              className="whitespace-nowrap bg-[rgb(255,255,255,0.075)] hover:bg-[rgb(255,255,255,0.125)] text-base backdrop-blur rounded-2xl transition-all items-center border-transparent border-opacity-5 border-[1px] px-3 py-1"
-                              type="button"
-                              key={index}
-                            >
-                              {cfn}
-                            </button>
-                          );
-                        })}
-                      </div>
-                      <div className={`text-lg flex items-center mt-4`}>
-                        <input
-                          type="checkbox"
-                          className="w-7 h-7 rounded-md checked:border-2 checked:focus:border-[rgba(255,255,255,.25)] checked:hover:border-[rgba(255,255,255,.25)] checked:border-[rgba(255,255,255,.25)] border-2 border-[rgba(255,255,255,.25)] focus:border-2 cursor-pointer bg-transparent text-transparent focus:ring-offset-transparent focus:ring-transparent mr-4"
-                          onChange={(e) => {
-                            setRestore(e.target.checked);
-                            if (e.target.checked) {
-                              setInputValue(' ')
-                            }
-                          }}
-                        />
-                        {t('restoreSession')}
-                      </div>
-                    </>
+                    <div className="mt-3 flex flex-wrap gap-2 content-center items-center text-center pr-3">
+                      {oldCfns.map((cfn, index) => {
+                        return (
+                          <button
+                            disabled={isLoading || isRestore}
+                            onClick={() => setInputValue(cfn)}
+                            className="whitespace-nowrap bg-[rgb(255,255,255,0.075)] hover:bg-[rgb(255,255,255,0.125)] text-base backdrop-blur rounded-2xl transition-all items-center border-transparent border-opacity-5 border-[1px] px-3 py-1"
+                            type="button"
+                            key={index}
+                          >
+                            {cfn}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                  {lastJSONExist && (
+                    <div className={`text-lg flex items-center mt-4`}>
+                      <input
+                        type="checkbox"
+                        className="w-7 h-7 rounded-md checked:border-2 checked:focus:border-[rgba(255,255,255,.25)] checked:hover:border-[rgba(255,255,255,.25)] checked:border-[rgba(255,255,255,.25)] border-2 border-[rgba(255,255,255,.25)] focus:border-2 cursor-pointer bg-transparent text-transparent focus:ring-offset-transparent focus:ring-transparent mr-4"
+                        onChange={(e) => {
+                          setRestore(e.target.checked);
+                          if (e.target.checked) {
+                            setInputValue(" ");
+                          }
+                        }}
+                      />
+                      {t("restoreSession")}
+                    </div>
                   )}
                 </>
               }
@@ -307,9 +310,9 @@ const Root = () => {
                   style={{
                     filter: "hue-rotate(156deg)",
                   }}
-                  className="mt-4 flex select-none items-center justify-between bg-[rgba(255,10,10,.1)] rounded-md px-5 py-3 border-[#FF3D51] hover:bg-[#FF3D51] border-[1px] transition-colors font-semibold text-md"
+                  className="mt-4 select-none text-center bg-[rgba(255,10,10,.1)] rounded-md px-7 py-3 border-[#FF3D51] hover:bg-[#FF3D51] border-[1px] transition-colors font-semibold text-md"
                 >
-                  <GiDeerTrack className="mr-3" /> {t("start")}
+                  {t("start")}
                 </button>
               </div>
             </form>

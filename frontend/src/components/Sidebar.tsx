@@ -68,7 +68,7 @@ const Sidebar = () => {
 
   return (
     <aside
-      className="bg-[rgba(3,5,19,0.33)] border-r border-slate-50 border-opacity-10 backdrop-blur relative z-50 h-screen overflow-auto scrollbar-none grid grid-rows-[0fr_1fr_0fr] py-2 text-white whitespace-nowrap dark:border-slate-50 dark:border-opacity-10"
+      className="select-none bg-[rgba(3,5,19,0.33)] border-r border-slate-50 border-opacity-10 backdrop-blur relative z-50 h-screen overflow-auto scrollbar-none grid grid-rows-[0fr_1fr_0fr] py-2 text-white whitespace-nowrap dark:border-slate-50 dark:border-opacity-10"
       style={{
         width: isMinimized ? '73px' : "175px",
         overflow: "visible",
@@ -164,7 +164,7 @@ const Sidebar = () => {
         </a>
         {newVersionAvailable && (
           <a
-            className="cursor-pointer leading-5 bottom-2 absolute left-[80%] text-base py-2 px-3 rounded-lg bg-slate-900"
+            className="cursor-pointer leading-5 bottom-2 absolute left-[107%] text-base py-2 px-3 rounded-lg bg-slate-900"
             onClick={() => {
               BrowserOpenURL(
                 "https://github.com/GreenSoap/cfn-tracker/releases"

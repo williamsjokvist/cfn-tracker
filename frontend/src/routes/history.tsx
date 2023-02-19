@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { FaChevronLeft } from "react-icons/fa";
-import { MdOutlineDelete } from "react-icons/md";
+import { RiFileExcel2Fill } from "react-icons/ri";
+
+import { MdDelete } from "react-icons/md";
 import {
   GetAvailableLogs,
   GetMatchLog,
@@ -52,9 +54,7 @@ const History = () => {
 
     setMatchLog([]);
     setTimeout(() => {
-      setMatchLog(
-        matchLog.filter((ml) => (ml as any)[property] == value)
-      );
+      setMatchLog(matchLog.filter((ml) => (ml as any)[property] == value));
       setSpecified(true);
     }, 50);
   };
@@ -72,7 +72,7 @@ const History = () => {
           {t("history")}
         </h2>
         {chosenLog && (
-          <div className='flex items-center justify-between w-full ml-4'>
+          <div className="flex items-center justify-end w-full ml-4">
             <button
               onClick={() => {
                 isSpecified && fetchLog(chosenLog);
@@ -83,18 +83,21 @@ const History = () => {
               <FaChevronLeft className="w-4 h-4 inline mr-2" />
               {t("goBack")}
             </button>
+            <button className="bg-[rgb(0,0,0,0.28)] hover:bg-[rgb(255,255,255,0.125)] backdrop-blur h-8 inline-block mr-3 rounded-2xl transition-all items-center border-transparent border-opacity-5 border-[1px] px-3 py-1">
+              <RiFileExcel2Fill className="w-4 h-4 inline mr-2 text-white"/>{t("export")}
+            </button>
             <button
-            onClick={() => {
-              chosenLog && DeleteMatchLog(chosenLog);
-              setTimeout(() => {
-                setMatchLog([]);
-              }, 50);
-            }}
-            className="bg-[rgb(0,0,0,0.28)] hover:bg-[rgb(255,255,255,0.125)] backdrop-blur h-8 inline-block float-right rounded-2xl transition-all items-center border-transparent border-opacity-5 border-[1px] px-3 py-1"
-          >
-            <MdOutlineDelete className="w-4 h-4 inline mr-2" />
-            {t("delete")}
-          </button>
+              onClick={() => {
+                chosenLog && DeleteMatchLog(chosenLog);
+                setTimeout(() => {
+                  setMatchLog([]);
+                }, 50);
+              }}
+              className="bg-[rgb(0,0,0,0.28)] hover:bg-[rgb(255,255,255,0.125)] backdrop-blur h-8 inline-block float-right rounded-2xl transition-all items-center border-transparent border-opacity-5 border-[1px] px-3 py-1"
+            >
+              <MdDelete className="w-4 h-4 inline mr-2" />
+              {t("delete")}
+            </button>
           </div>
         )}
       </header>
@@ -156,22 +159,28 @@ const History = () => {
                   matchLog.map((log, index) => {
                     return (
                       <tr key={index} className="w-full backdrop-blur">
-                        <td 
-                          onClick={() => filterLog('date', log.date)}
-                          className="whitespace-nowrap text-center rounded-l-xl rounded-r-none bg-slate-50 bg-opacity-5 px-3 py-2 hover:underline cursor-pointer">
+                        <td
+                          onClick={() => filterLog("date", log.date)}
+                          className="whitespace-nowrap text-center rounded-l-xl rounded-r-none bg-slate-50 bg-opacity-5 px-3 py-2 hover:underline cursor-pointer"
+                        >
                           {log.date}
                         </td>
                         <td className="whitespace-nowrap text-center bg-slate-50 bg-opacity-5 px-3 py-2">
                           {log.timestamp}
                         </td>
                         <td
-                          onClick={() => filterLog('opponent', log.opponent)}
+                          onClick={() => filterLog("opponent", log.opponent)}
                           className="whitespace-nowrap w-full rounded-none bg-slate-50 bg-opacity-5 px-3 py-2 hover:underline cursor-pointer"
                         >
                           {log.opponent}
                         </td>
                         <td
-                          onClick={() => filterLog('opponentCharacter', log.opponentCharacter)}
+                          onClick={() =>
+                            filterLog(
+                              "opponentCharacter",
+                              log.opponentCharacter
+                            )
+                          }
                           className="rounded-none bg-slate-50 bg-opacity-5 px-3 py-2 text-center hover:underline cursor-pointer"
                         >
                           {log.opponentCharacter}

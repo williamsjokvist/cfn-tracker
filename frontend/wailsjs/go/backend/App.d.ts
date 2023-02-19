@@ -27,6 +27,8 @@ export function OpenResultsDirectory():Promise<void>;
 
 export function RefreshData(arg1:string,arg2:rod.Page,arg3:boolean):Promise<void>;
 
+export function ResultsJSONExist():Promise<boolean>;
+
 export function StartTracking(arg1:string,arg2:boolean):Promise<void>;
 
 export function StopTracking():Promise<void>;

@@ -12,7 +12,7 @@ ifneq (,$(wildcard ./.env))
   export
 endif
 
-LDFLAGS=-X 'main.steamUsername=${STEAM_USERNAME}' -X 'main.steamPassword=${STEAM_PASSWORD}'
+LDFLAGS=-X 'main.appVersion=${APP_VERSION}' -X 'main.steamUsername=${STEAM_USERNAME}' -X 'main.steamPassword=${STEAM_PASSWORD}'
 
 # MacOS
 macos: 

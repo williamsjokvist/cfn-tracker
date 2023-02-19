@@ -30,7 +30,8 @@ interface CFNTrackerTranslation {
   statistics: string,
   date: string,
   minimize: string,
-  restoreSession: string
+  restoreSession: string,
+  export: string
 }
 
 i18n
@@ -74,7 +75,8 @@ i18n
           statistics: 'Statistics',
           date: 'Date',
           minimize: 'minimize',
-          restoreSession: 'Restore last session'
+          restoreSession: 'Restore last session',
+          export: 'Export CSV'
         } as CFNTrackerTranslation
       },
       fr: {
@@ -106,7 +108,8 @@ i18n
           statistics: 'Statistiques',
           date: 'Date',
           minimize: 'réduire',
-          restoreSession: 'Restaurer la dernière session'
+          restoreSession: 'Restaurer la dernière session',
+          export: 'Exporter CSV'
         } as CFNTrackerTranslation
       },
       jp: {
@@ -138,7 +141,8 @@ i18n
           statistics: '統計',
           date: '日付',
           minimize: '縮む',
-          restoreSession: '最後のセッションを復元'
+          restoreSession: '最後のセッションを復元',
+          export: 'CSVに保存'
         } as CFNTrackerTranslation
       }
     }

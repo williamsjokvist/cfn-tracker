@@ -17,6 +17,7 @@ import (
 var (
 	steamUsername string = ``
 	steamPassword string = ``
+	appVersion    string = ``
 )
 
 //go:embed all:frontend/dist
@@ -28,22 +29,22 @@ var icon []byte
 var WailsApp *backend.App
 
 func init() {
-	if steamUsername == `` && steamPassword == `` {
+	if steamUsername == `` || steamPassword == `` || appVersion == `` {
 		err := godotenv.Load(`.env`)
 		if err != nil {
 			log.Fatal(err)
 		}
 		steamUsername = os.Getenv(`STEAM_USERNAME`)
 		steamPassword = os.Getenv(`STEAM_PASSWORD`)
+		appVersion = os.Getenv(`APP_VERSION`)
 	}
 }
 
 func main() {
-	appVersion, _ := version.NewVersion(`2.1.0`)
 
 	// Create an instance of the app structure
 	WailsApp = backend.NewApp()
-	backend.AppVersion = appVersion
+	backend.AppVersion, _ = version.NewVersion(appVersion)
 	backend.SteamUsername = steamUsername
 	backend.SteamPassword = steamPassword
 
@@ -73,8 +74,8 @@ func main() {
 			WindowIsTranslucent:  true,
 			Appearance:           mac.AppearanceType(mac.NSAppearanceNameAccessibilityHighContrastDarkAqua),
 			About: &mac.AboutInfo{
-				Title:   "CFN Tracker " + appVersion.Original(),
-				Message: "Version " + appVersion.Original() + " © 2022 William Sjökvist <william.sjokvist@gmail.com>",
+				Title:   "CFN Tracker " + appVersion,
+				Message: "Version " + appVersion + " © 2022 William Sjökvist <william.sjokvist@gmail.com>",
 			},
 		},
 		OnStartup:     WailsApp.Startup,

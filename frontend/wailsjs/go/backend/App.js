@@ -46,6 +46,10 @@ export function RefreshData(arg1, arg2, arg3) {
   return window['go']['backend']['App']['RefreshData'](arg1, arg2, arg3);
 }
 
+export function ResultsJSONExist() {
+  return window['go']['backend']['App']['ResultsJSONExist']();
+}
+
 export function StartTracking(arg1, arg2) {
   return window['go']['backend']['App']['StartTracking'](arg1, arg2);
 }

@@ -109,6 +109,11 @@ func (a *App) GetAvailableLogs() []string {
 	return cfns
 }
 
+func (a *App) ResultsJSONExist() bool {
+	_, err := os.Stat(`results/results.json`)
+	return !os.IsNotExist(err)
+}
+
 func (a *App) DeleteMatchLog(cfn string) {
 	err := os.Remove(`results/` + cfn + `-log.json`)
 	if err != nil {
