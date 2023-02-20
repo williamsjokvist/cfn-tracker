@@ -9,6 +9,8 @@ export function DeleteMatchLog(arg1:string):Promise<void>;
 
 export function DomReady(arg1:context.Context):Promise<void>;
 
+export function ExportLogToCSV(arg1:string):Promise<void>;
+
 export function GetAppVersion():Promise<string>;
 
 export function GetAvailableLogs():Promise<Array<string>>;

@@ -13,7 +13,7 @@ If you find the tool useful for your streams or to become a better player, consi
 ### Usage
 
 * Download the executable for either Mac or Windows from the [Releases](https://github.com/GreenSoap/cfn-tracker/releases) page.
-* Execute the app and wait for it to initialize.
+* Launch the app and wait for it to initialize.
 * Input your CFN when prompted.
 
 Text files will be generated in a `results` folder for every match played. Use them as sources for your labels and watch the labels be automatically updated after every match.
@@ -29,6 +29,11 @@ The app has translations for English, French and Japanese - as these are big reg
 ![stream](images/stream-example-2.gif?raw=true "stream-example")
 
 ### Development
+
+For coming updates
+* Optional web output, so you instead can choose to add it as a browser source
+* Themes for said web output, with easy customization of font, font size, colors
+* Street Fighter 6 support
 
 Any ideas for features and improvements are welcome, feel free to open an [issue](https://github.com/GreenSoap/cfn-tracker/issues)
 

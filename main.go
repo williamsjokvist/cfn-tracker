@@ -38,15 +38,15 @@ func init() {
 		steamPassword = os.Getenv(`STEAM_PASSWORD`)
 		appVersion = os.Getenv(`APP_VERSION`)
 	}
-}
 
-func main() {
-
-	// Create an instance of the app structure
-	WailsApp = backend.NewApp()
 	backend.AppVersion, _ = version.NewVersion(appVersion)
 	backend.SteamUsername = steamUsername
 	backend.SteamPassword = steamPassword
+}
+
+func main() {
+	// Create an instance of the app structure
+	WailsApp = backend.NewApp()
 
 	err := wails.Run(&options.App{
 		Title:             `CFN Tracker v2`,

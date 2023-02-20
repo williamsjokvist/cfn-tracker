@@ -47,7 +47,10 @@ func (a *App) Shutdown(ctx context.Context) {
 }
 
 func (a *App) GetAppVersion() string {
-	return AppVersion.Original()
+	if AppVersion != nil {
+		return AppVersion.Original()
+	}
+	return ""
 }
 
 func (a *App) IsTracking() bool {

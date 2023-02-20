@@ -8,6 +8,7 @@ import {
   GetAvailableLogs,
   GetMatchLog,
   DeleteMatchLog,
+  ExportLogToCSV
 } from "../../wailsjs/go/backend/App";
 import { backend } from "../../wailsjs/go/models";
 
@@ -83,7 +84,11 @@ const History = () => {
               <FaChevronLeft className="w-4 h-4 inline mr-2" />
               {t("goBack")}
             </button>
-            <button className="bg-[rgb(0,0,0,0.28)] hover:bg-[rgb(255,255,255,0.125)] backdrop-blur h-8 inline-block mr-3 rounded-2xl transition-all items-center border-transparent border-opacity-5 border-[1px] px-3 py-1">
+            <button 
+              onClick={() => {
+                ExportLogToCSV(chosenLog)
+              }}
+              className="bg-[rgb(0,0,0,0.28)] hover:bg-[rgb(255,255,255,0.125)] backdrop-blur h-8 inline-block mr-3 rounded-2xl transition-all items-center border-transparent border-opacity-5 border-[1px] px-3 py-1">
               <RiFileExcel2Fill className="w-4 h-4 inline mr-2 text-white"/>{t("export")}
             </button>
             <button

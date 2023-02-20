@@ -1,6 +1,7 @@
 package backend
 
 import (
+	"encoding/csv"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -109,4 +110,44 @@ func SaveTextToFile(directory string, fileName string, text string) {
 		fmt.Println(`Issue writing to file`, fileName)
 		LogError(SaveError)
 	}
+}
+
+func (a *App) ExportLogToCSV(cfn string) {
+	var matchHistories []MatchHistory
+	pastMatches, _ := os.ReadFile(`results/` + cfn + `-log.json`)
+	_ = json.Unmarshal(pastMatches, &matchHistories)
+	csvFile, _ := os.Create(`results/` + cfn + `.csv`)
+	defer csvFile.Close()
+	writer := csv.NewWriter(csvFile)
+
+	// Header
+	var header []string
+	header = append(header, "Date")
+	header = append(header, "Time")
+	header = append(header, "Opponent")
+	header = append(header, "Opponent Character")
+	header = append(header, "Opponent LP")
+	header = append(header, "Result")
+
+	writer.Write(header)
+
+	for _, obj := range matchHistories {
+		var record []string
+		record = append(record, obj.Date)
+		record = append(record, obj.TimeStamp)
+		record = append(record, obj.Opponent)
+		record = append(record, obj.OpponentCharacter)
+		record = append(record, obj.OpponentLP)
+
+		if obj.IsWin == true {
+			record = append(record, `W`)
+		} else if obj.IsWin == false {
+			record = append(record, `L`)
+		}
+
+		writer.Write(record)
+		record = nil
+	}
+
+	writer.Flush()
 }
