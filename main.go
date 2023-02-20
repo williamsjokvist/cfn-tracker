@@ -51,7 +51,7 @@ func main() {
 	err := wails.Run(&options.App{
 		Title:             `CFN Tracker v2`,
 		Assets:            assets,
-		Width:             800,
+		Width:             920,
 		Height:            450,
 		MinWidth:          800,
 		MinHeight:         450,

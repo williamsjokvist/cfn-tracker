@@ -126,7 +126,7 @@ func (a *App) ExportLogToCSV(cfn string) {
 	header = append(header, "Time")
 	header = append(header, "Opponent")
 	header = append(header, "Opponent Character")
-	header = append(header, "Opponent LP")
+	header = append(header, "Opponent League")
 	header = append(header, "Result")
 
 	writer.Write(header)
@@ -137,7 +137,7 @@ func (a *App) ExportLogToCSV(cfn string) {
 		record = append(record, obj.TimeStamp)
 		record = append(record, obj.Opponent)
 		record = append(record, obj.OpponentCharacter)
-		record = append(record, obj.OpponentLP)
+		record = append(record, obj.OpponentLeague)
 
 		if obj.IsWin == true {
 			record = append(record, `W`)

@@ -11,10 +11,6 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
-func LogMatchHistory() {
-	fmt.Println("["+time.Now().Format(`15:04`)+"] LP:", CurrentMatchHistory.LP, "/ Gain:", CurrentMatchHistory.LPGain, "/ Wins:", CurrentMatchHistory.Wins, "/ Losses:", CurrentMatchHistory.Losses, "/ Winrate:", CurrentMatchHistory.WinRate, `%`)
-}
-
 func (a *App) StartTracking(profile string, restoreData bool) {
 	if IsInitialized == false || IsTracking == true {
 		return
@@ -46,26 +42,60 @@ func (a *App) StartTracking(profile string, restoreData bool) {
 	PageInstance.MustNavigate(`https://game.capcom.com/cfn/sfv/profile/` + profile).MustWaitLoad()
 	IsTracking = true
 	fmt.Println("Profile loaded")
-	time.Sleep(3 * time.Second)
 
 	runtime.EventsEmit(a.ctx, `started-tracking`)
 
+	// First fetch
+	a.FetchData(profile, PageInstance, true)
+
 	for {
-		if IsTracking == false {
-			fmt.Println("Stopped tracking")
-			IsInitialized = true
-			IsTracking = false
-			runtime.EventsEmit(a.ctx, `initialized`, IsInitialized)
-			runtime.EventsEmit(a.ctx, `stopped-tracking`)
+		didBreak := sleepOrBreak(RefreshInterval, func() bool {
+			shouldBreak := false
+
+			if IsTracking == false {
+				fmt.Println("Stopped tracking")
+				IsInitialized = true
+				IsTracking = false
+				runtime.EventsEmit(a.ctx, `initialized`, IsInitialized)
+				runtime.EventsEmit(a.ctx, `stopped-tracking`)
+				shouldBreak = true
+			}
+
+			fmt.Println(`shouldBreak`, shouldBreak)
+			return shouldBreak
+		})
+
+		if didBreak {
 			break
 		}
-		isFirstFetch := CurrentMatchHistory.LP == 0 || restoreData == true
-		a.RefreshData(profile, PageInstance, isFirstFetch)
-		time.Sleep(RefreshIntervalSeconds * time.Second)
+
+		a.FetchData(profile, PageInstance, false)
 	}
+
 }
 
-func (a *App) RefreshData(profile string, page *rod.Page, isFirstFetch bool) {
+type breakFn func() bool
+
+func sleepOrBreak(duration time.Duration, breakFunction breakFn) bool {
+	didBreak := false
+	sleepPeriod := 1 * time.Second
+	sleepCyclesLeft := int(duration / sleepPeriod)
+
+	for sleepCyclesLeft > 0 {
+		if breakFunction() {
+			sleepCyclesLeft = 0
+			didBreak = true
+		}
+
+		time.Sleep(sleepPeriod)
+		fmt.Print(`(`, sleepCyclesLeft, `) `)
+		sleepCyclesLeft--
+	}
+
+	return didBreak
+}
+
+func (a *App) FetchData(profile string, page *rod.Page, isFirstFetch bool) {
 	if !isFirstFetch && page.MustInfo().URL != `https://game.capcom.com/cfn/sfv/profile/`+profile {
 		return
 	}
@@ -90,7 +120,7 @@ func (a *App) RefreshData(profile string, page *rod.Page, isFirstFetch bool) {
 	}
 
 	opponent := opponentEl.MustText()
-	opponentLP := opponentLPEl.MustText()
+	opponentLP, _ := strconv.Atoi(opponentLPEl.MustText())
 	opponentCharacter := opponentCharacterEl.MustText()
 
 	// Convert to ints
@@ -124,13 +154,14 @@ func (a *App) RefreshData(profile string, page *rod.Page, isFirstFetch bool) {
 
 	// Matches have been played since first fetch
 	if hasNewMatch && !isFirstFetch {
-		CurrentMatchHistory.Wins = CurrentMatchHistory.Wins + int(math.Abs(float64(CurrentMatchHistory.TotalWins)-float64(totalWins)))
-		CurrentMatchHistory.Losses = CurrentMatchHistory.Losses + int(math.Abs(float64(CurrentMatchHistory.TotalLosses)-float64(totalLosses)))
-		CurrentMatchHistory.WinRate = int((float64(CurrentMatchHistory.Wins) / float64(CurrentMatchHistory.Wins+CurrentMatchHistory.Losses)) * 100)
+		CurrentMatchHistory.Wins = CurrentMatchHistory.Wins + int(math.Abs(float64(CurrentMatchHistory.TotalWins-totalWins)))
+		CurrentMatchHistory.Losses = CurrentMatchHistory.Losses + int(math.Abs(float64(CurrentMatchHistory.TotalLosses-totalLosses)))
 		CurrentMatchHistory.Opponent = opponent
 		CurrentMatchHistory.OpponentLP = opponentLP
 		CurrentMatchHistory.OpponentCharacter = opponentCharacter
+		CurrentMatchHistory.OpponentLeague = GetLeagueFromLP(opponentLP)
 		CurrentMatchHistory.IsWin = isWin
+		CurrentMatchHistory.WinRate = int((float64(CurrentMatchHistory.Wins) / float64(CurrentMatchHistory.Wins+CurrentMatchHistory.Losses)) * 100)
 
 		if isWin {
 			CurrentMatchHistory.WinStreak++
@@ -149,4 +180,56 @@ func (a *App) RefreshData(profile string, page *rod.Page, isFirstFetch bool) {
 	runtime.EventsEmit(a.ctx, `cfn-data`, CurrentMatchHistory)
 	SaveMatchHistory(CurrentMatchHistory)
 	LogMatchHistory()
+}
+
+func LogMatchHistory() {
+	fmt.Println("["+time.Now().Format(`15:04`)+"] LP:", CurrentMatchHistory.LP, "/ Gain:", CurrentMatchHistory.LPGain, "/ Wins:", CurrentMatchHistory.Wins, "/ Losses:", CurrentMatchHistory.Losses, "/ Winrate:", CurrentMatchHistory.WinRate, `%`)
+}
+
+func GetLeagueFromLP(lp int) string {
+	var league string
+
+	if lp >= 300000 {
+		league = "Warlord"
+	} else if lp >= 100000 {
+		league = "Ultimate Grand Master"
+	} else if lp >= 35000 {
+		league = "Grand Master"
+	} else if lp >= 30000 {
+		league = "Master"
+	} else if lp >= 25000 {
+		league = "Ultra Diamond"
+	} else if lp >= 20000 {
+		league = "Super Diamond"
+	} else if lp >= 14000 {
+		league = "Diamond"
+	} else if lp >= 12000 {
+		league = "Ultra Platinum"
+	} else if lp >= 10000 {
+		league = "Super Platinum"
+	} else if lp >= 7500 {
+		league = "Platinum"
+	} else if lp >= 6500 {
+		league = "Ultra Gold"
+	} else if lp >= 4500 {
+		league = "Super Gold"
+	} else if lp >= 4000 {
+		league = "Gold"
+	} else if lp >= 3500 {
+		league = "Ultra Silver"
+	} else if lp >= 3000 {
+		league = "Super Silver"
+	} else if lp >= 2000 {
+		league = "Silver"
+	} else if lp >= 1500 {
+		league = "Ultra Bronze"
+	} else if lp >= 1000 {
+		league = "Super Bronze"
+	} else if lp >= 500 {
+		league = "Bronze"
+	} else if lp < 500 {
+		league = "Rookie"
+	}
+
+	return league
 }

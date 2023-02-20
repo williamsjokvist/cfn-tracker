@@ -31,7 +31,8 @@ interface CFNTrackerTranslation {
   date: string,
   minimize: string,
   restoreSession: string,
-  export: string
+  export: string,
+  league: string
 }
 
 i18n
@@ -47,7 +48,7 @@ i18n
     },
     resources: {
       en: {
-        translation: {
+        translation: <CFNTrackerTranslation>{
           tracking: 'Tracking',
           history: 'Match Log',
           language: 'Language',
@@ -69,18 +70,19 @@ i18n
           result: 'Result',
           time: 'Time',
           winStreak: 'Win Streak',
-          newVersionAvailable: 'New version available!',
+          newVersionAvailable: 'Update available!',
           pause: 'Pause',
           unpause: 'Unpause',
           statistics: 'Statistics',
           date: 'Date',
           minimize: 'minimize',
           restoreSession: 'Restore last session',
-          export: 'Export CSV'
-        } as CFNTrackerTranslation
+          export: 'Export CSV',
+          league: 'League'
+        }
       },
       fr: {
-        translation: {
+        translation: <CFNTrackerTranslation>{
           tracking: 'Suivie',
           history: 'Histoire',
           language: 'Langue',
@@ -109,13 +111,14 @@ i18n
           date: 'Date',
           minimize: 'réduire',
           restoreSession: 'Restaurer la dernière session',
-          export: 'Exporter CSV'
-        } as CFNTrackerTranslation
+          export: 'Exporter CSV',
+          league: 'Ligue'
+        }
       },
       jp: {
-        translation: {
+        translation: <CFNTrackerTranslation>{
           tracking: '追跡',
-          history: 'マッチログ',
+          history: 'ログ',
           language: '言語',
           startTracking: '追跡を開始',
           cfnName: 'CFN名',
@@ -127,23 +130,24 @@ i18n
           goBack: '戻る',
           loading: 'お待ちください',
           wins: '勝つ',
-          losses: '損失',
+          losses: '負け',
           winRate: '勝率',
           stop: 'やめる',
           openResultFolder: '結果フォルダ',
           enterCfnName: 'CFN名を入力してください',
           result: '結果',
           time: '時間',
-          winStreak: 'ストリークを獲得',
-          newVersionAvailable: '利用可能な新しいバージョン!',
-          pause: '一時停止',
-          unpause: '再開',
+          winStreak: '連勝',
+          newVersionAvailable: 'アップデートが入手可能!',
+          pause: '休止',
+          unpause: '続く',
           statistics: '統計',
           date: '日付',
-          minimize: '縮む',
+          minimize: '最小化',
           restoreSession: '最後のセッションを復元',
-          export: 'CSVに保存'
-        } as CFNTrackerTranslation
+          export: 'CSVに保存',
+          league: 'リーグ'
+        }
       }
     }
   });

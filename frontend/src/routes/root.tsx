@@ -118,14 +118,6 @@ const Root = () => {
                 </div>
                 <div className="mb-2 flex gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl backdrop-blur">
                   <dt className="tracking-wide font-extralight">
-                    {t("winRate")}
-                  </dt>
-                  <dd className="text-4xl font-semibold">
-                    {matchHistory.winRate}%
-                  </dd>
-                </div>
-                <div className="mb-2 flex gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl backdrop-blur">
-                  <dt className="tracking-wide font-extralight">
                     {t("winStreak")}
                   </dt>
                   <dd className="text-4xl font-semibold">
@@ -144,9 +136,12 @@ const Root = () => {
               </dl>
             </div>
             {matchHistory && isTracking && (
-              <div className="relative mr-4 h-full grid content-between justify-items-center">
+              <div className="relative mr-4 text-center h-full grid content-between justify-items-center">
+                <b className='absolute top-[30%] z-50 text-4xl'>
+                  {matchHistory.winRate}%
+                </b>
                 <PieChart
-                  className="pie-chart mt-6 animate-enter max-w-[160px] max-h-[160px] backdrop-blur"
+                  className="pie-chart mt-6 animate-enter max-w-[200px] max-h-[200px] backdrop-blur"
                   animate={true}
                   lineWidth={75}
                   paddingAngle={0}
@@ -183,15 +178,12 @@ const Root = () => {
                   <button
                     disabled={isLoading}
                     onClick={() => {
-                      StopTracking();
-                      setLoading(true);
-                      setTimeout(() => {
+                      StopTracking().then(() => {
                         setLoading(false);
                         setPaused(false);
                         setTracking(false);
-                      }, 30000);
-
-                      setInitialized(false);
+                        setRestore(false);
+                      });
                     }}
                     type="button"
                     className="flex items-center mb-2 justify-between bg-[rgba(255,10,10,.1)] rounded-md px-5 py-3 border-[#FF3D51] hover:bg-[#FF3D51] border-[1px] transition-colors font-semibold text-md"

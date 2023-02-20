@@ -12,7 +12,8 @@ export namespace backend {
 	    winRate: number;
 	    opponent: string;
 	    opponentCharacter: string;
-	    opponentLP: string;
+	    opponentLP: number;
+	    opponentLeague: string;
 	    result: boolean;
 	    timestamp: string;
 	    date: string;
@@ -36,6 +37,7 @@ export namespace backend {
 	        this.opponent = source["opponent"];
 	        this.opponentCharacter = source["opponentCharacter"];
 	        this.opponentLP = source["opponentLP"];
+	        this.opponentLeague = source["opponentLeague"];
 	        this.result = source["result"];
 	        this.timestamp = source["timestamp"];
 	        this.date = source["date"];

@@ -14,6 +14,10 @@ export function ExportLogToCSV(arg1) {
   return window['go']['backend']['App']['ExportLogToCSV'](arg1);
 }
 
+export function FetchData(arg1, arg2, arg3) {
+  return window['go']['backend']['App']['FetchData'](arg1, arg2, arg3);
+}
+
 export function GetAppVersion() {
   return window['go']['backend']['App']['GetAppVersion']();
 }
@@ -44,10 +48,6 @@ export function IsTracking() {
 
 export function OpenResultsDirectory() {
   return window['go']['backend']['App']['OpenResultsDirectory']();
-}
-
-export function RefreshData(arg1, arg2, arg3) {
-  return window['go']['backend']['App']['RefreshData'](arg1, arg2, arg3);
 }
 
 export function ResultsJSONExist() {

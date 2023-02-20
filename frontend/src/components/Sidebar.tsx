@@ -164,7 +164,7 @@ const Sidebar = () => {
         </a>
         {newVersionAvailable && (
           <a
-            className="cursor-pointer leading-5 bottom-2 absolute left-[107%] text-base py-2 px-3 rounded-lg bg-slate-900"
+            className="group hover:bg-[rgba(0,0,0,.525)] text-[#bfbcff] hover:text-white transition-colors backdrop-blur cursor-pointer leading-5 bottom-2 absolute left-[107%] text-base py-2 px-3 rounded-lg bg-slate-900"
             onClick={() => {
               BrowserOpenURL(
                 "https://github.com/GreenSoap/cfn-tracker/releases"
@@ -172,7 +172,7 @@ const Sidebar = () => {
               setNewVersionAvailable(false);
             }}
           >
-            <RxUpdate className="inline text-[#49b3f5] w-4 h-4 mr-2" />
+            <RxUpdate className="group-hover:text-white inline text-[#49b3f5] transition-colors w-4 h-4 mr-2" />
             {t(`newVersionAvailable`)}
           </a>
         )}

@@ -19,7 +19,8 @@ type MatchHistory struct {
 	WinRate           int    `json:"winRate"`
 	Opponent          string `json:"opponent"`
 	OpponentCharacter string `json:"opponentCharacter"`
-	OpponentLP        string `json:"opponentLP"`
+	OpponentLP        int    `json:"opponentLP"`
+	OpponentLeague    string `json:"opponentLeague"`
 	IsWin             bool   `json:"result"`
 	TimeStamp         string `json:"timestamp"`
 	Date              string `json:"date"`
@@ -43,12 +44,12 @@ var CurrentMatchHistory = MatchHistory{
 }
 
 var (
-	FirstLPRecorded        = 0
-	IsTracking             = false
-	IsInitialized          = false
-	PageInstance           *rod.Page
-	SteamUsername          string
-	SteamPassword          string
-	AppVersion             *version.Version
-	RefreshIntervalSeconds time.Duration = 30
+	FirstLPRecorded = 0
+	IsTracking      = false
+	IsInitialized   = false
+	PageInstance    *rod.Page
+	SteamUsername   string
+	SteamPassword   string
+	AppVersion      *version.Version
+	RefreshInterval time.Duration = 30 * time.Second
 )
