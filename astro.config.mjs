@@ -7,5 +7,7 @@ import image from '@astrojs/image';
 
 // https://astro.build/config
 export default defineConfig({
+  site: 'https://greensoap.github.io',
+  base: '/cfn-tracker',
   integrations: [tailwind(), image()]
 });
