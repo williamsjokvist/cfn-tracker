@@ -37,27 +37,15 @@ const { title } = Astro.props;
     );
   }
   html {
+
+  }
+
+  body {
     font-family: 'Ubuntu', system-ui, sans-serif;
-    background: linear-gradient(0deg, black 0%, rgba(0, 32, 129, 1) 100%);
+    background: linear-gradient(0deg, black 0%, rgb(54, 6, 102) 100%);
     background-attachment: fixed;
     min-height: 100%;
     color: #fff;
-  }
-
-  body {
-    /*background: url("/noise.png") top center/220px repeat rgba(0,0,0,.65);*/
     width: 100%;
-    height: 100%;
-  }
-  code {
-    font-family: Menlo, Monaco, Lucida Console, Liberation Mono,
-      DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace;
-  }
-
-  html,
-  body {
-    height: 100%;
-    z-index: -2;
-    position: relative;
   }
 </style>
