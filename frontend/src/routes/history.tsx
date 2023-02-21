@@ -111,7 +111,7 @@ const History = () => {
       </header>
       <div className="relative w-full">
         {chosenLog && (
-          <div className="flex items-center px-8 mb-2 h-10 border-b border-slate-50 border-opacity-10 ">
+          <div className="flex items-center pt-1 px-8 mb-2 h-10 border-b border-slate-50 border-opacity-10 ">
             {totalWinRate != null && (
               <span>
                 {t("winRate")}: <b>{totalWinRate}</b>%

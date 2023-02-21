@@ -61,7 +61,6 @@ func (a *App) StartTracking(profile string, restoreData bool) {
 				shouldBreak = true
 			}
 
-			fmt.Println(`shouldBreak`, shouldBreak)
 			return shouldBreak
 		})
 
@@ -88,7 +87,6 @@ func sleepOrBreak(duration time.Duration, breakFunction breakFn) bool {
 		}
 
 		time.Sleep(sleepPeriod)
-		fmt.Print(`(`, sleepCyclesLeft, `) `)
 		sleepCyclesLeft--
 	}
 

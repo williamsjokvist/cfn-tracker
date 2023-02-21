@@ -70,7 +70,7 @@ const Sidebar = () => {
     <aside
       className="select-none bg-[rgba(3,5,19,0.33)] border-r border-slate-50 border-opacity-10 backdrop-blur relative z-50 h-screen overflow-auto scrollbar-none grid grid-rows-[0fr_1fr_0fr] py-2 text-white whitespace-nowrap dark:border-slate-50 dark:border-opacity-10"
       style={{
-        width: isMinimized ? '73px' : "175px",
+        width: isMinimized ? '75px' : "175px",
         overflow: "visible",
         justifyContent: isMinimized ? 'center' : 'normal',
         paddingLeft: isMinimized ? '0' : '10px',

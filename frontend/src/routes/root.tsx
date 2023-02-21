@@ -138,7 +138,7 @@ const Root = () => {
             {matchHistory && isTracking && (
               <div className="relative mr-4 text-center h-full grid content-between justify-items-center">
                 <b className='absolute top-[30%] z-50 text-4xl'>
-                  {matchHistory.winRate}%
+                  {(matchHistory.winRate > 0) && (matchHistory.winRate + '%')}
                 </b>
                 <PieChart
                   className="pie-chart mt-6 animate-enter max-w-[200px] max-h-[200px] backdrop-blur"
