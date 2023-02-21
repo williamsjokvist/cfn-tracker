@@ -2,8 +2,10 @@
 
 # Requirements
 # go
+# node
+# wails (https://wails.io/)
 # .env file following example.env
-# you can install go with e.g: scoop (windows), brew (mac) or your linux pkg manager
+# you can install Go and Wails with e.g: scoop (windows), brew (mac) or your linux pkg manager
 
 ifneq (,$(wildcard ./.env))
   include .env
