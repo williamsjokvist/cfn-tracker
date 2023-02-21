@@ -1,4 +1,4 @@
-package main
+package backend
 
 import (
 	"os"
@@ -9,8 +9,8 @@ import (
 
 func TestLogin(t *testing.T) {
 	assert := assert.New(t)
-	page, _ := SetupBrowser()
+	page := SetupBrowser()
 
-	loginStatus := Login(`GreenSoap`, page, os.Getenv(`STEAM_USERNAME`), os.Getenv(`STEAM_PASSWORD`))
+	loginStatus, _ := Login(page, os.Getenv(`STEAM_USERNAME`), os.Getenv(`STEAM_PASSWORD`))
 	assert.Equal(1, loginStatus)
 }

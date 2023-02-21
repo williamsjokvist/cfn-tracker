@@ -1,12 +1,11 @@
-package main
+package backend
 
 import (
-	"log"
+	"fmt"
 )
 
 func LogError(err AppError) {
-	progressBar.Stop()
-	log.Fatal(err.message)
+	fmt.Println(err.message)
 }
 
 type AppError struct {

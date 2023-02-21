@@ -10,8 +10,8 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-go@v3
       - uses: n8maninger/action-golang-test@v1
+        with:
+          package: ./backend/...
         env:
           STEAM_USERNAME: ${{ secrets.STEAM_USERNAME }} 
           STEAM_PASSWORD: ${{ secrets.STEAM_PASSWORD }} 
-          EXECUTION_ENVIRONMENT: 'test'
-          GITHUB_TEST: 'true'

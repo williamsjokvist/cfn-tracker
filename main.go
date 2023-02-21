@@ -1,75 +1,93 @@
 package main
 
 import (
-	"fmt"
+	"cfnscraper/backend"
+	"embed"
+	"log"
 	"os"
-	"time"
 
-	"github.com/BurntSushi/toml"
-	"github.com/briandowns/spinner"
+	"github.com/hashicorp/go-version"
 	"github.com/joho/godotenv"
+	"github.com/wailsapp/wails/v2"
+	"github.com/wailsapp/wails/v2/pkg/options"
+	"github.com/wailsapp/wails/v2/pkg/options/mac"
+	"github.com/wailsapp/wails/v2/pkg/options/windows"
 )
 
-type Config struct {
-	CFN string
-}
+var (
+	steamUsername string = ``
+	steamPassword string = ``
+	appVersion    string = ``
+)
 
-var progressBar = spinner.New(spinner.CharSets[9], 100*time.Millisecond)
-var steamUsername string
-var steamPassword string
+//go:embed all:frontend/dist
+var assets embed.FS
 
-func IsTestRun() bool {
-	return os.Getenv(`EXECUTION_ENVIRONMENT`) == `test`
-}
+//go:embed build/appicon.png
+var icon []byte
 
-func IsBuildRun() bool {
-	return os.Getenv(`EXECUTION_ENVIRONMENT`) == `build`
-}
-
-func IsDevRun() bool {
-	return os.Getenv(`EXECUTION_ENVIRONMENT`) == `dev`
-}
+var WailsApp *backend.App
 
 func init() {
-	if !IsBuildRun() && !IsTestRun() {
-		godotenv.Load(`.env`)
+	if steamUsername == `` || steamPassword == `` || appVersion == `` {
+		err := godotenv.Load(`.env`)
+		if err != nil {
+			log.Fatal(err)
+		}
+		steamUsername = os.Getenv(`STEAM_USERNAME`)
+		steamPassword = os.Getenv(`STEAM_PASSWORD`)
+		appVersion = os.Getenv(`APP_VERSION`)
 	}
+
+	backend.AppVersion, _ = version.NewVersion(appVersion)
+	backend.SteamUsername = steamUsername
+	backend.SteamPassword = steamPassword
 }
 
 func main() {
-	fmt.Println(`CFN Tracker v2 by @greensoap_`)
-	f := `cfn-tracker-config.toml`
-	if _, err := os.Stat(f); err != nil {
-		f = `cfn-tracker-config.toml`
-	}
+	// Create an instance of the app structure
+	WailsApp = backend.NewApp()
 
-	var config Config
-	var profile string
-
-	_, err := toml.DecodeFile(f, &config)
+	err := wails.Run(&options.App{
+		Title:             `CFN Tracker v2`,
+		Assets:            assets,
+		Width:             920,
+		Height:            450,
+		MinWidth:          800,
+		MinHeight:         450,
+		DisableResize:     true,
+		Fullscreen:        false,
+		Frameless:         true,
+		StartHidden:       false,
+		HideWindowOnClose: false,
+		BackgroundColour:  options.NewRGBA(0, 0, 0, 0),
+		CSSDragProperty:   `--wails-draggable`,
+		Windows: &windows.Options{
+			WebviewIsTransparent:              false,
+			WindowIsTranslucent:               false,
+			Theme:                             windows.Theme(windows.Dark),
+			DisableFramelessWindowDecorations: true,
+		},
+		Mac: &mac.Options{
+			TitleBar:             mac.TitleBarHiddenInset(),
+			WebviewIsTransparent: true,
+			WindowIsTranslucent:  true,
+			Appearance:           mac.AppearanceType(mac.NSAppearanceNameAccessibilityHighContrastDarkAqua),
+			About: &mac.AboutInfo{
+				Title:   "CFN Tracker " + appVersion,
+				Message: "Version " + appVersion + " © 2022 William Sjökvist <william.sjokvist@gmail.com>",
+			},
+		},
+		OnStartup:     WailsApp.Startup,
+		OnDomReady:    WailsApp.DomReady,
+		OnShutdown:    WailsApp.Shutdown,
+		OnBeforeClose: WailsApp.BeforeClose,
+		Bind: []interface{}{
+			WailsApp,
+		},
+	})
 
 	if err != nil {
-		fmt.Println(`No CFN account configured, please input a valid CFN account to track. You can change it later in the config file.`)
-		var inputText string
-
-		_, err := fmt.Scanln(&inputText)
-
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			os.Exit(1)
-			return
-		}
-
-		profile = inputText
-
-		SaveTextToFile(``, `cfn-tracker-config.toml`, `CFN = "`+profile+`"`)
-	} else {
-		profile = config.CFN
+		log.Fatal(err)
 	}
-
-	progressBar.Start()
-	progressBar.HideCursor = true
-	progressBar.Color(`yellow`)
-
-	StartTracking(profile)
 }

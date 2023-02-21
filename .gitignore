@@ -24,9 +24,8 @@ go.work
 
 results
 
-cfn-tracker-config.toml
-*.exe
-cfntracker.sh
+node_modules
+
 resource.syso
 
 .DS_Store
