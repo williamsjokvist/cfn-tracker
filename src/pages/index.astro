@@ -117,11 +117,19 @@ import World from "../components/World.astro";
   }
 
   .windows {
-    --accent: 124, 58, 237;
     --accent-gradient: linear-gradient(
       45deg,
-      rgb(var(--accent)),
+      rgb(124, 58, 237),
       #627ada 30%,
+      rgba(0,0,0,0.75) 60%
+    );
+  }
+  
+  .mac {
+    --accent-gradient: linear-gradient(
+      45deg,
+      #fb5b5b,
+      #ff938e 30%,
       rgba(0,0,0,0.75) 60%
     );
   }
