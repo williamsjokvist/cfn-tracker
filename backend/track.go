@@ -40,6 +40,12 @@ func (a *App) StartTracking(profile string, restoreData bool) {
 
 	fmt.Println("Loading profile")
 	PageInstance.MustNavigate(`https://game.capcom.com/cfn/sfv/profile/` + profile).MustWaitLoad()
+	isValidProfile, _, _ := PageInstance.Has(`.leagueInfo`)
+	if isValidProfile == false {
+		runtime.EventsEmit(a.ctx, `stopped-tracking`)
+		return
+	}
+
 	IsTracking = true
 	fmt.Println("Profile loaded")
 
@@ -134,8 +140,10 @@ func (a *App) FetchData(profile string, page *rod.Page, isFirstFetch bool) {
 
 	hasNewMatch := totalMatches != CurrentMatchHistory.TotalMatches
 
-	if isFirstFetch {
+	if isFirstFetch && CurrentMatchHistory.LPGain == 0 {
 		FirstLPRecorded = newLp
+	} else if isFirstFetch && CurrentMatchHistory.LPGain != 0 {
+		FirstLPRecorded = newLp - CurrentMatchHistory.LPGain
 	}
 
 	// Revalidate LP gain, because of CFN revalidations

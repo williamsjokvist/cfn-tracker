@@ -54,7 +54,7 @@ const Root = () => {
         setInitialized(isInitialized);
       });
     }
-  }, []);
+  }, [isTracking, isInitialized]);
 
   return (
     <main className="grid grid-rows-[0fr_1fr] min-h-screen max-h-screen z-40 flex-1 text-white mx-auto">
