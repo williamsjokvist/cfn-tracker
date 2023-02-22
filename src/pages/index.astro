@@ -83,8 +83,35 @@ import World from "../components/World.astro";
         >
       </div>
     </section>
-
-    <section class="pb-12">
+    <section class="pb-12 mx-auto max-w-[60ch] w-full text-shadow-sm">
+      <h2 class="text-center text-3xl mt-32 mb-16 text-shadow-none">Usage</h2>
+      <ol class="list-decimal">
+        <li>
+          Download the app for either Mac or Windows from the download page.
+        </li>
+        <li>
+          Extract the app from the zip and put it the folder of your choice.
+        </li>
+        <li>Launch it and wait for it to finish initializing.</li>
+        <li>Input your CFN when prompted and start.</li>
+      </ol>
+      <br />
+      <br />
+      Text files will be generated in a results folder, which are updated after every
+      match. Use them as sources for your labels in e.g. OBS.
+      <br />
+      <br />
+      All of the logged matches are listed in the Match Log tab, and can be filtered
+      by character, date, league and opponent.
+      <br />
+      <br />
+      The app has translations for <b>English</b>, <b>French</b> and <b>Japanese</b>.
+      <br />
+      <br />
+      The app will start with a notification if an update has released. You can also
+      follow me on Twitter for update tweets.
+    </section>
+    <section class="pb-24">
       <h2 class="text-center text-3xl mt-32 mb-16">Screenshots</h2>
       <div class="flex flex-wrap gap-4 justify-around">
         <img
@@ -100,8 +127,9 @@ import World from "../components/World.astro";
       </div>
     </section>
   </main>
-  <World />
 </Layout>
+
+<World />
 
 <style>
   main {
