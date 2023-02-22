@@ -40,6 +40,12 @@ func (a *App) StartTracking(profile string, restoreData bool) {
 
 	fmt.Println("Loading profile")
 	PageInstance.MustNavigate(`https://game.capcom.com/cfn/sfv/profile/` + profile).MustWaitLoad()
+	isValidProfile, _, _ := PageInstance.Has(`.leagueInfo`)
+	if isValidProfile == false {
+		runtime.EventsEmit(a.ctx, `stopped-tracking`)
+		return
+	}
+
 	IsTracking = true
 	fmt.Println("Profile loaded")
 
