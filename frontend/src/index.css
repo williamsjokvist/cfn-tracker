@@ -4,8 +4,6 @@
 
 body {
   font-family: 'League Spartan', sans-serif;
-  /*background: rgba(27,38,54,.25);
-  /*background-color: #181a3b;*/
   background: radial-gradient(circle at 52.1% -29.6%, rgb(144, 17, 105) 0%, rgb(51, 0, 131) 100.2%);  
   overflow: hidden;
   border-radius: 14px;

@@ -134,8 +134,10 @@ func (a *App) FetchData(profile string, page *rod.Page, isFirstFetch bool) {
 
 	hasNewMatch := totalMatches != CurrentMatchHistory.TotalMatches
 
-	if isFirstFetch {
+	if isFirstFetch && CurrentMatchHistory.LPGain == 0 {
 		FirstLPRecorded = newLp
+	} else if isFirstFetch && CurrentMatchHistory.LPGain != 0 {
+		FirstLPRecorded = newLp - CurrentMatchHistory.LPGain
 	}
 
 	// Revalidate LP gain, because of CFN revalidations
