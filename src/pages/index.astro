@@ -61,9 +61,13 @@ import World from "../components/World.astro";
         <span>Download for Mac</span>
       </a>
 
-      <span class='text-lg text-right'><b id='cfn-tracker-download-count'/> total downloads</span>
+      <span class="text-lg text-right"
+        ><b id="cfn-tracker-download-count"></b> total downloads</span
+      >
     </section>
-    <div class="pt-6 justify-around lowercase border-t-[1px] max-w-[60ch] mx-auto mt-8 px-4 border-white flex gap-7 flex-wrap">
+    <div
+      class="pt-6 justify-around lowercase border-t-[1px] max-w-[60ch] mx-auto mt-8 px-4 border-white flex gap-7 flex-wrap"
+    >
       <a
         class="text-lg flex gap-4 hover:underline"
         href="https://github.com/GreenSoap/cfn-tracker/"
@@ -106,7 +110,9 @@ import World from "../components/World.astro";
       by character, date, league and opponent.
       <br />
       <br />
-      The app has translations for <b>English</b>, <b>French</b> and <b>Japanese</b>.
+      The app has translations for <b>English</b>, <b>French</b> and <b
+        >Japanese</b
+      >.
       <br />
       <br />
       The app will start with a notification if an update has released. You can also
@@ -133,21 +139,37 @@ import World from "../components/World.astro";
 <World />
 
 <script defer>
-  const fetchDownloadCounts = async () => {
-    const res = await fetch(`https://williamsjokvist.se/api/project-downloads`)
+  const fetchCFNTrackerDownloadCount = async () => {
+    const res = await fetch(
+      `https://api.github.com/repos/greensoap/cfn-tracker/releases`,
+      {
+        method: `GET`,
+      }
+    );
+
     if (res.status == 200) {
-      const payload = await res.json()
-      return payload.download_counts
-    } else {
-      return 0
+      const releases = await res.json();
+
+      let downloadCount = 0;
+      for (const release of releases) {
+        const macDownloadCount = release.assets[0].download_count;
+        const windowsDownloadCount = release.assets[1].download_count;
+
+        downloadCount += macDownloadCount;
+        downloadCount += windowsDownloadCount;
+      }
+      return downloadCount;
+    } else if (res.status == 404) {
+      return 0;
     }
-  }
-  document.addEventListener('DOMContentLoaded', async () => {
-    const download_counts = await fetchDownloadCounts()
-    const cfnTrackerEl = document.getElementById(`cfn-tracker-download-count`)
-    console.log(download_counts)
-    cfnTrackerEl.innerText = download_counts.cfn_tracker ? download_counts.cfn_tracker : 0
-  })
+  };
+
+  document.addEventListener("DOMContentLoaded", async () => {
+    const download_count = await fetchCFNTrackerDownloadCount();
+
+    const cfnTrackerEl = document.getElementById(`cfn-tracker-download-count`);
+    cfnTrackerEl.innerText = download_count;
+  });
 </script>
 
 <style>
