@@ -11,7 +11,7 @@ jobs:
       - uses: actions/setup-go@v3
       - uses: n8maninger/action-golang-test@v1
         with:
-          package: ./backend/...
+          package: ./core/...
         env:
           STEAM_USERNAME: ${{ secrets.STEAM_USERNAME }} 
           STEAM_PASSWORD: ${{ secrets.STEAM_PASSWORD }} 
