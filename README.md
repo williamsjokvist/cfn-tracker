@@ -40,7 +40,7 @@ If you wish to contribute, you can open a [pull request](https://github.com/Gree
 
 ## Tools
 
-The app is created with React for the [frontend](https://github.com/GreenSoap/cfn-tracker/tree/master/frontend) and Go for the [backend](https://github.com/GreenSoap/cfn-tracker/tree/master/frontend), using the [Wails](https://github.com/wailsapp/wails) framework.
+The app is created with a React [gui](https://github.com/GreenSoap/cfn-tracker/tree/master/gui) and a Go [core](https://github.com/GreenSoap/cfn-tracker/tree/master/core), using the [Wails](https://github.com/wailsapp/wails) framework.
 
 ## Building from source
 
@@ -58,4 +58,6 @@ An .env file following [example.env](https://github.com/GreenSoap/cfn-tracker/bl
 
 If you use this app for your stream, DM me a screenshot on [Twitter](https://twitter.com/GreenSoap_) and I will add it here!
 ### [OneStepLayered](https://twitch.tv/OneStepLayered)
-![stream](showcase/stream-example-2.gif?raw=true "stream-example")
+![stream](showcase/OneStepLayered.gif?raw=true "OneStepLayered")
+### [SheldonTwitching](https://twitch.tv/SheldonTwitching)
+![stream](showcase/SheldonTwitching.jpg?raw=true "SheldonTwitching")

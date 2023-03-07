@@ -49,7 +49,7 @@ func main() {
 	WailsApp = backend.NewApp()
 
 	err := wails.Run(&options.App{
-		Title:             `CFN Tracker v2`,
+		Title:             `CFN Tracker v3`,
 		Assets:            assets,
 		Width:             920,
 		Height:            450,
