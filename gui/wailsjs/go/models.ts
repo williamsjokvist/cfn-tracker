@@ -1,4 +1,4 @@
-export namespace backend {
+export namespace core {
 	
 	export class MatchHistory {
 	    cfn: string;

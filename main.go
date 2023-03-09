@@ -1,7 +1,7 @@
 package main
 
 import (
-	"cfnscraper/backend"
+	"cfnscraper/core"
 	"embed"
 	"log"
 	"os"
@@ -20,13 +20,13 @@ var (
 	appVersion    string = ``
 )
 
-//go:embed all:frontend/dist
+//go:embed all:gui/dist
 var assets embed.FS
 
 //go:embed build/appicon.png
 var icon []byte
 
-var WailsApp *backend.App
+var WailsApp *core.App
 
 func init() {
 	if steamUsername == `` || steamPassword == `` || appVersion == `` {
@@ -39,14 +39,14 @@ func init() {
 		appVersion = os.Getenv(`APP_VERSION`)
 	}
 
-	backend.AppVersion, _ = version.NewVersion(appVersion)
-	backend.SteamUsername = steamUsername
-	backend.SteamPassword = steamPassword
+	core.AppVersion, _ = version.NewVersion(appVersion)
+	core.SteamUsername = steamUsername
+	core.SteamPassword = steamPassword
 }
 
 func main() {
 	// Create an instance of the app structure
-	WailsApp = backend.NewApp()
+	WailsApp = core.NewApp()
 
 	err := wails.Run(&options.App{
 		Title:             `CFN Tracker v3`,

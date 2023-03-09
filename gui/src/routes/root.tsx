@@ -9,7 +9,7 @@ import {
   ResultsJSONExist,
   GetAvailableLogs,
   StartTracking,
-} from "../../wailsjs/go/backend/App";
+} from "../../wailsjs/go/core/App";
 import { PieChart } from "react-minimal-pie-chart";
 import { AiFillFolderOpen } from "react-icons/ai";
 import { useStatStore } from "../store/use-stat-store";

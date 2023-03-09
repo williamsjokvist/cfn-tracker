@@ -4,7 +4,7 @@ import { EventsOn, EventsOff } from "../../wailsjs/runtime"
 import { useStatStore } from "../store/use-stat-store";
 import { useAppStore } from "../store/use-app-store";
 
-import { backend } from "../../wailsjs/go/models";
+import { core } from "../../wailsjs/go/models";
 
 
 const Wrapper = ({ children }: any) => {
@@ -12,7 +12,7 @@ const Wrapper = ({ children }: any) => {
   const { setNewVersionAvailable } = useAppStore();
 
   useEffect(() => {
-    EventsOn(`cfn-data`, (mh: backend.MatchHistory) => {
+    EventsOn(`cfn-data`, (mh: core.MatchHistory) => {
       setMatchHistory(mh);
       setTracking(true);
       setLoading(false)

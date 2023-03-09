@@ -17,5 +17,8 @@ LDFLAGS=-X 'main.appVersion=${APP_VERSION}' -X 'main.steamUsername=${STEAM_USERN
 gui:
 	wails build -ldflags="${LDFLAGS}"
 
+gui_linux:
+	wails build -ldflags="${LDFLAGS}"
+
 gui_mac:
 	env GOOS=darwin GOARCH=amd64 wails build -ldflags="${LDFLAGS}"

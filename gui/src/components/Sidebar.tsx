@@ -12,7 +12,7 @@ import LanguageSelector from "./LanguageSelector";
 import { useLocation } from "react-router-dom";
 import { BrowserOpenURL, Quit, WindowMinimise } from "../../wailsjs/runtime";
 
-import { GetAppVersion } from "../../wailsjs/go/backend/App";
+import { GetAppVersion } from "../../wailsjs/go/core/App";
 import { useAppStore } from "../store/use-app-store";
 
 const Link = (props: {

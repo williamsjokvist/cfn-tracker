@@ -6,6 +6,9 @@
   "frontend:build": "npm run build",
   "frontend:dev:watcher": "npm run dev",
   "frontend:dev:serverUrl": "auto",
+  "assetdir": "./gui/dist",
+  "build:dir": "./build",
+  "frontend:dir": "./gui",
   "author": {
     "name": "greensoap"
   }

@@ -10,15 +10,15 @@ import {
   DeleteMatchLog,
   ExportLogToCSV,
   OpenResultsDirectory
-} from "../../wailsjs/go/backend/App";
-import { backend } from "../../wailsjs/go/models";
+} from "../../wailsjs/go/core/App";
+import { core } from "../../wailsjs/go/models";
 
 const History = () => {
   const { t } = useTranslation();
 
   const [availableLogs, setAvailableLogs] = useState<string[]>([]);
   const [chosenLog, setLog] = useState<string>();
-  const [matchLog, setMatchLog] = useState<backend.MatchHistory[]>();
+  const [matchLog, setMatchLog] = useState<core.MatchHistory[]>();
   const [isSpecified, setSpecified] = useState(false);
   const [totalWinRate, setTotalWinRate] = useState<number | null>(null);
 

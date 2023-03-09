@@ -1,7 +1,7 @@
 import { create } from "zustand";
-import { backend } from "../../wailsjs/go/models";
+import { core } from "../../wailsjs/go/models";
 
-const initialState: backend.MatchHistory = {
+const initialState: core.MatchHistory = {
   cfn: "",
   wins: 0,
   losses: 0,
@@ -22,7 +22,7 @@ const initialState: backend.MatchHistory = {
 };
 
 type State = {
-  matchHistory: backend.MatchHistory | null;
+  matchHistory: core.MatchHistory | null;
   isTracking: boolean;
   isLoading: boolean;
   isPaused: boolean;
@@ -30,7 +30,7 @@ type State = {
 };
 
 type Actions = {
-  setMatchHistory: (mh: backend.MatchHistory) => void;
+  setMatchHistory: (mh: core.MatchHistory) => void;
   setTracking: (isTracking: boolean) => void;
   setLoading: (isLoading: boolean) => void;
   setPaused: (isPaused: boolean) => void;
