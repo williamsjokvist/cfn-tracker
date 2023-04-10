@@ -6,6 +6,9 @@
 # testing
 /coverage
 
+# generated code
+/wailsjs/*
+
 /out/
 
 # production
