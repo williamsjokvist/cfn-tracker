@@ -1,30 +1,17 @@
 import React from 'react'
-import ReactDOM from 'react-dom/client'
-import {
-  createHashRouter,
-  RouterProvider,
-} from "react-router-dom";
-import Root from "./routes/root";
-import History from "./routes/history";
+import { createRoot } from 'react-dom/client'
+import { RouterProvider } from "react-router-dom";
+import { router } from "./router";
+
+import './globals.sass'
 import './i18n';
-import './index.css'
-import Wrapper from './components/Wrapper';
 
-const router = createHashRouter([
-  {
-    path: "/",
-    element: <Wrapper><Root /></Wrapper>,
-  },
-  {
-    path: "/history",
-    element: <Wrapper><History /></Wrapper>,
-  },
-]);
-
-
-
-ReactDOM.createRoot(document.getElementById("root")!).render(
+const app = (
   <React.StrictMode>
     <RouterProvider router={router} />
   </React.StrictMode>
-);
+)
+
+const root = document.getElementById("root")!
+
+createRoot(root).render(app);

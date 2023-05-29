@@ -1,29 +1,27 @@
-import { useEffect, useState } from "react";
+import React from "react";
+import { useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { FaTwitter, FaChevronLeft, FaArrowUp } from "react-icons/fa";
 import { RxUpdate } from "react-icons/rx";
-import {
-  IoDocumentTextOutline,
-  IoDocumentText,
-} from "react-icons/io5";
+import { IoDocumentTextOutline, IoDocumentText } from "react-icons/io5";
 import { RiSearch2Line, RiSearch2Fill } from "react-icons/ri";
 import { VscChromeMinimize, VscChromeClose } from "react-icons/vsc";
-import LanguageSelector from "./LanguageSelector";
-import { useLocation } from "react-router-dom";
-import { BrowserOpenURL, Quit, WindowMinimise } from "../../wailsjs/runtime";
 
-import { GetAppVersion } from "../../wailsjs/go/core/App";
-import { useAppStore } from "../store/use-app-store";
+import { LanguageSelector } from "./LanguageSelector";
 
-const Link = (props: {
+import { useAppStore } from "@/store/use-app-store";
+import { BrowserOpenURL, Quit, WindowMinimise } from "@@/runtime";
+import { GetAppVersion } from "@@/go/core/App";
+
+type SidebarLinkProps = {
   Icon: any;
   link: string;
   name: string;
   isSelected?: boolean;
   SelectedIcon?: any;
   showArrow: boolean;
-}) => {
-  const { Icon, link, name, isSelected, SelectedIcon, showArrow } = props;
+}
+const SidebarLink: React.FC<SidebarLinkProps> = ( { Icon, link, name, isSelected, SelectedIcon, showArrow } ) => {
   return (
     <li>
       <a
@@ -35,12 +33,8 @@ const Link = (props: {
         }}
       >
         <span className="flex items-center justify-between">
-          {isSelected && (
-            <SelectedIcon className="text-[#f85961] transition-colors w-10 h-7 mr-1" />
-          )}
-          {!isSelected && (
-            <Icon className="text-[#f85961] transition-colors w-10 h-7 mr-1" />
-          )}
+          {isSelected && <SelectedIcon className="text-[#f85961] transition-colors w-10 h-7 mr-1" />}
+          {!isSelected && <Icon className="text-[#f85961] transition-colors w-10 h-7 mr-1" />}
           {name}
         </span>
         <FaChevronLeft
@@ -51,20 +45,18 @@ const Link = (props: {
     </li>
   );
 };
-const Sidebar = () => {
+export const Sidebar: React.FC = () => {
   const { t } = useTranslation();
   const location = useLocation();
-  const [appVersion, setAppVersion] = useState("");
-
-  const [isMinimized, setMinimized] = useState(false)
+  const [appVersion, setAppVersion] = React.useState("");
+  const [isMinimized, setMinimized] = React.useState(false)
 
   const { newVersionAvailable, setNewVersionAvailable } = useAppStore();
-  useEffect(() => {
+
+  React.useEffect(() => {
     setMinimized(false)
-    GetAppVersion().then((version: string) => {
-      setAppVersion(version);
-    });
-  }, []);
+    GetAppVersion().then((version: string) => setAppVersion(version));
+  }, [setMinimized, GetAppVersion]);
 
   return (
     <aside
@@ -75,16 +67,9 @@ const Sidebar = () => {
         justifyContent: isMinimized ? 'center' : 'normal',
         paddingLeft: isMinimized ? '0' : '10px',
         paddingRight: isMinimized ? '0' : '10px'
-
       }}
     >
-      <header
-        style={
-          {
-            "--wails-draggable": "drag",
-          } as React.CSSProperties
-        }
-      >
+      <header style={{"--wails-draggable": "drag"} as React.CSSProperties}>
         <div className="flex justify-start">
           <div className="group mt-2 group ml-2 flex mb-3">
             <button
@@ -106,7 +91,7 @@ const Sidebar = () => {
       </header>
       <nav className="mt-5 w-full">
         <ul>
-          <Link
+          <SidebarLink
             Icon={RiSearch2Line}
             link=""
             name={isMinimized ? '' : t("tracking")}
@@ -114,7 +99,7 @@ const Sidebar = () => {
             SelectedIcon={RiSearch2Fill}
             showArrow={!isMinimized}
           />
-          <Link
+          <SidebarLink
             Icon={IoDocumentTextOutline}
             link="history"
             name={isMinimized ? '' : t("history")}
@@ -128,20 +113,14 @@ const Sidebar = () => {
         <LanguageSelector isMinimized={isMinimized} />
         <a
           target="#"
-          onClick={() => {
-            BrowserOpenURL("https://twitter.com/greensoap_");
-          }}
+          onClick={() => BrowserOpenURL("https://twitter.com/greensoap_")}
           className={`h-[28px] cursor-pointer w-full group font-extralight flex justify-between items-center mt-1 text-[#d6d4ff] hover:text-white transition-colors`}
         >
           <span className={`flex items-center justify-between`}>
             <FaTwitter className="text-[#49b3f5] w-4 h-4 mr-2 transition-colors group-hover:text-white" />
             {!isMinimized && 'greensoap_'}
           </span>
-          <FaArrowUp
-            className="relative right-[-8px] w-3 h-3 group-hover:opacity-100 opacity-0 transition-opacity"
-            style={{ transform: "rotate(45deg)" }}
-          />
-
+          <FaArrowUp className="relative right-[-8px] w-3 h-3 group-hover:opacity-100 opacity-0 transition-opacity" style={{ transform: "rotate(45deg)" }} />
         </a>
         <button className={`h-[28px] cursor-pointer w-full group font-extralight flex items-center mt-1 text-[#d6d4ff] hover:text-white transition-colors`}
           onClick={() => setMinimized(!isMinimized)}>
@@ -149,16 +128,12 @@ const Sidebar = () => {
             className="group-hover:text-white text-[#d6d4ff] w-4 h-4 transition-all"
             style={{ transform: isMinimized ? "rotate(-180deg)" : 'none' }}
           />
-          {!isMinimized && (
-            <span className="ml-2">{t('minimize')}</span>
-          )}
+          {!isMinimized && <span className="ml-2">{t('minimize')}</span>}
         </button>
         <a
           target="#"
           className="text-sm mt-4 font-extralight cursor-pointer hover:underline"
-          onClick={() => {
-            BrowserOpenURL("https://github.com/GreenSoap/cfn-tracker/releases");
-          }}
+          onClick={() => BrowserOpenURL("https://github.com/GreenSoap/cfn-tracker/releases")}
         >
           {isMinimized ? 'v' + appVersion : 'CFN Tracker v' + appVersion}
         </a>
@@ -180,5 +155,3 @@ const Sidebar = () => {
     </aside>
   );
 };
-
-export default Sidebar;

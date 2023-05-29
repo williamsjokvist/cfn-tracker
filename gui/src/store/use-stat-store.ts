@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { core } from "../../wailsjs/go/models";
+import { core } from "@@/go/models";
 
 const initialState: core.MatchHistory = {
   cfn: "",

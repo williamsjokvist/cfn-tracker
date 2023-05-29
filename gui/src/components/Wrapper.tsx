@@ -1,30 +1,33 @@
-import Sidebar from "./Sidebar";
-import { useEffect } from "react";
-import { EventsOn, EventsOff } from "../../wailsjs/runtime"
-import { useStatStore } from "../store/use-stat-store";
-import { useAppStore } from "../store/use-app-store";
+import React from "react";
+import { Sidebar } from "./Sidebar";
 
-import { core } from "../../wailsjs/go/models";
+import { useStatStore } from "@/store/use-stat-store";
+import { useAppStore } from "@/store/use-app-store";
 
+import { core } from "@@/go/models";
+import { EventsOn, EventsOff } from "@@/runtime"
 
-const Wrapper = ({ children }: any) => {
-  const { setMatchHistory, setTracking, setLoading, setInitialized, setPaused } = useStatStore();
+export const PageWrapper: React.FC<React.PropsWithChildren> = ({ children }) => {
+  const {
+    setMatchHistory,
+    setInitialized,
+    setTracking,
+    setLoading,
+    setPaused,
+  } = useStatStore();
+  
   const { setNewVersionAvailable } = useAppStore();
 
-  useEffect(() => {
+  React.useEffect(() => {
     EventsOn(`cfn-data`, (mh: core.MatchHistory) => {
       setMatchHistory(mh);
       setTracking(true);
       setLoading(false)
     })
 
-    EventsOn(`initialized`, (init) => {
+    EventsOn(`initialized`, (init: boolean) => {
       setInitialized(init);
-      (init == true) && setLoading(false);
-    })
-
-    EventsOn(`stopped-tracking`, () => {
-      setLoading(false)
+      setLoading(!init)
     })
 
     EventsOn(`started-tracking`, () => {
@@ -32,24 +35,24 @@ const Wrapper = ({ children }: any) => {
       setTracking(true)
     })
 
-    EventsOn(`version-update`, (hasNewVersion) => {
-      console.log('has new version', hasNewVersion)
-      setNewVersionAvailable(hasNewVersion)
-    })
+    EventsOn(`stopped-tracking`, () => setLoading(false))
+    EventsOn(`version-update`, (hasNewVersion: boolean) => setNewVersionAvailable(hasNewVersion))
 
     return () => {
-      // EventsOff(`cfn-data`)
-      // EventsOff(`initialized`)
       EventsOff(`version-update`)
+      EventsOff(`stopped-tracking`)
+      EventsOff(`started-tracking`)
+      EventsOff(`initialized`)
+      EventsOff(`cfn-data`)
     }
-  }, [])
+  })
 
   return (
     <>
       <Sidebar />
-      {children}
+      <main className="grid grid-rows-[0fr_1fr] min-h-screen max-h-screen z-40 flex-1 text-white mx-auto">
+        {children}
+      </main>
     </>
   );
 };
-
-export default Wrapper;
