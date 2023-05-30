@@ -1,55 +1,106 @@
-import { createMachine, assign } from 'xstate';
+import { createMachine, assign, EventObject } from 'xstate';
+import { createActorContext } from '@xstate/react';
+
 import {
-  StopTracking,
-  OpenResultsDirectory,
-  IsTracking,
-  IsInitialized,
-  ResultsJSONExist,
-  GetAvailableLogs,
   StartTracking,
+  StopTracking
 } from "@@/go/core/App";
+import { core } from "@@/go/models";
 
-const startTracking = async (cfn: string, restoreData: boolean) => {
-  StartTracking(cfn, restoreData)
-}
+export type TrackEvent = {
+  cfn: string; 
+  restore: boolean;
+} & EventObject
 
-export const createCfnMachine = (cfn: string) => {
-  return createMachine({
-    /** @xstate-layout N4IgpgJg5mDOIC5QGMBmA7AdAGwPYEMIBLdKAYgl3TE1gBd86a0s9CSoBtABgF1FQAB1ywidIlQEgAHogC0AJgBsAdkzKArBoAsARm5KNAZm2qANCACeiABy7MSvbqMmb2uxoXaAvt4stMEjEifGwiAC9ICioaekZmDED0YNCIyB5+JBBhUXFJLNkERRUjTB1uDRVuBTsaowULawQFI24HAE4Faq1uXW0K7QVff0S6ACd8ZABrDjIABQBBAFUAZQBRDKkc4PzQQuKFdRslVV1ddqUbL10lRsRtI3sWlTt+9pcDDWGQAPHJmdIZBWABUAPJzTZZbZ5dBSQoKdqYEwqJS6GwvRxGWp3ZoIzDnLoKfRnFQaJQ1b4BQT4ACusCiACU1islgBZDZ8LYiHawgryTqYbjcFRdTpC8mPXQ4oxKNrad7VckqC7CvqUxLUulREHgyFCbkwuGIZz2bg2DS6F4ioWdZw4hR4gnVYmWslGdVYVD4IjYRlrYEMgCaeuyBokvL2iG4OO4vj8IHQuAgcCkLC5uXDRqK9VKGhsRh0ug0nzJOLkRaUDk81Ramla7S+8YCbGIpHTPKzB0w2hewpU8vaLzcKjLpRr7XOFsq-SM7RsHqSKTCkQg7cNfKKCn76gMDeL73q-W0OL6iJUZzzAwRNnzC7+0w4a8zG+KGjK+cLxcMpasiElmAVfRPjOap5ybDVaXpVcoTDXYZHkc0OmFG8RQedo9BHX8EEGewHmQgtBgqd1wM9b1fWg-UMzg-ZnFKZQa0qA9TjLJRESLQlUXQ5QGzA3wgA */
-    id: 'cfn',
-    initial: 'loading',
-    context: {
-      cfn,
-      matchHistory: null,
+
+export type MatchEvent = {
+  matchHistory: core.MatchHistory
+} & EventObject
+
+
+export const cfnMachine = createMachine({
+  /** @xstate-layout N4IgpgJg5mDOIC5QGMBmA7AtAFwE4ENkBrMXAOgBsB7fCAS3SgGIG7s78K6AvSAbQAMAXUSgADlVhs6VdKJAAPRJgBMZAMzqVA9QEYVAVgA0IAJ7KDa9QHZdAgJw2DAX2cm0WPIRLk6ECmBMsACuAEYAtmyCIkggElLssvJKCNZkACz2AGwOTibmqQZkWenpBnqGru4YOATEpGRexAzMsNhUYtHy8dJJsSn66RnWKlkGWYb5iDlk4yUCEy5uIB613g1NRC1M4fjYyAAWAAoU+Kb8wt2SvXL9iAAcZPp2jtbGZogq97pkKurpTlcy3QVAgcHkq02pCuCRkt1AKUwBgEGi0On07wKqgEVlsAnu1nU9xUX3SOiqKxqUPI1FoLRhN2SiB+93s9wBbymCEwul0QwJL0By0hdR8ZD8AQZiXhimZ9mK9j5C0mHwQdg0+IMryW1U8oo2ovpsR60qZCHUv3uBl04xVBV06nlmRUugJOspevW5GCYgge0gAFk9ocABJ0NpUXAFcTXU13BB-NTs+4ExzaN72Tmq3RvMj2ewutl-G34+xA5xAA */
+  id: 'cfn-tracker',
+  predictableActionArguments: true,
+  
+  context: {
+    cfn: '',
+    restore: false,
+    isTracking: false,
+    matchHistory: <core.MatchHistory>null
+  },
+
+  states: {
+    loading: {
+      on: {
+        initialized: "idle"
+      }
     },
-    states: {
-      loading: {
-        onDone: {
+
+    idle: {
+      on: {
+        submit: "fetchingCfn",
+      }
+    },
+
+    fetchingCfn: {
+      on: {
+        success: 'tracking',
+        // todo:  add fail state
+      }
+    },
+
+    tracking: {
+      on: {
+        stop: "idle",
+      },
+
+      entry: "startTracking",
+      exit: "stopTracking",
+    },
+  },
+
+  initial: "loading"
+}, {
+  actions: {
+    startTracking: ({cfn, restore, isTracking}) => {
+      if (!isTracking) 
+        StartTracking(cfn, restore)
+    },
+    stopTracking: () => StopTracking()
+  }
+});
+
+export const CFNMachineContext = createActorContext(cfnMachine);
+
+/*
+
+    loading: { 
+      on: {
+        INITIALIZED: {
           target: 'initialized'
-        },
-      },
-      initialized: {
-        onDone: {
-          target: 'tracking'
-        }
-      },
-      tracking: {
-        on: {
-          PAUSE: 'paused',
-          STOP: 'initialized'
-        }
-      },
-      paused: {
-        on: {
-          RESUME: 'tracking',
-          STOP: 'initialized'
-        }
-      },
-      failed: {
-        on: {
-          RETRY: 'loading'
         }
       }
-    }
-  });
-}
+    },
+    initialized: {
+      on: {
+        TRACK: {
+          target: 'tracking',
+          actions: assign({
+            cfn: (ctx, event: TrackEvent) => event.cfn,
+            restore: (ctx, event: TrackEvent) => event.restore
+          })
+        }
+      }
+    },
+    tracking: {
+      on: {
+        STOP: 'initialized',
+        MATCH: {
+          actions: assign({
+            matchHistory: (ctx, event: MatchEvent) => event.matchHistory,
+          })
+        }
+      }
+    },
+*/

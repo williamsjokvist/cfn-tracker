@@ -1,42 +1,26 @@
 import React from "react";
 import { Sidebar } from "./Sidebar";
 
-import { useStatStore } from "@/store/use-stat-store";
 import { useAppStore } from "@/store/use-app-store";
+import { CFNMachineContext } from '@/state-machine/machine';
 
 import { core } from "@@/go/models";
 import { EventsOn, EventsOff } from "@@/runtime"
 
 export const PageWrapper: React.FC<React.PropsWithChildren> = ({ children }) => {
-  const {
-    setMatchHistory,
-    setInitialized,
-    setTracking,
-    setLoading,
-    setPaused,
-  } = useStatStore();
+  const [state, send] = CFNMachineContext.useActor();
   
   const { setNewVersionAvailable } = useAppStore();
 
   React.useEffect(() => {
     EventsOn(`cfn-data`, (mh: core.MatchHistory) => {
-      setMatchHistory(mh);
-      setTracking(true);
-      setLoading(false)
+      state.context.matchHistory = mh
     })
 
-    EventsOn(`initialized`, (init: boolean) => {
-      setInitialized(init);
-      setLoading(!init)
-    })
-
-    EventsOn(`started-tracking`, () => {
-      setPaused(false)
-      setTracking(true)
-    })
-
-    EventsOn(`stopped-tracking`, () => setLoading(false))
-    EventsOn(`version-update`, (hasNewVersion: boolean) => setNewVersionAvailable(hasNewVersion))
+    EventsOn(`initialized`, () => send('initialized'))
+    EventsOn(`started-tracking`, () => send('success'))
+    EventsOn(`stopped-tracking`, () => send('stop'))
+    EventsOn(`version-update`, (hasUpdated: boolean) => setNewVersionAvailable(hasUpdated))
 
     return () => {
       EventsOff(`version-update`)

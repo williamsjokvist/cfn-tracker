@@ -2,19 +2,16 @@ import i18n from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import { initReactI18next } from 'react-i18next';
 
-import eng from './locales/en.json';
-import fr from './locales/fr.json';
-import jp from './locales/jp.json';
-
 type AppLanguage = {
   code: string;
   nativeName: string;
+  translation: Object;
 }
 
 export const APP_LANGUAGES: AppLanguage[] = [
-  { code: 'en', nativeName: 'English' },
-  { code: 'fr', nativeName: 'Français' },
-  { code: 'jp', nativeName: '日本' },
+  { code: 'en', nativeName: 'English', translation: await import('./locales/en.json') },
+  { code: 'fr', nativeName: 'Français', translation: await import('./locales/fr.json') },
+  { code: 'jp', nativeName: '日本', translation: await import('./locales/jp.json') },
 ];
 
 i18n
@@ -24,15 +21,17 @@ i18n
   // for all options read: https://www.i18next.com/overview/configuration-options
   .init({
     debug: false,
-    fallbackLng: 'en',
+    fallbackLng: APP_LANGUAGES[0].code,
     interpolation: {
       escapeValue: false,
     },
-    resources: {
-      en: { translation: eng },
-      fr: { translation: fr },
-      jp: { translation: jp }
-    }
+    resources: 
+      APP_LANGUAGES.reduce((obj, item) => {
+        return {
+          ...obj,
+          [item['code']]: { translation: item.translation }
+        }
+      }, {})
   });
 
 export default i18n;
