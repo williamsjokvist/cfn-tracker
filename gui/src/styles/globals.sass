@@ -1,0 +1,49 @@
+@tailwind base
+@tailwind components
+@tailwind utilities
+
+body 
+  font-family: 'League Spartan', sans-serif
+  background: radial-gradient(circle at 52.1% -29.6%, rgb(144, 17, 105) 0%, rgb(51, 0, 131) 100.2%)  
+  overflow: hidden
+  border-radius: 14px
+
+main
+  display: grid
+  grid-template-rows: 0fr 1fr
+  height: 100vh
+  z-index: 40
+  flex: 1
+  color: #fff
+  margin: 0 auto
+
+.page-header
+  display: flex
+  justify-content: space-between
+  align-items: center
+  padding: 0 32px
+  border-bottom: 1px solid rgba(255,255,255,.125)
+  user-select: none
+  height: 53px
+
+.stat-grid-item 
+  grid-row-start: 2
+  grid-column-start: 1
+  grid-row-end: 3
+  grid-column-end: 3
+
+.pie-chart 
+  clip-path: circle(50% at 50% 50%)
+
+::-webkit-scrollbar-track
+  border-radius: 10px
+  background-color: transparent
+
+::-webkit-scrollbar
+  width: 5px
+  background-color: transparent
+
+::-webkit-scrollbar-thumb
+  border-radius: 10px
+  -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3)
+  background-color: #F5F5F5

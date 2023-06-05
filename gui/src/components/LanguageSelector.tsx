@@ -1,17 +1,15 @@
 import { FaGlobe, FaChevronLeft } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
+import { APP_LANGUAGES } from "@/i18n";
 
-const lngs = [
-  { code: "en", nativeName: "English" },
-  { code: "fr", nativeName: "Français" },
-  { code: "jp", nativeName: "日本" },
-];
-
-const LanguageSelector = (props: { isMinimized: boolean }) => {
+type LanguageSelectorProps = {
+  isMinimized: boolean
+}
+export const LanguageSelector: React.FC<LanguageSelectorProps> = ({ isMinimized }) => {
   const { t, i18n } = useTranslation();
-  const { isMinimized } = props
+
   return (
-    <div className={`group flex`}>
+    <div className='group flex'>
       <button
         type="button"
         className="h-[28px] font-extralight lowercase relative flex justify-center items-center text-[#d6d4ff] group-hover:text-white transition-colors"
@@ -24,21 +22,20 @@ const LanguageSelector = (props: { isMinimized: boolean }) => {
           className="text-white w-3 h-3 relative right-4 top-2"
           style={{ transform: "rotate(180deg)" }}
         />
-        <ul className="w-[195px] text-[16px] uppercase flex justify-between bg-black px-3 py-2 relative bottom-2 rounded-lg">
-          {lngs.map((lng, index) => {
+        <ul className="w-[195px] text-[16px] uppercase italic flex justify-between bg-black px-3 py-2 relative bottom-2 rounded-lg">
+          {APP_LANGUAGES.map((lng, index) => {
             return (
-              <li key={index}>
+              <li key={lng.code}>
                 <button
                   type="button"
                   style={{
-                    fontWeight:
-                      i18n.resolvedLanguage === lng.code ? "600" : "normal",
+                    fontWeight: i18n.resolvedLanguage === lng.code ? "600" : "normal",
                   }}
                   onClick={() => i18n.changeLanguage(lng.code)}
                 >
                   {lng.nativeName}
                 </button>
-                {index !== lngs.length - 1 && <span className='mx-2'>|</span>}
+                {index !== APP_LANGUAGES.length - 1 && <i className='mx-2'>|</i>}
               </li>
             );
           })}
@@ -47,5 +44,3 @@ const LanguageSelector = (props: { isMinimized: boolean }) => {
     </div>
   );
 };
-
-export default LanguageSelector;

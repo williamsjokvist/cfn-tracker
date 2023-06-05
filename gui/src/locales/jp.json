@@ -8,7 +8,7 @@
   "opponent": "敵",
   "character": "キャラクター",
   "lpGain": "LP得",
-  "delete": "日誌を削除",
+  "deleteLog": "日誌を削除",
   "goBack": "戻る",
   "loading": "お待ちください",
   "wins": "勝つ",
@@ -27,6 +27,6 @@
   "date": "日付",
   "minimize": "最小化",
   "restoreSession": "最後のセッションを復元",
-  "export": "CSVに保存",
+  "exportLog": "CSVに保存",
   "league": "リーグ"
 }

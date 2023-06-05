@@ -8,7 +8,7 @@
   "opponent": "Ennemi",
   "character": "Caractère",
   "lpGain": "Gain LP",
-  "delete": "Supprimer le journal",
+  "deleteLog": "Supprimer le journal",
   "goBack": "Retourner",
   "loading": "Chargement, veuillez patienter",
   "wins": "Gagne",
@@ -27,6 +27,6 @@
   "date": "Date",
   "minimize": "réduire",
   "restoreSession": "Restaurer la dernière session",
-  "export": "Exporter CSV",
+  "exportLog": "Exporter CSV",
   "league": "Ligue"
 }

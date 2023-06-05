@@ -1,55 +1,33 @@
-import Sidebar from "./Sidebar";
-import { useEffect } from "react";
-import { EventsOn, EventsOff } from "../../wailsjs/runtime"
-import { useStatStore } from "../store/use-stat-store";
-import { useAppStore } from "../store/use-app-store";
+import React from "react";
+import { Outlet } from "react-router-dom";
+import { Sidebar } from "./Sidebar";
 
-import { core } from "../../wailsjs/go/models";
+import { useAppStore } from "@/store/use-app-store";
+import { CFNMachineContext } from '@/machine';
 
+import { EventsOn, EventsOff } from "@@/runtime"
 
-const Wrapper = ({ children }: any) => {
-  const { setMatchHistory, setTracking, setLoading, setInitialized, setPaused } = useStatStore();
+export const PageWrapper: React.FC = () => {
+  const [_, send] = CFNMachineContext.useActor();
   const { setNewVersionAvailable } = useAppStore();
 
-  useEffect(() => {
-    EventsOn(`cfn-data`, (mh: core.MatchHistory) => {
-      setMatchHistory(mh);
-      setTracking(true);
-      setLoading(false)
-    })
-
-    EventsOn(`initialized`, (init) => {
-      setInitialized(init);
-      (init == true) && setLoading(false);
-    })
-
-    EventsOn(`stopped-tracking`, () => {
-      setLoading(false)
-    })
-
-    EventsOn(`started-tracking`, () => {
-      setPaused(false)
-      setTracking(true)
-    })
-
-    EventsOn(`version-update`, (hasNewVersion) => {
-      console.log('has new version', hasNewVersion)
-      setNewVersionAvailable(hasNewVersion)
-    })
-
-    return () => {
-      // EventsOff(`cfn-data`)
-      // EventsOff(`initialized`)
-      EventsOff(`version-update`)
-    }
-  }, [])
+  React.useEffect(() => {
+    EventsOn(`version-update`, updated => setNewVersionAvailable(updated))
+    EventsOn(`initialized`, () => send('initialized'))
+    EventsOn(`started-tracking`, () => send('startedTracking'))
+    EventsOn(`stopped-tracking`, () => send('stoppedTracking'))
+    EventsOn(`cfn-data`, matchHistory => send({
+      type: 'matchPlayed',
+      matchHistory
+    }))
+  })
 
   return (
     <>
       <Sidebar />
-      {children}
+      <main>
+        <Outlet />
+      </main>
     </>
   );
 };
-
-export default Wrapper;
