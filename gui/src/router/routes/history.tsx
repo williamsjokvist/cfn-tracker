@@ -52,11 +52,8 @@ export const HistoryPage: React.FC = () => {
   const filterLog = (property: string, value: string) => {
     if (!matchLog) return;
 
-    setMatchLog([]);
-    setTimeout(() => {
-      setMatchLog(matchLog.filter((ml) => (ml as any)[property] == value));
-      setSpecified(true);
-    }, 50);
+    setMatchLog(matchLog.filter((ml) => (ml as any)[property] == value));
+    setSpecified(true);
   };
 
   return (
@@ -82,7 +79,7 @@ export const HistoryPage: React.FC = () => {
               className="bg-[rgb(0,0,0,0.28)] hover:bg-[rgb(255,255,255,0.125)] backdrop-blur h-8 inline-block mr-3 rounded-2xl transition-all items-center border-transparent border-opacity-5 border-[1px] px-3 py-1"
             >
               <RiFileExcel2Fill className="w-4 h-4 inline mr-2 text-white" />
-              {t("export")}
+              {t("exportLog")}
             </button>
             <button
               onClick={() => {
@@ -93,7 +90,7 @@ export const HistoryPage: React.FC = () => {
               className="bg-[rgb(0,0,0,0.28)] hover:bg-[rgb(255,255,255,0.125)] backdrop-blur h-8 inline-block float-right rounded-2xl transition-all items-center border-transparent border-opacity-5 border-[1px] px-3 py-1"
             >
               <MdDelete className="w-4 h-4 inline mr-2" />
-              {t("delete")}
+              {t("deleteLog")}
             </button>
           </div>
         )}

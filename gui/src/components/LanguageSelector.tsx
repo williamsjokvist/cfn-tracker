@@ -22,7 +22,7 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({ isMinimized 
           className="text-white w-3 h-3 relative right-4 top-2"
           style={{ transform: "rotate(180deg)" }}
         />
-        <ul className="w-[195px] text-[16px] uppercase flex justify-between bg-black px-3 py-2 relative bottom-2 rounded-lg">
+        <ul className="w-[195px] text-[16px] uppercase italic flex justify-between bg-black px-3 py-2 relative bottom-2 rounded-lg">
           {APP_LANGUAGES.map((lng, index) => {
             return (
               <li key={lng.code}>

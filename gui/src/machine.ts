@@ -1,4 +1,4 @@
-import { createMachine, assign, EventObject } from 'xstate';
+import { createMachine, assign, EventObject, send } from 'xstate';
 import { createActorContext } from '@xstate/react';
 
 import {
@@ -27,80 +27,83 @@ export const cfnMachine = createMachine({
     cfn: '',
     restore: false,
     isTracking: false,
-    matchHistory: <core.MatchHistory>null
+    matchHistory: <core.MatchHistory>{
+      cfn: "",
+      wins: 0,
+      losses: 0,
+      winRate: 0,
+      lpGain: 0,
+      lp: 0,
+      opponent: "",
+      opponentCharacter: "",
+      opponentLeague: "",
+      opponentLP: 0,
+      totalLosses: 0,
+      totalMatches: 0,
+      totalWins: 0,
+      result: false,
+      winStreak: 0,
+      timestamp: "",
+      date: "",
+    }
   },
-
+  initial: 'idle',
   states: {
     loading: {
       on: {
-        initialized: "idle"
+        initialized: "idle",
       }
     },
 
     idle: {
+      entry: 'stopTracking',
       on: {
-        submit: "fetchingCfn",
-      }
+        submit: {
+          actions: assign({
+            cfn: (ctx, e: any) => e.cfn,
+            restore: (ctx, e: any) => e.restore,
+          }),
+          target: 'loadingCfn'
+        },
+      },
     },
 
-    fetchingCfn: {
+    loadingCfn: {
+      entry: "startTracking",
       on: {
-        success: 'tracking',
-        // todo:  add fail state
+        startedTracking: 'tracking'
       }
     },
 
     tracking: {
       on: {
-        stop: "idle",
+        stoppedTracking: "idle",
+        matchPlayed: {
+          actions: assign({
+            matchHistory: (_, e: any) => e.matchHistory
+          })
+        }
       },
 
-      entry: "startTracking",
       exit: "stopTracking",
     },
-  },
 
-  initial: "loading"
+  },
 }, {
   actions: {
     startTracking: ({cfn, restore, isTracking}) => {
-      if (!isTracking) 
+      if (cfn && !isTracking) {
         StartTracking(cfn, restore)
+        isTracking = true
+      }
     },
-    stopTracking: () => StopTracking()
+    stopTracking: ({ isTracking }) => {
+      if (!isTracking) return
+      StopTracking().then(_ => {
+        isTracking = false
+      })
+    }
   }
 });
 
 export const CFNMachineContext = createActorContext(cfnMachine);
-
-/*
-
-    loading: { 
-      on: {
-        INITIALIZED: {
-          target: 'initialized'
-        }
-      }
-    },
-    initialized: {
-      on: {
-        TRACK: {
-          target: 'tracking',
-          actions: assign({
-            cfn: (ctx, event: TrackEvent) => event.cfn,
-            restore: (ctx, event: TrackEvent) => event.restore
-          })
-        }
-      }
-    },
-    tracking: {
-      on: {
-        STOP: 'initialized',
-        MATCH: {
-          actions: assign({
-            matchHistory: (ctx, event: MatchEvent) => event.matchHistory,
-          })
-        }
-      }
-    },
-*/

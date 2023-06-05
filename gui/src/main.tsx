@@ -1,10 +1,12 @@
 import React from 'react'
 import { createRoot } from 'react-dom/client'
 import { RouterProvider } from "react-router-dom";
-import { CFNMachineContext } from './state-machine/machine';
+import { CFNMachineContext } from './machine';
 import { router } from "./router";
 
 import './styles/globals.sass'
+import './styles/sidebar.sass'
+
 import './i18n';
 
 const app = (

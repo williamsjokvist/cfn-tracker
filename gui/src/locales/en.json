@@ -8,7 +8,7 @@
   "opponent": "Opponent",
   "character": "Character",
   "lpGain": "LP Gain",
-  "delete": "Clear Log",
+  "deleteLog": "Clear Log",
   "goBack": "Go back",
   "loading": "Loading, please wait",
   "wins": "Wins",
@@ -27,6 +27,6 @@
   "date": "Date",
   "minimize": "minimize",
   "restoreSession": "Restore last session",
-  "export": "Export CSV",
+  "exportLog": "Export CSV",
   "league": "League"
 }
