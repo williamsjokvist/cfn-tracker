@@ -28,5 +28,8 @@
   "minimize": "réduire",
   "restoreSession": "Restaurer la dernière session",
   "exportLog": "Exporter CSV",
-  "league": "Ligue"
+  "league": "Ligue",
+  "pickGame": "Choisir le jeu",
+  "follow": "Suivre",
+  "continueStep": "Continuer"
 }

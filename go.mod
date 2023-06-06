@@ -1,4 +1,4 @@
-module cfnscraper
+module github.com/williamsjokvist/cfn-tracker
 
 go 1.19
 

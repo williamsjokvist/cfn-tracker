@@ -11,7 +11,7 @@ import { LanguageSelector } from "./LanguageSelector";
 
 import { useAppStore } from "@/store/use-app-store";
 import { BrowserOpenURL, Quit, WindowMinimise } from "@@/runtime";
-import { GetAppVersion } from "@@/go/core/App";
+import { GetAppVersion } from "@@/go/core/CommandHandler";
 
 type SidebarLinkProps = {
   Icon: any;
@@ -62,14 +62,14 @@ export const Sidebar: React.FC = () => {
     <aside
       className="sidebar"
       style={{
-        width: isMinimized ? '75px' : "175px",
+        width: isMinimized ? '76px' : "175px",
         overflow: "visible",
         justifyContent: isMinimized ? 'center' : 'normal',
         paddingLeft: isMinimized ? '0' : '10px',
         paddingRight: isMinimized ? '0' : '10px'
       }}
     >
-      <header style={{"--wails-draggable": "drag"} as React.CSSProperties}>
+      <header style={{"--draggable": "drag"} as React.CSSProperties}>
         <div className="flex justify-start">
           <div className="group mt-2 group ml-2 flex mb-3">
             <button
@@ -116,9 +116,9 @@ export const Sidebar: React.FC = () => {
           onClick={() => BrowserOpenURL("https://twitter.com/greensoap_")}
           className={`h-[28px] cursor-pointer w-full group font-extralight flex justify-between items-center mt-1 text-[#d6d4ff] hover:text-white transition-colors`}
         >
-          <span className={`flex items-center justify-between`}>
+          <span className={`flex items-center justify-between lowercase`}>
             <FaTwitter className="text-[#49b3f5] w-4 h-4 mr-2 transition-colors group-hover:text-white" />
-            {!isMinimized && 'greensoap_'}
+            {!isMinimized && t('follow')}
           </span>
           <FaArrowUp className="relative right-[-8px] w-3 h-3 group-hover:opacity-100 opacity-0 transition-opacity" style={{ transform: "rotate(45deg)" }} />
         </a>

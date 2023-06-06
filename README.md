@@ -12,7 +12,7 @@ If you find the tool useful for your streams or otherwise, consider [buying me a
 
 ## Usage
 
-* Download the app for either Mac or Windows from [the download page](https://greensoap.github.io/cfn-tracker/).
+* Download the app for either Mac or Windows from [the download page](https://williamsjokvist.github.io/cfn-tracker/).
 * Launch it and wait for it to finish initializing.
 * Input your CFN when prompted and start.
 
@@ -30,33 +30,13 @@ The app will start with a notification if an update has released. You can also f
 ![log](showcase/log.jpg?raw=true "log-example")
 
 ## Coming updates
-* Optional web output, so you can add it as a browser source in OBS
-* Themes for said web output, with easy customization of layout, font, font size and colors
-* Street Fighter 6 support
 
-Any ideas for features and improvements are welcome, feel free to open an [issue](https://github.com/GreenSoap/cfn-tracker/issues)
+Any ideas for features and improvements are welcome, feel free to open an [issue](https://github.com/williamsjokvist/cfn-tracker/issues)
 
-If you wish to contribute, you can open a [pull request](https://github.com/GreenSoap/cfn-tracker/pulls) 
+If you wish to contribute, you can open a [pull request](https://github.com/williamsjokvist/cfn-tracker/pulls) 
 
-## Tools
+## Streamer showcase
 
-The app is created with a React [gui](https://github.com/GreenSoap/cfn-tracker/tree/master/gui) and a Go [core](https://github.com/GreenSoap/cfn-tracker/tree/master/core), using the [Wails](https://github.com/wailsapp/wails) framework.
-
-## Building from source
-
-To build from source, run `make gui` in the root directory. 
-
-Wails is required to build from source: [installation instructions](https://wails.io/docs/gettingstarted/installation).
-
-The only required dependencies for Wails are:
-* Go 1.18+
-* Node 15+
-
-An .env file following [example.env](https://github.com/GreenSoap/cfn-tracker/blob/master/example.env) is also required.
-
-## Streamers using the app
-
-If you use this app for your stream, DM me a screenshot on [Twitter](https://twitter.com/GreenSoap_) and I will add it here!
 ### [OneStepLayered](https://twitch.tv/OneStepLayered)
 ![stream](showcase/OneStepLayered.gif?raw=true "OneStepLayered")
 ### [SheldonTwitching](https://twitch.tv/SheldonTwitching)

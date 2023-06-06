@@ -28,5 +28,8 @@
   "minimize": "最小化",
   "restoreSession": "最後のセッションを復元",
   "exportLog": "CSVに保存",
-  "league": "リーグ"
+  "league": "リーグ",
+  "pickGame": "ゲームを選択",
+  "follow": "フォロー",
+  "continueStep": "続ける"
 }
