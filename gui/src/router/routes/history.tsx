@@ -10,8 +10,8 @@ import {
   DeleteMatchLog,
   ExportLogToCSV,
   OpenResultsDirectory,
-} from "@@/go/core/App";
-import { core } from "@@/go/models";
+} from "@@/go/core/CommandHandler";
+import { common } from "@@/go/models";
 import { PageHeader } from "@/ui/header";
 
 export const HistoryPage: React.FC = () => {
@@ -19,7 +19,7 @@ export const HistoryPage: React.FC = () => {
 
   const [availableLogs, setAvailableLogs] = React.useState<string[]>([]);
   const [chosenLog, setLog] = React.useState<string>();
-  const [matchLog, setMatchLog] = React.useState<core.MatchHistory[]>();
+  const [matchLog, setMatchLog] = React.useState<common.MatchHistory[]>();
 
   const [isSpecified, setSpecified] = React.useState(false);
   const [totalWinRate, setTotalWinRate] = React.useState<number | null>(null);

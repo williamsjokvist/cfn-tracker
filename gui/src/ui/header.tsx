@@ -4,7 +4,7 @@ type PageHeaderProps = {
 }
 export const PageHeader: React.FC<React.PropsWithChildren<PageHeaderProps>> = ( { text, showSpinner, children } ) => {
   return (
-    <header className="page-header" style={{ "--wails-draggable": "drag" } as React.CSSProperties}>
+    <header className="page-header" style={{ "--draggable": "drag" } as React.CSSProperties}>
       <h2 className="whitespace-nowrap uppercase text-sm tracking-widest">
         {text}
       </h2>
