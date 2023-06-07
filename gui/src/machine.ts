@@ -119,7 +119,6 @@ export const cfnMachine = createMachine({
       if (!isTracking) return
       StopTracking().then(_ => {
         isTracking = false
-        cfn = ''
       })
     }
   }
