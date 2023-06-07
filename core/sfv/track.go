@@ -80,11 +80,11 @@ func (t *SFVTracker) Start(cfn string, restoreData bool, refreshInterval time.Du
 
 	fmt.Println(`Profile loaded`)
 	t.isTracking = true
-	t.mh.CFN = cfn
+	t.mh = common.NewMatchHistory(cfn)
 	runtime.EventsEmit(t.ctx, `started-tracking`)
 
 	// First fetch
-	t.fetchMatchHistory(cfn, true)
+	t.refreshMatchHistory(cfn, true)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	t.stopTracking = cancel
@@ -109,11 +109,11 @@ func (t *SFVTracker) poll(ctx context.Context, cfn string, refreshInterval time.
 			break
 		}
 
-		t.fetchMatchHistory(cfn, false)
+		t.refreshMatchHistory(cfn, false)
 	}
 }
 
-func (t *SFVTracker) fetchMatchHistory(cfn string, isFirstFetch bool) {
+func (t *SFVTracker) refreshMatchHistory(cfn string, isFirstFetch bool) {
 	if !isFirstFetch && t.Page.MustInfo().URL != fmt.Sprintf(`https://game.capcom.com/cfn/sfv/profile/%s`, cfn) {
 		return
 	}

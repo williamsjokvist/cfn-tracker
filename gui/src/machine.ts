@@ -19,7 +19,7 @@ export type MatchEvent = {
 } & EventObject
 
 type CFNMachineContext = {
-  cfn: '',
+  cfn: string,
   game?: 'sfv' | 'sf6',
   restore: boolean,
   isTracking: boolean,
@@ -32,7 +32,6 @@ export const cfnMachine = createMachine({
   predictableActionArguments: true,
   
   context: <CFNMachineContext>{
-    cfn: '',
     restore: false,
     isTracking: false,
     matchHistory: <common.MatchHistory>{
@@ -120,7 +119,6 @@ export const cfnMachine = createMachine({
       if (!isTracking) return
       StopTracking().then(_ => {
         isTracking = false
-        cfn = ''
       })
     }
   }

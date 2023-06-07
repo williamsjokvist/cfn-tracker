@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 
 import { CFNMachineContext } from "@/machine";
 import { GetAvailableLogs } from "@@/go/core/CommandHandler";
+import { ActionButton } from "@/ui/action-button";
 
 type CfnFormValues = {
   cfn: string;
@@ -88,13 +89,13 @@ export const CFNForm: React.FC = () => {
         </div>
       )}
       <div className="flex justify-end">
-        <button
+        <ActionButton
           type="submit"
-          className="mt-4 select-none text-center bg-[rgba(255,10,10,.1)] rounded-md px-7 py-3 border-[#FF3D51] hover:bg-[#FF3D51] border-[1px] transition-colors font-semibold text-md"
+          className="mt-4"
           style={{ filter: "hue-rotate(156deg)" }}
         >
           {t("start")}
-        </button>
+        </ActionButton>
       </div>
     </form>
   )

@@ -1,11 +1,11 @@
 import React from 'react'
 
-export const ActionButton: React.FC<React.PropsWithChildren<React.HTMLAttributes<HTMLButtonElement>>> = (
-  { onClick, className, style,  children }
+export const ActionButton: React.FC<React.PropsWithChildren<React.ButtonHTMLAttributes<HTMLButtonElement>>> = (
+  { onClick, className, style,  children, type }
 ) => {
   return (
     <button 
-      type='button'
+      type={type}
       onClick={onClick}
       style={style}
       className={`

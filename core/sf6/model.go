@@ -1,5 +1,71 @@
 package sf6
 
+type PlayerInfo struct {
+	AllowCrossPlay  bool `json:"allow_cross_play"`
+	BattleInputType int  `json:"battle_input_type"`
+	CharacterID     int  `json:"character_id"`
+	HomeID          int  `json:"home_id"`
+	LeaguePoint     int  `json:"league_point"`
+	LeagueRank      int  `json:"league_rank"`
+	MainCircle      struct {
+		CircleID   string `json:"circle_id"`
+		CircleName string `json:"circle_name"`
+		DataExist  bool   `json:"data_exist"`
+		Emblem     struct {
+			EmblemBase                       int  `json:"emblem_base"`
+			EmblemBaseColor                  int  `json:"emblem_base_color"`
+			EmblemFrame                      int  `json:"emblem_frame"`
+			EmblemFrameColor                 int  `json:"emblem_frame_color"`
+			EmblemPattern                    int  `json:"emblem_pattern"`
+			EmblemPatternColor               int  `json:"emblem_pattern_color"`
+			EmblemPatternHorizontalInversion bool `json:"emblem_pattern_horizontal_inversion"`
+			EmblemPatternVerticalInversion   bool `json:"emblem_pattern_vertical_inversion"`
+			EmblemProcessing                 int  `json:"emblem_processing"`
+			EmblemSymbol1                    int  `json:"emblem_symbol1"`
+			EmblemSymbol1Clipping            bool `json:"emblem_symbol1_clipping"`
+			EmblemSymbol1Color               int  `json:"emblem_symbol1_color"`
+			EmblemSymbol1HorizontalInversion bool `json:"emblem_symbol1_horizontal_inversion"`
+			EmblemSymbol1VerticalInversion   bool `json:"emblem_symbol1_vertical_inversion"`
+			EmblemSymbol2                    int  `json:"emblem_symbol2"`
+			EmblemSymbol2Clipping            bool `json:"emblem_symbol2_clipping"`
+			EmblemSymbol2Color               int  `json:"emblem_symbol2_color"`
+			EmblemSymbol2HorizontalInversion bool `json:"emblem_symbol2_horizontal_inversion"`
+			EmblemSymbol2VerticalInversion   bool `json:"emblem_symbol2_vertical_inversion"`
+		} `json:"emblem"`
+		Leader struct {
+			FighterID  string `json:"fighter_id"`
+			PlatformID int    `json:"platform_id"`
+			ShortID    int    `json:"short_id"`
+		} `json:"leader"`
+	} `json:"main_circle"`
+	MasterLeague        int `json:"master_league"`
+	MasterRating        int `json:"master_rating"`
+	MasterRatingRanking int `json:"master_rating_ranking"`
+	Player              struct {
+		FighterID        string `json:"fighter_id"`
+		PlatformID       int    `json:"platform_id"`
+		ShortID          int64  `json:"short_id"`
+		PlatformName     string `json:"platform_name"`
+		PlatformToolName string `json:"platform_tool_name"`
+	} `json:"player"`
+	PlayingCharacterID       int    `json:"playing_character_id"`
+	RoundResults             []int  `json:"round_results"`
+	TitlePlate               int    `json:"title_plate"`
+	CharacterName            string `json:"character_name"`
+	CharacterToolName        string `json:"character_tool_name"`
+	PlayingCharacterName     string `json:"playing_character_name"`
+	PlayingCharacterToolName string `json:"playing_character_tool_name"`
+	TitleData                struct {
+		TitleDataID        int    `json:"title_data_id"`
+		TitleDataGradeID   int    `json:"title_data_grade_id"`
+		TitleDataGradeName string `json:"title_data_grade_name"`
+		TitleDataPlateID   int    `json:"title_data_plate_id"`
+		TitleDataPlateName string `json:"title_data_plate_name"`
+		TitleDataVal       string `json:"title_data_val"`
+	} `json:"title_data"`
+	BattleInputTypeName string `json:"battle_input_type_name"`
+}
+
 type BattleLog struct {
 	PageProps struct {
 		FighterBannerInfo struct {
@@ -124,145 +190,17 @@ type BattleLog struct {
 		} `json:"fighter_banner_info"`
 		CurrentPage int `json:"current_page"`
 		ReplayList  []struct {
-			BattleVersion int  `json:"battle_version"`
-			IsRegistered  bool `json:"is_registered"`
-			Player1Info   struct {
-				AllowCrossPlay  bool `json:"allow_cross_play"`
-				BattleInputType int  `json:"battle_input_type"`
-				CharacterID     int  `json:"character_id"`
-				HomeID          int  `json:"home_id"`
-				LeaguePoint     int  `json:"league_point"`
-				LeagueRank      int  `json:"league_rank"`
-				MainCircle      struct {
-					CircleID   string `json:"circle_id"`
-					CircleName string `json:"circle_name"`
-					DataExist  bool   `json:"data_exist"`
-					Emblem     struct {
-						EmblemBase                       int  `json:"emblem_base"`
-						EmblemBaseColor                  int  `json:"emblem_base_color"`
-						EmblemFrame                      int  `json:"emblem_frame"`
-						EmblemFrameColor                 int  `json:"emblem_frame_color"`
-						EmblemPattern                    int  `json:"emblem_pattern"`
-						EmblemPatternColor               int  `json:"emblem_pattern_color"`
-						EmblemPatternHorizontalInversion bool `json:"emblem_pattern_horizontal_inversion"`
-						EmblemPatternVerticalInversion   bool `json:"emblem_pattern_vertical_inversion"`
-						EmblemProcessing                 int  `json:"emblem_processing"`
-						EmblemSymbol1                    int  `json:"emblem_symbol1"`
-						EmblemSymbol1Clipping            bool `json:"emblem_symbol1_clipping"`
-						EmblemSymbol1Color               int  `json:"emblem_symbol1_color"`
-						EmblemSymbol1HorizontalInversion bool `json:"emblem_symbol1_horizontal_inversion"`
-						EmblemSymbol1VerticalInversion   bool `json:"emblem_symbol1_vertical_inversion"`
-						EmblemSymbol2                    int  `json:"emblem_symbol2"`
-						EmblemSymbol2Clipping            bool `json:"emblem_symbol2_clipping"`
-						EmblemSymbol2Color               int  `json:"emblem_symbol2_color"`
-						EmblemSymbol2HorizontalInversion bool `json:"emblem_symbol2_horizontal_inversion"`
-						EmblemSymbol2VerticalInversion   bool `json:"emblem_symbol2_vertical_inversion"`
-					} `json:"emblem"`
-					Leader struct {
-						FighterID  string `json:"fighter_id"`
-						PlatformID int    `json:"platform_id"`
-						ShortID    int64  `json:"short_id"`
-					} `json:"leader"`
-				} `json:"main_circle"`
-				MasterLeague        int `json:"master_league"`
-				MasterRating        int `json:"master_rating"`
-				MasterRatingRanking int `json:"master_rating_ranking"`
-				Player              struct {
-					FighterID        string `json:"fighter_id"`
-					PlatformID       int    `json:"platform_id"`
-					ShortID          int64  `json:"short_id"`
-					PlatformName     string `json:"platform_name"`
-					PlatformToolName string `json:"platform_tool_name"`
-				} `json:"player"`
-				PlayingCharacterID       int    `json:"playing_character_id"`
-				RoundResults             []int  `json:"round_results"`
-				TitlePlate               int    `json:"title_plate"`
-				CharacterName            string `json:"character_name"`
-				CharacterToolName        string `json:"character_tool_name"`
-				PlayingCharacterName     string `json:"playing_character_name"`
-				PlayingCharacterToolName string `json:"playing_character_tool_name"`
-				TitleData                struct {
-					TitleDataID        int    `json:"title_data_id"`
-					TitleDataGradeID   int    `json:"title_data_grade_id"`
-					TitleDataGradeName string `json:"title_data_grade_name"`
-					TitleDataPlateID   int    `json:"title_data_plate_id"`
-					TitleDataPlateName string `json:"title_data_plate_name"`
-					TitleDataVal       string `json:"title_data_val"`
-				} `json:"title_data"`
-				BattleInputTypeName string `json:"battle_input_type_name"`
-			} `json:"player1_info"`
-			Player2Info struct {
-				AllowCrossPlay  bool `json:"allow_cross_play"`
-				BattleInputType int  `json:"battle_input_type"`
-				CharacterID     int  `json:"character_id"`
-				HomeID          int  `json:"home_id"`
-				LeaguePoint     int  `json:"league_point"`
-				LeagueRank      int  `json:"league_rank"`
-				MainCircle      struct {
-					CircleID   string `json:"circle_id"`
-					CircleName string `json:"circle_name"`
-					DataExist  bool   `json:"data_exist"`
-					Emblem     struct {
-						EmblemBase                       int  `json:"emblem_base"`
-						EmblemBaseColor                  int  `json:"emblem_base_color"`
-						EmblemFrame                      int  `json:"emblem_frame"`
-						EmblemFrameColor                 int  `json:"emblem_frame_color"`
-						EmblemPattern                    int  `json:"emblem_pattern"`
-						EmblemPatternColor               int  `json:"emblem_pattern_color"`
-						EmblemPatternHorizontalInversion bool `json:"emblem_pattern_horizontal_inversion"`
-						EmblemPatternVerticalInversion   bool `json:"emblem_pattern_vertical_inversion"`
-						EmblemProcessing                 int  `json:"emblem_processing"`
-						EmblemSymbol1                    int  `json:"emblem_symbol1"`
-						EmblemSymbol1Clipping            bool `json:"emblem_symbol1_clipping"`
-						EmblemSymbol1Color               int  `json:"emblem_symbol1_color"`
-						EmblemSymbol1HorizontalInversion bool `json:"emblem_symbol1_horizontal_inversion"`
-						EmblemSymbol1VerticalInversion   bool `json:"emblem_symbol1_vertical_inversion"`
-						EmblemSymbol2                    int  `json:"emblem_symbol2"`
-						EmblemSymbol2Clipping            bool `json:"emblem_symbol2_clipping"`
-						EmblemSymbol2Color               int  `json:"emblem_symbol2_color"`
-						EmblemSymbol2HorizontalInversion bool `json:"emblem_symbol2_horizontal_inversion"`
-						EmblemSymbol2VerticalInversion   bool `json:"emblem_symbol2_vertical_inversion"`
-					} `json:"emblem"`
-					Leader struct {
-						FighterID  string `json:"fighter_id"`
-						PlatformID int    `json:"platform_id"`
-						ShortID    int    `json:"short_id"`
-					} `json:"leader"`
-				} `json:"main_circle"`
-				MasterLeague        int `json:"master_league"`
-				MasterRating        int `json:"master_rating"`
-				MasterRatingRanking int `json:"master_rating_ranking"`
-				Player              struct {
-					FighterID        string `json:"fighter_id"`
-					PlatformID       int    `json:"platform_id"`
-					ShortID          int64  `json:"short_id"`
-					PlatformName     string `json:"platform_name"`
-					PlatformToolName string `json:"platform_tool_name"`
-				} `json:"player"`
-				PlayingCharacterID       int    `json:"playing_character_id"`
-				RoundResults             []int  `json:"round_results"`
-				TitlePlate               int    `json:"title_plate"`
-				CharacterName            string `json:"character_name"`
-				CharacterToolName        string `json:"character_tool_name"`
-				PlayingCharacterName     string `json:"playing_character_name"`
-				PlayingCharacterToolName string `json:"playing_character_tool_name"`
-				TitleData                struct {
-					TitleDataID        int    `json:"title_data_id"`
-					TitleDataGradeID   int    `json:"title_data_grade_id"`
-					TitleDataGradeName string `json:"title_data_grade_name"`
-					TitleDataPlateID   int    `json:"title_data_plate_id"`
-					TitleDataPlateName string `json:"title_data_plate_name"`
-					TitleDataVal       string `json:"title_data_val"`
-				} `json:"title_data"`
-				BattleInputTypeName string `json:"battle_input_type_name"`
-			} `json:"player2_info"`
-			ReplayBattleSubType     int    `json:"replay_battle_sub_type"`
-			ReplayBattleType        int    `json:"replay_battle_type"`
-			ReplayID                string `json:"replay_id"`
-			UploadedAt              int    `json:"uploaded_at"`
-			Views                   int    `json:"views"`
-			ReplayBattleTypeName    string `json:"replay_battle_type_name"`
-			ReplayBattleSubTypeName string `json:"replay_battle_sub_type_name"`
+			BattleVersion           int        `json:"battle_version"`
+			IsRegistered            bool       `json:"is_registered"`
+			Player1Info             PlayerInfo `json:"player1_info"`
+			Player2Info             PlayerInfo `json:"player2_info"`
+			ReplayBattleSubType     int        `json:"replay_battle_sub_type"`
+			ReplayBattleType        int        `json:"replay_battle_type"`
+			ReplayID                string     `json:"replay_id"`
+			UploadedAt              int        `json:"uploaded_at"`
+			Views                   int        `json:"views"`
+			ReplayBattleTypeName    string     `json:"replay_battle_type_name"`
+			ReplayBattleSubTypeName string     `json:"replay_battle_sub_type_name"`
 		} `json:"replay_list"`
 		TotalPage int   `json:"total_page"`
 		Sid       int64 `json:"sid"`

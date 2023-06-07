@@ -45,7 +45,10 @@ func (ch *CommandHandler) StopTracking() {
 }
 
 func (ch *CommandHandler) StartTracking(cfn string, restore bool) {
-	ch.tracker.Start(cfn, restore, RefreshInterval)
+	err := ch.tracker.Start(cfn, restore, RefreshInterval)
+	if err != nil {
+		fmt.Println(err)
+	}
 }
 
 func (ch *CommandHandler) GetMatchHistory() common.MatchHistory {

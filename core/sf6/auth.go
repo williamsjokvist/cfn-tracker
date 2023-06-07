@@ -2,6 +2,8 @@ package sf6
 
 import (
 	"fmt"
+	"math/rand"
+	"strconv"
 	"strings"
 	"time"
 
@@ -14,7 +16,17 @@ func (t *SF6Tracker) Authenticate(email string, password string) error {
 	}
 
 	fmt.Println(`Logging in`)
-	t.Page.MustNavigate(`https://www.streetfighter.com/6/buckler/auth/loginep?redirect_url=/`)
+	t.Page.MustNavigate(`https://www.streetfighter.com/6/buckler/auth/loginep?redirect_url=/`).MustWaitLoad()
+
+	// Bypass age check
+	if t.Page.MustInfo().URL == `https://cid.capcom.com/ja/agecheck/confirm` {
+		t.Page.MustElement(`#country`).MustSelect(`Australia`)
+		t.Page.MustElement(`#birthMonth`).MustSelect(strconv.Itoa(rand.Intn(12-1) + 1))
+		t.Page.MustElement(`#birthYear`).MustSelect(strconv.Itoa(rand.Intn(1999-1970) + 1970))
+		t.Page.MustElement(`#birthDay`).MustSelect(strconv.Itoa(rand.Intn(31-28) + 28))
+		t.Page.MustElement(`form button[type="submit"]`).MustClick()
+		t.Page.MustWaitLoad().MustWaitRequestIdle()
+	}
 
 	// Submit form
 	t.Page.MustElement(`input[name="email"]`).Input(email)
@@ -36,6 +48,5 @@ func (t *SF6Tracker) Authenticate(email string, password string) error {
 
 	runtime.EventsEmit(t.ctx, `initialized`, true)
 	t.isAuthenticated = true
-	t.Page.Browser().MustClose()
 	return nil
 }

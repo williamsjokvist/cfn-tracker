@@ -85,8 +85,9 @@ export const Tracking: React.FC = () => {
             {t("openResultFolder")}
           </ActionButton>
           <ActionButton onClick={() =>{
-                  StopTracking()
-            send('stoppedTracking')}}>
+             StopTracking() // TODO: this should be part of the state machine
+            send('stoppedTracking')}
+          }>
             <FaStop className="mr-3" /> 
             {t("stop")}
           </ActionButton>
