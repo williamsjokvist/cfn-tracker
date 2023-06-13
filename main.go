@@ -46,6 +46,7 @@ func init() {
 		capIDEmail = os.Getenv(`CAP_ID_EMAIL`)
 		capIDPassword = os.Getenv(`CAP_ID_PASSWORD`)
 		appVersion = os.Getenv(`APP_VERSION`)
+		runHeadless = os.Getenv(`RUN_HEADLESS`) == `true`
 	}
 
 	core.AppVersion, _ = version.NewVersion(appVersion)
