@@ -15,3 +15,5 @@ jobs:
         env:
           STEAM_USERNAME: ${{ secrets.STEAM_USERNAME }} 
           STEAM_PASSWORD: ${{ secrets.STEAM_PASSWORD }} 
+          CAP_ID_EMAIL: ${{ secrets.CAP_ID_EMAIL }} 
+          CAP_ID_PASSWORD: ${{ secrets.CAP_ID_PASSWORD }} 
