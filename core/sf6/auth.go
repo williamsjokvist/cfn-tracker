@@ -10,7 +10,7 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
-func (t *SF6Tracker) Authenticate(email string, password string) error {
+func (t *SF6Tracker) Authenticate(email string, password string, dry bool) error {
 	if t.isAuthenticated {
 		return nil
 	}
@@ -46,7 +46,10 @@ func (t *SF6Tracker) Authenticate(email string, password string) error {
 		fmt.Println(`Waiting for gateway to pass...`, secondsWaited)
 	}
 
-	runtime.EventsEmit(t.ctx, `initialized`, true)
-	t.isAuthenticated = true
+	if !dry {
+		runtime.EventsEmit(t.ctx, `initialized`, true)
+		t.isAuthenticated = true
+	}
+
 	return nil
 }

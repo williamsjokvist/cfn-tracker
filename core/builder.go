@@ -39,7 +39,7 @@ func (s GameType) String() string {
 // Make a SF6Tracker and expose it as a GameTracker
 func MakeSF6Tracker(ctx context.Context, browser *common.Browser, username string, password string) (GameTracker, error) {
 	sf6Tracker := sf6.NewSF6Tracker(ctx, browser)
-	err := sf6Tracker.Authenticate(username, password)
+	err := sf6Tracker.Authenticate(username, password, false)
 	if err != nil {
 		return nil, fmt.Errorf(`auth err: %v`, err)
 	}
@@ -50,7 +50,7 @@ func MakeSF6Tracker(ctx context.Context, browser *common.Browser, username strin
 // Make a SFVTracker and expose it as a GameTracker
 func MakeSFVTracker(ctx context.Context, browser *common.Browser, username string, password string) (GameTracker, error) {
 	sfvTracker := sfv.NewSFVTracker(ctx, browser)
-	err := sfvTracker.Authenticate(username, password)
+	err := sfvTracker.Authenticate(username, password, false)
 	if err != nil {
 		return nil, fmt.Errorf(`auth err: %v`, err)
 	}
