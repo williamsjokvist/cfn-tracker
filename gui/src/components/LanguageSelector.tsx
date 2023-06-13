@@ -22,20 +22,23 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({ isMinimized 
           className="text-white w-3 h-3 relative right-4 top-2"
           style={{ transform: "rotate(180deg)" }}
         />
-        <ul className="w-[195px] text-[16px] uppercase italic flex justify-between bg-black px-3 py-2 relative bottom-2 rounded-lg">
-          {APP_LANGUAGES.map((lng, index) => {
+        <ul 
+          className="relative bottom-1 w-[195px] text-[16px] uppercase flex gap-2 justify-between group hover:bg-[rgba(0,0,0,.525)] text-[#bfbcff] transition-colors backdrop-blur leading-5 text-base py-2 px-3 rounded-lg bg-slate-900">
+          {APP_LANGUAGES.map(lng => {
             return (
               <li key={lng.code}>
                 <button
-                  type="button"
-                  style={{
-                    fontWeight: i18n.resolvedLanguage === lng.code ? "600" : "normal",
-                  }}
                   onClick={() => i18n.changeLanguage(lng.code)}
+                  type="button"
+                  className='cursor-pointer hover:!text-white transition-colors'
+                  {...(i18n.resolvedLanguage === lng.code && {
+                    style: {
+                      fontWeight: 600,
+                    }
+                  })}
                 >
                   {lng.nativeName}
                 </button>
-                {index !== APP_LANGUAGES.length - 1 && <i className='mx-2'>|</i>}
               </li>
             );
           })}

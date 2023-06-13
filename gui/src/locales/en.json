@@ -15,7 +15,7 @@
   "losses": "Losses",
   "winRate": "Win Rate",
   "stop": "Stop",
-  "openResultFolder": "Results Folder",
+  "files": "Files",
   "enterCfnName": "Enter your CFN name",
   "result": "Result",
   "time": "Time",
@@ -31,5 +31,6 @@
   "league": "League",
   "pickGame": "Choose game",
   "follow": "Follow",
-  "continueStep": "Continue"
+  "continueStep": "Continue",
+  "placement": "Placement Matches"
 }
