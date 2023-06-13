@@ -30,7 +30,10 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({ isMinimized 
             return (
               <li key={lng.code}>
                 <button
-                  onClick={() => i18n.changeLanguage(lng.code)}
+                  onClick={() => {
+                    i18n.changeLanguage(lng.code)
+                    window.localStorage.setItem('lng', lng.code)
+                  }}
                   type="button"
                   className='cursor-pointer hover:!text-white transition-colors'
                   {...(i18n.resolvedLanguage === lng.code && {
