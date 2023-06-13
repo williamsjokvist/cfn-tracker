@@ -14,14 +14,14 @@ var (
 	ErrCaptcha = errors.New(`encountered a captcha`)
 )
 
-func (t *SFVTracker) Authenticate(username string, password string) error {
+func (t *SFVTracker) Authenticate(username string, password string, dry bool) error {
 	fmt.Println(`Accepting CFN terms`)
 	t.Page.MustNavigate(`https://game.capcom.com/cfn/sfv/consent/steam`).MustWaitLoad()
 	t.Page.MustElement(`input[type="submit"]`).MustClick()
 	t.Page.MustWaitLoad().MustWaitRequestIdle()
 	fmt.Println(`CFN terms accepted`)
 
-	if t.Page.MustInfo().URL == `https://game.capcom.com/cfn/sfv/` {
+	if t.Page.MustInfo().URL == `https://game.capcom.com/cfn/sfv/` && !dry {
 		t.setInitialized()
 		return nil
 	}
@@ -32,7 +32,7 @@ func (t *SFVTracker) Authenticate(username string, password string) error {
 	isSteamOpen := t.Page.MustHas(`#loginModals`)
 	isConfirmPageOpen := t.Page.MustHas(`#imageLogin`)
 
-	if !isSteamOpen && isConfirmPageOpen {
+	if !isSteamOpen && isConfirmPageOpen && !dry {
 		t.setInitialized()
 		return nil
 	}
@@ -83,8 +83,10 @@ func (t *SFVTracker) Authenticate(username string, password string) error {
 			hasClickedAccept = true
 		}
 	}
+	if !dry {
+		t.setInitialized()
+	}
 
-	t.setInitialized()
 	return nil
 }
 

@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
 	"github.com/williamsjokvist/cfn-tracker/core/common"
 )
 
@@ -16,7 +17,7 @@ func TestSFVAuthenticate(t *testing.T) {
 	ctx := context.Background()
 	browser := common.NewBrowser(ctx, true)
 	sf5Tracker := NewSFVTracker(ctx, browser)
-	err := sf5Tracker.Authenticate(os.Getenv(`STEAM_USERNAME`), os.Getenv(`STEAM_PASSWORD`))
+	err := sf5Tracker.Authenticate(os.Getenv(`STEAM_USERNAME`), os.Getenv(`STEAM_PASSWORD`), true)
 
 	assert.Equal(nil, err)
 }
