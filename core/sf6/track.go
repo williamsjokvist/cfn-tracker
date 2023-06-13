@@ -23,34 +23,33 @@ var (
 )
 
 type SF6Tracker struct {
-	ctx             context.Context
-	firstLPRecorded int
-	isTracking      bool
-	isAuthenticated bool
-	stopTracking    context.CancelFunc
-	mh              *common.MatchHistory
+	ctx              context.Context
+	isTracking       bool
+	isAuthenticated  bool
+	stopTracking     context.CancelFunc
+	mh               *common.MatchHistory
+	gains            map[string]int
+	startingPoints   map[string]int
+	currentCharacter string
 	*common.Browser
 }
 
 func NewSF6Tracker(ctx context.Context, browser *common.Browser) *SF6Tracker {
 	return &SF6Tracker{
-		ctx:          ctx,
-		isTracking:   false,
-		mh:           common.NewMatchHistory(``),
-		Browser:      browser,
-		stopTracking: func() {},
+		ctx:              ctx,
+		isTracking:       false,
+		mh:               common.NewMatchHistory(``),
+		Browser:          browser,
+		stopTracking:     func() {},
+		gains:            make(map[string]int, 42), // Make room for 42 characters
+		startingPoints:   make(map[string]int, 42), // Make room for 42 characters
+		currentCharacter: ``,
 	}
 }
 
 // Stop will stop any current tracking
 func (t *SF6Tracker) Stop() {
 	t.stopTracking()
-}
-
-func (t *SF6Tracker) stopFn() {
-	fmt.Println(`Stopped tracking`)
-	t.isTracking = false
-	runtime.EventsEmit(t.ctx, `stopped-tracking`)
 }
 
 // Start will update the MatchHistory when new matches are played.
@@ -75,8 +74,7 @@ func (t *SF6Tracker) Start(cfn string, restoreData bool, refreshInterval time.Du
 		t.mh.Reset()
 	}
 
-	t.mh.CFN = cfn
-
+	t.mh = common.NewMatchHistory(cfn)
 	/*
 		Raw GET	request method (needs cookie passed in req):
 
@@ -91,13 +89,14 @@ func (t *SF6Tracker) Start(cfn string, restoreData bool, refreshInterval time.Du
 	cfnID := t.fetchCfnIDByCfn(cfn)
 	battleLog := t.fetchBattleLog(cfnID)
 	if battleLog.PageProps.Common.StatusCode != 200 {
-		t.stopFn()
+		t.stopped()
 		return ErrUnauthenticated
 	}
 
+	t.refreshMatchHistory(battleLog)
+
 	fmt.Println(`Profile loaded `)
 	t.isTracking = true
-	t.mh = common.NewMatchHistory(cfn)
 	runtime.EventsEmit(t.ctx, `started-tracking`)
 	runtime.EventsEmit(t.ctx, `cfn-data`, t.mh)
 
@@ -120,7 +119,7 @@ func (t *SF6Tracker) poll(ctx context.Context, cfnID string, refreshInterval tim
 		})
 
 		if didBreak {
-			t.stopFn()
+			t.stopped()
 			break
 		}
 
@@ -128,7 +127,7 @@ func (t *SF6Tracker) poll(ctx context.Context, cfnID string, refreshInterval tim
 		if battleLog.PageProps.Common.StatusCode != 200 {
 			fmt.Printf(`%v`, ErrUnauthenticated)
 			t.Stop()
-			t.stopFn()
+			t.stopped()
 		}
 
 		t.refreshMatchHistory(battleLog)
@@ -142,13 +141,11 @@ func (t *SF6Tracker) fetchCfnIDByCfn(cfn string) string {
 
 	var searchResult SearchResult
 	err := json.Unmarshal([]byte(body), &searchResult)
-
 	if err != nil {
 		log.Fatalf(`unmarshal battle log: %v`, err)
 	}
 
 	cfnID := strconv.Itoa(int(searchResult.PageProps.FighterBannerList[0].PersonalInfo.ShortID))
-	fmt.Println(cfnID)
 	return cfnID
 
 	/*
@@ -208,19 +205,6 @@ func (t *SF6Tracker) fetchBattleLog(cfnID string) *BattleLog {
 }
 
 func (t *SF6Tracker) refreshMatchHistory(battleLog *BattleLog) {
-	newLP := battleLog.PageProps.FighterBannerInfo.FavoriteCharacterLeagueInfo.LeaguePoint
-
-	// Assign firstLPRecorded
-	if t.firstLPRecorded == 0 {
-		t.firstLPRecorded = newLP
-		t.mh.LP = newLP
-	}
-
-	// Abort if no match has been played
-	if t.mh.LP == newLP {
-		return
-	}
-
 	// Assign player infos
 	p1 := battleLog.PageProps.ReplayList[0].Player1Info
 	p2 := battleLog.PageProps.ReplayList[0].Player2Info
@@ -236,19 +220,24 @@ func (t *SF6Tracker) refreshMatchHistory(battleLog *BattleLog) {
 		opponent = p1
 	}
 
-	t.mh.Opponent = opponent.Player.FighterID
-	t.mh.OpponentCharacter = opponent.CharacterName
-	t.mh.OpponentLP = opponent.LeaguePoint
-	t.mh.OpponentLeague = GetLeagueFromLP(opponent.LeaguePoint)
+	newLP := battleLog.PageProps.FighterBannerInfo.FavoriteCharacterLeagueInfo.LeaguePoint
 
-	t.mh.LP = newLP
-	t.mh.LPGain = newLP - t.firstLPRecorded
-	t.mh.TimeStamp = time.Now().Format(`15:04`)
-	t.mh.Date = time.Now().Format(`2006-01-02`)
+	// assign starting values if switched characters and that character has no points
+	if t.currentCharacter != me.CharacterName && t.startingPoints[me.CharacterName] == 0 {
+		t.startingPoints[me.CharacterName] = newLP
+		t.gains[me.CharacterName] = 0
+		t.mh.LP = newLP
+	}
+
+	// Abort if no match has been played
+	if t.mh.LP == newLP {
+		return
+	}
+
+	t.currentCharacter = me.CharacterName
+	t.gains[me.CharacterName] = newLP - t.startingPoints[me.CharacterName]
 
 	// Update match counters
-
-	isWin := false
 	roundsPlayed := len(me.RoundResults)
 	losses := make([]int, 0, roundsPlayed)
 	for _, result := range me.RoundResults {
@@ -257,30 +246,63 @@ func (t *SF6Tracker) refreshMatchHistory(battleLog *BattleLog) {
 		}
 	}
 
-	if (len(losses) == 1 && roundsPlayed == 3) || len(losses) == 0 {
-		isWin = true
-	}
+	isWin := (roundsPlayed == 3 && len(losses) == 1) || len(losses) == 0
 
+	newWins := t.mh.Wins
+	newLosses := t.mh.Losses
+	winStreak := t.mh.WinStreak
 	if isWin {
-		t.mh.WinStreak++
-		t.mh.Wins++
+		winStreak++
+		newWins++
 	} else {
-		t.mh.WinStreak = 0
-		t.mh.Losses++
+		winStreak = 0
+		newLosses++
 	}
 
-	t.mh.IsWin = isWin
-	t.mh.TotalMatches++
+	newLPGain := t.gains[me.CharacterName]
+
+	// Don't track lpgain on placement matches
+	if newLP == -1 {
+		newLPGain = 0
+	}
+
+	t.mh = &common.MatchHistory{
+		CFN:          me.Player.FighterID,
+		LP:           newLP,
+		LPGain:       newLPGain,
+		WinRate:      int((float64(newWins) / float64(newWins+newLosses)) * 100),
+		TotalMatches: t.mh.TotalMatches + 1,
+
+		IsWin:     isWin,
+		Wins:      newWins,
+		Losses:    newLosses,
+		WinStreak: winStreak,
+
+		Opponent:          opponent.Player.FighterID,
+		OpponentCharacter: opponent.CharacterName,
+		OpponentLP:        opponent.LeaguePoint,
+		OpponentLeague:    getLeagueFromLP(opponent.LeaguePoint),
+
+		TimeStamp: time.Now().Format(`15:04`),
+		Date:      time.Now().Format(`2006-01-02`),
+	}
+
 	runtime.EventsEmit(t.ctx, `cfn-data`, t.mh)
 	t.mh.Save()
 	t.mh.Log()
+}
+
+func (t *SF6Tracker) stopped() {
+	fmt.Println(`Stopped tracking`)
+	runtime.EventsEmit(t.ctx, `stopped-tracking`)
+	t.isTracking = false
 }
 
 func (t *SF6Tracker) GetMatchHistory() *common.MatchHistory {
 	return t.mh
 }
 
-func GetLeagueFromLP(lp int) string {
+func getLeagueFromLP(lp int) string {
 	if lp >= 25000 {
 		return `Master`
 	} else if lp >= 20000 {

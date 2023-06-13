@@ -166,7 +166,7 @@ func (t *SFVTracker) refreshMatchHistory(cfn string, isFirstFetch bool) {
 		t.mh.Opponent = opponent
 		t.mh.OpponentLP = opponentLP
 		t.mh.OpponentCharacter = opponentCharacter
-		t.mh.OpponentLeague = GetLeagueFromLP(opponentLP)
+		t.mh.OpponentLeague = getLeagueFromLP(opponentLP)
 		t.mh.IsWin = isWin
 		t.mh.WinRate = int((float64(t.mh.Wins) / float64(t.mh.Wins+t.mh.Losses)) * 100)
 
@@ -193,7 +193,7 @@ func (t *SFVTracker) GetMatchHistory() *common.MatchHistory {
 	return t.mh
 }
 
-func GetLeagueFromLP(lp int) string {
+func getLeagueFromLP(lp int) string {
 	if lp >= 300000 {
 		return `Warlord`
 	} else if lp >= 100000 {

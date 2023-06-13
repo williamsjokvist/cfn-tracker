@@ -49,7 +49,7 @@ export const Sidebar: React.FC = () => {
   const { t } = useTranslation();
   const location = useLocation();
   const [appVersion, setAppVersion] = React.useState("");
-  const [isMinimized, setMinimized] = React.useState(false)
+  const [isMinimized, setMinimized] = React.useState(window.localStorage.getItem('sidebar-minimized') == 'true')
 
   const { newVersionAvailable, setNewVersionAvailable } = useAppStore();
 
@@ -57,6 +57,27 @@ export const Sidebar: React.FC = () => {
     if (appVersion) return
       GetAppVersion().then((version: string) => setAppVersion(version));
   }, [appVersion])
+
+  React.useEffect(() => {
+    if (isMinimized) {
+      window.localStorage.setItem('sidebar-minimized', 'true')
+    } else if (!isMinimized) {
+      window.localStorage.removeItem('sidebar-minimized')
+    }
+  }, [isMinimized])
+
+  const newVersionPrompt = (
+    <a
+      className="group hover:bg-[rgba(0,0,0,.525)] text-[#bfbcff] hover:text-white transition-colors backdrop-blur cursor-pointer leading-5 bottom-2 absolute left-[107%] text-base py-2 px-3 rounded-lg bg-slate-900"
+      onClick={() => {
+        BrowserOpenURL("https://github.com/GreenSoap/cfn-tracker/releases");
+        setNewVersionAvailable(false);
+      }}
+    >
+      <RxUpdate className="group-hover:text-white inline text-[#49b3f5] transition-colors w-4 h-4 mr-2" />
+      {t(`newVersionAvailable`)}
+    </a>
+  )
 
   return (
     <aside
@@ -137,18 +158,7 @@ export const Sidebar: React.FC = () => {
         >
           {isMinimized ? 'v' + appVersion : 'CFN Tracker v' + appVersion}
         </a>
-        {newVersionAvailable && (
-          <a
-            className="group hover:bg-[rgba(0,0,0,.525)] text-[#bfbcff] hover:text-white transition-colors backdrop-blur cursor-pointer leading-5 bottom-2 absolute left-[107%] text-base py-2 px-3 rounded-lg bg-slate-900"
-            onClick={() => {
-              BrowserOpenURL("https://github.com/GreenSoap/cfn-tracker/releases");
-              setNewVersionAvailable(false);
-            }}
-          >
-            <RxUpdate className="group-hover:text-white inline text-[#49b3f5] transition-colors w-4 h-4 mr-2" />
-            {t(`newVersionAvailable`)}
-          </a>
-        )}
+        {newVersionAvailable && newVersionPrompt}
       </footer>
     </aside>
   );

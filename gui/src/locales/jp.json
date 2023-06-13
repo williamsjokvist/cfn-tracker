@@ -15,7 +15,7 @@
   "losses": "負け",
   "winRate": "勝率",
   "stop": "やめる",
-  "openResultFolder": "結果フォルダ",
+  "files": "ファイル",
   "enterCfnName": "CFN名を入力してください",
   "result": "結果",
   "time": "時間",
@@ -31,5 +31,6 @@
   "league": "リーグ",
   "pickGame": "ゲームを選択",
   "follow": "フォロー",
-  "continueStep": "続ける"
+  "continueStep": "続ける",
+  "placement": "Placement Matches"
 }

@@ -15,7 +15,7 @@
   "losses": "Pertes",
   "winRate": "Taux de réussite",
   "stop": "Arrêter",
-  "openResultFolder": "Dossier des résultats",
+  "files": "Des dossiers",
   "enterCfnName": "Entrez votre nom CFN",
   "result": "Dossier",
   "time": "Temps",
@@ -31,5 +31,6 @@
   "league": "Ligue",
   "pickGame": "Choisir le jeu",
   "follow": "Suivre",
-  "continueStep": "Continuer"
+  "continueStep": "Continuer",
+  "placement": "Placement Matches"
 }
