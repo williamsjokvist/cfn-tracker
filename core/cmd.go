@@ -11,8 +11,6 @@ import (
 	"github.com/hashicorp/go-version"
 
 	"github.com/williamsjokvist/cfn-tracker/core/common"
-	"github.com/williamsjokvist/cfn-tracker/core/sf6"
-	"github.com/williamsjokvist/cfn-tracker/core/sfv"
 )
 
 var (
@@ -28,7 +26,7 @@ var (
 // The CommandHandler is the interface between the GUI and the core
 type CommandHandler struct {
 	ctx     context.Context
-	tracker common.GameTracker
+	tracker GameTracker
 	browser *common.Browser
 }
 
@@ -104,10 +102,10 @@ func (ch *CommandHandler) ExportLogToCSV(cfn string) {
 
 func (ch *CommandHandler) SelectGame(game string) {
 	switch game {
-	case `sf6`:
-		ch.tracker, _ = sf6.MakeSF6Tracker(ch.ctx, ch.browser, CapIDEmail, CapIDPassword)
-	case `sfv`:
-		ch.tracker, _ = sfv.MakeSFVTracker(ch.ctx, ch.browser, SteamUsername, SteamPassword)
+	case GameTypeSF6.String():
+		ch.tracker, _ = MakeSF6Tracker(ch.ctx, ch.browser, CapIDEmail, CapIDPassword)
+	case GameTypeSFV.String():
+		ch.tracker, _ = MakeSFVTracker(ch.ctx, ch.browser, SteamUsername, SteamPassword)
 	}
 }
 

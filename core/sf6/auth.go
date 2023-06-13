@@ -43,7 +43,7 @@ func (t *SF6Tracker) Authenticate(email string, password string) error {
 
 		time.Sleep(time.Second)
 		secondsWaited += time.Second
-		fmt.Printf(`Waiting for gateway to pass... %s s\n`, secondsWaited)
+		fmt.Println(`Waiting for gateway to pass...`, secondsWaited)
 	}
 
 	runtime.EventsEmit(t.ctx, `initialized`, true)

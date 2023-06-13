@@ -44,7 +44,7 @@ export const GamePicker: React.FC = () => {
       <ul className='flex justify-center w-full gap-8'>
         {GAMES.map((game) => {
           return (
-            <li>
+            <li key={game.code}>
               <GameButton 
                 {...(game.code == selectedGame && {
                   style: {
@@ -52,11 +52,7 @@ export const GamePicker: React.FC = () => {
                     background: 'rgb(248 250 252 / 0.05)'
                   }
                 })}
-                key={game.code}
-                onClick={() => {
-                  setSelectedGame(game.code)
-                  console.log(game.code)
-                }}
+                onClick={() => setSelectedGame(game.code)}
                 {...game}
               />
             </li>

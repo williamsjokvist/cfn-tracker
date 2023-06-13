@@ -33,19 +33,23 @@ type MatchHistory struct {
 
 func NewMatchHistory(cfn string) *MatchHistory {
 	return &MatchHistory{
-		CFN:          cfn,
-		LP:           0,
-		LPGain:       0,
-		Wins:         0,
-		Losses:       0,
-		TotalWins:    0,
-		TotalLosses:  0,
-		TotalMatches: 0,
-		WinRate:      0,
-		WinStreak:    0,
-		IsWin:        false,
-		TimeStamp:    ``,
-		Date:         ``,
+		CFN:               cfn,
+		LP:                0,
+		LPGain:            0,
+		Wins:              0,
+		Losses:            0,
+		TotalWins:         0,
+		TotalLosses:       0,
+		TotalMatches:      0,
+		WinRate:           0,
+		WinStreak:         0,
+		IsWin:             false,
+		TimeStamp:         ``,
+		Date:              ``,
+		Opponent:          ``,
+		OpponentCharacter: ``,
+		OpponentLP:        0,
+		OpponentLeague:    ``,
 	}
 }
 
@@ -103,7 +107,7 @@ func (mh *MatchHistory) Save() error {
 		return fmt.Errorf(`unmarshal past match history: %v`, err)
 	}
 
-	newArr := append(arr, *mh)
+	newArr := append([]MatchHistory{*mh}, arr...)
 	newArrMarshalled, err := json.Marshal(&newArr)
 	if err != nil {
 		return fmt.Errorf(`marshal match history: %w`, err)

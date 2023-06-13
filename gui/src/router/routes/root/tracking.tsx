@@ -2,9 +2,23 @@ import { CFNMachineContext } from "@/machine";
 import { ActionButton } from "@/ui/action-button";
 import { OpenResultsDirectory, StopTracking } from "@@/go/core/CommandHandler";
 import { useTranslation } from "react-i18next";
-import { AiFillFolderOpen } from "react-icons/ai";
+
+import { FaFolderOpen } from "react-icons/fa";
 import { FaStop } from "react-icons/fa";
 import { PieChart } from "react-minimal-pie-chart";
+
+type BigStatProps = {
+  type: string
+  value: string | number
+}
+const BigStat: React.FC<BigStatProps> = ({ type, value }) => {
+  return (
+    <div className="mb-2 flex gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl">
+      <dt className="tracking-wider font-extralight">{type}</dt>
+      <dd className="text-4xl font-semibold">{value}</dd>
+    </div>
+  )
+}
 
 export const Tracking: React.FC = () => {
   const { t } = useTranslation();
@@ -46,6 +60,7 @@ export const Tracking: React.FC = () => {
       </defs>
     </PieChart>
   )
+  
   return (
     <>
       <section className="relative w-full h-full grid grid-rows-[0fr_1fr] max-w-[320px]">
@@ -55,37 +70,25 @@ export const Tracking: React.FC = () => {
         </h3>
         <h3 className="text-2xl">
           <span className="text-sm block">LP</span>
-          {lp}
+          {`${lp == -1 ? t('placement') : lp}`}
         </h3>
         <dl className="stat-grid-item w-full mt-2 relative text-center text-lg whitespace-nowrap">
-          <div className="mb-2 flex gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl backdrop-blur">
-            <dt className="tracking-wider font-extralight">{t("wins")}</dt>
-            <dd className="text-4xl font-semibold">{wins}</dd>
-          </div>
-          <div className="mb-2 flex gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl backdrop-blur">
-            <dt className="tracking-wide font-extralight">{t("losses")}</dt>
-            <dd className="text-4xl font-semibold">{losses}</dd>
-          </div>
-          <div className="mb-2 flex gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl backdrop-blur">
-            <dt className="tracking-wide font-extralight">{t("winStreak")}</dt>
-            <dd className="text-4xl font-semibold">{winStreak}</dd>
-          </div>
-          <div className="mb-2 flex gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl backdrop-blur">
-            <dt className="tracking-wide font-extralight">{t("lpGain")}</dt>
-            <dd className="text-4xl font-semibold">{lpGain > 0 && "+"} {lpGain}</dd>
-          </div>
+          <BigStat type={t("wins")} value={wins}/>
+          <BigStat type={t("losses")} value={losses}/>
+          <BigStat type={t("winStreak")} value={winStreak}/>
+          <BigStat type={t("lpGain")} value={`${(lpGain > 0) ? `+` : ``}${lpGain}`}/>
         </dl>
       </section>
-      <section className="relative text-center h-full grid content-between justify-items-center">
+      <section className="relative text-center w-[300px] h-full grid content-between justify-items-center">
         <b className='absolute top-[10px] z-50 text-4xl'>{(winRate > 0) && (winRate + '%')}</b>
         {pieChart}
         <div className="relative bottom-[10px] flex items-start gap-5">
           <ActionButton onClick={OpenResultsDirectory} style={{ filter: "hue-rotate(-120deg)" }}>
-            <AiFillFolderOpen className="w-4 h-4 mr-2" />
-            {t("openResultFolder")}
+            <FaFolderOpen className="w-5 h-5 mr-2" />
+            {t("files")}
           </ActionButton>
           <ActionButton onClick={() =>{
-             StopTracking() // TODO: this should be part of the state machine
+            StopTracking() // TODO: this should be part of the state machine
             send('stoppedTracking')}
           }>
             <FaStop className="mr-3" /> 
