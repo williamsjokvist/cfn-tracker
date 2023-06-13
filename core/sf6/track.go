@@ -14,7 +14,7 @@ import (
 	"github.com/williamsjokvist/cfn-tracker/core/common"
 )
 
-const TOKEN = `ziAgkOAXngH2p3yZVQZmY`
+const TOKEN = `6bkERHAvSquQJXIOllkqC` // ziAgkOAXngH2p3yZVQZmY
 const BASE_URL = `https://www.streetfighter.com/6/buckler/_next/data/` + TOKEN + `/en`
 
 var (

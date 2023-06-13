@@ -1,6 +1,8 @@
 import { FaGlobe, FaChevronLeft } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { APP_LANGUAGES } from "@/i18n";
+import { HideableText } from "./Sidebar";
+import '@/styles/language-selector.sass'
 
 type LanguageSelectorProps = {
   isMinimized: boolean
@@ -12,10 +14,10 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({ isMinimized 
     <div className='group flex'>
       <button
         type="button"
-        className="h-[28px] font-extralight lowercase relative flex justify-center items-center text-[#d6d4ff] group-hover:text-white transition-colors"
+        className="lang-btn group-hover:text-white transition-colors"
       >
         <FaGlobe className="w-4 h-4 text-[#d6d4ff] group-hover:text-white text-2xl transition-all mr-2" />
-        {!isMinimized && t("language")}
+        <HideableText text={t('language')} hide={isMinimized}/>
       </button>
       <div className="absolute left-[98%] flex group-hover:opacity-100 group-hover:visible invisible opacity-0 transition-all">
         <FaChevronLeft

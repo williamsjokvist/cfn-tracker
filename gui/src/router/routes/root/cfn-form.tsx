@@ -1,6 +1,7 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
+import { motion } from "framer-motion";
 
 import { CFNMachineContext } from "@/machine";
 import { GetAvailableLogs, ResultsJSONExist } from "@@/go/core/CommandHandler";
@@ -43,7 +44,10 @@ export const CFNForm: React.FC = () => {
   }
 
   return (
-    <form
+    <motion.form
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ delay: 0.125 }}
       className="max-w-[450px] mx-auto"
       onSubmit={handleSubmit(onSubmit)}
     >
@@ -109,6 +113,6 @@ export const CFNForm: React.FC = () => {
           {t("start")}
         </ActionButton>
       </div>
-    </form>
+    </motion.form>
   )
 }
