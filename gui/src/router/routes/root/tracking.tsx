@@ -28,7 +28,7 @@ export const Tracking: React.FC = () => {
 
   const PieChart = (
     <ReactMinimalPieChart
-      className="absolute top-0 right-[-70px] pie-chart animate-enter w-[45px] backdrop-blur"
+      className="pie-chart animate-enter w-[45px] backdrop-blur"
       animate
       animationDuration={750}
       lineWidth={85}
@@ -44,7 +44,7 @@ export const Tracking: React.FC = () => {
         },
         {
           title: t('losses'),
-          value: losses,
+          value: (wins == 0 && losses == 0) ? 1 : losses,
           color: "rgba(251, 73, 73, 0.25)",
         },
       ]}
@@ -68,9 +68,9 @@ export const Tracking: React.FC = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.125 }}
-        className="relative w-full h-full grid grid-rows-[0fr_1fr] max-w-[360px]"
+        className="relative w-full h-full max-w-[360px]"
       >
-        <header className='flex whitespace-nowrap items-start justify-between'>
+        <header className='flex whitespace-nowrap items-start justify-between w-full'>
           <h3 className="whitespace-nowrap max-w-[145px] text-2xl">
             <span className="text-sm block">CFN</span>
             <b className="text-ellipsis block overflow-hidden">{cfn}</b>
@@ -79,7 +79,7 @@ export const Tracking: React.FC = () => {
             <span className="text-sm block">LP</span>
             <b>{`${lp == -1 ? t('placement') : lp}`}</b>
           </h3>
-          <div className='relative'>
+          <div className='relative flex gap-5 text-right'>
             <h3 className='text-2xl relative'>
               <span className="text-sm block">{t("winRate")}</span>
               <b>{winRate + '%'}</b>

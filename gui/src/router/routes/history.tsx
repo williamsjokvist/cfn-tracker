@@ -75,10 +75,7 @@ export const HistoryPage: React.FC = () => {
             <motion.button
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              onClick={() => {
-                isSpecified && fetchLog(chosenLog);
-                !isSpecified && setLog(undefined);
-              }}
+              onClick={() => isSpecified ? fetchLog(chosenLog) : setLog(undefined)}
               className="crumb-btn-dark mr-3"
             >
               <FaChevronLeft className="w-4 h-4 inline mr-2" />
@@ -124,12 +121,12 @@ export const HistoryPage: React.FC = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.225 }}
-            className="grid h-full justify-center content-center overflow-y-scroll"
+            className="grid max-h-[340px] h-full m-4 justify-center content-start overflow-y-scroll gap-5"
           >
             {availableLogs.map(cfn => {
               return (
                 <button
-                  className="bg-[rgb(255,255,255,0.075)] hover:bg-[rgb(255,255,255,0.125)] text-xl backdrop-blur mb-5 rounded-2xl transition-all items-center border-transparent border-opacity-5 border-[1px] px-3 py-1"
+                  className="bg-[rgb(255,255,255,0.075)] hover:bg-[rgb(255,255,255,0.125)] text-xl backdrop-blur rounded-2xl transition-all items-center border-transparent border-opacity-5 border-[1px] px-3 py-1"
                   key={cfn}
                   onClick={() => {
                     setLog(cfn);
@@ -143,7 +140,7 @@ export const HistoryPage: React.FC = () => {
           </motion.div>
         )}
         {matchLog && chosenLog && (
-          <div className="overflow-y-scroll max-h-[340px] h-full px-4 mx-4" ref={scope}>
+          <div className="overflow-y-scroll max-h-[340px] h-full mx-4 px-4 pb-4" ref={scope}>
             <motion.table 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}

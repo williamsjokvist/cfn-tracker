@@ -59,19 +59,14 @@ export const Sidebar: React.FC = () => {
 
   React.useEffect(() => {
     animate('a, button', 
-      { 
-        opacity: [0, 1], 
-      }, 
-      { 
-        
-        delay: 0.125
-      })
+      { opacity: [0, 1] }, 
+      { delay: 0.125 }
+    )
   }, [])
 
   
   React.useEffect(() => {
-    if (appVersion) return
-    GetAppVersion().then(v => setAppVersion(v));
+    !appVersion && GetAppVersion().then(v => setAppVersion(v));
   }, [appVersion])
 
   React.useEffect(() => {

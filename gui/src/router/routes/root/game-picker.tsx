@@ -44,13 +44,9 @@ export const GamePicker: React.FC = () => {
 
   React.useEffect(() => {
     animate("li", 
-      { 
-        opacity: [0, 1], 
-      }, 
-      { 
-        
-        delay: stagger(0.125, { ease: "linear" }) 
-      })
+      { opacity: [0, 1] }, 
+      { delay: stagger(0.125, { ease: "linear" }) }
+    )
   }, [])
 
   return (
