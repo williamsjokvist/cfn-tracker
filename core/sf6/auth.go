@@ -11,7 +11,7 @@ import (
 )
 
 func (t *SF6Tracker) Authenticate(email string, password string, dry bool) error {
-	if t.isAuthenticated || t.cookie != `` {
+	if t.isAuthenticated || t.cookie != `` || t.Page.MustInfo().URL == `https://www.streetfighter.com/6/buckler?status=login` {
 		t.isAuthenticated = true
 		return nil
 	}
@@ -53,7 +53,6 @@ func (t *SF6Tracker) Authenticate(email string, password string, dry bool) error
 	}
 
 	t.assignCookie()
-	t.assignToken()
 	return nil
 }
 
@@ -74,29 +73,4 @@ func (t *SF6Tracker) assignCookie() {
 
 	t.cookie = cookie
 	fmt.Println(`Cookie`, t.cookie)
-}
-
-func (t *SF6Tracker) assignToken() {
-	fmt.Println(`Assigning token`)
-	/*
-		t.HijackRouter.MustAdd(`_next`, func(ctx *rod.Hijack) {
-			url := ctx.Request.URL().Path
-
-			if !strings.Contains(url, `/6/buckler/_next/data/`) {
-				return
-			}
-
-			fmt.Println(url)
-			strs := strings.Split(url, `/6/buckler/_next/data/`)[1]
-
-			t.token = strings.Split(strs, `/en/profile`)[0]
-
-			fmt.Println(`Token `, t.token)
-
-			ctx.ContinueRequest(&proto.FetchContinueRequest{})
-		})
-
-		t.Page.MustNavigate(`https://www.streetfighter.com/6/buckler/fighterslist/search/result?fighter_id=greensoap`).MustWaitLoad().MustWaitIdle()
-		t.Page.Mouse.MustClick(`a[href="/6/buckler/profile/3524508259"]`)
-		t.Page.MustWaitLoad().MustWaitIdle()*/
 }

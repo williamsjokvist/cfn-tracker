@@ -101,7 +101,7 @@ export const Tracking: React.FC = () => {
         className="relative text-center w-[300px] h-full grid content-between justify-items-end"
       >
         <div className="w-full max-w-[280px] mx-auto whitespace-nowrap text-md">
-          Detailed stats
+         {/* Detailed stats
           <ul>
             <li className="leading-none flex justify-between p-2 border-b-[1px] border-white border-opacity-25 border-solid">
               <span>Most faced opponent</span>
@@ -119,7 +119,7 @@ export const Tracking: React.FC = () => {
               <span>Highest win streak</span>
               <b>4</b>
             </li>
-          </ul>
+          </ul>*/}
         </div>
 
         <div className="flex items-start justify-center w-full gap-5">

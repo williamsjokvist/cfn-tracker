@@ -68,9 +68,9 @@ func (t *SF6Tracker) Start(cfn string, restoreData bool, refreshInterval time.Du
 		lastSavedMatchHistory, err := common.GetLastSavedMatchHistory()
 		if err != nil {
 			return ErrRestoreData
-		} else {
-			t.mh = lastSavedMatchHistory
 		}
+		t.mh = lastSavedMatchHistory
+		cfn = t.mh.CFN
 	} else if !restoreData {
 		t.mh.Reset()
 	}
@@ -85,7 +85,9 @@ func (t *SF6Tracker) Start(cfn string, restoreData bool, refreshInterval time.Du
 		return ErrUnauthenticated
 	}
 
-	t.refreshMatchHistory(battleLog)
+	if !restoreData {
+		t.refreshMatchHistory(battleLog)
+	}
 
 	fmt.Println(`Profile loaded `)
 	t.isTracking = true
@@ -143,7 +145,9 @@ func (t *SF6Tracker) fetchCfnIDByCfn(cfn string) string {
 
 func (t *SF6Tracker) fetchBattleLog(cfnID string) *BattleLog {
 	fmt.Println(`Fetched battle log`)
-	t.Page.MustNavigate(fmt.Sprintf(`%s/profile/%s/battlelog/rank`, BASE_URL, cfnID)).MustWaitLoad()
+	t.Page.MustNavigate(fmt.Sprintf(`%s/profile/%s/battlelog/rank`, BASE_URL, cfnID)).
+		MustWaitLoad()
+  
 	body := t.Page.MustElement(`#__NEXT_DATA__`).MustText()
 
 	var battleLog BattleLog

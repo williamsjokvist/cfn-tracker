@@ -34,7 +34,7 @@ export const CFNForm: React.FC = () => {
 
   const onSubmit = (values: CfnFormValues) => {
     const cfn = cfnInputRef.current.value
-    if (!cfn || cfn == '') return
+    if (!restore && cfn == '') return
 
     send({
       type: 'submit',
@@ -71,10 +71,11 @@ export const CFNForm: React.FC = () => {
               <button
                 disabled={false}
                 onClick={_ => { 
-                  if (!(cfnInputRef.current && restoreRef.current)) return
+                  if (!cfnInputRef.current) return
+                  //if (!(cfnInputRef.current && restoreRef.current)) return
 
                   cfnInputRef.current.value = cfn
-                  restoreRef.current.checked = false
+                  // restoreRef.current.checked = false
                   setRestore(false)
                 }}
                 className="whitespace-nowrap bg-[rgb(255,255,255,0.075)] hover:bg-[rgb(255,255,255,0.125)] text-base backdrop-blur rounded-2xl transition-all items-center border-transparent border-opacity-5 border-[1px] px-3 py-1"
@@ -87,7 +88,7 @@ export const CFNForm: React.FC = () => {
           })}
         </div>
       )}
-      {lastJSONExist && (
+      {/*lastJSONExist && (
         <div className={`text-lg flex items-center mt-4`}>
           <input
             {...register('restore')}
@@ -103,7 +104,7 @@ export const CFNForm: React.FC = () => {
           />
           {t("restoreSession")}
         </div>
-      )}
+      )*/}
       <div className="flex justify-end">
         <ActionButton
           type="submit"
