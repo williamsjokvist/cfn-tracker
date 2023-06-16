@@ -14,8 +14,7 @@ import (
 	"github.com/williamsjokvist/cfn-tracker/core/common"
 )
 
-const TOKEN = `ziAgkOAXngH2p3yZVQZmY`
-const BASE_URL = `https://www.streetfighter.com/6/buckler/_next/data/` + TOKEN + `/en`
+const BASE_URL = `https://www.streetfighter.com/6/buckler`
 
 var (
 	ErrUnauthenticated = errors.New(`sf6 authentication err or invalid cfn`)
@@ -31,6 +30,7 @@ type SF6Tracker struct {
 	gains            map[string]int
 	startingPoints   map[string]int
 	currentCharacter string
+	cookie           string
 	*common.Browser
 }
 
@@ -44,6 +44,7 @@ func NewSF6Tracker(ctx context.Context, browser *common.Browser) *SF6Tracker {
 		gains:            make(map[string]int, 42), // Make room for 42 characters
 		startingPoints:   make(map[string]int, 42), // Make room for 42 characters
 		currentCharacter: ``,
+		cookie:           ``,
 	}
 }
 
@@ -75,20 +76,11 @@ func (t *SF6Tracker) Start(cfn string, restoreData bool, refreshInterval time.Du
 	}
 
 	t.mh = common.NewMatchHistory(cfn)
-	/*
-		Raw GET	request method (needs cookie passed in req):
-
-		if searchResult.PageProps.Common.StatusCode != 200 {
-			t.stopFn()
-			return ErrUnauthenticated
-		}
-
-		cfnID := searchResult.PageProps.FighterBannerList[0].PersonalInfo.ShortID*/
 
 	fmt.Println(`Loading profile`)
 	cfnID := t.fetchCfnIDByCfn(cfn)
 	battleLog := t.fetchBattleLog(cfnID)
-	if battleLog.PageProps.Common.StatusCode != 200 {
+	if battleLog.Props.PageProps.Common.StatusCode != 200 {
 		t.stopped()
 		return ErrUnauthenticated
 	}
@@ -108,7 +100,7 @@ func (t *SF6Tracker) Start(cfn string, restoreData bool, refreshInterval time.Du
 }
 
 func (t *SF6Tracker) poll(ctx context.Context, cfnID string, refreshInterval time.Duration) {
-	for {
+	for t.isTracking {
 		didBreak := common.SleepOrBreak(refreshInterval, func() bool {
 			select {
 			case <-ctx.Done():
@@ -120,13 +112,11 @@ func (t *SF6Tracker) poll(ctx context.Context, cfnID string, refreshInterval tim
 
 		if didBreak {
 			t.stopped()
-			break
 		}
 
 		battleLog := t.fetchBattleLog(cfnID)
-		if battleLog.PageProps.Common.StatusCode != 200 {
+		if battleLog.Props.PageProps.Common.StatusCode != 200 {
 			fmt.Printf(`%v`, ErrUnauthenticated)
-			t.Stop()
 			t.stopped()
 		}
 
@@ -136,46 +126,25 @@ func (t *SF6Tracker) poll(ctx context.Context, cfnID string, refreshInterval tim
 
 // TODO: Error handling
 func (t *SF6Tracker) fetchCfnIDByCfn(cfn string) string {
-	t.Page.MustNavigate(fmt.Sprintf(`%s/fighterslist/search/result.json?fighter_id=%s`, BASE_URL, cfn)).MustWaitLoad()
-	body := t.Page.MustElement(`pre`).MustText()
+	t.Page.MustNavigate(fmt.Sprintf(`%s/fighterslist/search/result?fighter_id=%s`, BASE_URL, cfn)).
+		MustWaitLoad().
+		MustWaitIdle()
+
+	body := t.Page.MustElement(`#__NEXT_DATA__`).MustText()
 
 	var searchResult SearchResult
 	err := json.Unmarshal([]byte(body), &searchResult)
 	if err != nil {
-		log.Fatalf(`unmarshal battle log: %v`, err)
+		log.Fatalf(`unmarshal cfn search: %v`, err)
 	}
 
-	cfnID := strconv.Itoa(int(searchResult.PageProps.FighterBannerList[0].PersonalInfo.ShortID))
-	return cfnID
-
-	/*
-		t.Page.MustNavigate(fmt.Sprintf(`https://www.streetfighter.com/6/buckler/fighterslist/search/result?fighter_id=%s`, cfn)).MustWaitLoad()
-		href := t.Page.MustElement(`#wrapper > article:last-of-type ul > li:first-child a`).MustAttribute(`href`)
-		cfnID := strings.Split(*href, `/profile/`)[1]*/
-
-	/*
-		If we can get the cookie, maybe do this way?
-
-		res, err := http.Get(fmt.Sprintf(`%s/fighterslist/search/result.json?fighter_id=%s`, BASE_URL, cfn))
-		if err != nil {
-			log.Fatalf(`battle log http get: %v`, err)
-		}
-
-		body, err := ioutil.ReadAll(res.Body)
-		defer res.Body.Close()
-
-		var searchResult SearchResult
-		json.Unmarshal(body, &searchResult)
-
-		if err != nil {
-			log.Fatalf(`unmarshal battle log: %v`, err)
-		}*/
+	return strconv.Itoa(int(searchResult.Props.PageProps.FighterBannerList[0].PersonalInfo.ShortID))
 }
 
 func (t *SF6Tracker) fetchBattleLog(cfnID string) *BattleLog {
 	fmt.Println(`Fetched battle log`)
-	t.Page.MustNavigate(fmt.Sprintf(`%s/profile/%s/battlelog/rank.json`, BASE_URL, cfnID)).MustWaitLoad()
-	body := t.Page.MustElement(`pre`).MustText()
+	t.Page.MustNavigate(fmt.Sprintf(`%s/profile/%s/battlelog/rank`, BASE_URL, cfnID)).MustWaitLoad()
+	body := t.Page.MustElement(`#__NEXT_DATA__`).MustText()
 
 	var battleLog BattleLog
 	err := json.Unmarshal([]byte(body), &battleLog)
@@ -185,29 +154,12 @@ func (t *SF6Tracker) fetchBattleLog(cfnID string) *BattleLog {
 	}
 
 	return &battleLog
-	/*
-			res, err := http.Get(fmt.Sprintf(`%s/profile/%s/battlelog/rank.json`, BASE_URL, cfnID))
-
-			if err != nil {
-				log.Fatalf(`battle log http get: %v`, err)
-			}
-
-			body, err := ioutil.ReadAll(res.Body)
-			defer res.Body.Close()
-
-			var battleLog BattleLog
-			json.Unmarshal(body, &battleLog)
-
-		if err != nil {
-			log.Fatalf(`unmarshal battle log: %v`, err)
-		}
-	*/
 }
 
 func (t *SF6Tracker) refreshMatchHistory(battleLog *BattleLog) {
 	// Assign player infos
-	p1 := battleLog.PageProps.ReplayList[0].Player1Info
-	p2 := battleLog.PageProps.ReplayList[0].Player2Info
+	p1 := battleLog.Props.PageProps.ReplayList[0].Player1Info
+	p2 := battleLog.Props.PageProps.ReplayList[0].Player2Info
 
 	var me PlayerInfo
 	var opponent PlayerInfo
@@ -220,7 +172,7 @@ func (t *SF6Tracker) refreshMatchHistory(battleLog *BattleLog) {
 		opponent = p1
 	}
 
-	newLP := battleLog.PageProps.FighterBannerInfo.FavoriteCharacterLeagueInfo.LeaguePoint
+	newLP := battleLog.Props.PageProps.FighterBannerInfo.FavoriteCharacterLeagueInfo.LeaguePoint
 
 	// assign starting values if switched characters and that character has no points
 	if t.currentCharacter != me.CharacterName && t.startingPoints[me.CharacterName] == 0 {
@@ -293,9 +245,9 @@ func (t *SF6Tracker) refreshMatchHistory(battleLog *BattleLog) {
 }
 
 func (t *SF6Tracker) stopped() {
+	t.isTracking = false
 	fmt.Println(`Stopped tracking`)
 	runtime.EventsEmit(t.ctx, `stopped-tracking`)
-	t.isTracking = false
 }
 
 func (t *SF6Tracker) GetMatchHistory() *common.MatchHistory {

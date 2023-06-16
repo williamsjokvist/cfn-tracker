@@ -1,5 +1,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
+import { motion, useAnimate, stagger } from "framer-motion";
+
 import { FaChevronLeft } from "react-icons/fa";
 import { RiFileExcel2Fill } from "react-icons/ri";
 
@@ -24,35 +26,44 @@ export const HistoryPage: React.FC = () => {
   const [isSpecified, setSpecified] = React.useState(false);
   const [totalWinRate, setTotalWinRate] = React.useState<number | null>(null);
 
+  const [scope, animate] = useAnimate()
+
+  React.useEffect(() => {
+    if (!chosenLog || !matchLog) return
+    animate("tr:not(first-child)", 
+      { opacity: [0, 1] }, 
+      { delay: stagger(0.075, { ease: "linear" }) }
+    )
+  }, [chosenLog, matchLog])
+
   const fetchLog = (log: string) => {
-    GetMatchLog(log).then((log) => {
-      setMatchLog([]);
-      setTimeout(() => {
-        setMatchLog(log);
-        setSpecified(false);
-      }, 50);
+    GetMatchLog(log).then(log => {
+      setMatchLog(log);
+      setSpecified(false);
     })
   }
 
   React.useEffect(() => {
-    GetAvailableLogs().then((logs) => setAvailableLogs(logs))
+    if (availableLogs.length === 0)
+      GetAvailableLogs().then((logs) => setAvailableLogs(logs))
+  }, [availableLogs])
 
-    if (matchLog) {
-      const wonMatches = matchLog.filter((log) => log.result == true).length;
-      const lostMatches = matchLog.filter((log) => log.result == false).length;
-      const winRate = Math.floor((wonMatches / (wonMatches + lostMatches)) * 100);
-      setTotalWinRate(winRate);
-    }
-
-    if (chosenLog && !matchLog) {
+  React.useEffect(() => {
+    if (chosenLog && !matchLog)
       fetchLog(chosenLog)
-    }
-  }, [chosenLog, matchLog]);
+  }, [chosenLog, matchLog])
+
+  React.useEffect(() => {
+    if (!matchLog) return
+    const wonMatches = matchLog.filter((log) => log.result == true).length;
+    const winRate = Math.floor((wonMatches / matchLog.length) * 100);
+    !isNaN(winRate) && setTotalWinRate(winRate);
+  }, [matchLog]);
 
   const filterLog = (property: string, value: string) => {
     if (!matchLog) return;
 
-    setMatchLog(matchLog.filter((ml) => (ml as any)[property] == value));
+    setMatchLog(matchLog.filter(ml => ((ml as any)[property] as string).toLowerCase() === value.toLowerCase()));
     setSpecified(true);
   };
 
@@ -61,37 +72,40 @@ export const HistoryPage: React.FC = () => {
       <PageHeader text={t("history")}>
         {chosenLog && (
           <div className="flex items-center justify-end w-full ml-4">
-            <button
-              onClick={() => {
-                isSpecified && fetchLog(chosenLog);
-                !isSpecified && setLog(undefined);
-              }}
-              className="bg-[rgb(0,0,0,0.28)] hover:bg-[rgb(255,255,255,0.125)] backdrop-blur h-8 inline-block mr-3 rounded-2xl transition-all items-center border-transparent border-opacity-5 border-[1px] px-3 py-1"
+            <motion.button
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              onClick={() => isSpecified ? fetchLog(chosenLog) : setLog(undefined)}
+              className="crumb-btn-dark mr-3"
             >
               <FaChevronLeft className="w-4 h-4 inline mr-2" />
               {t("goBack")}
-            </button>
-            <button
+            </motion.button>
+            <motion.button
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
               onClick={() => {
                 ExportLogToCSV(chosenLog);
                 OpenResultsDirectory();
               }}
-              className="bg-[rgb(0,0,0,0.28)] hover:bg-[rgb(255,255,255,0.125)] backdrop-blur h-8 inline-block mr-3 rounded-2xl transition-all items-center border-transparent border-opacity-5 border-[1px] px-3 py-1"
+              className="crumb-btn-dark mr-3"
             >
               <RiFileExcel2Fill className="w-4 h-4 inline mr-2 text-white" />
               {t("exportLog")}
-            </button>
-            <button
+            </motion.button>
+            <motion.button
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
               onClick={() => {
                 chosenLog && DeleteMatchLog(chosenLog);
                 setTimeout(() => setMatchLog([]), 50);
                 setLog(undefined);
               }}
-              className="bg-[rgb(0,0,0,0.28)] hover:bg-[rgb(255,255,255,0.125)] backdrop-blur h-8 inline-block float-right rounded-2xl transition-all items-center border-transparent border-opacity-5 border-[1px] px-3 py-1"
+              className="crumb-btn-dark"
             >
               <MdDelete className="w-4 h-4 inline mr-2" />
               {t("deleteLog")}
-            </button>
+            </motion.button>
           </div>
         )}
       </PageHeader>
@@ -103,11 +117,16 @@ export const HistoryPage: React.FC = () => {
           </div>
         )}
         {!chosenLog && availableLogs.length > 0 && (
-          <div className="grid h-full justify-center content-center overflow-y-scroll">
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.225 }}
+            className="grid max-h-[340px] h-full m-4 justify-center content-start overflow-y-scroll gap-5"
+          >
             {availableLogs.map(cfn => {
               return (
                 <button
-                  className="bg-[rgb(255,255,255,0.075)] hover:bg-[rgb(255,255,255,0.125)] text-xl backdrop-blur mb-5 rounded-2xl transition-all items-center border-transparent border-opacity-5 border-[1px] px-3 py-1"
+                  className="bg-[rgb(255,255,255,0.075)] hover:bg-[rgb(255,255,255,0.125)] text-xl backdrop-blur rounded-2xl transition-all items-center border-transparent border-opacity-5 border-[1px] px-3 py-1"
                   key={cfn}
                   onClick={() => {
                     setLog(cfn);
@@ -118,52 +137,57 @@ export const HistoryPage: React.FC = () => {
                 </button>
               );
             })}
-          </div>
+          </motion.div>
         )}
-        {chosenLog && (
-          <div className="overflow-y-scroll max-h-[340px] h-full px-4 mx-4">
-            <table className="w-full border-spacing-y-1 border-separate min-w-[525px]">
+        {matchLog && chosenLog && (
+          <div className="overflow-y-scroll max-h-[340px] h-full mx-4 px-4 pb-4" ref={scope}>
+            <motion.table 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.55 }}
+              className="w-full border-spacing-y-1 border-separate min-w-[525px]"
+            >
               <thead>
                 <tr>
-                  <th className="text-left px-3 whitespace-nowrap">{t("date")}</th>
-                  <th className="text-left px-3 whitespace-nowrap">{t("time")}</th>
-                  <th className="text-left px-3 whitespace-nowrap">{t("opponent")}</th>
+                  <th className="text-left px-3 whitespace-nowrap w-[120px]">{t("date")}</th>
+                  <th className="text-left px-3 whitespace-nowrap w-[70px]">{t("time")}</th>
+                  <th className="text-left px-3 whitespace-nowrap w-[180px]">{t("opponent")}</th>
                   <th className="text-left px-3 whitespace-nowrap">{t("league")}</th>
                   <th className="text-center px-3 whitespace-nowrap">{t("character")}</th>
                   <th className="text-center px-3 whitespace-nowrap">{t("result")}</th>
                 </tr>
               </thead>
               <tbody>
-                {matchLog && matchLog.map((log, index) => {
+                {matchLog.map((log, index) => {
                   return (
-                    <tr key={index} className="backdrop-blur">
+                    <tr key={index} className="backdrop-blur group">
                       <td
                         onClick={() => filterLog("date", log.date)}
-                        className="whitespace-nowrap text-left rounded-l-xl rounded-r-none bg-slate-50 bg-opacity-5 px-3 py-2 hover:underline cursor-pointer"
+                        className="whitespace-nowrap text-left rounded-l-xl rounded-r-none bg-slate-50 bg-opacity-5 group-hover:bg-opacity-10 transition-colors px-3 py-2 hover:underline cursor-pointer"
                       >
                         {log.date}
                       </td>
-                      <td className="whitespace-nowrap text-left bg-slate-50 bg-opacity-5 px-3 py-2">{log.timestamp}</td>
+                      <td className="whitespace-nowrap text-left bg-slate-50 bg-opacity-5 group-hover:bg-opacity-10 transition-colors px-3 py-2">{log.timestamp}</td>
                       <td
                         onClick={() => filterLog("opponent", log.opponent)}
-                        className="whitespace-nowrap rounded-none bg-slate-50 bg-opacity-5 px-3 py-2 hover:underline cursor-pointer"
+                        className="whitespace-nowrap rounded-none bg-slate-50 bg-opacity-5 group-hover:bg-opacity-10 transition-colors px-3 py-2 hover:underline cursor-pointer"
                       >
                         {log.opponent}
                       </td>
                       <td
                         onClick={() => filterLog("opponentLeague", log.opponentLeague)}
-                        className="whitespace-nowrap rounded-none bg-slate-50 bg-opacity-5 px-3 py-2 hover:underline cursor-pointer"
+                        className="whitespace-nowrap rounded-none bg-slate-50 bg-opacity-5 group-hover:bg-opacity-10 transition-colors px-3 py-2 hover:underline cursor-pointer"
                       >
                         {log.opponentLeague}
                       </td>
                       <td
                         onClick={() => filterLog("opponentCharacter", log.opponentCharacter)}
-                        className="rounded-none bg-slate-50 bg-opacity-5 px-3 py-2 text-center hover:underline cursor-pointer"
+                        className="rounded-none bg-slate-50 bg-opacity-5 group-hover:bg-opacity-10 transition-colors px-3 py-2 text-center hover:underline cursor-pointer"
                       >
                         {log.opponentCharacter}
                       </td>
                       <td
-                        className="rounded-r-xl rounded-l-none bg-slate-50 bg-opacity-5 px-3 py-2 text-center"
+                        className="rounded-r-xl rounded-l-none bg-slate-50 bg-opacity-5 group-hover:bg-opacity-10 transition-colors px-3 py-2 text-center"
                         style={{ color: log.result == true ? "lime" : "red" }}
                       >
                         {log.result == true ? "W" : "L"}
@@ -172,7 +196,7 @@ export const HistoryPage: React.FC = () => {
                   );
                 })}
               </tbody>
-            </table>
+            </motion.table>
           </div>
         )}
       </div>

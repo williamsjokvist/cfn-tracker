@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { motion, useAnimate, stagger } from "framer-motion";
 
 import sfvLogo from '@/img/logo_sfv.png'
 import sf6Logo from '@/img/logo_sf6.png'
@@ -39,9 +40,18 @@ export const GamePicker: React.FC = () => {
   const [selectedGame, setSelectedGame] = React.useState('')
   const [_, send] = CFNMachineContext.useActor();
 
+  const [scope, animate] = useAnimate()
+
+  React.useEffect(() => {
+    animate("li", 
+      { opacity: [0, 1] }, 
+      { delay: stagger(0.125, { ease: "linear" }) }
+    )
+  }, [])
+
   return (
     <div className='w-full flex items-center flex-col gap-10'>
-      <ul className='flex justify-center w-full gap-8'>
+      <ul ref={scope} className='flex justify-center w-full gap-8'>
         {GAMES.map((game) => {
           return (
             <li key={game.code}>

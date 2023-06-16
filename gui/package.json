@@ -9,7 +9,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@tanstack/react-table": "^8.9.2",
     "@xstate/react": "^3.2.2",
+    "framer-motion": "^10.12.16",
     "i18next": "^22.4.14",
     "i18next-browser-languagedetector": "^7.0.1",
     "react": "^18.2.0",
@@ -19,6 +21,7 @@
     "react-icons": "^4.7.1",
     "react-minimal-pie-chart": "^8.4.0",
     "react-router-dom": "^6.6.2",
+    "react-window": "^1.8.9",
     "xstate": "^4.37.2",
     "zustand": "^4.3.2"
   },
@@ -27,6 +30,7 @@
     "@types/node": "^20.2.5",
     "@types/react": "^18.0.17",
     "@types/react-dom": "^18.0.6",
+    "@types/react-window": "^1.8.5",
     "@vitejs/plugin-react": "^2.1.0",
     "autoprefixer": "^10.4.12",
     "postcss": "^8.4.17",

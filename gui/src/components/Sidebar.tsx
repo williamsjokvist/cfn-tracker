@@ -1,6 +1,8 @@
 import React from "react";
 import { useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { useAnimate } from "framer-motion";
+
 import { FaTwitter, FaChevronLeft, FaArrowUp } from "react-icons/fa";
 import { RxUpdate } from "react-icons/rx";
 import { IoDocumentTextOutline, IoDocumentText } from "react-icons/io5";
@@ -19,43 +21,52 @@ type SidebarLinkProps = {
   name: string;
   isSelected?: boolean;
   SelectedIcon?: any;
-  showArrow: boolean;
+  isMinimized: boolean;
 }
-const SidebarLink: React.FC<SidebarLinkProps> = ( { Icon, link, name, isSelected, SelectedIcon, showArrow } ) => {
+const SidebarLink: React.FC<SidebarLinkProps> = ( { Icon, link, name, isSelected, isMinimized, SelectedIcon } ) => {
   return (
-    <li>
-      <a
-        href={"#/" + link}
-        className="text-lg text-[#bfbcff] text-opacity-80 rounded py-2 px-1 group flex items-center justify-between hover:!text-white hover:bg-slate-50 hover:bg-opacity-5 transition-colors"
-        style={{
-          fontWeight: isSelected ? "600" : "200",
-          color: isSelected ? "#d6d4ff" : "#bfbcff",
-        }}
-      >
-        <span className="flex items-center justify-between">
-          {isSelected && <SelectedIcon className="text-[#f85961] transition-colors w-10 h-7 mr-1" />}
-          {!isSelected && <Icon className="text-[#f85961] transition-colors w-10 h-7 mr-1" />}
-          {name}
-        </span>
-        <FaChevronLeft
-          className="w-3 h-3 group-hover:opacity-100 opacity-0 transition-opacity"
-          style={{ transform: "rotate(180deg)", display: showArrow ? 'block' : 'none' }}
-        />
-      </a>
-    </li>
+    <a
+      href={"#/" + link}
+      className="text-lg text-[#bfbcff] text-opacity-80 rounded py-2 px-1 group flex items-center justify-between hover:!text-white hover:bg-slate-50 hover:bg-opacity-5 transition-colors"
+      style={{
+        fontWeight: isSelected ? "600" : "200",
+        color: isSelected ? "#d6d4ff" : "#bfbcff",
+      }}
+    >
+      <span className="flex items-center justify-between">
+        {isSelected ? 
+          <SelectedIcon className="text-[#f85961] transition-colors w-10 h-7 mr-1" /> : 
+          <Icon className="text-[#f85961] transition-colors w-10 h-7 mr-1" />
+        }
+        <HideableText text={name} hide={isMinimized}/>
+      </span>
+      <FaChevronLeft
+        className="w-3 h-3 group-hover:opacity-100 opacity-0 transition-opacity"
+        style={{ transform: "rotate(180deg)", display: isMinimized ? 'none' : 'block' }}
+      />
+    </a>
   );
 };
+
 export const Sidebar: React.FC = () => {
   const { t } = useTranslation();
   const location = useLocation();
-  const [appVersion, setAppVersion] = React.useState("");
+  const [appVersion, setAppVersion] = React.useState('');
   const [isMinimized, setMinimized] = React.useState(window.localStorage.getItem('sidebar-minimized') == 'true')
-
   const { newVersionAvailable, setNewVersionAvailable } = useAppStore();
 
+  const [scope, animate] = useAnimate()
+
   React.useEffect(() => {
-    if (appVersion) return
-      GetAppVersion().then((version: string) => setAppVersion(version));
+    animate('a, button', 
+      { opacity: [0, 1] }, 
+      { delay: 0.125 }
+    )
+  }, [])
+
+  
+  React.useEffect(() => {
+    !appVersion && GetAppVersion().then(v => setAppVersion(v));
   }, [appVersion])
 
   React.useEffect(() => {
@@ -81,13 +92,10 @@ export const Sidebar: React.FC = () => {
 
   return (
     <aside
+      ref={scope}
       className="sidebar"
       style={{
         width: isMinimized ? '76px' : "175px",
-        overflow: "visible",
-        justifyContent: isMinimized ? 'center' : 'normal',
-        paddingLeft: isMinimized ? '0' : '10px',
-        paddingRight: isMinimized ? '0' : '10px'
       }}
     >
       <header style={{"--draggable": "drag"} as React.CSSProperties}>
@@ -96,14 +104,14 @@ export const Sidebar: React.FC = () => {
             <button
               aria-label="close"
               className="mr-[8px] p-[2px] w-[14px] h-[14px] group-hover:bg-red-500 bg-slate-600 flex items-center justify-center rounded-full transition-all"
-              onClick={() => Quit()}
+              onClick={Quit}
             >
               <VscChromeClose className="text-red-800 group-hover:opacity-100 opacity-0 transition-all" />
             </button>
             <button
               aria-label="close"
               className="p-[2px] w-[14px] h-[14px] group-hover:bg-yellow-500 bg-slate-600 flex items-center justify-center rounded-full transition-all"
-              onClick={() => WindowMinimise()}
+              onClick={WindowMinimise}
             >
               <VscChromeMinimize className="text-yellow-800 group-hover:opacity-100 opacity-0 transition-all" />
             </button>
@@ -112,26 +120,32 @@ export const Sidebar: React.FC = () => {
       </header>
       <nav className="mt-5 w-full">
         <ul>
-          <SidebarLink
-            Icon={RiSearch2Line}
-            link=""
-            name={isMinimized ? '' : t("tracking")}
-            isSelected={location.pathname == "/"}
-            SelectedIcon={RiSearch2Fill}
-            showArrow={!isMinimized}
-          />
-          <SidebarLink
-            Icon={IoDocumentTextOutline}
-            link="history"
-            name={isMinimized ? '' : t("history")}
-            isSelected={location.pathname == "/history"}
-            SelectedIcon={IoDocumentText}
-            showArrow={!isMinimized}
-          />
+          <li>
+            <SidebarLink
+              Icon={RiSearch2Line}
+              link=""
+              name={t("tracking")}
+              isSelected={location.pathname == "/"}
+              SelectedIcon={RiSearch2Fill}
+              isMinimized={isMinimized}
+            />
+          </li>
+          <li>
+            <SidebarLink
+              Icon={IoDocumentTextOutline}
+              link="history"
+              name={t("history")}
+              isSelected={location.pathname == "/history"}
+              SelectedIcon={IoDocumentText}
+              isMinimized={isMinimized}
+            />
+          </li>
         </ul>
       </nav>
       <footer className={`grid w-full text-xl px-2`}>
         <LanguageSelector isMinimized={isMinimized} />
+
+        {/* Twitter */}
         <a
           target="#"
           onClick={() => BrowserOpenURL("https://twitter.com/greensoap_")}
@@ -139,27 +153,41 @@ export const Sidebar: React.FC = () => {
         >
           <span className={`flex items-center justify-between lowercase`}>
             <FaTwitter className="text-[#49b3f5] w-4 h-4 mr-2 transition-colors group-hover:text-white" />
-            {!isMinimized && t('follow')}
+            <HideableText text={t('follow')} hide={isMinimized}/>
           </span>
           <FaArrowUp className="relative right-[-8px] w-3 h-3 group-hover:opacity-100 opacity-0 transition-opacity" style={{ transform: "rotate(45deg)" }} />
         </a>
-        <button className={`h-[28px] cursor-pointer w-full group font-extralight flex items-center mt-1 text-[#d6d4ff] hover:text-white transition-colors`}
+
+        {/* Minimize */}
+        <button 
+          type='button'
+          className={`h-[28px] cursor-pointer w-full group font-extralight flex items-center mt-1 text-[#d6d4ff] hover:text-white transition-colors`}
           onClick={() => setMinimized(!isMinimized)}>
           <FaChevronLeft
             className="group-hover:text-white text-[#d6d4ff] w-4 h-4 transition-all"
             style={{ transform: isMinimized ? "rotate(-180deg)" : 'none' }}
           />
-          {!isMinimized && <span className="ml-2">{t('minimize')}</span>}
+          <HideableText className="ml-2" text={t('minimize')} hide={isMinimized}/>
         </button>
+
+        {/* Version */}
         <a
           target="#"
           className="text-sm mt-4 font-extralight cursor-pointer hover:underline"
           onClick={() => BrowserOpenURL("https://github.com/GreenSoap/cfn-tracker/releases")}
         >
-          {isMinimized ? 'v' + appVersion : 'CFN Tracker v' + appVersion}
+          {isMinimized ? `v${appVersion}` : `CFN Tracker v${appVersion}`}
         </a>
         {newVersionAvailable && newVersionPrompt}
       </footer>
     </aside>
   );
 };
+
+type HideableTextProps = {
+  text: string;
+  hide: boolean;
+  className?: string;
+}
+export const HideableText: React.FC<HideableTextProps> = ( { text, hide, className }) => 
+  <span className={`transition-opacity ${hide ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'} ${className}`}>{text}</span>

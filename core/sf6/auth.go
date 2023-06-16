@@ -11,7 +11,8 @@ import (
 )
 
 func (t *SF6Tracker) Authenticate(email string, password string, dry bool) error {
-	if t.isAuthenticated {
+	if t.isAuthenticated || t.cookie != `` {
+		t.isAuthenticated = true
 		return nil
 	}
 
@@ -20,10 +21,10 @@ func (t *SF6Tracker) Authenticate(email string, password string, dry bool) error
 
 	// Bypass age check
 	if t.Page.MustInfo().URL == `https://cid.capcom.com/ja/agecheck/confirm` {
-		t.Page.MustElement(`#country`).MustSelect(`Australia`)
+		t.Page.MustElement(`#country`).MustSelect(COUNTRIES[rand.Intn(len(COUNTRIES))])
 		t.Page.MustElement(`#birthMonth`).MustSelect(strconv.Itoa(rand.Intn(12-1) + 1))
 		t.Page.MustElement(`#birthYear`).MustSelect(strconv.Itoa(rand.Intn(1999-1970) + 1970))
-		t.Page.MustElement(`#birthDay`).MustSelect(strconv.Itoa(rand.Intn(31-28) + 28))
+		t.Page.MustElement(`#birthDay`).MustSelect(strconv.Itoa(rand.Intn(28-1) + 1))
 		t.Page.MustElement(`form button[type="submit"]`).MustClick()
 		t.Page.MustWaitLoad().MustWaitRequestIdle()
 	}
@@ -51,5 +52,51 @@ func (t *SF6Tracker) Authenticate(email string, password string, dry bool) error
 		t.isAuthenticated = true
 	}
 
+	t.assignCookie()
+	t.assignToken()
 	return nil
+}
+
+func (t *SF6Tracker) assignCookie() {
+	cookies := t.Page.Browser().MustGetCookies()
+	cookie := ``
+
+	for i, c := range cookies {
+		if !strings.Contains(c.Name, `buckler`) {
+			continue
+		}
+
+		cookie += c.Name + `=` + c.Value
+		if i != len(cookies)-1 {
+			cookie += `; `
+		}
+	}
+
+	t.cookie = cookie
+	fmt.Println(`Cookie`, t.cookie)
+}
+
+func (t *SF6Tracker) assignToken() {
+	fmt.Println(`Assigning token`)
+	/*
+		t.HijackRouter.MustAdd(`_next`, func(ctx *rod.Hijack) {
+			url := ctx.Request.URL().Path
+
+			if !strings.Contains(url, `/6/buckler/_next/data/`) {
+				return
+			}
+
+			fmt.Println(url)
+			strs := strings.Split(url, `/6/buckler/_next/data/`)[1]
+
+			t.token = strings.Split(strs, `/en/profile`)[0]
+
+			fmt.Println(`Token `, t.token)
+
+			ctx.ContinueRequest(&proto.FetchContinueRequest{})
+		})
+
+		t.Page.MustNavigate(`https://www.streetfighter.com/6/buckler/fighterslist/search/result?fighter_id=greensoap`).MustWaitLoad().MustWaitIdle()
+		t.Page.Mouse.MustClick(`a[href="/6/buckler/profile/3524508259"]`)
+		t.Page.MustWaitLoad().MustWaitIdle()*/
 }
