@@ -81,7 +81,7 @@ export const Sidebar: React.FC = () => {
     <a
       className="group hover:bg-[rgba(0,0,0,.525)] text-[#bfbcff] hover:text-white transition-colors backdrop-blur cursor-pointer leading-5 bottom-2 absolute left-[107%] text-base py-2 px-3 rounded-lg bg-slate-900"
       onClick={() => {
-        BrowserOpenURL("https://github.com/GreenSoap/cfn-tracker/releases");
+        BrowserOpenURL("https://williamsjokvist.github.io/cfn-tracker/");
         setNewVersionAvailable(false);
       }}
     >
