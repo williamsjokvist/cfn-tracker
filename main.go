@@ -23,7 +23,7 @@ var (
 	capIDEmail    string = ``
 	capIDPassword string = ``
 	appVersion    string = ``
-	runHeadless   bool   = false
+	runHeadless   string = ``
 )
 
 //go:embed all:gui/dist
@@ -46,13 +46,13 @@ func init() {
 		capIDEmail = os.Getenv(`CAP_ID_EMAIL`)
 		capIDPassword = os.Getenv(`CAP_ID_PASSWORD`)
 		appVersion = os.Getenv(`APP_VERSION`)
-		runHeadless = os.Getenv(`RUN_HEADLESS`) == `true`
+		runHeadless = os.Getenv(`RUN_HEADLESS`)
 	}
 
 	core.AppVersion, _ = version.NewVersion(appVersion)
 	core.SteamUsername = steamUsername
 	core.SteamPassword = steamPassword
-	core.RunHeadless = runHeadless
+	core.RunHeadless = runHeadless == `true`
 	core.CapIDEmail = capIDEmail
 	core.CapIDPassword = capIDPassword
 }

@@ -21,7 +21,7 @@ export const HistoryPage: React.FC = () => {
 
   const [availableLogs, setAvailableLogs] = React.useState<string[]>([]);
   const [chosenLog, setLog] = React.useState<string>();
-  const [matchLog, setMatchLog] = React.useState<common.MatchHistory[]>();
+  const [matchLog, setMatchLog] = React.useState<common.MatchHistory[]>([]);
 
   const [isSpecified, setSpecified] = React.useState(false);
   const [totalWinRate, setTotalWinRate] = React.useState<number | null>(null);
@@ -45,7 +45,7 @@ export const HistoryPage: React.FC = () => {
 
   React.useEffect(() => {
     if (availableLogs.length === 0)
-      GetAvailableLogs().then((logs) => setAvailableLogs(logs))
+      GetAvailableLogs().then(logs => logs && setAvailableLogs(logs))
   }, [availableLogs])
 
   React.useEffect(() => {
@@ -116,7 +116,7 @@ export const HistoryPage: React.FC = () => {
             <span>{t("winRate")}: <b>{totalWinRate}</b>%</span>
           </div>
         )}
-        {!chosenLog && availableLogs.length > 0 && (
+        {!chosenLog && availableLogs && availableLogs.length > 0 && (
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
