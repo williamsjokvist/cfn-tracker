@@ -147,7 +147,7 @@ func (t *SF6Tracker) fetchBattleLog(cfnID string) *BattleLog {
 	fmt.Println(`Fetched battle log`)
 	t.Page.MustNavigate(fmt.Sprintf(`%s/profile/%s/battlelog/rank`, BASE_URL, cfnID)).
 		MustWaitLoad()
-
+  
 	body := t.Page.MustElement(`#__NEXT_DATA__`).MustText()
 
 	var battleLog BattleLog
