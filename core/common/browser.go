@@ -13,8 +13,9 @@ import (
 )
 
 type Browser struct {
-	ctx  context.Context
-	Page *rod.Page
+	ctx          context.Context
+	Page         *rod.Page
+	HijackRouter *rod.HijackRouter
 }
 
 func NewBrowser(ctx context.Context, headless bool) *Browser {
@@ -45,8 +46,9 @@ func NewBrowser(ctx context.Context, headless bool) *Browser {
 	go router.Run()
 
 	return &Browser{
-		ctx:  ctx,
-		Page: page,
+		ctx:          ctx,
+		Page:         page,
+		HijackRouter: router,
 	}
 }
 
