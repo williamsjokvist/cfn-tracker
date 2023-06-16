@@ -35,7 +35,8 @@ var icon []byte
 var cmdHandler *core.CommandHandler
 
 func init() {
-	if steamUsername == `` || steamPassword == `` || appVersion == `` {
+	if capIDEmail == `` || capIDPassword == `` ||
+		steamUsername == `` || steamPassword == `` || appVersion == `` {
 		err := godotenv.Load(`.env`)
 		if err != nil {
 			log.Fatalf(`missing .env file: %v`, err)
