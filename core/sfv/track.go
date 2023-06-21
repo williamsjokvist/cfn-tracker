@@ -12,6 +12,7 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 
 	"github.com/williamsjokvist/cfn-tracker/core/common"
+	"github.com/williamsjokvist/cfn-tracker/core/utils"
 )
 
 type SFVTracker struct {
@@ -95,7 +96,7 @@ func (t *SFVTracker) Start(cfn string, restoreData bool, refreshInterval time.Du
 
 func (t *SFVTracker) poll(ctx context.Context, cfn string, refreshInterval time.Duration) {
 	for {
-		didBreak := common.SleepOrBreak(refreshInterval, func() bool {
+		didBreak := utils.SleepOrBreak(refreshInterval, func() bool {
 			select {
 			case <-ctx.Done():
 				return true

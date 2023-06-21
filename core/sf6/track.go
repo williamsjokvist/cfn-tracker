@@ -12,6 +12,7 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 
 	"github.com/williamsjokvist/cfn-tracker/core/common"
+	"github.com/williamsjokvist/cfn-tracker/core/utils"
 )
 
 const BASE_URL = `https://www.streetfighter.com/6/buckler`
@@ -103,7 +104,7 @@ func (t *SF6Tracker) Start(cfn string, restoreData bool, refreshInterval time.Du
 
 func (t *SF6Tracker) poll(ctx context.Context, cfnID string, refreshInterval time.Duration) {
 	for t.isTracking {
-		didBreak := common.SleepOrBreak(refreshInterval, func() bool {
+		didBreak := utils.SleepOrBreak(refreshInterval, func() bool {
 			select {
 			case <-ctx.Done():
 				return true
@@ -147,7 +148,7 @@ func (t *SF6Tracker) fetchBattleLog(cfnID string) *BattleLog {
 	fmt.Println(`Fetched battle log`)
 	t.Page.MustNavigate(fmt.Sprintf(`%s/profile/%s/battlelog/rank`, BASE_URL, cfnID)).
 		MustWaitLoad()
-  
+
 	body := t.Page.MustElement(`#__NEXT_DATA__`).MustText()
 
 	var battleLog BattleLog
