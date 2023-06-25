@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { motion, useAnimate, stagger } from "framer-motion";
+import { useAnimate, stagger } from "framer-motion";
 
 import sfvLogo from '@/img/logo_sfv.png'
 import sf6Logo from '@/img/logo_sf6.png'

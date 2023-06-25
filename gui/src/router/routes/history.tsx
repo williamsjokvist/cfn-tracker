@@ -1,11 +1,8 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { motion, useAnimate, stagger } from "framer-motion";
+import { Icon } from '@iconify/react';
 
-import { FaChevronLeft } from "react-icons/fa";
-import { RiFileExcel2Fill } from "react-icons/ri";
-
-import { MdDelete } from "react-icons/md";
 import {
   GetAvailableLogs,
   GetMatchLog,
@@ -13,7 +10,7 @@ import {
   ExportLogToCSV,
   OpenResultsDirectory,
 } from "@@/go/core/CommandHandler";
-import { common } from "@@/go/models";
+import { common as core } from "@@/go/models";
 import { PageHeader } from "@/ui/header";
 
 export const HistoryPage: React.FC = () => {
@@ -21,7 +18,7 @@ export const HistoryPage: React.FC = () => {
 
   const [availableLogs, setAvailableLogs] = React.useState<string[]>([]);
   const [chosenLog, setLog] = React.useState<string>();
-  const [matchLog, setMatchLog] = React.useState<common.MatchHistory[]>([]);
+  const [matchLog, setMatchLog] = React.useState<core.MatchHistory[]>([]);
 
   const [isSpecified, setSpecified] = React.useState(false);
   const [totalWinRate, setTotalWinRate] = React.useState<number | null>(null);
@@ -78,7 +75,7 @@ export const HistoryPage: React.FC = () => {
               onClick={() => isSpecified ? fetchLog(chosenLog) : setLog(undefined)}
               className="crumb-btn-dark mr-3"
             >
-              <FaChevronLeft className="w-4 h-4 inline mr-2" />
+              <Icon icon='fa6-solid:chevron-left' className="w-4 h-4 inline mr-2" />
               {t("goBack")}
             </motion.button>
             <motion.button
@@ -90,7 +87,7 @@ export const HistoryPage: React.FC = () => {
               }}
               className="crumb-btn-dark mr-3"
             >
-              <RiFileExcel2Fill className="w-4 h-4 inline mr-2 text-white" />
+              <Icon icon='ri:file-excel-2-fill' className="w-4 h-4 inline mr-2 text-white" />
               {t("exportLog")}
             </motion.button>
             <motion.button
@@ -103,7 +100,7 @@ export const HistoryPage: React.FC = () => {
               }}
               className="crumb-btn-dark"
             >
-              <MdDelete className="w-4 h-4 inline mr-2" />
+              <Icon icon='mdi:delete' className="w-4 h-4 inline mr-2" />
               {t("deleteLog")}
             </motion.button>
           </div>
@@ -144,7 +141,7 @@ export const HistoryPage: React.FC = () => {
             <motion.table 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.55 }}
+              transition={{ delay: 0.25 }}
               className="w-full border-spacing-y-1 border-separate min-w-[525px]"
             >
               <thead>
@@ -158,9 +155,9 @@ export const HistoryPage: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {matchLog.map((log, index) => {
+                {matchLog.map(log => {
                   return (
-                    <tr key={index} className="backdrop-blur group">
+                    <tr key={`${log.timestamp}-${log.totalMatches}`} className="backdrop-blur group">
                       <td
                         onClick={() => filterLog("date", log.date)}
                         className="whitespace-nowrap text-left rounded-l-xl rounded-r-none bg-slate-50 bg-opacity-5 group-hover:bg-opacity-10 transition-colors px-3 py-2 hover:underline cursor-pointer"

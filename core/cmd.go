@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/hashicorp/go-version"
+	wruntime "github.com/wailsapp/wails/v2/pkg/runtime"
 
 	"github.com/williamsjokvist/cfn-tracker/core/common"
 )
@@ -45,6 +46,7 @@ func (ch *CommandHandler) StopTracking() {
 func (ch *CommandHandler) StartTracking(cfn string, restore bool) {
 	err := ch.tracker.Start(cfn, restore, RefreshInterval)
 	if err != nil {
+		wruntime.EventsEmit(ch.ctx, `error-cfn`, err.Error())
 		fmt.Println(err)
 	}
 }

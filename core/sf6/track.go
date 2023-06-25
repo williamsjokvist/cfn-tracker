@@ -79,7 +79,10 @@ func (t *SF6Tracker) Start(cfn string, restoreData bool, refreshInterval time.Du
 	t.mh = common.NewMatchHistory(cfn)
 
 	fmt.Println(`Loading profile`)
-	cfnID := t.fetchCfnIDByCfn(cfn)
+	cfnID, err := t.fetchCfnIDByCfn(cfn)
+	if err != nil {
+		return fmt.Errorf(`cfn not exists: %v`, err)
+	}
 	battleLog := t.fetchBattleLog(cfnID)
 	if battleLog.Props.PageProps.Common.StatusCode != 200 {
 		t.stopped()
@@ -127,8 +130,7 @@ func (t *SF6Tracker) poll(ctx context.Context, cfnID string, refreshInterval tim
 	}
 }
 
-// TODO: Error handling
-func (t *SF6Tracker) fetchCfnIDByCfn(cfn string) string {
+func (t *SF6Tracker) fetchCfnIDByCfn(cfn string) (string, error) {
 	t.Page.MustNavigate(fmt.Sprintf(`%s/fighterslist/search/result?fighter_id=%s`, BASE_URL, cfn)).
 		MustWaitLoad().
 		MustWaitIdle()
@@ -138,10 +140,19 @@ func (t *SF6Tracker) fetchCfnIDByCfn(cfn string) string {
 	var searchResult SearchResult
 	err := json.Unmarshal([]byte(body), &searchResult)
 	if err != nil {
-		log.Fatalf(`unmarshal cfn search: %v`, err)
+		return "", fmt.Errorf(`unmarshal cfn search: %v`, err)
 	}
 
-	return strconv.Itoa(int(searchResult.Props.PageProps.FighterBannerList[0].PersonalInfo.ShortID))
+	cfnID := 0
+	for _, fighter := range searchResult.Props.PageProps.FighterBannerList {
+		cfnID = int(fighter.PersonalInfo.ShortID)
+	}
+
+	if cfnID == 0 {
+		return "", fmt.Errorf(`cfn "%s" missing in search result`, cfn)
+	}
+
+	return strconv.Itoa(cfnID), nil
 }
 
 func (t *SF6Tracker) fetchBattleLog(cfnID string) *BattleLog {

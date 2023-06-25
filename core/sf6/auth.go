@@ -18,6 +18,9 @@ func (t *SF6Tracker) Authenticate(email string, password string, dry bool) error
 
 	fmt.Println(`Logging in`)
 	t.Page.MustNavigate(`https://www.streetfighter.com/6/buckler/auth/loginep?redirect_url=/`).MustWaitLoad()
+	if !dry {
+		runtime.EventsEmit(t.ctx, `auth-loaded`, 10)
+	}
 
 	// Bypass age check
 	if t.Page.MustInfo().URL == `https://cid.capcom.com/ja/agecheck/confirm` {
@@ -27,13 +30,18 @@ func (t *SF6Tracker) Authenticate(email string, password string, dry bool) error
 		t.Page.MustElement(`#birthDay`).MustSelect(strconv.Itoa(rand.Intn(28-1) + 1))
 		t.Page.MustElement(`form button[type="submit"]`).MustClick()
 		t.Page.MustWaitLoad().MustWaitRequestIdle()
+		if !dry {
+			runtime.EventsEmit(t.ctx, `auth-loaded`, 20)
+		}
 	}
 
 	// Submit form
 	t.Page.MustElement(`input[name="email"]`).Input(email)
 	t.Page.MustElement(`input[name="password"]`).Input(password)
 	t.Page.MustElement(`button[type="submit"]`).MustClick()
-
+	if !dry {
+		runtime.EventsEmit(t.ctx, `auth-loaded`, 30)
+	}
 	// Wait for redirection
 	var secondsWaited time.Duration = 0
 	for {
@@ -45,6 +53,9 @@ func (t *SF6Tracker) Authenticate(email string, password string, dry bool) error
 		time.Sleep(time.Second)
 		secondsWaited += time.Second
 		fmt.Println(`Waiting for gateway to pass...`, secondsWaited)
+		if secondsWaited > (3*time.Second) && !dry {
+			runtime.EventsEmit(t.ctx, `auth-loaded`, (secondsWaited/time.Second)*10)
+		}
 	}
 
 	if !dry {
