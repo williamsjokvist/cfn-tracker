@@ -32,5 +32,6 @@
   "pickGame": "Choose game",
   "follow": "Updates",
   "continueStep": "Continue",
-  "placement": "Placement Matches"
+  "placement": "Placement Matches",
+  "cfnError": "CFN does not exist"
 }

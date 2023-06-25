@@ -5,7 +5,6 @@ import { useAnimate } from "framer-motion";
 import { Icon } from '@iconify/react';
 
 import { LanguageSelector } from "./LanguageSelector";
-import { useAppStore } from "@/store/use-app-store";
 import { BrowserOpenURL, Quit, WindowMinimise } from "@@/runtime";
 import { GetAppVersion } from "@@/go/core/CommandHandler";
 
@@ -40,12 +39,11 @@ const SidebarLink: React.FC<SidebarLinkProps> = ( { icon, link, name, isSelected
   );
 };
 
-export const Sidebar: React.FC = () => {
+export const Sidebar: React.FC<React.PropsWithChildren> = ( { children } ) => {
   const { t } = useTranslation();
   const location = useLocation();
   const [appVersion, setAppVersion] = React.useState('');
   const [isMinimized, setMinimized] = React.useState(window.localStorage.getItem('sidebar-minimized') == 'true')
-  const { newVersionAvailable, setNewVersionAvailable } = useAppStore();
 
   const [scope, animate] = useAnimate()
 
@@ -55,7 +53,6 @@ export const Sidebar: React.FC = () => {
       { delay: 0.125 }
     )
   }, [])
-
   
   React.useEffect(() => {
     !appVersion && GetAppVersion().then(v => setAppVersion(v));
@@ -68,19 +65,6 @@ export const Sidebar: React.FC = () => {
       window.localStorage.removeItem('sidebar-minimized')
     }
   }, [isMinimized])
-
-  const newVersionPrompt = (
-    <a
-      className="group hover:bg-[rgba(0,0,0,.525)] text-[#bfbcff] hover:text-white transition-colors backdrop-blur cursor-pointer leading-5 bottom-2 absolute left-[107%] text-base py-2 px-3 rounded-lg bg-[rgba(0,0,0,.625)]"
-      onClick={() => {
-        BrowserOpenURL("https://williamsjokvist.github.io/cfn-tracker/");
-        setNewVersionAvailable(false);
-      }}
-    >
-      <Icon icon='radix-icons:update' className="group-hover:text-white inline text-[#49b3f5] transition-colors w-4 h-4 mr-2" />
-      {t(`newVersionAvailable`)}
-    </a>
-  )
 
   return (
     <aside
@@ -134,6 +118,7 @@ export const Sidebar: React.FC = () => {
           </li>
         </ul>
       </nav>
+      {children}
       <footer className={`grid w-full text-xl px-2`}>
         <LanguageSelector isMinimized={isMinimized} />
 
@@ -171,7 +156,6 @@ export const Sidebar: React.FC = () => {
         >
           {isMinimized ? `v${appVersion}` : `CFN Tracker v${appVersion}`}
         </a>
-        {newVersionAvailable && newVersionPrompt}
       </footer>
     </aside>
   );

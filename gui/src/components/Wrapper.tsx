@@ -1,21 +1,23 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
-import { useAppStore } from "@/store/use-app-store";
 import { CFNMachineContext } from '@/machine';
 import { EventsOn, EventsOff } from "@@/runtime"
 import { LoadingBar } from "@/ui/loading-bar";
 import { Sidebar } from "./Sidebar";
 import { ErrorMessage } from "./ErrorMessage";
+import { NewVersionPrompt } from "@/ui/new-version";
 
 export const PageWrapper: React.FC = () => {
+  const { t } = useTranslation()
   const [_, send] = CFNMachineContext.useActor();
-  const { setNewVersionAvailable } = useAppStore();
   const [loaded, setLoaded] = React.useState(0)
   const [errMsg, setErrMsg] = React.useState('')
+  const [hasNewVersion, setNewVersion] = React.useState(false)
 
   React.useEffect(() => {
-    EventsOn(`version-update`, updated => setNewVersionAvailable(updated))
+    EventsOn(`version-update`, hasNewVersion => setNewVersion(hasNewVersion))
     EventsOn(`initialized`, () => {
       send('initialized')
       setLoaded(100)
@@ -34,13 +36,15 @@ export const PageWrapper: React.FC = () => {
         type: 'errorCfn',
         error
       })
-      setErrMsg(error)
+      setErrMsg(t('cfnError'))
     })
   })
 
   return (
     <>
-      <Sidebar />
+      <Sidebar>
+        <NewVersionPrompt hasNewVersion={hasNewVersion} setNewVersion={setNewVersion}/>  
+      </Sidebar>
       <main>
         <ErrorMessage message={errMsg}/>
         <LoadingBar percentage={loaded}/>

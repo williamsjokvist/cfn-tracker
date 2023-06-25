@@ -5,7 +5,7 @@ type ErrorMessageProps = {
   message: string
 }
 export const ErrorMessage: React.FC<ErrorMessageProps> = ( { message } ) => {
-  const [isOpen, setOpen] = React.useState(true)
+  const [isOpen, setOpen] = React.useState(false)
 
   React.useEffect(() => {
     if (message == '') return
