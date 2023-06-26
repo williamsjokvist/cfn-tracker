@@ -25,12 +25,13 @@
   "unpause": "Unpause",
   "statistics": "Statistics",
   "date": "Date",
-  "minimize": "minimize",
+  "minimize": "shrink",
   "restoreSession": "Restore last session",
   "exportLog": "Export CSV",
   "league": "League",
   "pickGame": "Choose game",
   "follow": "Updates",
   "continueStep": "Continue",
-  "placement": "Placement Matches"
+  "placement": "Placement Matches",
+  "cfnError": "CFN does not exist"
 }

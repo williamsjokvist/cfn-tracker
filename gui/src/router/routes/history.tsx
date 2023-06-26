@@ -66,7 +66,7 @@ export const HistoryPage: React.FC = () => {
 
   return (
     <>
-      <PageHeader text={t("history")}>
+      <PageHeader text={chosenLog ? `${t("history")}/${chosenLog}` : t("history")}>
         {chosenLog && (
           <div className="flex items-center justify-end w-full ml-4">
             <motion.button

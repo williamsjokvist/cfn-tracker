@@ -88,6 +88,16 @@ func (ch *CommandHandler) GetAvailableLogs() []string {
 	return loggedCfns
 }
 
+func (ch *CommandHandler) GetThemeList() []string {
+	themes, err := common.GetThemeList()
+	if err != nil {
+		fmt.Println(err)
+		return nil
+	}
+
+	return themes
+}
+
 func (ch *CommandHandler) DeleteMatchLog(cfn string) {
 	err := common.DeleteLog(cfn)
 	if err != nil {
@@ -120,6 +130,7 @@ func (ch *CommandHandler) StartBrowser(ctx context.Context) {
 	ch.ctx = ctx
 	ch.browser = common.NewBrowser(ctx, RunHeadless)
 	ch.browser.CheckForVersionUpdate(AppVersion)
+	common.Serve(ctx)
 }
 
 func (ch *CommandHandler) CloseBrowser(ctx context.Context) {

@@ -32,5 +32,6 @@
   "pickGame": "ゲームを選択",
   "follow": "フォロー",
   "continueStep": "続ける",
-  "placement": "Placement Matches"
+  "placement": "Placement Matches",
+  "cfnError": "CFNは存在しません"
 }

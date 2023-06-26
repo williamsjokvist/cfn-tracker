@@ -2,10 +2,17 @@ import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { Icon } from '@iconify/react';
 import { PieChart as ReactMinimalPieChart } from "react-minimal-pie-chart";
+<<<<<<< HEAD
 
 import { CFNMachineContext } from "@/machine";
 import { ActionButton } from "@/ui/action-button";
 import { OpenResultsDirectory, StopTracking } from "@@/go/core/CommandHandler";
+=======
+>>>>>>> cacb1d958cc3502df91b0c83bde80067c987e616
+
+import { CFNMachineContext } from "@/machine";
+import { ActionButton } from "@/ui/action-button";
+import { StopTracking } from "@@/go/core/CommandHandler";
 
 type BigStatProps = {
   text: string
@@ -122,17 +129,25 @@ export const Tracking: React.FC = () => {
           )}
         </div>
 
+<<<<<<< HEAD
         <div className="flex items-start justify-center w-full gap-5">
           <ActionButton onClick={OpenResultsDirectory} style={{ filter: "hue-rotate(-120deg)" }}>
             <Icon icon='fa6-solid:folder-open' className="mr-3" /> 
             {t("files")}
           </ActionButton>
+=======
+        <div className="flex items-start justify-end w-full m-3 gap-5">
+>>>>>>> cacb1d958cc3502df91b0c83bde80067c987e616
           <ActionButton 
             onClick={() =>{
               StopTracking() // TODO: this should be part of the state machine
               send('stoppedTracking')}
             }>
+<<<<<<< HEAD
             <Icon icon='fa6-solid:stop' className="mr-3" /> 
+=======
+            <Icon icon='fa6-solid:stop' className="mr-3 w-5 h-5" /> 
+>>>>>>> cacb1d958cc3502df91b0c83bde80067c987e616
             {t("stop")}
           </ActionButton>
         </div>
