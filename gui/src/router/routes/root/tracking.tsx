@@ -1,12 +1,11 @@
-import { CFNMachineContext } from "@/machine";
-import { ActionButton } from "@/ui/action-button";
-import { OpenResultsDirectory, StopTracking } from "@@/go/core/CommandHandler";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
-
-import { FaFolderOpen } from "react-icons/fa";
-import { FaStop } from "react-icons/fa";
+import { Icon } from '@iconify/react';
 import { PieChart as ReactMinimalPieChart } from "react-minimal-pie-chart";
+
+import { CFNMachineContext } from "@/machine";
+import { ActionButton } from "@/ui/action-button";
+import { StopTracking } from "@@/go/core/CommandHandler";
 
 type BigStatProps = {
   text: string
@@ -24,7 +23,7 @@ const BigStat: React.FC<BigStatProps> = ({ text, value }) => {
 export const Tracking: React.FC = () => {
   const { t } = useTranslation();
   const [state, send] = CFNMachineContext.useActor();
-  const { cfn, lp, wins, losses, winStreak, lpGain, winRate } = state.context.matchHistory
+  const { cfn, lp, wins, losses, winStreak, lpGain, winRate, opponent, opponentCharacter, opponentLeague, result } = state.context.matchHistory
 
   const PieChart = (
     <ReactMinimalPieChart
@@ -101,38 +100,35 @@ export const Tracking: React.FC = () => {
         className="relative text-center w-[300px] h-full grid content-between justify-items-end"
       >
         <div className="w-full max-w-[280px] mx-auto whitespace-nowrap text-md">
-         {/* Detailed stats
-          <ul>
-            <li className="leading-none flex justify-between p-2 border-b-[1px] border-white border-opacity-25 border-solid">
-              <span>Most faced opponent</span>
-              <b>RMK-FAST (6)</b>
-            </li>
-            <li className="leading-none flex justify-between p-2 border-b-[1px] border-white border-opacity-25 border-solid">
-              <span>Most faced character</span>
-              <b>Guile (12)</b>
-            </li>
-            <li className="leading-none flex justify-between p-2 border-b-[1px] border-white border-opacity-25 border-solid">
-              <span>Most faced league</span>
-              <b>Diamond (25)</b>
-            </li>
-            <li className="leading-none flex justify-between p-2 border-b-[1px] border-white border-opacity-25 border-solid">
-              <span>Highest win streak</span>
-              <b>4</b>
-            </li>
-          </ul>*/}
+          {opponent != '' && (
+            <ul>
+              <li className="group leading-none flex justify-between p-2 border-b-[1px] border-white border-opacity-25 border-solid">
+                <span>Last opponent</span>
+                <div className='relative'>
+                  <b>{opponent}</b>
+                  <div className='group-hover:opacity-100 opacity-0 pointer-events-none absolute top-5 transition-all bg-[rgba(0,0,0,.525)] backdrop-blur-xl px-3 py-2 right-0 rounded-md'>
+                    <b className='mr-2'>{opponentCharacter}</b>
+                    <span>{`(${opponentLeague})`}</span>
+                  </div>
+                </div>
+              </li>
+              <li className="leading-none flex justify-between p-2 border-b-[1px] border-white border-opacity-25 border-solid">
+                <span>Last match result</span>
+                <div>
+                  <b>{result ? 'WIN' : 'LOSE'}</b>
+                </div>
+              </li>
+            </ul>         
+          )}
         </div>
 
-        <div className="flex items-start justify-center w-full gap-5">
-          <ActionButton onClick={OpenResultsDirectory} style={{ filter: "hue-rotate(-120deg)" }}>
-            <FaFolderOpen className="w-5 h-5 mr-2" />
-            {t("files")}
-          </ActionButton>
+        <div className="flex items-start justify-end w-full m-3 gap-5">
           <ActionButton 
             onClick={() =>{
               StopTracking() // TODO: this should be part of the state machine
               send('stoppedTracking')}
             }>
-            <FaStop className="mr-3" /> 
+            <Icon icon='fa6-solid:stop' className="mr-3 w-5 h-5" /> 
             {t("stop")}
           </ActionButton>
         </div>

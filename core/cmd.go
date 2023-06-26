@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/hashicorp/go-version"
+	wruntime "github.com/wailsapp/wails/v2/pkg/runtime"
 
 	"github.com/williamsjokvist/cfn-tracker/core/common"
 )
@@ -45,6 +46,7 @@ func (ch *CommandHandler) StopTracking() {
 func (ch *CommandHandler) StartTracking(cfn string, restore bool) {
 	err := ch.tracker.Start(cfn, restore, RefreshInterval)
 	if err != nil {
+		wruntime.EventsEmit(ch.ctx, `error-cfn`, err.Error())
 		fmt.Println(err)
 	}
 }
@@ -86,6 +88,16 @@ func (ch *CommandHandler) GetAvailableLogs() []string {
 	return loggedCfns
 }
 
+func (ch *CommandHandler) GetThemeList() []string {
+	themes, err := common.GetThemeList()
+	if err != nil {
+		fmt.Println(err)
+		return nil
+	}
+
+	return themes
+}
+
 func (ch *CommandHandler) DeleteMatchLog(cfn string) {
 	err := common.DeleteLog(cfn)
 	if err != nil {
@@ -118,6 +130,7 @@ func (ch *CommandHandler) StartBrowser(ctx context.Context) {
 	ch.ctx = ctx
 	ch.browser = common.NewBrowser(ctx, RunHeadless)
 	ch.browser.CheckForVersionUpdate(AppVersion)
+	common.Serve(ctx)
 }
 
 func (ch *CommandHandler) CloseBrowser(ctx context.Context) {

@@ -79,7 +79,10 @@ func (t *SF6Tracker) Start(cfn string, restoreData bool, refreshInterval time.Du
 	t.mh = common.NewMatchHistory(cfn)
 
 	fmt.Println(`Loading profile`)
-	cfnID := t.fetchCfnIDByCfn(cfn)
+	cfnID, err := t.fetchCfnIDByCfn(cfn)
+	if err != nil {
+		return fmt.Errorf(`cfn not exists: %v`, err)
+	}
 	battleLog := t.fetchBattleLog(cfnID)
 	if battleLog.Props.PageProps.Common.StatusCode != 200 {
 		t.stopped()
@@ -87,7 +90,7 @@ func (t *SF6Tracker) Start(cfn string, restoreData bool, refreshInterval time.Du
 	}
 
 	if !restoreData {
-		t.refreshMatchHistory(battleLog)
+		// t.refreshMatchHistory(battleLog)
 	}
 
 	fmt.Println(`Profile loaded `)
@@ -127,8 +130,7 @@ func (t *SF6Tracker) poll(ctx context.Context, cfnID string, refreshInterval tim
 	}
 }
 
-// TODO: Error handling
-func (t *SF6Tracker) fetchCfnIDByCfn(cfn string) string {
+func (t *SF6Tracker) fetchCfnIDByCfn(cfn string) (string, error) {
 	t.Page.MustNavigate(fmt.Sprintf(`%s/fighterslist/search/result?fighter_id=%s`, BASE_URL, cfn)).
 		MustWaitLoad().
 		MustWaitIdle()
@@ -138,10 +140,19 @@ func (t *SF6Tracker) fetchCfnIDByCfn(cfn string) string {
 	var searchResult SearchResult
 	err := json.Unmarshal([]byte(body), &searchResult)
 	if err != nil {
-		log.Fatalf(`unmarshal cfn search: %v`, err)
+		return "", fmt.Errorf(`unmarshal cfn search: %v`, err)
 	}
 
-	return strconv.Itoa(int(searchResult.Props.PageProps.FighterBannerList[0].PersonalInfo.ShortID))
+	cfnID := 0
+	for _, fighter := range searchResult.Props.PageProps.FighterBannerList {
+		cfnID = int(fighter.PersonalInfo.ShortID)
+	}
+
+	if cfnID == 0 {
+		return "", fmt.Errorf(`cfn "%s" missing in search result`, cfn)
+	}
+
+	return strconv.Itoa(cfnID), nil
 }
 
 func (t *SF6Tracker) fetchBattleLog(cfnID string) *BattleLog {
@@ -163,18 +174,26 @@ func (t *SF6Tracker) fetchBattleLog(cfnID string) *BattleLog {
 
 func (t *SF6Tracker) refreshMatchHistory(battleLog *BattleLog) {
 	// Assign player infos
-	p1 := battleLog.Props.PageProps.ReplayList[0].Player1Info
-	p2 := battleLog.Props.PageProps.ReplayList[0].Player2Info
+	var me *PlayerInfo
+	var opponent *PlayerInfo
 
-	var me PlayerInfo
-	var opponent PlayerInfo
+	for i, replay := range battleLog.Props.PageProps.ReplayList {
+		if i > 0 {
+			break
+		}
 
-	if t.mh.CFN == p1.Player.FighterID {
-		opponent = p2
-		me = p1
-	} else if t.mh.CFN == p2.Player.FighterID {
-		me = p2
-		opponent = p1
+		if t.mh.CFN == replay.Player1Info.Player.FighterID {
+			opponent = &replay.Player2Info
+			me = &replay.Player1Info
+		} else if t.mh.CFN == replay.Player2Info.Player.FighterID {
+			me = &replay.Player2Info
+			opponent = &replay.Player1Info
+		}
+	}
+
+	if me == nil || opponent == nil {
+		t.stopped()
+		return
 	}
 
 	newLP := battleLog.Props.PageProps.FighterBannerInfo.FavoriteCharacterLeagueInfo.LeaguePoint
