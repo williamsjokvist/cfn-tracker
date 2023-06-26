@@ -92,25 +92,26 @@ const main = () => {
     console.log('New match played: ', mh)
 
     for (const [stat, value] of Object.entries(mh)) {
-      if (searchParams.get(stat) == 'true') {
-        let s = stat
-        let v = value
+      if (searchParams.get(stat) != 'true') 
+        continue
 
-        if (stat.includes('lp'))
-          s = stat.replace('lp', 'LP ')
-        else if (stat.includes('win') && stat != 'wins')
-          s = stat.replace('win', 'Win ')
-        else if (stat.includes('opponent') && stat != 'opponent')
-          s = stat.replace('opponent', `Opponent's `)
-        else if (stat == 'result')
-          v = value ? 'W' : 'L'
-        else if (stat == 'cfn')
-          s = stat.toUpperCase()
-        else if (stat == 'winRate')
-          v += '%'
-        
-        list.updateItem(s, v)
-      }
+      let s = stat
+      let v = value
+
+      if (stat.includes('lp'))
+        s = stat.replace('lp', 'LP ')
+      else if (stat.includes('win') && stat != 'wins')
+        s = stat.replace('win', 'Win ')
+      else if (stat.includes('opponent') && stat != 'opponent')
+        s = stat.replace('opponent', `Opponent's `)
+      else if (stat == 'result')
+        v = value ? 'W' : 'L'
+      else if (stat == 'cfn')
+        s = stat.toUpperCase()
+      else if (stat == 'winRate')
+        v += '%'
+      
+      list.updateItem(s, v)
     }
   })
 }
