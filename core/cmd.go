@@ -88,6 +88,16 @@ func (ch *CommandHandler) GetAvailableLogs() []string {
 	return loggedCfns
 }
 
+func (ch *CommandHandler) GetThemeList() []string {
+	themes, err := common.GetThemeList()
+	if err != nil {
+		fmt.Println(err)
+		return nil
+	}
+
+	return themes
+}
+
 func (ch *CommandHandler) DeleteMatchLog(cfn string) {
 	err := common.DeleteLog(cfn)
 	if err != nil {

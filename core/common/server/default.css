@@ -1,0 +1,41 @@
+body {
+  background: radial-gradient(circle at 52.1% -29.6%, rgb(144, 17, 105) 0%, rgb(51, 0, 131) 100.2%);
+  background-attachment: fixed;
+  white-space: nowrap;
+  font-family: Verdana, sans-serif;
+
+  --stat-title-color: rgb(255, 255, 255);
+  --stat-value-color: rgb(255, 255, 255);
+  --stat-bg-color: rgb(248 250 252 / 0.05);
+}
+
+/* Stat list container */
+stat-list {
+  display: grid;
+  gap: 8px;
+  max-width: 300px;
+  width: 100%;
+}
+
+/* Stat container */
+stat-list::part(list-item) {
+  display: flex;
+  justify-content: space-between;
+  background: var(--stat-bg-color);
+  padding: 0.75rem;
+  border-radius: 0.75rem;
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+}
+
+/* Stat title (Wins, Losses, Win Rate, LP Gain etc.) */
+stat-list::part(list-title) {
+  color: var(--stat-title-color);
+  font-weight: 100;
+}
+
+/* Stat value */
+stat-list::part(list-value) {
+  color: var(--stat-value-color);
+  font-weight: bold;
+}

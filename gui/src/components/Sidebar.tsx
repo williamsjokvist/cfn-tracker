@@ -116,6 +116,16 @@ export const Sidebar: React.FC<React.PropsWithChildren> = ( { children } ) => {
               isMinimized={isMinimized}
             />
           </li>
+          <li>
+            <SidebarLink
+              icon='clarity:sign-out-line'
+              selectedIcon='clarity:sign-out-solid'
+              link="output"
+              name={'Output'}
+              isSelected={location.pathname == "/output"}
+              isMinimized={isMinimized}
+            />
+          </li>
         </ul>
       </nav>
       {children}

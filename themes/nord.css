@@ -1,0 +1,37 @@
+body {
+  background: #2E3440; /* Doesn't matter, the bg is removed in OBS anyway */  
+  font-family: 'Trebuchet MS'; /* Any font installed on the system works */
+
+  --stat-title-color: #ECEFF4; /* Stat title color */
+  --stat-value-color: #88C0D0; /* Stat value color */
+  --stat-bg-color: #4C566A; /* Stat box background color */
+}
+
+/* Stat list container */
+stat-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  max-width: 816px;
+}
+
+/* Stat box container */
+stat-list::part(list-item) {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: .75rem;
+  border-radius: .75rem;
+  font-size: 1.125rem;
+  white-space: nowrap;
+}
+
+/* Stat title (Wins, Losses, Win Rate, LP Gain etc.) */
+stat-list::part(list-title) {
+  font-weight: 100;
+}
+
+/* Stat value */
+stat-list::part(list-value) {
+  font-weight: bold;
+}

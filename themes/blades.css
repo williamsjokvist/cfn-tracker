@@ -1,0 +1,39 @@
+body {
+  background: #1E283C;
+  font-family: Helvetica;
+
+  --stat-title-color: #66e6ff;
+  --stat-value-color: #fff;
+  --stat-bg-color: transparent;
+}
+
+stat-list {
+  display: block;
+  max-width: 490px;
+}
+
+stat-list::part(list-item) {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1.125rem;
+  line-height: 8px;
+  white-space: nowrap;
+  margin-bottom: 8px;
+  clip-path: polygon(5% 5%, 100% 0%, 95% 95%, 0% 100%);
+}
+
+stat-list::part(list-title), stat-list::part(list-value) {
+  padding: 15px 25px;
+  font-weight: 100;
+  width: 100%;
+}
+
+stat-list::part(list-title) {
+  background: #25394b;
+  text-align: right;
+}
+
+stat-list::part(list-value) {
+  background: #161e2d;
+  text-align: left;
+}

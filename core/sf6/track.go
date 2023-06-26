@@ -90,7 +90,7 @@ func (t *SF6Tracker) Start(cfn string, restoreData bool, refreshInterval time.Du
 	}
 
 	if !restoreData {
-		t.refreshMatchHistory(battleLog)
+		// t.refreshMatchHistory(battleLog)
 	}
 
 	fmt.Println(`Profile loaded `)
@@ -174,18 +174,26 @@ func (t *SF6Tracker) fetchBattleLog(cfnID string) *BattleLog {
 
 func (t *SF6Tracker) refreshMatchHistory(battleLog *BattleLog) {
 	// Assign player infos
-	p1 := battleLog.Props.PageProps.ReplayList[0].Player1Info
-	p2 := battleLog.Props.PageProps.ReplayList[0].Player2Info
+	var me *PlayerInfo
+	var opponent *PlayerInfo
 
-	var me PlayerInfo
-	var opponent PlayerInfo
+	for i, replay := range battleLog.Props.PageProps.ReplayList {
+		if i > 0 {
+			break
+		}
 
-	if t.mh.CFN == p1.Player.FighterID {
-		opponent = p2
-		me = p1
-	} else if t.mh.CFN == p2.Player.FighterID {
-		me = p2
-		opponent = p1
+		if t.mh.CFN == replay.Player1Info.Player.FighterID {
+			opponent = &replay.Player2Info
+			me = &replay.Player1Info
+		} else if t.mh.CFN == replay.Player2Info.Player.FighterID {
+			me = &replay.Player2Info
+			opponent = &replay.Player1Info
+		}
+	}
+
+	if me == nil || opponent == nil {
+		t.stopped()
+		return
 	}
 
 	newLP := battleLog.Props.PageProps.FighterBannerInfo.FavoriteCharacterLeagueInfo.LeaguePoint
