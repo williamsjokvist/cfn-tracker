@@ -33,5 +33,6 @@
   "follow": "Updates",
   "continueStep": "Continue",
   "placement": "Placement Matches",
-  "cfnError": "CFN does not exist"
+  "cfnError": "CFN does not exist",
+  "output": "Output"
 }

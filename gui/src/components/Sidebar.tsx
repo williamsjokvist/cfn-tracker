@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useAnimate } from "framer-motion";
 import { Icon } from '@iconify/react';
 
-import { LanguageSelector } from "./LanguageSelector";
+import { LanguageSelector } from "../i18n/LanguageSelector";
 import { BrowserOpenURL, Quit, WindowMinimise } from "@@/runtime";
 import { GetAppVersion } from "@@/go/core/CommandHandler";
 
@@ -121,7 +121,7 @@ export const Sidebar: React.FC<React.PropsWithChildren> = ( { children } ) => {
               icon='clarity:sign-out-line'
               selectedIcon='clarity:sign-out-solid'
               link="output"
-              name={'Output'}
+              name={t('output')}
               isSelected={location.pathname == "/output"}
               isMinimized={isMinimized}
             />

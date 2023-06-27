@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { Icon } from "@iconify/react";
-import { APP_LANGUAGES } from "@/i18n";
-import { HideableText } from "./Sidebar";
+import { APP_LANGUAGES } from "@/i18n/i18n";
+import { HideableText } from "../components/Sidebar";
 import '@/styles/language-selector.sass'
 
 type LanguageSelectorProps = {

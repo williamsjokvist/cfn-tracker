@@ -33,5 +33,6 @@
   "follow": "フォロー",
   "continueStep": "続ける",
   "placement": "Placement Matches",
-  "cfnError": "CFNは存在しません"
+  "cfnError": "CFNは存在しません",
+  "output": "出力"
 }
