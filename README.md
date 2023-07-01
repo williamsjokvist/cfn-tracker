@@ -1,42 +1,53 @@
 <img src="build/appicon.png" height="150px" align="right"/>
 
 # CFN Tracker
-This tool tracks any Street Fighter V CFN account's live match statistics. 
+This tool tracks any Street Fighter 6 or V CFN account's live match statistics. 
 
 ## Who is this for? 
 This is primarily targeted toward streamers who want automatically updated win/loss counters. It can also be useful if you wanna keep track of your LP gain and other statistics during a session.
 
-## Support
+## Known issues
+- In SF6, if using a CFN where other players have the same name, it will pick the first one that appears in the search result. 
 
+If you encounter any bugs, @ me on Twitter [@greensoap_](https://twitter.com/GreenSoap_)
+
+## Support
 If you find the tool useful for your streams or otherwise, consider [buying me a coffee ☕](https://ko-fi.com/greensoap)
 
-## Usage
-
+## Getting Started
 * Download the app for either Mac or Windows from [the download page](https://williamsjokvist.github.io/cfn-tracker/).
-* Launch it and wait for it to finish initializing.
-* Input your CFN when prompted and start.
+* Extract the app wherever you want and pick either SFV or SF6
+* Input your CFN when prompted and start
+* If all is well, tracking has now started. Go to the `Output` screen, pick a theme and mark the stats you want to display and click `Copy Browser Source Link`
+* Open OBS and add a Browser Source, paste the link as the source.
 
-Text files will be generated in a `results` folder, which are updated after every match. Use them as sources for your labels in e.g. OBS.
+Text files will also be generated in a `results` folder, which are updated after every match. For memory efficiency you can use these instead of the `Browser Source` in OBS. 
 
-All of the logged matches are listed in the `Match Log` tab, and can be filtered by character, date, league and opponent.
+## Features
 
-The app has translations for `English`, `French` and `Japanese`.
+### Real-Time Tracking
+![tracking](https://raw.githubusercontent.com/williamsjokvist/cfn-tracker/github-pages/public/tracking.png "tracking-example")
 
-The app will start with a notification if an update has released. You can also follow me on [Twitter](https://twitter.com/GreenSoap_) for update tweets.
+### View the Match Log
+![log](https://raw.githubusercontent.com/williamsjokvist/cfn-tracker/github-pages/public/log.png "log-example")
 
-## Screenshots
+### Display Stats on Stream
+Display the stats either via an OBS Browser Source or by importing simple text files. 
+![browser-src](https://raw.githubusercontent.com/williamsjokvist/cfn-tracker/github-pages/public/output.png "game-pick")
 
-![tracking](showcase/tracking.jpg?raw=true "tracking-example")
-![log](showcase/log.jpg?raw=true "log-example")
+### Track Multiple Games
+![game](https://raw.githubusercontent.com/williamsjokvist/cfn-tracker/github-pages/public/game.png "game-pick")
 
-## Coming updates
+## Creating your own Browser Source theme with CSS
+Create a CSS file in the `themes` directory and it will be available as an option in the theme selector. In the CSS there are 4 CSS selectors you can use: 
+- `stat-list`: the container for all of the stats
+- `stat-list::part(list-item)`: the container for one stat
+- `stat-list::part(list-title)`: the stat title e.g. "LP Gain", "Win Rate" ...
+- `stat-list::part(list-value)`: the value of the stat
 
-Any ideas for features and improvements are welcome, feel free to open an [issue](https://github.com/williamsjokvist/cfn-tracker/issues)
-
-If you wish to contribute, you can open a [pull request](https://github.com/williamsjokvist/cfn-tracker/pulls) 
+Easiest is to base a new theme on `nord.css`
 
 ## Streamer showcase
-
 ### [OneStepLayered](https://twitch.tv/OneStepLayered)
 ![stream](showcase/OneStepLayered.gif?raw=true "OneStepLayered")
 ### [SheldonTwitching](https://twitch.tv/SheldonTwitching)
