@@ -49,6 +49,6 @@ Easiest is to base a new theme on `nord.css`
 
 ## Streamer showcase
 ### [OneStepLayered](https://twitch.tv/OneStepLayered)
-![stream](showcase/OneStepLayered.gif?raw=true "OneStepLayered")
+![stream](https://raw.githubusercontent.com/williamsjokvist/cfn-tracker/github-pages/public/osl.gif "OneStepLayered")
 ### [SheldonTwitching](https://twitch.tv/SheldonTwitching)
-![stream](showcase/SheldonTwitching.jpg?raw=true "SheldonTwitching")
+![stream](https://raw.githubusercontent.com/williamsjokvist/cfn-tracker/github-pages/public/sheldon.jpg "SheldonTwitching")
