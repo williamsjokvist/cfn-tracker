@@ -130,7 +130,7 @@ func (ch *CommandHandler) StartBrowser(ctx context.Context) {
 	ch.ctx = ctx
 	ch.browser = common.NewBrowser(ctx, RunHeadless)
 	ch.browser.CheckForVersionUpdate(AppVersion)
-	common.Serve(ctx)
+	go common.Serve(ctx)
 }
 
 func (ch *CommandHandler) CloseBrowser(ctx context.Context) {

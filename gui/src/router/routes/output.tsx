@@ -39,7 +39,7 @@ export const OutputPage: React.FC = () => {
   }, [])
   return (
     <>
-      <PageHeader text='Output Options'/>
+      <PageHeader text={t('output')}/>
       <div className="z-40 h-full w-full overflow-y-scroll">
         <motion.section            
           initial={{ opacity: 0 }}
