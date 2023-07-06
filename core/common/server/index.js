@@ -1,4 +1,3 @@
-
 class StatList extends HTMLElement {
   constructor() {
     super();
@@ -59,7 +58,7 @@ class StatListItem extends HTMLElement{
 const applyTheme = async (theme) => {
   if (theme == null)
     theme = 'default'
-    
+
   if (theme != 'default') {
     const cssEl = document.createElement('link')
     cssEl.setAttribute('href', `/themes/${theme}.css`)
@@ -74,6 +73,36 @@ const defineCustomElements = () => {
   customElements.define('stat-list-item', StatListItem);
 }
 
+const convertToNaturalLanguage = (stat, value) => {
+  let s = stat, v = value
+  switch (stat) {
+    case 'cfn': case 'lp':
+      s = stat.toUpperCase()
+      break
+    case 'lpGain':
+      s = stat.replace('lp', 'LP ')
+      if (value > 0)
+        v = '+' + value
+      break
+    case 'result':
+      v = value ? 'W' : 'L'
+      break
+    case 'winRate':
+      v = value + '%'
+      break
+  }
+
+  if (stat.includes('win') && stat != 'wins') {
+    s = stat.replace('win', 'Win ')
+  } else if (stat.includes('total')) {
+    s = stat.replace('total', 'Total ')
+  } else if (stat.includes('opponent')) {
+    s = stat.replace('opponent', 'Opponent ')
+  }
+
+  return { stat: s, value: v }
+}
+
 const main = () => {
   defineCustomElements()
 
@@ -86,7 +115,6 @@ const main = () => {
   const src = new EventSource('/stream')
   src.addEventListener('open', _ => console.log('The connection has been established'))
   src.addEventListener('error', _ => console.log('An error occurred while attempting to connect'))
-
   src.addEventListener('message', e => {
     const mh = JSON.parse(e.data)
     console.log('New match played: ', mh)
@@ -94,24 +122,9 @@ const main = () => {
     for (const [stat, value] of Object.entries(mh)) {
       if (searchParams.get(stat) != 'true') 
         continue
-
-      let s = stat
-      let v = value
-
-      if (stat.includes('lp'))
-        s = stat.replace('lp', 'LP ')
-      else if (stat.includes('win') && stat != 'wins')
-        s = stat.replace('win', 'Win ')
-      else if (stat.includes('opponent') && stat != 'opponent')
-        s = stat.replace('opponent', `Opponent's `)
-      else if (stat == 'result')
-        v = value ? 'W' : 'L'
-      else if (stat == 'cfn')
-        s = stat.toUpperCase()
-      else if (stat == 'winRate')
-        v += '%'
-      
-      list.updateItem(s, v)
+        
+      const natural = convertToNaturalLanguage(stat, value)
+      list.updateItem(natural.stat, natural.value)
     }
   })
 }

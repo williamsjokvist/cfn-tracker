@@ -177,18 +177,18 @@ func (t *SF6Tracker) refreshMatchHistory(battleLog *BattleLog) {
 	var me *PlayerInfo
 	var opponent *PlayerInfo
 
-	for i, replay := range battleLog.Props.PageProps.ReplayList {
-		if i > 0 {
-			break
-		}
+	if len(battleLog.Props.PageProps.ReplayList) == 0 {
+		return
+	}
 
-		if t.mh.CFN == replay.Player1Info.Player.FighterID {
-			opponent = &replay.Player2Info
-			me = &replay.Player1Info
-		} else if t.mh.CFN == replay.Player2Info.Player.FighterID {
-			me = &replay.Player2Info
-			opponent = &replay.Player1Info
-		}
+	replay := battleLog.Props.PageProps.ReplayList[0]
+
+	if t.mh.CFN == replay.Player1Info.Player.FighterID {
+		me = &replay.Player1Info
+		opponent = &replay.Player2Info
+	} else if t.mh.CFN == replay.Player2Info.Player.FighterID {
+		me = &replay.Player2Info
+		opponent = &replay.Player1Info
 	}
 
 	if me == nil || opponent == nil {
