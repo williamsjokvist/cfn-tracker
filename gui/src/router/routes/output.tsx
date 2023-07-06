@@ -1,5 +1,5 @@
 import React from "react";
-import { useTranslation } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { Icon } from "@iconify/react";
 
@@ -49,9 +49,11 @@ export const OutputPage: React.FC = () => {
         >
           <div className='flex items-center justify-between gap-8'>
             <div>
-              <h2 className="text-xl font-bold">Using Browser Source</h2>
+              <h2 className="text-xl font-bold">{t('usingBrowserSource')}</h2>
                 <p className='my-2 '>
-                  The easiest way to display the stats in OBS is to use <i className="whitespace-nowrap">Browser Source</i>. After editing the options, copy the browser source link.
+                  <Trans t={t} i18nKey='browserSourceDescription'>
+                    The easiest way to display the stats in OBS is to use <i className="whitespace-nowrap">Browser Source</i>. After editing the options, copy the browser source link.
+                  </Trans>
                 </p>
             </div>
             <div>
@@ -68,32 +70,34 @@ export const OutputPage: React.FC = () => {
                 style={{ filter: "hue-rotate(-120deg)" }}
               >
                 <Icon icon='mdi:internet' className="mr-3 w-6 h-6" /> 
-                Copy Browser Source Link
+                {t('copyBrowserSourceLink')}
               </ActionButton>
             </div>
           </div>
           <div className='flex items-center justify-between gap-8'>
             <div>
-              <b className='block'>Theme</b>
+              <b className='block'>{t('theme')}</b>
               <select 
                 defaultValue='default' 
                 onChange={(e) => { setOptions({...options, theme: e.target.value}) }}
                 className='w-48 appearance-none bg-[rgb(0,0,0,.525)] rounded-lg border-none !drop-shadow-none'
               >
-                <option value='default'>Default</option>
+                <option value='default'>{t('defaultTheme')}</option>
                 {themes && themes.map(theme => <option key={theme} value={theme}>{theme.charAt(0).toUpperCase() + theme.slice(1)}</option>)}
               </select>
             </div>
             <div>
-              <h3 className='text-lg font-bold'>Pick a theme to display in the browser source</h3>
+              <h3 className='text-lg font-bold'>{t('pickTheme')}</h3>
               <p>
-                To create your own theme in CSS, create a <i>yourthemename.css</i> file in the <i>themes folder</i> and it will appear in the menu here. You can look at the <i>nord.css</i> file for reference.
+                <Trans t={t} i18nKey='createTheme'>
+                  To create your own theme in CSS, create a <i>yourthemename.css</i> file in the <i>themes folder</i> and it will appear in the menu here. You can look at the <i>nord.css</i> file for reference.
+                </Trans>
               </p>
             </div>
           </div>
 
           <div className="grid gap-2 items-center my-4 select-none">
-            <h3 className='text-lg font-bold'>Display Stats (Browser Source)</h3>
+            <h3 className='text-lg font-bold'>{t('displayStats')}</h3>
             {Object.entries(options).map(([key, value]) => {
               if (key == 'theme') return null
               const sfvOnly = key == 'totalLosses' || key == 'totalWins'
@@ -126,8 +130,12 @@ export const OutputPage: React.FC = () => {
           className='flex justify-between items-center gap-8 py-6 px-8 w-full'
         >
           <header>
-            <h2 className="text-xl font-bold">Importing text files</h2>
-            <p className='my-2'>If you want to customize through OBS, you can use <i className='whitespace-nowrap'>Text Labels</i> and add the text files in the <i className='whitespace-nowrap'>results folder</i> as sources</p>
+            <h2 className="text-xl font-bold">{t('importFiles')}</h2>
+            <p className='my-2'>
+              <Trans t={t} i18nKey='obsCustomize'>
+                If you want to customize through OBS, you can use <i>Text Labels</i> and add the text files in the results folder as sources              
+              </Trans>
+            </p>
           </header>
           <ActionButton onClick={OpenResultsDirectory} style={{ filter: "hue-rotate(-120deg)" }}>
             <Icon icon='fa6-solid:folder-open' className="mr-3 w-6 h-6" /> 

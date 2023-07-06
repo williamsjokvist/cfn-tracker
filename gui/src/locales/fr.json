@@ -34,5 +34,15 @@
   "continueStep": "Continuer",
   "placement": "Placement Matches",
   "cfnError": "CFN n'existe pas",
-  "output": "Production"
+  "output": "",
+  "theme": "",
+  "defaultTheme": "",
+  "usingBrowserSource": "",
+  "copyBrowserSourceLink": "",
+  "browserSourceDescription": "",
+  "pickTheme": "",
+  "createTheme": "",
+  "displayStats": "",
+  "importFiles": "",
+  "obsCustomize": ""
 }

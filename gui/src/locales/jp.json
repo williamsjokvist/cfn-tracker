@@ -34,5 +34,15 @@
   "continueStep": "続ける",
   "placement": "Placement Matches",
   "cfnError": "CFNは存在しません",
-  "output": "出力"
+  "output": "",
+  "theme": "",
+  "defaultTheme": "",
+  "usingBrowserSource": "",
+  "copyBrowserSourceLink": "",
+  "browserSourceDescription": "",
+  "pickTheme": "",
+  "createTheme": "",
+  "displayStats": "",
+  "importFiles": "",
+  "obsCustomize": ""
 }

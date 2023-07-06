@@ -34,5 +34,15 @@
   "continueStep": "Continue",
   "placement": "Placement Matches",
   "cfnError": "CFN does not exist",
-  "output": "Output"
+  "output": "Output",
+  "theme": "Theme",
+  "defaultTheme": "Default",
+  "usingBrowserSource": "Using Browser Source",
+  "copyBrowserSourceLink": "Copy Browser Source Link",
+  "browserSourceDescription": "The easiest way to display the stats in OBS is to use <1>Browser Source</1>. After editing the options, copy the browser source link.",
+  "pickTheme": "Pick a theme to display in the browser source",
+  "createTheme": "To create your own theme in CSS, create a <1>yourthemename.css</1> file in the themes folder and it will appear in the menu here. You can look at the <2>nord.css</2> file for reference.",
+  "displayStats": "Display Stats (Browser Source)",
+  "importFiles": "Importing text files",
+  "obsCustomize": "If you want to customize through OBS, you can use <1>Text Labels</1> and add the text files in the results folder as sources"
 }
