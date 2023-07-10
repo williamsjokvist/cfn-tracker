@@ -11,22 +11,22 @@ import (
 )
 
 func (t *SF6Tracker) Authenticate(email string, password string, dry bool) error {
-	if t.isAuthenticated || t.cookie != `` || t.Page.MustInfo().URL == `https://www.streetfighter.com/6/buckler?status=login` {
+	if t.isAuthenticated || t.cookie != `` || strings.Contains(t.Page.MustInfo().URL, `buckler`) {
 		t.isAuthenticated = true
 		return nil
 	}
 
 	fmt.Println(`Logging in`)
-	t.Page.MustNavigate(`https://www.streetfighter.com/6/buckler/auth/loginep?redirect_url=/`).MustWaitLoad()
+	t.Page.MustNavigate(`https://cid.capcom.com/ja/login/?guidedBy=web`).MustWaitLoad().MustWaitIdle()
 	if !dry {
 		runtime.EventsEmit(t.ctx, `auth-loaded`, 10)
 	}
 
 	// Bypass age check
-	if t.Page.MustInfo().URL == `https://cid.capcom.com/ja/agecheck/confirm` {
+	if strings.Contains(t.Page.MustInfo().URL, `agecheck`) {
 		t.Page.MustElement(`#country`).MustSelect(COUNTRIES[rand.Intn(len(COUNTRIES))])
-		t.Page.MustElement(`#birthMonth`).MustSelect(strconv.Itoa(rand.Intn(12-1) + 1))
 		t.Page.MustElement(`#birthYear`).MustSelect(strconv.Itoa(rand.Intn(1999-1970) + 1970))
+		t.Page.MustElement(`#birthMonth`).MustSelect(strconv.Itoa(rand.Intn(12-1) + 1))
 		t.Page.MustElement(`#birthDay`).MustSelect(strconv.Itoa(rand.Intn(28-1) + 1))
 		t.Page.MustElement(`form button[type="submit"]`).MustClick()
 		t.Page.MustWaitLoad().MustWaitRequestIdle()
@@ -57,6 +57,9 @@ func (t *SF6Tracker) Authenticate(email string, password string, dry bool) error
 			runtime.EventsEmit(t.ctx, `auth-loaded`, (secondsWaited/time.Second)*10)
 		}
 	}
+
+	t.Page.MustNavigate(`https://www.streetfighter.com/6/buckler/auth/loginep?redirect_url=/`)
+	t.Page.MustWaitLoad().MustWaitRequestIdle()
 
 	if !dry {
 		runtime.EventsEmit(t.ctx, `initialized`, true)
