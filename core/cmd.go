@@ -57,15 +57,12 @@ func (ch *CommandHandler) GetMatchHistory() common.MatchHistory {
 }
 
 func (ch *CommandHandler) OpenResultsDirectory() {
-	var cmd *exec.Cmd
-
-	if runtime.GOOS == `darwin` {
-		cmd = exec.Command(`Open`, `./results`)
-	} else {
-		cmd = exec.Command(`explorer.exe`, `.\results`)
+	switch runtime.GOOS {
+	case `darwin`:
+		exec.Command(`Open`, `./results`).Run()
+	case `windows`:
+		exec.Command(`explorer.exe`, `.\results`).Run()
 	}
-
-	cmd.Run()
 }
 
 func (ch *CommandHandler) GetMatchLog(cfn string) []common.MatchHistory {

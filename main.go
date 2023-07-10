@@ -32,9 +32,9 @@ var assets embed.FS
 //go:embed build/appicon.png
 var icon []byte
 
-var cmdHandler *core.CommandHandler
-
 func init() {
+	cleanUpProcess()
+
 	if capIDEmail == `` || capIDPassword == `` ||
 		steamUsername == `` || steamPassword == `` || appVersion == `` {
 		err := godotenv.Load(`.env`)
@@ -59,8 +59,7 @@ func init() {
 }
 
 func main() {
-	// Create an instance of the app structure
-	cmdHandler = core.NewCommandHandler()
+	cmdHandler := core.NewCommandHandler()
 
 	err := wails.Run(&options.App{
 		Title:             `CFN Tracker v3`,
