@@ -2,13 +2,20 @@
 @tailwind components
 @tailwind utilities
 
-body 
+*
+  user-select: none
+
+p, h1, h2, h3, h4
+  cursor: default
+
+body
   font-family: 'League Spartan', sans-serif
-  background: radial-gradient(circle at 52.1% -29.6%, rgb(144, 17, 105) 0%, rgb(51, 0, 131) 100.2%)  
+  background: radial-gradient(circle at 52.1% -29.6%, rgb(144, 17, 105) 0%, rgb(51, 0, 131) 100.2%)
   overflow: hidden
   border-radius: 14px
 
 main
+  position: relative
   display: grid
   grid-template-rows: 0fr 1fr
   height: 100vh
@@ -37,13 +44,13 @@ main
   &:hover
     background-color: rgb(255,255,255,.125)
 
-.stat-grid-item 
+.stat-grid-item
   grid-row-start: 2
   grid-column-start: 1
   grid-row-end: 3
   grid-column-end: 3
 
-.pie-chart 
+.pie-chart
   clip-path: circle(50% at 50% 50%)
 
 ::-webkit-scrollbar-track
@@ -63,5 +70,5 @@ main
   animation: blink 1s linear infinite
 
 @keyframes blink
-  50% 
+  50%
     color: #fff

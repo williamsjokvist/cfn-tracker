@@ -9,21 +9,18 @@ type AppLanguage = {
 }
 
 export const APP_LANGUAGES: AppLanguage[] = [
-  { code: 'en', nativeName: 'English', translation: await import('@/locales/en.json') },
-  { code: 'fr', nativeName: 'Français', translation: await import('@/locales/fr.json') },
-  { code: 'jp', nativeName: '日本', translation: await import('@/locales/jp.json') },
-];
+  { code: 'en', nativeName: 'English', translation: await import('./locales/en.json') },
+  { code: 'fr', nativeName: 'Français', translation: await import('./locales/fr.json') },
+  { code: 'jp', nativeName: '日本', translation: await import('./locales/jp.json') },
+]; 
 
 // https://www.i18next.com/overview/configuration-options
-i18n
+export const initLocalization = () => {
+  i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
-    debug: false,
     fallbackLng: APP_LANGUAGES[0].code,
-    interpolation: {
-      escapeValue: false,
-    },
     lng: window.localStorage.getItem('lng'),
     resources: 
       APP_LANGUAGES.reduce((obj, item) => {
@@ -33,5 +30,4 @@ i18n
         }
       }, {})
   });
-
-export default i18n;
+}

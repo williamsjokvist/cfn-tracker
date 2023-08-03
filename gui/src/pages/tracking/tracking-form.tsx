@@ -1,47 +1,40 @@
 import React from "react";
-import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 
-import { CFNMachineContext } from "@/machine";
+import { CFNMachineContext } from "@/main/machine";
 import { GetAvailableLogs, ResultsJSONExist } from "@@/go/core/CommandHandler";
 import { ActionButton } from "@/ui/action-button";
 
-type CfnFormValues = {
-  cfn: string;
-  restore?: boolean;
-}
-export const CFNForm: React.FC = () => {
+export const TrackingForm: React.FC = () => {
   const { t } = useTranslation();
   const [_, send] = CFNMachineContext.useActor();
 
-  const cfnInputRef = React.useRef<HTMLInputElement>(null)
-  const restoreRef = React.useRef<HTMLInputElement>(null)
-
+  const cfnInputRef = React.useRef<HTMLInputElement>(null);
+  const restoreRef = React.useRef<HTMLInputElement>(null);
 
   const [oldCfns, setOldCfns] = React.useState<string[] | null>(null);
   const [lastJSONExist, setLastJSONExist] = React.useState<boolean>(false);
-  
-  const [restore, setRestore] = React.useState(false)
+  const [restore, setRestore] = React.useState(false);
 
   React.useEffect(() => {
-    if (oldCfns) return
-    GetAvailableLogs().then(logs => setOldCfns(logs))
-    ResultsJSONExist().then(exists => setLastJSONExist(exists))
-  }, [oldCfns])
+    if (oldCfns) return;
+    GetAvailableLogs().then((logs) => setOldCfns(logs));
+    ResultsJSONExist().then((exists) => setLastJSONExist(exists));
+  }, [oldCfns]);
 
-  const { register, handleSubmit, control } = useForm<CfnFormValues>()
+  const onSubmit = (e: any) => {
+    e.preventDefault();
 
-  const onSubmit = (values: CfnFormValues) => {
-    const cfn = cfnInputRef.current.value
-    if (!restore && cfn == '') return
+    const cfn = cfnInputRef.current.value;
+    if (!restore && cfn == "") return;
 
     send({
-      type: 'submit',
+      type: "submit",
       cfn: cfn,
-      restore
-    })
-  }
+      restore,
+    });
+  };
 
   return (
     <motion.form
@@ -49,11 +42,10 @@ export const CFNForm: React.FC = () => {
       animate={{ opacity: 1 }}
       transition={{ delay: 0.125 }}
       className="max-w-[450px] mx-auto"
-      onSubmit={handleSubmit(onSubmit)}
+      onSubmit={onSubmit}
     >
       <h3 className="mb-2 text-lg">{t("enterCfnName")}:</h3>
       <input
-        {...register('cfn')}
         ref={cfnInputRef}
         className="bg-transparent border-b-2 border-0 focus:ring-offset-transparent focus:ring-transparent border-b-[rgba(255,255,255,0.275)] focus:border-white hover:border-white outline-none focus:outline-none hover:text-white transition-colors py-3 px-4 block w-full text-lg text-gray-300"
         type="text"
@@ -66,17 +58,17 @@ export const CFNForm: React.FC = () => {
       />
       {oldCfns && (
         <div className="mt-3 flex flex-wrap gap-2 content-center items-center text-center pr-3">
-          {oldCfns.map(cfn => {
+          {oldCfns.map((cfn) => {
             return (
               <button
                 disabled={false}
-                onClick={_ => { 
-                  if (!cfnInputRef.current) return
+                onClick={(_) => {
+                  if (!cfnInputRef.current) return;
                   //if (!(cfnInputRef.current && restoreRef.current)) return
 
-                  cfnInputRef.current.value = cfn
+                  cfnInputRef.current.value = cfn;
                   // restoreRef.current.checked = false
-                  setRestore(false)
+                  setRestore(false);
                 }}
                 className="whitespace-nowrap bg-[rgb(255,255,255,0.075)] hover:bg-[rgb(255,255,255,0.125)] text-base backdrop-blur rounded-2xl transition-all items-center border-transparent border-opacity-5 border-[1px] px-3 py-1"
                 type="button"
@@ -115,5 +107,5 @@ export const CFNForm: React.FC = () => {
         </ActionButton>
       </div>
     </motion.form>
-  )
-}
+  );
+};
