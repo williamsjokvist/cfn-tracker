@@ -1,4 +1,4 @@
-package common
+package shared
 
 import (
 	"context"
@@ -9,7 +9,7 @@ import (
 	"github.com/go-rod/rod/lib/launcher"
 	"github.com/go-rod/rod/lib/proto"
 	"github.com/hashicorp/go-version"
-	"github.com/wailsapp/wails/v2/pkg/runtime"
+	wails "github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 type Browser struct {
@@ -63,6 +63,6 @@ func (b *Browser) CheckForVersionUpdate(currentVersion *version.Version) {
 	hasNewVersion := currentVersion.LessThan(latestVersion)
 	if hasNewVersion {
 		fmt.Println(`Has new version: `, latestVersionText)
-		runtime.EventsEmit(b.ctx, `version-update`, hasNewVersion)
+		wails.EventsEmit(b.ctx, `version-update`, hasNewVersion)
 	}
 }

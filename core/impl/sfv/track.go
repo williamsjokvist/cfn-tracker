@@ -9,9 +9,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/wailsapp/wails/v2/pkg/runtime"
+	wails "github.com/wailsapp/wails/v2/pkg/runtime"
 
-	"github.com/williamsjokvist/cfn-tracker/core/common"
+	"github.com/williamsjokvist/cfn-tracker/core/data"
+	"github.com/williamsjokvist/cfn-tracker/core/shared"
 	"github.com/williamsjokvist/cfn-tracker/core/utils"
 )
 
@@ -21,8 +22,8 @@ type SFVTracker struct {
 	isTracking      bool
 	isAuthenticated bool
 	stopTracking    context.CancelFunc
-	mh              *common.MatchHistory
-	*common.Browser
+	mh              *data.MatchHistory
+	*shared.Browser
 }
 
 var (
@@ -30,11 +31,11 @@ var (
 	ErrInvalidCFN      = errors.New(`invalid cfn provided`)
 )
 
-func NewSFVTracker(ctx context.Context, browser *common.Browser) *SFVTracker {
+func NewSFVTracker(ctx context.Context, browser *shared.Browser) *SFVTracker {
 	return &SFVTracker{
 		ctx:          ctx,
 		isTracking:   false,
-		mh:           common.NewMatchHistory(``),
+		mh:           data.NewMatchHistory(``),
 		Browser:      browser,
 		stopTracking: func() {},
 	}
@@ -48,7 +49,7 @@ func (t *SFVTracker) Stop() {
 func (t *SFVTracker) stopFn() {
 	fmt.Println(`Stopped tracking`)
 	t.isTracking = false
-	runtime.EventsEmit(t.ctx, `stopped-tracking`)
+	wails.EventsEmit(t.ctx, `stopped-tracking`)
 }
 
 // Start will update the MatchHistory when new matches are played.
@@ -63,7 +64,7 @@ func (t *SFVTracker) Start(cfn string, restoreData bool, refreshInterval time.Du
 	}
 
 	if restoreData {
-		lastSavedMatchHistory, err := common.GetLastSavedMatchHistory()
+		lastSavedMatchHistory, err := data.GetLastSavedMatchHistory()
 		if err == nil {
 			t.mh = lastSavedMatchHistory
 		}
@@ -81,8 +82,8 @@ func (t *SFVTracker) Start(cfn string, restoreData bool, refreshInterval time.Du
 
 	fmt.Println(`Profile loaded`)
 	t.isTracking = true
-	t.mh = common.NewMatchHistory(cfn)
-	runtime.EventsEmit(t.ctx, `started-tracking`)
+	t.mh = data.NewMatchHistory(cfn)
+	wails.EventsEmit(t.ctx, `started-tracking`)
 
 	// First fetch
 	t.refreshMatchHistory(cfn, true)
@@ -185,12 +186,12 @@ func (t *SFVTracker) refreshMatchHistory(cfn string, isFirstFetch bool) {
 	t.mh.TimeStamp = time.Now().Format(`15:04`)
 	t.mh.Date = time.Now().Format(`2006-01-02`)
 
-	runtime.EventsEmit(t.ctx, `cfn-data`, t.mh)
+	wails.EventsEmit(t.ctx, `cfn-data`, t.mh)
 	t.mh.Save()
 	t.mh.Log()
 }
 
-func (t *SFVTracker) GetMatchHistory() *common.MatchHistory {
+func (t *SFVTracker) GetMatchHistory() *data.MatchHistory {
 	return t.mh
 }
 

@@ -9,9 +9,10 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/wailsapp/wails/v2/pkg/runtime"
+	wails "github.com/wailsapp/wails/v2/pkg/runtime"
 
-	"github.com/williamsjokvist/cfn-tracker/core/common"
+	"github.com/williamsjokvist/cfn-tracker/core/data"
+	"github.com/williamsjokvist/cfn-tracker/core/shared"
 	"github.com/williamsjokvist/cfn-tracker/core/utils"
 )
 
@@ -27,19 +28,19 @@ type SF6Tracker struct {
 	isTracking       bool
 	isAuthenticated  bool
 	stopTracking     context.CancelFunc
-	mh               *common.MatchHistory
+	mh               *data.MatchHistory
 	gains            map[string]int
 	startingPoints   map[string]int
 	currentCharacter string
 	cookie           string
-	*common.Browser
+	*shared.Browser
 }
 
-func NewSF6Tracker(ctx context.Context, browser *common.Browser) *SF6Tracker {
+func NewSF6Tracker(ctx context.Context, browser *shared.Browser) *SF6Tracker {
 	return &SF6Tracker{
 		ctx:              ctx,
 		isTracking:       false,
-		mh:               common.NewMatchHistory(``),
+		mh:               data.NewMatchHistory(``),
 		Browser:          browser,
 		stopTracking:     func() {},
 		gains:            make(map[string]int, 42), // Make room for 42 characters
@@ -66,7 +67,7 @@ func (t *SF6Tracker) Start(cfn string, restoreData bool, refreshInterval time.Du
 	}
 
 	if restoreData {
-		lastSavedMatchHistory, err := common.GetLastSavedMatchHistory()
+		lastSavedMatchHistory, err := data.GetLastSavedMatchHistory()
 		if err != nil {
 			return ErrRestoreData
 		}
@@ -76,7 +77,7 @@ func (t *SF6Tracker) Start(cfn string, restoreData bool, refreshInterval time.Du
 		t.mh.Reset()
 	}
 
-	t.mh = common.NewMatchHistory(cfn)
+	t.mh = data.NewMatchHistory(cfn)
 
 	fmt.Println(`Loading profile`)
 	cfnID, err := t.fetchCfnIDByCfn(cfn)
@@ -95,8 +96,8 @@ func (t *SF6Tracker) Start(cfn string, restoreData bool, refreshInterval time.Du
 
 	fmt.Println(`Profile loaded `)
 	t.isTracking = true
-	runtime.EventsEmit(t.ctx, `started-tracking`)
-	runtime.EventsEmit(t.ctx, `cfn-data`, t.mh)
+	wails.EventsEmit(t.ctx, `started-tracking`)
+	wails.EventsEmit(t.ctx, `cfn-data`, t.mh)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	t.stopTracking = cancel
@@ -242,7 +243,7 @@ func (t *SF6Tracker) refreshMatchHistory(battleLog *BattleLog) {
 		newLPGain = 0
 	}
 
-	t.mh = &common.MatchHistory{
+	t.mh = &data.MatchHistory{
 		CFN:          me.Player.FighterID,
 		LP:           newLP,
 		LPGain:       newLPGain,
@@ -263,7 +264,7 @@ func (t *SF6Tracker) refreshMatchHistory(battleLog *BattleLog) {
 		Date:      time.Now().Format(`2006-01-02`),
 	}
 
-	runtime.EventsEmit(t.ctx, `cfn-data`, t.mh)
+	wails.EventsEmit(t.ctx, `cfn-data`, t.mh)
 	t.mh.Save()
 	t.mh.Log()
 }
@@ -271,10 +272,10 @@ func (t *SF6Tracker) refreshMatchHistory(battleLog *BattleLog) {
 func (t *SF6Tracker) stopped() {
 	t.isTracking = false
 	fmt.Println(`Stopped tracking`)
-	runtime.EventsEmit(t.ctx, `stopped-tracking`)
+	wails.EventsEmit(t.ctx, `stopped-tracking`)
 }
 
-func (t *SF6Tracker) GetMatchHistory() *common.MatchHistory {
+func (t *SF6Tracker) GetMatchHistory() *data.MatchHistory {
 	return t.mh
 }
 

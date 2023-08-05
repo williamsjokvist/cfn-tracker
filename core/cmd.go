@@ -9,9 +9,10 @@ import (
 	"time"
 
 	"github.com/hashicorp/go-version"
-	wruntime "github.com/wailsapp/wails/v2/pkg/runtime"
+	wails "github.com/wailsapp/wails/v2/pkg/runtime"
 
-	"github.com/williamsjokvist/cfn-tracker/core/common"
+	"github.com/williamsjokvist/cfn-tracker/core/data"
+	"github.com/williamsjokvist/cfn-tracker/core/shared"
 )
 
 var (
@@ -28,7 +29,7 @@ var (
 type CommandHandler struct {
 	ctx     context.Context
 	tracker GameTracker
-	browser *common.Browser
+	browser *shared.Browser
 }
 
 func NewCommandHandler() *CommandHandler {
@@ -46,12 +47,12 @@ func (ch *CommandHandler) StopTracking() {
 func (ch *CommandHandler) StartTracking(cfn string, restore bool) {
 	err := ch.tracker.Start(cfn, restore, RefreshInterval)
 	if err != nil {
-		wruntime.EventsEmit(ch.ctx, `error-cfn`, err.Error())
+		wails.EventsEmit(ch.ctx, `error-cfn`, err.Error())
 		fmt.Println(err)
 	}
 }
 
-func (ch *CommandHandler) GetMatchHistory() common.MatchHistory {
+func (ch *CommandHandler) GetMatchHistory() data.MatchHistory {
 	mh := ch.tracker.GetMatchHistory()
 	return *mh
 }
@@ -65,8 +66,8 @@ func (ch *CommandHandler) OpenResultsDirectory() {
 	}
 }
 
-func (ch *CommandHandler) GetMatchLog(cfn string) []common.MatchHistory {
-	mhLog, err := common.GetLog(cfn)
+func (ch *CommandHandler) GetMatchLog(cfn string) []data.MatchHistory {
+	mhLog, err := data.GetLog(cfn)
 	if err != nil {
 		fmt.Println(err)
 		return nil
@@ -76,7 +77,7 @@ func (ch *CommandHandler) GetMatchLog(cfn string) []common.MatchHistory {
 }
 
 func (ch *CommandHandler) GetAvailableLogs() []string {
-	loggedCfns, err := common.GetLoggedCFNs()
+	loggedCfns, err := data.GetLoggedCFNs()
 	if err != nil {
 		fmt.Println(err)
 		return nil
@@ -86,7 +87,7 @@ func (ch *CommandHandler) GetAvailableLogs() []string {
 }
 
 func (ch *CommandHandler) GetThemeList() []string {
-	themes, err := common.GetThemeList()
+	themes, err := shared.GetThemeList()
 	if err != nil {
 		fmt.Println(err)
 		return nil
@@ -96,14 +97,14 @@ func (ch *CommandHandler) GetThemeList() []string {
 }
 
 func (ch *CommandHandler) DeleteMatchLog(cfn string) {
-	err := common.DeleteLog(cfn)
+	err := data.DeleteLog(cfn)
 	if err != nil {
 		fmt.Println(err)
 	}
 }
 
 func (ch *CommandHandler) ExportLogToCSV(cfn string) {
-	err := common.ExportLog(cfn)
+	err := data.ExportLog(cfn)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -125,9 +126,9 @@ func (ch *CommandHandler) ResultsJSONExist() bool {
 
 func (ch *CommandHandler) StartBrowser(ctx context.Context) {
 	ch.ctx = ctx
-	ch.browser = common.NewBrowser(ctx, RunHeadless)
+	ch.browser = shared.NewBrowser(ctx, RunHeadless)
 	ch.browser.CheckForVersionUpdate(AppVersion)
-	go common.Serve(ctx)
+	go shared.Serve(ctx)
 }
 
 func (ch *CommandHandler) CloseBrowser(ctx context.Context) {

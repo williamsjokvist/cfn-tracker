@@ -7,15 +7,15 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/williamsjokvist/cfn-tracker/core/common"
+	"github.com/williamsjokvist/cfn-tracker/core/shared"
 )
 
 // The most crucial test, to make sure authentication is always working.
-func TestSFVAuthenticate(t *testing.T) {
+func TestSFVAuthentication(t *testing.T) {
 	assert := assert.New(t)
 
 	ctx := context.Background()
-	browser := common.NewBrowser(ctx, true)
+	browser := shared.NewBrowser(ctx, true)
 	sf5Tracker := NewSFVTracker(ctx, browser)
 	err := sf5Tracker.Authenticate(os.Getenv(`STEAM_USERNAME`), os.Getenv(`STEAM_PASSWORD`), true)
 

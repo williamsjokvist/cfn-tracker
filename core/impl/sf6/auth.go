@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/wailsapp/wails/v2/pkg/runtime"
+	wails "github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 func (t *SF6Tracker) Authenticate(email string, password string, dry bool) error {
@@ -19,7 +19,7 @@ func (t *SF6Tracker) Authenticate(email string, password string, dry bool) error
 	fmt.Println(`Logging in`)
 	t.Page.MustNavigate(`https://cid.capcom.com/ja/login/?guidedBy=web`).MustWaitLoad().MustWaitIdle()
 	if !dry {
-		runtime.EventsEmit(t.ctx, `auth-loaded`, 10)
+		wails.EventsEmit(t.ctx, `auth-loaded`, 10)
 	}
 
 	// Bypass age check
@@ -31,7 +31,7 @@ func (t *SF6Tracker) Authenticate(email string, password string, dry bool) error
 		t.Page.MustElement(`form button[type="submit"]`).MustClick()
 		t.Page.MustWaitLoad().MustWaitRequestIdle()
 		if !dry {
-			runtime.EventsEmit(t.ctx, `auth-loaded`, 20)
+			wails.EventsEmit(t.ctx, `auth-loaded`, 20)
 		}
 	}
 
@@ -40,7 +40,7 @@ func (t *SF6Tracker) Authenticate(email string, password string, dry bool) error
 	t.Page.MustElement(`input[name="password"]`).Input(password)
 	t.Page.MustElement(`button[type="submit"]`).MustClick()
 	if !dry {
-		runtime.EventsEmit(t.ctx, `auth-loaded`, 30)
+		wails.EventsEmit(t.ctx, `auth-loaded`, 30)
 	}
 	// Wait for redirection
 	var secondsWaited time.Duration = 0
@@ -54,7 +54,7 @@ func (t *SF6Tracker) Authenticate(email string, password string, dry bool) error
 		secondsWaited += time.Second
 		fmt.Println(`Waiting for gateway to pass...`, secondsWaited)
 		if secondsWaited > (3*time.Second) && !dry {
-			runtime.EventsEmit(t.ctx, `auth-loaded`, (secondsWaited/time.Second)*10)
+			wails.EventsEmit(t.ctx, `auth-loaded`, (secondsWaited/time.Second)*10)
 		}
 	}
 
@@ -62,7 +62,7 @@ func (t *SF6Tracker) Authenticate(email string, password string, dry bool) error
 	t.Page.MustWaitLoad().MustWaitRequestIdle()
 
 	if !dry {
-		runtime.EventsEmit(t.ctx, `initialized`, true)
+		wails.EventsEmit(t.ctx, `initialized`, true)
 		t.isAuthenticated = true
 	}
 

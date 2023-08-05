@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/go-rod/rod/lib/proto"
-	"github.com/wailsapp/wails/v2/pkg/runtime"
+	wails "github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 var (
@@ -93,5 +93,5 @@ func (t *SFVTracker) Authenticate(username string, password string, dry bool) er
 func (t *SFVTracker) setInitialized() {
 	fmt.Println(`Gateway passed`)
 	t.isAuthenticated = true
-	runtime.EventsEmit(t.ctx, `initialized`, true)
+	wails.EventsEmit(t.ctx, `initialized`, true)
 }

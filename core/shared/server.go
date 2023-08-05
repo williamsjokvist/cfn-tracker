@@ -1,4 +1,4 @@
-package common
+package shared
 
 import (
 	"context"
@@ -10,16 +10,18 @@ import (
 	"strings"
 	"time"
 
-	"github.com/wailsapp/wails/v2/pkg/runtime"
+	wails "github.com/wailsapp/wails/v2/pkg/runtime"
+
+	"github.com/williamsjokvist/cfn-tracker/core/data"
 )
 
-//go:embed server/index.html
+//go:embed static/index.html
 var page []byte
 
-//go:embed server/index.js
+//go:embed static/index.js
 var js []byte
 
-//go:embed server/default.css
+//go:embed static/default.css
 var css []byte
 
 const PORT = 4242
@@ -50,8 +52,8 @@ func Serve(ctx context.Context) {
 
 	var mhJson *[]byte
 
-	runtime.EventsOn(ctx, `cfn-data`, func(data ...interface{}) {
-		mh, ok := data[0].(*MatchHistory)
+	wails.EventsOn(ctx, `cfn-data`, func(incomingData ...interface{}) {
+		mh, ok := incomingData[0].(*data.MatchHistory)
 		if !ok {
 			return
 		}

@@ -5,15 +5,16 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/williamsjokvist/cfn-tracker/core/common"
-	"github.com/williamsjokvist/cfn-tracker/core/sf6"
-	"github.com/williamsjokvist/cfn-tracker/core/sfv"
+	"github.com/williamsjokvist/cfn-tracker/core/data"
+	"github.com/williamsjokvist/cfn-tracker/core/impl/sf6"
+	"github.com/williamsjokvist/cfn-tracker/core/impl/sfv"
+	"github.com/williamsjokvist/cfn-tracker/core/shared"
 )
 
 type GameTracker interface {
 	Start(cfn string, restore bool, refreshInterval time.Duration) error
 	Stop()
-	GetMatchHistory() *common.MatchHistory
+	GetMatchHistory() *data.MatchHistory
 }
 
 type GameType uint8
@@ -37,7 +38,7 @@ func (s GameType) String() string {
 }
 
 // Make a SF6Tracker and expose it as a GameTracker
-func MakeSF6Tracker(ctx context.Context, browser *common.Browser, username string, password string) (GameTracker, error) {
+func MakeSF6Tracker(ctx context.Context, browser *shared.Browser, username string, password string) (GameTracker, error) {
 	sf6Tracker := sf6.NewSF6Tracker(ctx, browser)
 	err := sf6Tracker.Authenticate(username, password, false)
 	if err != nil {
@@ -48,7 +49,7 @@ func MakeSF6Tracker(ctx context.Context, browser *common.Browser, username strin
 }
 
 // Make a SFVTracker and expose it as a GameTracker
-func MakeSFVTracker(ctx context.Context, browser *common.Browser, username string, password string) (GameTracker, error) {
+func MakeSFVTracker(ctx context.Context, browser *shared.Browser, username string, password string) (GameTracker, error) {
 	sfvTracker := sfv.NewSFVTracker(ctx, browser)
 	err := sfvTracker.Authenticate(username, password, false)
 	if err != nil {
