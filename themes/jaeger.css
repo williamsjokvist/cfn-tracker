@@ -1,0 +1,52 @@
+@import url("https://fonts.googleapis.com/css2?family=Pirata+One&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Nova+Cut&display=swap");
+body {
+  background: black;
+}
+
+stat-list {
+  display: block;
+  max-width: 500px;
+
+  letter-spacing: 1px;
+  line-height: 28px;
+  font-size: 2rem;
+
+  --stat-title-color: #ff47a3;
+  --stat-value-color: #fff;
+  --stat-bg-color: transparent;
+}
+
+stat-list::part(list-item) {
+  display: flex;
+  line-height: 18px;
+  white-space: nowrap;
+  margin-top: 8px;
+  overflow: hidden;
+
+  background: repeating-linear-gradient(
+    145deg,
+    #211c23,
+    #211c23 15px,
+    #231d25 15px,
+    #231d25 20px
+  );
+}
+
+stat-list::part(list-title),
+stat-list::part(list-value) {
+  padding: 15px 25px;
+  max-width: 250px;
+  width: 100%;
+}
+
+stat-list::part(list-title) {
+  font-family: "Pirata One", Helvetica, cursive;
+  text-transform: uppercase;
+  background: rgba(0, 0, 0, 0.25);
+}
+
+stat-list::part(list-value) {
+  font-family: "Nova Cut", Helvetica, cursive;
+  font-size: 26px;
+}

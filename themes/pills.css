@@ -1,40 +1,41 @@
-body {
-  background: #2E3440;
-  font-family: Helvetica;
+@import url("https://fonts.googleapis.com/css2?family=Cherry+Bomb+One&display=swap");
 
-  --stat-title-color: #61cd7a;
-  --stat-value-color: #fff;
-  --stat-bg-color: transparent;
+body {
+  background: #2e3440;
 }
 
 stat-list {
-  display: block;
-  max-width: 490px;
+  max-width: 690px;
+  font-family: "Cherry Bomb One", Helvetica, cursive;
+
+  --stat-title-color: #63c2e8;
+  --stat-value-color: #fff;
+  --stat-bg-color: transparent;
 }
 
 stat-list::part(list-item) {
   display: flex;
   justify-content: space-between;
-  font-size: 1rem;
-  line-height: 8px;
+  font-size: 2rem;
+  line-height: 18px;
   white-space: nowrap;
   margin-bottom: 8px;
   overflow: hidden;
   border-radius: 25px;
 }
 
-stat-list::part(list-title), stat-list::part(list-value) {
+stat-list::part(list-title),
+stat-list::part(list-value) {
   padding: 15px 25px;
-  font-weight: 100;
   width: 100%;
 }
 
 stat-list::part(list-title) {
-  background: #364446;
+  background: #42404d;
   text-align: right;
 }
 
 stat-list::part(list-value) {
-  background: #222730;
+  background: #2e242e;
   text-align: left;
 }

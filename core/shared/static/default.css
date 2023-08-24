@@ -1,20 +1,27 @@
-body {
-  background: radial-gradient(circle at 52.1% -29.6%, rgb(144, 17, 105) 0%, rgb(51, 0, 131) 100.2%);
-  background-attachment: fixed;
-  white-space: nowrap;
-  font-family: Verdana, sans-serif;
+@import url("https://fonts.googleapis.com/css2?family=League+Spartan:wght@200;600&display=swap");
 
-  --stat-title-color: rgb(255, 255, 255);
-  --stat-value-color: rgb(255, 255, 255);
-  --stat-bg-color: rgb(248 250 252 / 0.05);
+body {
+  background: radial-gradient(
+    circle at 52.1% -29.6%,
+    rgb(144, 17, 105) 0%,
+    rgb(51, 0, 131) 100.2%
+  );
+  background-attachment: fixed;
 }
 
 /* Stat list container */
 stat-list {
   display: grid;
   gap: 8px;
-  max-width: 300px;
+  max-width: 400px;
   width: 100%;
+
+  font-family: "League Spartan", Verdana, sans-serif;
+  white-space: nowrap;
+
+  --stat-title-color: rgb(255, 255, 255);
+  --stat-value-color: rgb(255, 255, 255);
+  --stat-bg-color: rgb(248 250 252 / 0.05);
 }
 
 /* Stat container */
@@ -23,19 +30,22 @@ stat-list::part(list-item) {
   justify-content: space-between;
   background: var(--stat-bg-color);
   padding: 0.75rem;
+  padding-bottom: 0.25rem;
   border-radius: 0.75rem;
-  font-size: 1.125rem;
-  line-height: 1.75rem;
 }
 
 /* Stat title (Wins, Losses, Win Rate, LP Gain etc.) */
 stat-list::part(list-title) {
   color: var(--stat-title-color);
-  font-weight: 100;
+  font-weight: 200;
+  letter-spacing: 0.05em;
+  font-size: 24px;
 }
 
 /* Stat value */
 stat-list::part(list-value) {
   color: var(--stat-value-color);
-  font-weight: bold;
+  font-weight: 600;
+  font-size: 2.5rem;
+  line-height: 2.5rem;
 }

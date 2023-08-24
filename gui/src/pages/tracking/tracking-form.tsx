@@ -98,11 +98,7 @@ export const TrackingForm: React.FC = () => {
         </div>
       )*/}
       <div className="flex justify-end">
-        <ActionButton
-          type="submit"
-          className="mt-4"
-          style={{ filter: "hue-rotate(156deg)" }}
-        >
+        <ActionButton type="submit" style={{ filter: "hue-rotate(156deg)" }}>
           {t("start")}
         </ActionButton>
       </div>

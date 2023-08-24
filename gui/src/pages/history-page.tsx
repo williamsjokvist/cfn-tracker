@@ -139,20 +139,18 @@ export const HistoryPage: React.FC = () => {
             transition={{ delay: 0.225 }}
             className="grid max-h-[340px] h-full m-4 justify-center content-start overflow-y-scroll gap-5"
           >
-            {availableLogs.map((cfn) => {
-              return (
-                <button
-                  className="bg-[rgb(255,255,255,0.075)] hover:bg-[rgb(255,255,255,0.125)] text-xl backdrop-blur rounded-2xl transition-all items-center border-transparent border-opacity-5 border-[1px] px-3 py-1"
-                  key={cfn}
-                  onClick={() => {
-                    setLog(cfn);
-                    fetchLog(cfn);
-                  }}
-                >
-                  {cfn}
-                </button>
-              );
-            })}
+            {availableLogs.map((cfn) => (
+              <button
+                className="bg-[rgb(255,255,255,0.075)] hover:bg-[rgb(255,255,255,0.125)] text-xl backdrop-blur rounded-2xl transition-all items-center border-transparent border-opacity-5 border-[1px] px-3 py-1"
+                key={cfn}
+                onClick={() => {
+                  setLog(cfn);
+                  fetchLog(cfn);
+                }}
+              >
+                {cfn}
+              </button>
+            ))}
           </motion.div>
         )}
         {matchLog && chosenLog && (
@@ -189,52 +187,50 @@ export const HistoryPage: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {matchLog.map((log) => {
-                  return (
-                    <tr
-                      key={`${log.timestamp}-${log.totalMatches}`}
-                      className="backdrop-blur group"
+                {matchLog.map((log) => (
+                  <tr
+                    key={`${log.timestamp}-${log.totalMatches}`}
+                    className="backdrop-blur group"
+                  >
+                    <td
+                      onClick={() => filterLog("date", log.date)}
+                      className="whitespace-nowrap text-left rounded-l-xl rounded-r-none bg-slate-50 bg-opacity-5 group-hover:bg-opacity-10 transition-colors px-3 py-2 hover:underline cursor-pointer"
                     >
-                      <td
-                        onClick={() => filterLog("date", log.date)}
-                        className="whitespace-nowrap text-left rounded-l-xl rounded-r-none bg-slate-50 bg-opacity-5 group-hover:bg-opacity-10 transition-colors px-3 py-2 hover:underline cursor-pointer"
-                      >
-                        {log.date}
-                      </td>
-                      <td className="whitespace-nowrap text-left bg-slate-50 bg-opacity-5 group-hover:bg-opacity-10 transition-colors px-3 py-2">
-                        {log.timestamp}
-                      </td>
-                      <td
-                        onClick={() => filterLog("opponent", log.opponent)}
-                        className="whitespace-nowrap rounded-none bg-slate-50 bg-opacity-5 group-hover:bg-opacity-10 transition-colors px-3 py-2 hover:underline cursor-pointer"
-                      >
-                        {log.opponent}
-                      </td>
-                      <td
-                        onClick={() =>
-                          filterLog("opponentLeague", log.opponentLeague)
-                        }
-                        className="whitespace-nowrap rounded-none bg-slate-50 bg-opacity-5 group-hover:bg-opacity-10 transition-colors px-3 py-2 hover:underline cursor-pointer"
-                      >
-                        {log.opponentLeague}
-                      </td>
-                      <td
-                        onClick={() =>
-                          filterLog("opponentCharacter", log.opponentCharacter)
-                        }
-                        className="rounded-none bg-slate-50 bg-opacity-5 group-hover:bg-opacity-10 transition-colors px-3 py-2 text-center hover:underline cursor-pointer"
-                      >
-                        {log.opponentCharacter}
-                      </td>
-                      <td
-                        className="rounded-r-xl rounded-l-none bg-slate-50 bg-opacity-5 group-hover:bg-opacity-10 transition-colors px-3 py-2 text-center"
-                        style={{ color: log.result == true ? "lime" : "red" }}
-                      >
-                        {log.result == true ? "W" : "L"}
-                      </td>
-                    </tr>
-                  );
-                })}
+                      {log.date}
+                    </td>
+                    <td className="whitespace-nowrap text-left bg-slate-50 bg-opacity-5 group-hover:bg-opacity-10 transition-colors px-3 py-2">
+                      {log.timestamp}
+                    </td>
+                    <td
+                      onClick={() => filterLog("opponent", log.opponent)}
+                      className="whitespace-nowrap rounded-none bg-slate-50 bg-opacity-5 group-hover:bg-opacity-10 transition-colors px-3 py-2 hover:underline cursor-pointer"
+                    >
+                      {log.opponent}
+                    </td>
+                    <td
+                      onClick={() =>
+                        filterLog("opponentLeague", log.opponentLeague)
+                      }
+                      className="whitespace-nowrap rounded-none bg-slate-50 bg-opacity-5 group-hover:bg-opacity-10 transition-colors px-3 py-2 hover:underline cursor-pointer"
+                    >
+                      {log.opponentLeague}
+                    </td>
+                    <td
+                      onClick={() =>
+                        filterLog("opponentCharacter", log.opponentCharacter)
+                      }
+                      className="rounded-none bg-slate-50 bg-opacity-5 group-hover:bg-opacity-10 transition-colors px-3 py-2 text-center hover:underline cursor-pointer"
+                    >
+                      {log.opponentCharacter}
+                    </td>
+                    <td
+                      className="rounded-r-xl rounded-l-none bg-slate-50 bg-opacity-5 group-hover:bg-opacity-10 transition-colors px-3 py-2 text-center"
+                      style={{ color: log.result == true ? "lime" : "red" }}
+                    >
+                      {log.result == true ? "W" : "L"}
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </motion.table>
           </div>

@@ -1,30 +1,30 @@
+@import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap");
+
 body {
-  background: #1E283C;
-  font-family: Helvetica;
+  background: #1e283c;
+}
+
+stat-list {
+  font-family: "Bebas Neue", Helvetica;
+  font-size: 2rem;
 
   --stat-title-color: #66e6ff;
   --stat-value-color: #fff;
   --stat-bg-color: transparent;
 }
 
-stat-list {
-  display: block;
-  max-width: 490px;
-}
-
 stat-list::part(list-item) {
   display: flex;
   justify-content: space-between;
-  font-size: 1.125rem;
-  line-height: 8px;
+  line-height: 18px;
   white-space: nowrap;
   margin-bottom: 8px;
   clip-path: polygon(5% 5%, 100% 0%, 95% 95%, 0% 100%);
 }
 
-stat-list::part(list-title), stat-list::part(list-value) {
-  padding: 15px 25px;
-  font-weight: 100;
+stat-list::part(list-title),
+stat-list::part(list-value) {
+  padding: 20px 25px;
   width: 100%;
 }
 
