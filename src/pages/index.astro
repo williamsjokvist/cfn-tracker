@@ -47,14 +47,14 @@ import World from "../components/World.astro";
     </div>
     <section class="grid gap-6 mt-6 max-w-[45ch] text-center mx-auto px-6">
       <a
-        href="https://github.com/GreenSoap/cfn-tracker/releases/download/v3.0.0/CFN_Tracker_Windows.zip"
+        href="https://github.com/GreenSoap/cfn-tracker/releases/download/v4.0.0/CFN_Tracker_Windows.zip"
         class="link-card windows flex gap-2 justify-between items-center rounded-full px-6 py-4 text-2xl w-full"
       >
         <Icon name="mdi:microsoft-windows" class="w-8 h-8" />
         <span>Download for Windows</span>
       </a>
       <a
-        href="https://github.com/GreenSoap/cfn-tracker/releases/download/v3.0.0/CFN_Tracker_macOS.zip"
+        href="https://github.com/GreenSoap/cfn-tracker/releases/download/v4.0.0/CFN_Tracker_macOS.zip"
         class="link-card mac flex gap-2 justify-between items-center rounded-full px-6 py-4 text-2xl w-full"
       >
         <Icon name="mdi:apple" class="w-8 h-8" />
@@ -75,11 +75,11 @@ import World from "../components/World.astro";
       >
       <a
         class="text-lg flex gap-4 hover:underline"
-        href="https://github.com/GreenSoap/cfn-tracker/releases/tag/v3.0.0"
+        href="https://github.com/GreenSoap/cfn-tracker/releases/tag/v4.0.0"
         target="_blank"
       >
         <Icon name="uil:clipboard-notes" class="w-8 h-8" />
-        Changelog</a
+         Changelog</a
       >
       <a
         class="flex gap-4 hover:underline"
@@ -102,21 +102,21 @@ import World from "../components/World.astro";
       </ol>
       <br />
       <br />
-      Text files will be generated in a results folder, which are updated after every
-      match. Use them as sources for your labels in e.g. OBS.
+       Text files will be generated in a results folder, which are updated after
+      every match. Use them as sources for your labels in e.g. OBS.
       <br />
       <br />
-      All of the logged matches are listed in the Match Log tab, and can be filtered
-      by character, date, league and opponent.
+       All of the logged matches are listed in the Match Log tab, and can be
+      filtered by character, date, league and opponent.
       <br />
       <br />
-      The app has translations for <b>English</b>, <b>French</b> and <b
+       The app has translations for <b>English</b>, <b>French</b> and <b
         >Japanese</b
       >.
       <br />
       <br />
-      The app will start with a notification if an update has released. You can also
-      follow me on Twitter for update tweets.
+       The app will start with a notification if an update has released. You can
+      also follow me on Twitter for update tweets.
     </section>
     <section class="pb-24">
       <h2 class="text-center text-3xl mt-32 mb-16">Screenshots</h2>
@@ -139,37 +139,37 @@ import World from "../components/World.astro";
 <World />
 
 <script defer>
-  const fetchCFNTrackerDownloadCount = async () => {
-    const res = await fetch(
-      `https://api.github.com/repos/greensoap/cfn-tracker/releases`,
-      {
-        method: `GET`,
-      }
-    );
-
-    if (res.status == 200) {
-      const releases = await res.json();
-
-      let downloadCount = 0;
-      for (const release of releases) {
-        const macDownloadCount = release.assets[0].download_count;
-        const windowsDownloadCount = release.assets[1].download_count;
-
-        downloadCount += macDownloadCount;
-        downloadCount += windowsDownloadCount;
-      }
-      return downloadCount;
-    } else if (res.status == 404) {
-      return 0;
+const fetchCFNTrackerDownloadCount = async () => {
+  const res = await fetch(
+    `https://api.github.com/repos/greensoap/cfn-tracker/releases`,
+    {
+      method: `GET`,
     }
-  };
+  );
 
-  document.addEventListener("DOMContentLoaded", async () => {
-    const download_count = await fetchCFNTrackerDownloadCount();
+  if (res.status == 200) {
+    const releases = await res.json();
 
-    const cfnTrackerEl = document.getElementById(`cfn-tracker-download-count`);
-    cfnTrackerEl.innerText = download_count;
-  });
+    let downloadCount = 0;
+    for (const release of releases) {
+      const macDownloadCount = release.assets[0].download_count;
+      const windowsDownloadCount = release.assets[1].download_count;
+
+      downloadCount += macDownloadCount;
+      downloadCount += windowsDownloadCount;
+    }
+    return downloadCount;
+  } else if (res.status == 404) {
+    return 0;
+  }
+};
+
+document.addEventListener("DOMContentLoaded", async () => {
+  const download_count = await fetchCFNTrackerDownloadCount();
+
+  const cfnTrackerEl = document.getElementById(`cfn-tracker-download-count`);
+  cfnTrackerEl.innerText = download_count;
+});
 </script>
 
 <style>

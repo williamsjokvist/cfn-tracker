@@ -6,7 +6,7 @@ export interface Props {
 const { title } = Astro.props;
 ---
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -19,7 +19,7 @@ const { title } = Astro.props;
     />
     <meta name="generator" content={Astro.generator} />
     <title>CFN Tracker</title>
-    <link rel="icon" type="image/x-icon" href="/cfn-tracker/favicon.ico">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
   </head>
   <body>
     <slot />
@@ -32,15 +32,14 @@ const { title } = Astro.props;
       45deg,
       rgb(var(--accent)),
       #ffb5f1 30%,
-      rgba(0,0,0,0.75) 60%
+      rgba(0, 0, 0, 0.75) 60%
     );
   }
   html {
-
   }
 
   body {
-    font-family: 'Ubuntu', system-ui, sans-serif;
+    font-family: "Ubuntu", system-ui, sans-serif;
     background: linear-gradient(0deg, black 0%, rgb(54, 6, 102) 100%);
     background-attachment: fixed;
     min-height: 100%;
