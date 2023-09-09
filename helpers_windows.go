@@ -12,7 +12,6 @@ import (
 	"golang.org/x/sys/windows"
 )
 
-// by: github.com/zveinn
 func cleanUpProcess() {
 	handle, err := windows.CreateToolhelp32Snapshot(windows.TH32CS_SNAPPROCESS, 0)
 	if err != nil {
@@ -27,22 +26,24 @@ func cleanUpProcess() {
 			break
 		}
 
-		if strings.Contains(windows.UTF16ToString(p.ExeFile[:]), "tracker") && p.ProcessID != uint32(os.Getpid()) {
-			didKillProcess = true
-
-			process, err := os.FindProcess(int(p.ProcessID))
-			if err != nil {
-				fmt.Println("Error killing remnant process by ID: ", p.ProcessID, " msg: ", err)
-				continue
-			}
-
-			err = process.Kill()
-			if err != nil {
-				process.Signal(syscall.SIGQUIT)
-				process.Signal(syscall.SIGTERM)
-				fmt.Println("Error killing remnant process by ID: ", p.ProcessID, " msg: ", err)
-			}
+		if !strings.Contains(windows.UTF16ToString(p.ExeFile[:]), "CFN Tracker") || p.ProcessID == uint32(os.Getpid()) {
+			continue
 		}
+
+		process, err := os.FindProcess(int(p.ProcessID))
+		if err != nil {
+			fmt.Println("Error killing remnant process by ID: ", p.ProcessID, " msg: ", err)
+			continue
+		}
+
+		err = process.Kill()
+		if err != nil {
+			process.Signal(syscall.SIGQUIT)
+			process.Signal(syscall.SIGTERM)
+			fmt.Println("Error killing remnant process by ID: ", p.ProcessID, " msg: ", err)
+		}
+
+		didKillProcess = true
 	}
 
 	if didKillProcess {

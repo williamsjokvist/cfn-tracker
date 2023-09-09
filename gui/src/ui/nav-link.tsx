@@ -6,9 +6,9 @@ type NavigationLinkProps = {
   icon: string;
   href: string;
   name: string;
+  isMinimized: boolean;
   isSelected?: boolean;
   selectedIcon?: string;
-  isMinimized: boolean;
 };
 export const NavigationLink: React.FC<NavigationLinkProps> = (props) => (
   <a

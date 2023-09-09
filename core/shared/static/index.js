@@ -76,11 +76,16 @@ const defineCustomElements = () => {
 const convertToNaturalLanguage = (stat, value) => {
   let s = stat, v = value
   switch (stat) {
-    case 'cfn': case 'lp':
+    case 'cfn': case 'lp': case 'mr':
       s = stat.toUpperCase()
       break
-    case 'lpGain':
+    case 'lpGain': 
       s = stat.replace('lp', 'LP ')
+      if (value > 0)
+        v = '+' + value
+      break
+    case 'mrGain': 
+      s = stat.replace('mr', 'MR ')
       if (value > 0)
         v = '+' + value
       break

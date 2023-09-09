@@ -1,6 +1,6 @@
 import React from "react";
 import { Trans, useTranslation } from "react-i18next";
-import { motion } from "framer-motion";
+import { motion, useAnimate } from "framer-motion";
 import { Icon } from "@iconify/react";
 
 import { PageHeader } from "@/ui/page-header";
@@ -14,8 +14,10 @@ const defaultOptions = {
   wins: true,
   losses: true,
   winRate: true,
-  lpGain: true,
   lp: false,
+  mr: true,
+  lpGain: false,
+  mrGain: true,
   opponent: false,
   opponentCharacter: false,
   opponentLeague: false,
@@ -31,6 +33,8 @@ export const OutputPage: React.FC = () => {
   const { t } = useTranslation();
   const [options, setOptions] = React.useState(defaultOptions);
   const [themes, setThemes] = React.useState<string[]>([]);
+  const [scope, animate] = useAnimate();
+
   React.useEffect(() => {
     if (themes.length == 0) {
       GetThemeList().then((themes) => setThemes(themes));
@@ -45,6 +49,17 @@ export const OutputPage: React.FC = () => {
     }
 
     navigator.clipboard.writeText(url);
+
+    animate("#ok",
+      { opacity: [0, 1], y: [-30, -40] },
+      { delay: 0.125 }
+    ).then(() => {
+      animate("#ok",
+        { opacity: [1, 0], y: [-40, -40] },
+        { delay: .5 }
+      );
+    })
+
   };
   return (
     <>
@@ -68,7 +83,8 @@ export const OutputPage: React.FC = () => {
                 </Trans>
               </p>
             </div>
-            <div>
+            <div ref={scope}>
+              <motion.span initial={{ opacity: 0 }} id="ok" className='h-0 top-2 -left-6 block relative text-2xl font-bold'>👌</motion.span>
               <ActionButton
                 onClick={copyUrlToClipBoard}
                 style={{ filter: "hue-rotate(-120deg)" }}
@@ -98,15 +114,16 @@ export const OutputPage: React.FC = () => {
               </select>
             </div>
             <div>
-              <h3 className="text-xl font-bold">{t("pickTheme")}</h3>
-              <p>
-                <Trans t={t} i18nKey="createTheme">
-                  To create your own theme in CSS, create a
-                  <i>yourthemename.css</i> file in the <i>themes folder</i> and
-                  it will appear in the menu here. You can look at the
-                  <i>nord.css</i> file for reference.
-                </Trans>
-              </p>
+              
+              <ActionButton
+                onClick={() => {
+
+                }}
+                style={{ filter: "hue-rotate(-320deg)" }}
+              >
+                <Icon icon="ph:paint-bucket-fill" className="mr-3 w-6 h-6" />
+                Pick Theme
+              </ActionButton>
             </div>
           </div>
 

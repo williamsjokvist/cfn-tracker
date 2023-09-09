@@ -27,7 +27,7 @@ export const TrackingGamePicker: React.FC = () => {
   const [_, send] = CFNMachineContext.useActor();
 
   return (
-    <div className="w-full flex items-center flex-col gap-10">
+    <div className="flex items-center flex-col gap-10 justify-self-center justify-center">
       <motion.ul
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}

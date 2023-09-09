@@ -1,10 +1,12 @@
 import React from "react";
 import clsx from "clsx";
 
-export const Checkbox: React.FC<React.InputHTMLAttributes<HTMLInputElement>> = (
-  props
+export const Checkbox = React.forwardRef((
+  props: React.InputHTMLAttributes<HTMLInputElement>,
+  ref: React.MutableRefObject<HTMLInputElement>
 ) => (
   <input
+    ref={ref}
     type="checkbox"
     className={clsx(
       "w-7 h-7 rounded-md cursor-pointer mr-4 bg-transparent text-transparent",
@@ -14,4 +16,4 @@ export const Checkbox: React.FC<React.InputHTMLAttributes<HTMLInputElement>> = (
     )}
     {...props}
   />
-);
+));

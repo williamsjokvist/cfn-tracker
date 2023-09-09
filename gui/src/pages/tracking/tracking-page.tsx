@@ -24,11 +24,9 @@ export const TrackingPage: React.FC = () => {
           showSpinner: true,
         })}
       />
-      <div className="z-40 h-full w-full justify-self-center flex justify-between items-center px-8 py-4">
         {state.matches("gamePicking") && <TrackingGamePicker />}
         {state.matches("tracking") && <TrackingLiveUpdater />}
         {state.matches("idle") && <TrackingForm />}
-      </div>
     </>
   );
 };

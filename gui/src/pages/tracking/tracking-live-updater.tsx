@@ -7,18 +7,23 @@ import { CFNMachineContext } from "@/main/machine";
 import { ActionButton } from "@/ui/action-button";
 import { StopTracking } from "@@/go/core/CommandHandler";
 
-type BigStatProps = {
+type StatProps = {
   text: string;
   value: string | number;
 };
-const BigStat: React.FC<BigStatProps> = ({ text, value }) => {
-  return (
-    <div className="mb-2 flex gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl">
-      <dt className="tracking-wider font-extralight">{text}</dt>
-      <dd className="text-4xl font-semibold">{value}</dd>
-    </div>
-  );
-};
+const BigStat: React.FC<StatProps> = ({ text, value }) => (
+  <div className="mb-2 flex flex-1 gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl">
+    <dt className="tracking-wider font-extralight">{text}</dt>
+    <dd className="text-4xl font-semibold">{value}</dd>
+  </div>
+);
+
+const SmallStat: React.FC<StatProps> = ({ text, value }) => (
+  <div className="flex gap-3 text-2xl">
+    <dt className='text-xl leading-8'>{text}</dt>
+    <dd className="font-bold">{value}</dd>
+  </div>
+)
 
 export const TrackingLiveUpdater: React.FC = () => {
   const { t } = useTranslation();
@@ -26,10 +31,12 @@ export const TrackingLiveUpdater: React.FC = () => {
   const {
     cfn,
     lp,
+    mr,
     wins,
     losses,
     winStreak,
     lpGain,
+    mrGain,
     winRate,
     opponent,
     opponentCharacter,
@@ -39,7 +46,7 @@ export const TrackingLiveUpdater: React.FC = () => {
 
   const PieChart = (
     <ReactMinimalPieChart
-      className="pie-chart animate-enter w-[45px] backdrop-blur"
+      className="pie-chart animate-enter w-[150px] h-[150px] mx-auto"
       animate
       animationDuration={750}
       lineWidth={85}
@@ -74,71 +81,61 @@ export const TrackingLiveUpdater: React.FC = () => {
   );
 
   return (
-    <>
-      <motion.section
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.125 }}
-        className="relative w-full h-full max-w-[360px]"
-      >
-        <header className="flex whitespace-nowrap items-start justify-between w-full">
-          <h3 className="whitespace-nowrap max-w-[145px] text-2xl">
-            <span className="text-sm block">CFN</span>
-            <b className="text-ellipsis block overflow-hidden">{cfn}</b>
-          </h3>
-          <h3 className="text-2xl">
-            <span className="text-sm block">LP</span>
-            <b>{`${lp == -1 ? t("placement") : lp}`}</b>
-          </h3>
-          <div className="relative flex gap-5 text-right">
-            <h3 className="text-2xl relative">
-              <span className="text-sm block">{t("winRate")}</span>
-              <b>{winRate + "%"}</b>
-            </h3>
-            {PieChart}
+    <motion.section           
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ delay: 0.125 }} 
+      className="px-6 pt-4 h-full"
+    >
+      <dl className="flex whitespace-nowrap items-start justify-between w-full">
+        <SmallStat text="CFN" value={cfn} />
+        <SmallStat text="LP" value={`${lp == -1 ? t("placement") : lp}`} />
+        <SmallStat text="MR" value={`${mr == -1 ? t("placement") : mr}`} />
+        <SmallStat text={t("winRate")} value={`${winRate}%`} />
+      </dl>
+      <div className="flex gap-12 pt-3 pb-5 h-[calc(100%-32px)]">
+        <dl className="w-full text-lg whitespace-nowrap">
+          <div className="flex justify-between gap-2">
+            <BigStat text={t("wins")} value={wins} />
+            <BigStat text={t("losses")} value={losses} />
           </div>
-        </header>
-        <dl className="stat-grid-item w-full mt-2 relative text-center text-lg whitespace-nowrap">
-          <BigStat text={t("wins")} value={wins} />
-          <BigStat text={t("losses")} value={losses} />
           <BigStat text={t("winStreak")} value={winStreak} />
-          <BigStat
-            text={t("lpGain")}
-            value={`${lpGain > 0 ? `+` : ``}${lpGain}`}
-          />
+          <div className="flex justify-between gap-2">
+            <BigStat text={t("lpGain")} value={`${lpGain > 0 ? `+` : ``}${lpGain}`} />
+            <BigStat text={t("mrGain")} value={`${mrGain > 0 ? `+` : ``}${mrGain}`} />
+          </div>
         </dl>
-      </motion.section>
-      <motion.section
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.35 }}
-        className="relative text-center w-[300px] h-full grid content-between justify-items-end"
-      >
-        <div className="w-full max-w-[280px] mx-auto whitespace-nowrap text-md">
-          {opponent != "" && (
-            <ul>
-              <li className="group leading-none flex justify-between p-2 border-b-[1px] border-white border-opacity-25 border-solid">
-                <span>Last opponent</span>
-                <div className="relative">
-                  <b>{opponent}</b>
-                  <div className="group-hover:opacity-100 opacity-0 pointer-events-none absolute top-5 transition-all bg-[rgba(0,0,0,.525)] backdrop-blur-xl px-3 py-2 right-0 rounded-md">
-                    <b className="mr-2">{opponentCharacter}</b>
-                    <span>{`(${opponentLeague})`}</span>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.35 }}
+          className="relative h-full max-w-[280px] w-full text-center gap-5"
+        >
+          {PieChart}
+          <div className="w-full max-w-[320px] mx-auto whitespace-nowrap text-lg mt-5">
+            {opponent != "" && (
+              <ul>
+                <li className="group leading-none flex justify-between p-2">
+                  <span>Last opponent</span>
+                  <div className="relative">
+                    <b>{opponent}</b>
+                    <div className="group-hover:opacity-100 opacity-0 pointer-events-none absolute top-5 transition-all bg-[rgba(0,0,0,.525)] backdrop-blur-xl px-3 py-2 right-0 rounded-md">
+                      <b className="mr-2">{opponentCharacter}</b>
+                      <span>{`(${opponentLeague})`}</span>
+                    </div>
                   </div>
-                </div>
-              </li>
-              <li className="leading-none flex justify-between p-2 border-b-[1px] border-white border-opacity-25 border-solid">
-                <span>Last match result</span>
-                <div>
-                  <b>{result ? "WIN" : "LOSE"}</b>
-                </div>
-              </li>
-            </ul>
-          )}
-        </div>
-
-        <div className="flex items-start justify-end w-full m-3 gap-5">
+                </li>
+                <li className="leading-none flex justify-between p-2">
+                  <span>Last match result</span>
+                  <div>
+                    <b>{result ? "WIN" : "LOSE"}</b>
+                  </div>
+                </li>
+              </ul>
+            )}
+          </div>
           <ActionButton
+            className="absolute bottom-0 right-0"
             onClick={() => {
               StopTracking(); // TODO: this should be part of the state machine
               send("stoppedTracking");
@@ -147,8 +144,8 @@ export const TrackingLiveUpdater: React.FC = () => {
             <Icon icon="fa6-solid:stop" className="mr-3 w-5 h-5" />
             {t("stop")}
           </ActionButton>
-        </div>
-      </motion.section>
-    </>
+        </motion.div>
+      </div>
+    </motion.section>
   );
 };

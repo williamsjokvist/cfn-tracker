@@ -3,18 +3,19 @@ import { Outlet } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import { CFNMachineContext } from "@/main/machine";
-import { BrowserOpenURL, EventsOn } from "@@/runtime";
-
 import { AppSidebar } from "@/main/app-layout/app-sidebar";
+import { ErrorMessage, useErrorMessage } from "@/main/error-message";
+
 import { LoadingBar } from "@/ui/loading-bar";
-import { ErrorMessage } from "@/ui/error-message";
 import { UpdatePrompt } from "@/ui/update-prompt";
+
+import { BrowserOpenURL, EventsOn } from "@@/runtime";
 
 export const AppWrapper: React.FC = () => {
   const { t } = useTranslation();
   const [loaded, setLoaded] = React.useState(0);
-  const [errMsg, setErrMsg] = React.useState<string | undefined>();
   const [hasNewVersion, setNewVersion] = React.useState(false);
+  const { setErrorMessage } = useErrorMessage()
 
   const [_, send] = CFNMachineContext.useActor();
 
@@ -42,25 +43,25 @@ export const AppWrapper: React.FC = () => {
         type: "errorCfn",
         error,
       });
-      setErrMsg(t("cfnError"));
+      setErrorMessage(t("cfnError"));
     });
   }, []);
 
   return (
     <>
       <AppSidebar />
-
       <main>
-        <ErrorMessage message={errMsg} />
+        <ErrorMessage />
         <LoadingBar percentage={loaded} />
-        <UpdatePrompt
-          onDismiss={() => {
-            BrowserOpenURL("https://williamsjokvist.github.io/cfn-tracker/");
-            setNewVersion(false);
-          }}
-          text={t("newVersionAvailable")}
-          show={hasNewVersion}
-        />
+        {hasNewVersion && (
+          <UpdatePrompt
+            onDismiss={() => {
+              BrowserOpenURL("https://williamsjokvist.github.io/cfn-tracker/");
+              setNewVersion(false);
+            }}
+            text={t("newVersionAvailable")}
+          />
+        )}
         <Outlet />
       </main>
     </>

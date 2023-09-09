@@ -3,8 +3,10 @@ import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 
 import { CFNMachineContext } from "@/main/machine";
-import { GetAvailableLogs, ResultsJSONExist } from "@@/go/core/CommandHandler";
+import { GetAvailableLogs } from "@@/go/core/CommandHandler";
+
 import { ActionButton } from "@/ui/action-button";
+import { Checkbox } from "@/ui/checkbox";
 
 export const TrackingForm: React.FC = () => {
   const { t } = useTranslation();
@@ -13,26 +15,20 @@ export const TrackingForm: React.FC = () => {
   const cfnInputRef = React.useRef<HTMLInputElement>(null);
   const restoreRef = React.useRef<HTMLInputElement>(null);
 
+  const [cfnInput, setCfnInput] = React.useState<string>("")
   const [oldCfns, setOldCfns] = React.useState<string[] | null>(null);
-  const [lastJSONExist, setLastJSONExist] = React.useState<boolean>(false);
-  const [restore, setRestore] = React.useState(false);
 
   React.useEffect(() => {
-    if (oldCfns) return;
-    GetAvailableLogs().then((logs) => setOldCfns(logs));
-    ResultsJSONExist().then((exists) => setLastJSONExist(exists));
-  }, [oldCfns]);
+    GetAvailableLogs().then(logs => setOldCfns(logs));
+  }, []);
 
-  const onSubmit = (e: any) => {
+  const onSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
-
-    const cfn = cfnInputRef.current.value;
-    if (!restore && cfn == "") return;
-
+    if (cfnInput == "") return;
     send({
       type: "submit",
-      cfn: cfn,
-      restore,
+      cfn: cfnInput, 
+      restore: restoreRef.current && restoreRef.current.checked,
     });
   };
 
@@ -41,15 +37,15 @@ export const TrackingForm: React.FC = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ delay: 0.125 }}
-      className="max-w-[450px] mx-auto"
+      className="relative h-full overflow-y-scroll overflow-x-visible w-full justify-self-center flex flex-col pt-12 gap-5 px-40 pb-4"
       onSubmit={onSubmit}
     >
-      <h3 className="mb-2 text-lg">{t("enterCfnName")}:</h3>
+      <h3 className="text-lg">{t("enterCfnName")}</h3>
       <input
         ref={cfnInputRef}
+        onChange={e => setCfnInput(e.target.value)}
         className="bg-transparent border-b-2 border-0 focus:ring-offset-transparent focus:ring-transparent border-b-[rgba(255,255,255,0.275)] focus:border-white hover:border-white outline-none focus:outline-none hover:text-white transition-colors py-3 px-4 block w-full text-lg text-gray-300"
         type="text"
-        disabled={restore}
         placeholder={t("cfnName")!}
         autoCapitalize="off"
         autoComplete="off"
@@ -57,51 +53,41 @@ export const TrackingForm: React.FC = () => {
         autoSave="off"
       />
       {oldCfns && (
-        <div className="mt-3 flex flex-wrap gap-2 content-center items-center text-center pr-3">
-          {oldCfns.map((cfn) => {
-            return (
-              <button
-                disabled={false}
-                onClick={(_) => {
-                  if (!cfnInputRef.current) return;
-                  //if (!(cfnInputRef.current && restoreRef.current)) return
-
+        <div className="flex flex-wrap gap-2 content-center items-center text-center">
+          {oldCfns.map(cfn => (
+            <button
+              key={cfn}
+              type="button"
+              onClick={(_) => {
+                if (cfnInputRef.current) {
                   cfnInputRef.current.value = cfn;
-                  // restoreRef.current.checked = false
-                  setRestore(false);
-                }}
-                className="whitespace-nowrap bg-[rgb(255,255,255,0.075)] hover:bg-[rgb(255,255,255,0.125)] text-base backdrop-blur rounded-2xl transition-all items-center border-transparent border-opacity-5 border-[1px] px-3 py-1"
-                type="button"
-                key={cfn}
-              >
-                {cfn}
-              </button>
-            );
-          })}
+                  setCfnInput(cfn)
+                }
+              }}
+              className="whitespace-nowrap bg-[rgb(255,255,255,0.075)] hover:bg-[rgb(255,255,255,0.125)] text-base rounded-2xl transition-all items-center px-3 pt-1"
+            >
+              {cfn}
+            </button>
+          ))} 
         </div>
       )}
-      {/*lastJSONExist && (
-        <div className={`text-lg flex items-center mt-4`}>
-          <input
-            {...register('restore')}
-            ref={restoreRef}
-            type="checkbox"
-            className="w-7 h-7 rounded-md checked:border-2 checked:focus:border-[rgba(255,255,255,.25)] checked:hover:border-[rgba(255,255,255,.25)] checked:border-[rgba(255,255,255,.25)] border-2 border-[rgba(255,255,255,.25)] focus:border-2 cursor-pointer bg-transparent text-transparent focus:ring-offset-transparent focus:ring-transparent mr-4"
-            onChange={e => {
-              if (e.target.checked) {
-                setRestore(e.target.checked)
-                cfnInputRef.current.value = ''
-              }
-            }}
-          />
-          {t("restoreSession")}
-        </div>
-      )*/}
-      <div className="flex justify-end">
-        <ActionButton type="submit" style={{ filter: "hue-rotate(156deg)" }}>
+      <footer className="flex items-center w-full">
+        {oldCfns && oldCfns.includes(cfnInput) &&
+          <div className="group flex items-center">
+            <Checkbox ref={restoreRef} id="restore-session"/> 
+            <label htmlFor="restore-session" className="text-lg cursor-pointer text-gray-300 group-hover:text-white transition-colors">
+              {t("restoreSession")}
+            </label>
+          </div>
+        }
+        <ActionButton 
+          type="submit" 
+          style={{ filter: "hue-rotate(-65deg)" }}
+          className="ml-auto"
+        >
           {t("start")}
         </ActionButton>
-      </div>
+      </footer>
     </motion.form>
   );
 };

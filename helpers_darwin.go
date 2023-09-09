@@ -13,7 +13,6 @@ import (
 	"github.com/shirou/gopsutil/process"
 )
 
-// by: github.com/zveinn
 func cleanUpProcess() {
 	defer func() {
 		if r := recover(); r != nil {

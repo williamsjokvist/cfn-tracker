@@ -20,7 +20,6 @@ const BASE_URL = `https://www.streetfighter.com/6/buckler`
 
 var (
 	ErrUnauthenticated = errors.New(`sf6 authentication err or invalid cfn`)
-	ErrRestoreData     = errors.New(`restore data mismatch`)
 )
 
 type SF6Tracker struct {
@@ -31,6 +30,8 @@ type SF6Tracker struct {
 	mh               *data.MatchHistory
 	gains            map[string]int
 	startingPoints   map[string]int
+	gainsMR          map[string]int
+	startingMR       map[string]int
 	currentCharacter string
 	cookie           string
 	*shared.Browser
@@ -43,10 +44,16 @@ func NewSF6Tracker(ctx context.Context, browser *shared.Browser) *SF6Tracker {
 		mh:               data.NewMatchHistory(``),
 		Browser:          browser,
 		stopTracking:     func() {},
-		gains:            make(map[string]int, 42), // Make room for 42 characters
-		startingPoints:   make(map[string]int, 42), // Make room for 42 characters
 		currentCharacter: ``,
 		cookie:           ``,
+
+		// LP
+		gains:          make(map[string]int, 42),
+		startingPoints: make(map[string]int, 42),
+
+		// MR
+		gainsMR:    make(map[string]int, 42),
+		startingMR: make(map[string]int, 42),
 	}
 }
 
@@ -67,17 +74,27 @@ func (t *SF6Tracker) Start(cfn string, restoreData bool, refreshInterval time.Du
 	}
 
 	if restoreData {
-		lastSavedMatchHistory, err := data.GetLastSavedMatchHistory()
+		lastSavedMatchHistory, err := data.GetSavedMatchHistory(cfn)
 		if err != nil {
-			return ErrRestoreData
+			return err
 		}
 		t.mh = lastSavedMatchHistory
 		cfn = t.mh.CFN
+		t.startingMR[t.mh.Character] = t.mh.MR
+		t.startingPoints[t.mh.Character] = t.mh.LP
+		t.gains[t.mh.Character] = t.mh.LPGain
+		t.gainsMR[t.mh.Character] = t.mh.MRGain
+
 	} else if !restoreData {
 		t.mh.Reset()
-	}
+		t.currentCharacter = ``
+		t.mh = data.NewMatchHistory(cfn)
+		t.gains = make(map[string]int, 42)
+		t.startingPoints = make(map[string]int, 42)
 
-	t.mh = data.NewMatchHistory(cfn)
+		t.gainsMR = make(map[string]int, 42)
+		t.startingMR = make(map[string]int, 42)
+	}
 
 	fmt.Println(`Loading profile`)
 	cfnID, err := t.fetchCfnIDByCfn(cfn)
@@ -89,9 +106,8 @@ func (t *SF6Tracker) Start(cfn string, restoreData bool, refreshInterval time.Du
 		t.stopped()
 		return ErrUnauthenticated
 	}
-
 	if !restoreData {
-		// t.refreshMatchHistory(battleLog)
+		t.refreshMatchHistory(battleLog)
 	}
 
 	fmt.Println(`Profile loaded `)
@@ -198,21 +214,36 @@ func (t *SF6Tracker) refreshMatchHistory(battleLog *BattleLog) {
 	}
 
 	newLP := battleLog.Props.PageProps.FighterBannerInfo.FavoriteCharacterLeagueInfo.LeaguePoint
+	newMR := battleLog.Props.PageProps.FighterBannerInfo.FavoriteCharacterLeagueInfo.MasterRating
 
-	// assign starting values if switched characters and that character has no points
+	// assign new starting values
 	if t.currentCharacter != me.CharacterName && t.startingPoints[me.CharacterName] == 0 {
+		t.mh = &data.MatchHistory{
+			CFN: me.Player.FighterID,
+			LP:  newLP,
+			MR:  newMR,
+		}
+
+		t.currentCharacter = me.CharacterName
 		t.startingPoints[me.CharacterName] = newLP
+		t.startingMR[me.CharacterName] = newMR
 		t.gains[me.CharacterName] = 0
-		t.mh.LP = newLP
+		t.gainsMR[me.CharacterName] = 0
+
+		t.mh.Save()
+		t.mh.Log()
+		wails.EventsEmit(t.ctx, `cfn-data`, t.mh)
+		return
 	}
 
-	// Abort if no match has been played
+	// Abort if no new match has been played
 	if t.mh.LP == newLP {
 		return
 	}
 
 	t.currentCharacter = me.CharacterName
 	t.gains[me.CharacterName] = newLP - t.startingPoints[me.CharacterName]
+	t.gainsMR[me.CharacterName] = newMR - t.startingMR[me.CharacterName]
 
 	// Update match counters
 	roundsPlayed := len(me.RoundResults)
@@ -237,16 +268,20 @@ func (t *SF6Tracker) refreshMatchHistory(battleLog *BattleLog) {
 	}
 
 	newLPGain := t.gains[me.CharacterName]
+	newMRGain := t.gainsMR[me.CharacterName]
 
 	// Don't track lpgain on placement matches
 	if newLP == -1 {
 		newLPGain = 0
+		newMRGain = 0
 	}
 
 	t.mh = &data.MatchHistory{
 		CFN:          me.Player.FighterID,
 		LP:           newLP,
 		LPGain:       newLPGain,
+		MR:           newMR,
+		MRGain:       newMRGain,
 		WinRate:      int((float64(newWins) / float64(newWins+newLosses)) * 100),
 		TotalMatches: t.mh.TotalMatches + 1,
 
@@ -264,9 +299,9 @@ func (t *SF6Tracker) refreshMatchHistory(battleLog *BattleLog) {
 		Date:      time.Now().Format(`2006-01-02`),
 	}
 
-	wails.EventsEmit(t.ctx, `cfn-data`, t.mh)
 	t.mh.Save()
 	t.mh.Log()
+	wails.EventsEmit(t.ctx, `cfn-data`, t.mh)
 }
 
 func (t *SF6Tracker) stopped() {

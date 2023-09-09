@@ -15,12 +15,15 @@ type MatchHistory struct {
 	CFN               string `json:"cfn"`
 	LP                int    `json:"lp"`
 	LPGain            int    `json:"lpGain"`
+	MR                int    `json:"mr"`
+	MRGain            int    `json:"mrGain"`
 	Wins              int    `json:"wins"`
 	TotalWins         int    `json:"totalWins"`
 	TotalLosses       int    `json:"totalLosses"`
 	TotalMatches      int    `json:"totalMatches"`
 	Losses            int    `json:"losses"`
 	WinRate           int    `json:"winRate"`
+	Character         string `json:"character",`
 	Opponent          string `json:"opponent"`
 	OpponentCharacter string `json:"opponentCharacter"`
 	OpponentLP        int    `json:"opponentLP"`
@@ -36,6 +39,8 @@ func NewMatchHistory(cfn string) *MatchHistory {
 		CFN:               cfn,
 		LP:                0,
 		LPGain:            0,
+		MR:                0,
+		MRGain:            0,
 		Wins:              0,
 		Losses:            0,
 		TotalWins:         0,
@@ -46,6 +51,7 @@ func NewMatchHistory(cfn string) *MatchHistory {
 		IsWin:             false,
 		TimeStamp:         ``,
 		Date:              ``,
+		Character:         ``,
 		Opponent:          ``,
 		OpponentCharacter: ``,
 		OpponentLP:        0,
@@ -57,7 +63,9 @@ func (mh *MatchHistory) Log() {
 	fmt.Println(`
 		[`+time.Now().Format(`15:04`)+`]	
 		LP:`, mh.LP, `/ 
-		Gain:`, mh.LPGain, `/ 
+		LP Gain:`, mh.LPGain, `/ 
+		MR:`, mh.MR, `/ 
+		MR Gain:`, mh.MRGain, `/ 
 		Wins:`, mh.Wins, `/ 
 		Losses:`, mh.Losses, `/ 
 		Winrate:`, mh.WinRate, `%`,
@@ -70,6 +78,7 @@ func (mh *MatchHistory) Save() error {
 	saveTextToFile(`results`, `win-rate.txt`, strconv.Itoa(mh.WinRate)+`%`)
 	saveTextToFile(`results`, `win-streak.txt`, strconv.Itoa(mh.WinStreak))
 	saveTextToFile(`results`, `lp.txt`, strconv.Itoa(mh.LP))
+	saveTextToFile(`results`, `mr.txt`, strconv.Itoa(mh.LP))
 	gain := strconv.Itoa(mh.LPGain)
 
 	if mh.LPGain > 0 {
@@ -122,6 +131,8 @@ func (mh *MatchHistory) Reset() {
 		CFN:          ``,
 		LP:           0,
 		LPGain:       0,
+		MR:           0,
+		MRGain:       0,
 		Wins:         0,
 		Losses:       0,
 		TotalWins:    0,
@@ -230,20 +241,12 @@ func ExportLog(cfn string) error {
 	return nil
 }
 
-func GetLastSavedMatchHistory() (*MatchHistory, error) {
-	var result MatchHistory
-
-	pastResultsFile, err := os.ReadFile(`results/results.json`)
+func GetSavedMatchHistory(cfn string) (*MatchHistory, error) {
+	mh, err := GetLog(cfn)
 	if err != nil {
-		return nil, fmt.Errorf(`nonexisting results file: %w`, err)
+		return nil, err
 	}
-
-	err = json.Unmarshal(pastResultsFile, &result)
-	if err != nil {
-		return nil, fmt.Errorf(`err unmarshal match history: %w`, err)
-	}
-
-	return &result, nil
+	return &mh[0], nil
 }
 
 func saveTextToFile(directory string, fileName string, text string) {

@@ -64,7 +64,7 @@ func (t *SFVTracker) Start(cfn string, restoreData bool, refreshInterval time.Du
 	}
 
 	if restoreData {
-		lastSavedMatchHistory, err := data.GetLastSavedMatchHistory()
+		lastSavedMatchHistory, err := data.GetSavedMatchHistory("result")
 		if err == nil {
 			t.mh = lastSavedMatchHistory
 		}
