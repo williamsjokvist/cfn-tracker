@@ -7,10 +7,7 @@ import { CFNMachineContext } from "@/main/machine";
 import { ActionButton } from "@/ui/action-button";
 import { StopTracking } from "@@/go/core/CommandHandler";
 
-type StatProps = {
-  text: string;
-  value: string | number;
-};
+type StatProps = { text: string; value: string | number; };
 const BigStat: React.FC<StatProps> = ({ text, value }) => (
   <div className="mb-2 flex flex-1 gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl">
     <dt className="tracking-wider font-extralight">{text}</dt>
@@ -87,53 +84,46 @@ export const TrackingLiveUpdater: React.FC = () => {
       transition={{ delay: 0.125 }} 
       className="px-6 pt-4 h-full"
     >
-      <dl className="flex whitespace-nowrap items-start justify-between w-full">
+      <dl className="flex whitespace-nowrap items-center justify-between w-full">
         <SmallStat text="CFN" value={cfn} />
-        <SmallStat text="LP" value={`${lp == -1 ? t("placement") : lp}`} />
-        <SmallStat text="MR" value={`${mr == -1 ? t("placement") : mr}`} />
-        <SmallStat text={t("winRate")} value={`${winRate}%`} />
+        <div className="flex justify-between gap-8">
+          <SmallStat text="LP" value={`${lp == -1 ? t("placement") : lp}`} />
+          <SmallStat text="MR" value={`${mr == -1 ? t("placement") : mr}`} />
+        </div>
       </dl>
       <div className="flex gap-12 pt-3 pb-5 h-[calc(100%-32px)]">
-        <dl className="w-full text-lg whitespace-nowrap">
-          <div className="flex justify-between gap-2">
-            <BigStat text={t("wins")} value={wins} />
-            <BigStat text={t("losses")} value={losses} />
-          </div>
-          <BigStat text={t("winStreak")} value={winStreak} />
-          <div className="flex justify-between gap-2">
-            <BigStat text={t("lpGain")} value={`${lpGain > 0 ? `+` : ``}${lpGain}`} />
-            <BigStat text={t("mrGain")} value={`${mrGain > 0 ? `+` : ``}${mrGain}`} />
-          </div>
-        </dl>
+        <div className="w-full">
+          <dl className="text-lg whitespace-nowrap">
+            <div className="flex justify-between gap-2">
+              <BigStat text={t("wins")} value={wins} />
+              <BigStat text={t("losses")} value={losses} />
+            </div>
+            <div className="flex justify-between gap-2">
+              <BigStat text={t("winRate")} value={`${winRate}%`} />
+              <BigStat text={t("winStreak")} value={winStreak} />
+            </div>
+            <div className="flex justify-between gap-2">
+              <BigStat text={t("lpGain")} value={`${lpGain > 0 ? `+` : ``}${lpGain}`} />
+              <BigStat text={t("mrGain")} value={`${mrGain > 0 ? `+` : ``}${mrGain}`} />
+            </div>
+          </dl>
+          {opponent != "" && (
+            <div className="text-lg group leading-none flex items-center justify-between bg-slate-50 bg-opacity-5 p-3 pb-2 rounded-xl">
+              <span>{t('lastMatch')}</span>
+              <div className="relative flex items-center gap-2">
+                <Icon icon={result ? "twemoji:victory-hand" : "twemoji:pensive-face"} width={25} /> vs
+                <b>{opponent}</b> - {opponentCharacter} ({ opponentLeague })
+              </div>
+            </div>
+          )}
+        </div>
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.35 }}
-          className="relative h-full max-w-[280px] w-full text-center gap-5"
+          className="relative h-full max-w-[220px] w-full text-center gap-5 pt-8"
         >
           {PieChart}
-          <div className="w-full max-w-[320px] mx-auto whitespace-nowrap text-lg mt-5">
-            {opponent != "" && (
-              <ul>
-                <li className="group leading-none flex justify-between p-2">
-                  <span>Last opponent</span>
-                  <div className="relative">
-                    <b>{opponent}</b>
-                    <div className="group-hover:opacity-100 opacity-0 pointer-events-none absolute top-5 transition-all bg-[rgba(0,0,0,.525)] backdrop-blur-xl px-3 py-2 right-0 rounded-md">
-                      <b className="mr-2">{opponentCharacter}</b>
-                      <span>{`(${opponentLeague})`}</span>
-                    </div>
-                  </div>
-                </li>
-                <li className="leading-none flex justify-between p-2">
-                  <span>Last match result</span>
-                  <div>
-                    <b>{result ? "WIN" : "LOSE"}</b>
-                  </div>
-                </li>
-              </ul>
-            )}
-          </div>
           <ActionButton
             className="absolute bottom-0 right-0"
             onClick={() => {

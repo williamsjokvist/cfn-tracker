@@ -24,6 +24,9 @@ main
   color: #fff
   margin: 0 auto
 
+#root
+  transition: filter .25s ease
+
 .page-header
   display: flex
   justify-content: space-between
@@ -66,3 +69,33 @@ main
 @keyframes blink
   50%
     color: #fff
+
+.DialogOverlay
+  background: rgba(0 0 0 / 0.25)
+  position: fixed
+  top: 0
+  left: 0
+  right: 0
+  bottom: 0
+  display: grid
+  place-items: center
+  overflow-y: auto
+
+.DialogContent
+  position: fixed
+  z-index: 9999
+  left: 50%
+  top: 50%
+  transform: translate(-50%, -50%)
+  width: 450px
+  color: #fff
+  background: #000000aa
+  backdrop-filter: blur(5px)
+  padding: 20px 25px
+  border-radius: 24px
+  font-size: 18px
+  height: 420px
+  box-shadow: 0 3px 16px rgba(0,0,0,.5)
+
+body[style="pointer-events: none;"] > #root
+  filter: blur(12px)

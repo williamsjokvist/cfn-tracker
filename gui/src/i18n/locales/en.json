@@ -43,7 +43,10 @@
   "browserSourceDescription": "The easiest way to display the stats in OBS is to use <1>Browser Source</1>. After editing the options, copy the browser source link.",
   "pickTheme": "Pick a theme to display in the browser source",
   "createTheme": "To create your own theme in CSS, create a <1>yourthemename.css</1> file in the <2>themes folder</2> and it will appear in the menu here. You can look at the <3>nord.css</3> file for reference.",
-  "displayStats": "Display Stats (Browser Source)",
+  "displayStats": "Select stats to display",
   "importFiles": "Importing text files",
-  "obsCustomize": "If you want to customize through OBS, you can use <1>Text Labels</1> and add the text files in the results folder as sources"
+  "obsCustomize": "If you want to customize through OBS, you can use <1>Text Labels</1> and add the text files in the results folder as sources",
+  "lastMatch": "Last match",
+  "statsWillBeDisplayed": "The stats selected will be displayed on the browser source output",
+  "selectTheme": "Select theme"
 }
