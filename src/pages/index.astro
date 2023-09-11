@@ -7,15 +7,11 @@ import World from "../components/World.astro";
 <Layout title="Welcome to Astro.">
   <header class="text-center pt-4 px-3">
     <img
-      src="https://raw.githubusercontent.com/GreenSoap/cfn-tracker/master/build/appicon.png"
-      class="w-full max-w-[260px] mx-auto"
+      src="https://raw.githubusercontent.com/williamsjokvist/cfn-tracker/master/build/appicon.png"
+      class="w-full max-w-[50ch] mx-auto"
       alt="CFN Tracker logotype"
     />
-    <h1>
-      <span class="">CFN</span>
-      <span class="">Tracker</span>
-    </h1>
-    <h2 id="catchphrase" class="text-2xl mt-8 mb-12">
+    <h2 id="catchphrase" class="text-4xl mt-8 mb-12">
       <span>Track</span>
       <span>the</span>
       <span class="text-gradient">live</span>
@@ -26,7 +22,7 @@ import World from "../components/World.astro";
       <span>any</span>
       <span>Street</span>
       <span>Fighter</span>
-      <span class="text-gradient">V</span>
+      <span class="text-gradient">6</span>
       <span>account</span>
     </h2>
   </header>
@@ -61,21 +57,22 @@ import World from "../components/World.astro";
         <span>Download for Mac</span>
       </a>
 
-      <span class="text-lg text-right"
-        ><b id="cfn-tracker-download-count"></b> total downloads</span
+      <span class="text-lg text-center"
+        ><b id="cfn-tracker-download-count"></b> downloads</span
       >
     </section>
     <div
-      class="pt-6 justify-around lowercase border-t-[1px] max-w-[60ch] mx-auto mt-8 px-4 border-white flex gap-7 flex-wrap"
+      class="pt-6 justify-around lowercase max-w-[60ch] mx-auto mt-8 px-4 flex gap-7 flex-wrap"
     >
       <a
         class="text-lg flex gap-4 hover:underline"
-        href="https://github.com/GreenSoap/cfn-tracker/"
-        target="_blank"><Icon name="mdi:github" class="w-8 h-8" /> Source</a
-      >
+        href="https://github.com/williamsjokvist/cfn-tracker/"
+        target="_blank">
+        <Icon name="mdi:github" class="w-8 h-8" /> Source
+      </a>
       <a
         class="text-lg flex gap-4 hover:underline"
-        href="https://github.com/GreenSoap/cfn-tracker/releases/tag/v4.0.0"
+        href="https://github.com/williamsjokvist/cfn-tracker/releases/tag/v4.0.0"
         target="_blank"
       >
         <Icon name="uil:clipboard-notes" class="w-8 h-8" />
@@ -85,51 +82,32 @@ import World from "../components/World.astro";
         class="flex gap-4 hover:underline"
         href="https://twitter.com/greensoap_"
         target="_blank"
-        ><Icon name="mdi:twitter" class="w-8 h-8 text-[#8ee5ff]" /> greensoap_</a
       >
+        <Icon name="mdi:twitter" class="w-8 h-8 text-[#8ee5ff]" />
+      </a>
     </div>
-    <section class="pb-12 mx-auto max-w-[70ch] w-full text-shadow-sm px-8">
-      <h2 class="text-center text-3xl mt-32 mb-16 text-shadow-none">Usage</h2>
-      <ol class="list-decimal ml-3">
-        <li>
-          Download the app for either Mac or Windows from the download page.
-        </li>
-        <li>
-          Extract the app from the zip and put it the folder of your choice.
-        </li>
-        <li>Launch it and wait for it to finish initializing.</li>
-        <li>Input your CFN when prompted and start.</li>
-      </ol>
-      <br />
-      <br />
-       Text files will be generated in a results folder, which are updated after
-      every match. Use them as sources for your labels in e.g. OBS.
-      <br />
-      <br />
-       All of the logged matches are listed in the Match Log tab, and can be
-      filtered by character, date, league and opponent.
-      <br />
-      <br />
-       The app has translations for <b>English</b>, <b>French</b> and <b
-        >Japanese</b
-      >.
-      <br />
-      <br />
-       The app will start with a notification if an update has released. You can
-      also follow me on Twitter for update tweets.
-    </section>
     <section class="pb-24">
       <h2 class="text-center text-3xl mt-32 mb-16">Screenshots</h2>
       <div class="flex flex-wrap gap-4 justify-around">
         <img
           class="w-full max-w-[750px]"
-          src="https://raw.githubusercontent.com/GreenSoap/cfn-tracker/master/showcase/tracking.jpg"
+          src="https://raw.githubusercontent.com/williamsjokvist/cfn-tracker/github-pages/public/tracking.png"
           alt="Screenshot of in progress tracking"
         />
         <img
           class="w-full max-w-[750px]"
-          src="https://raw.githubusercontent.com/GreenSoap/cfn-tracker/master/showcase/log.jpg"
+          src="https://raw.githubusercontent.com/williamsjokvist/cfn-tracker/github-pages/public/log.png"
           alt="Screenshot of the match log"
+        />
+        <img
+          class="w-full max-w-[750px]"
+          src="https://raw.githubusercontent.com/williamsjokvist/cfn-tracker/github-pages/public/themes.png"
+          alt="Screenshot of the theme select"
+        />
+        <img
+          class="w-full max-w-[750px]"
+          src="https://raw.githubusercontent.com/williamsjokvist/cfn-tracker/github-pages/public/stats.png"
+          alt="Screenshot of the stats select"
         />
       </div>
     </section>
@@ -141,7 +119,7 @@ import World from "../components/World.astro";
 <script defer>
 const fetchCFNTrackerDownloadCount = async () => {
   const res = await fetch(
-    `https://api.github.com/repos/greensoap/cfn-tracker/releases`,
+    `https://api.github.com/repos/williamsjokvist/cfn-tracker/releases`,
     {
       method: `GET`,
     }
@@ -152,11 +130,9 @@ const fetchCFNTrackerDownloadCount = async () => {
 
     let downloadCount = 0;
     for (const release of releases) {
-      const macDownloadCount = release.assets[0].download_count;
-      const windowsDownloadCount = release.assets[1].download_count;
-
-      downloadCount += macDownloadCount;
-      downloadCount += windowsDownloadCount;
+      for (const asset of release.assets) {
+        downloadCount += asset.download_count
+      }
     }
     return downloadCount;
   } else if (res.status == 404) {
