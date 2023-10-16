@@ -13,6 +13,7 @@ import (
 
 type MatchHistory struct {
 	CFN               string `json:"cfn"`
+	UserCode          string `json:"userCode"`
 	LP                int    `json:"lp"`
 	LPGain            int    `json:"lpGain"`
 	MR                int    `json:"mr"`
@@ -23,7 +24,7 @@ type MatchHistory struct {
 	TotalMatches      int    `json:"totalMatches"`
 	Losses            int    `json:"losses"`
 	WinRate           int    `json:"winRate"`
-	Character         string `json:"character",`
+	Character         string `json:"character"`
 	Opponent          string `json:"opponent"`
 	OpponentCharacter string `json:"opponentCharacter"`
 	OpponentLP        int    `json:"opponentLP"`
@@ -103,11 +104,10 @@ func (mh *MatchHistory) Save() error {
 	// Now save current results to the entire log
 	var arr []MatchHistory
 
-	pastMatches, err := os.ReadFile(`results/` + mh.CFN + `-log.json`)
+	fileName := fmt.Sprintf(`%s-%s-log.json`, mh.CFN, mh.UserCode)
+	pastMatches, err := os.ReadFile(`results/` + fileName)
 	if err != nil {
-		// No past matches
-		str := "[" + string(mhMarshalled) + "]"
-		saveTextToFile(`results`, mh.CFN+`-log.json`, str)
+		saveTextToFile(`results`, fileName, fmt.Sprintf(`[%s]`, string(mhMarshalled)))
 		return nil
 	}
 
@@ -122,7 +122,7 @@ func (mh *MatchHistory) Save() error {
 		return fmt.Errorf(`marshal match history: %w`, err)
 	}
 
-	saveTextToFile(`results`, mh.CFN+`-log.json`, string(newArrMarshalled))
+	saveTextToFile(`results`, fileName, string(newArrMarshalled))
 	return nil
 }
 
@@ -181,7 +181,7 @@ func GetLoggedCFNs() ([]string, error) {
 			continue
 		}
 
-		cfn := strings.Split(fileName, `-log.json`)[0]
+		cfn := strings.Split(fileName, `-`)[0]
 		cfns = append(cfns, cfn)
 	}
 
