@@ -32,8 +32,7 @@ export const HistoryPage: React.FC = () => {
   };
 
   React.useEffect(() => {
-    if (availableLogs.length === 0)
-      GetAvailableLogs().then((logs) => logs && setAvailableLogs(cur => logs));
+    GetAvailableLogs().then((logs) => logs && setAvailableLogs(cur => logs));
   }, []);
 
   React.useEffect(() => {
