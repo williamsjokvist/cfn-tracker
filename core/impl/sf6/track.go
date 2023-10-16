@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"strconv"
 	"time"
 
 	wails "github.com/wailsapp/wails/v2/pkg/runtime"
@@ -63,7 +62,7 @@ func (t *SF6Tracker) Stop() {
 }
 
 // Start will update the MatchHistory when new matches are played.
-func (t *SF6Tracker) Start(cfn string, restoreData bool, refreshInterval time.Duration) error {
+func (t *SF6Tracker) Start(userCode string, restoreData bool, refreshInterval time.Duration) error {
 	// safe guard
 	if t.isTracking {
 		return nil
@@ -74,12 +73,12 @@ func (t *SF6Tracker) Start(cfn string, restoreData bool, refreshInterval time.Du
 	}
 
 	if restoreData {
-		lastSavedMatchHistory, err := data.GetSavedMatchHistory(cfn)
+		lastSavedMatchHistory, err := data.GetSavedMatchHistory(userCode)
 		if err != nil {
 			return err
 		}
 		t.mh = lastSavedMatchHistory
-		cfn = t.mh.CFN
+		userCode = t.mh.UserCode
 		t.startingMR[t.mh.Character] = t.mh.MR
 		t.startingPoints[t.mh.Character] = t.mh.LP
 		t.gains[t.mh.Character] = t.mh.LPGain
@@ -88,7 +87,7 @@ func (t *SF6Tracker) Start(cfn string, restoreData bool, refreshInterval time.Du
 	} else if !restoreData {
 		t.mh.Reset()
 		t.currentCharacter = ``
-		t.mh = data.NewMatchHistory(cfn)
+		t.mh = data.NewMatchHistory(userCode)
 		t.gains = make(map[string]int, 42)
 		t.startingPoints = make(map[string]int, 42)
 
@@ -97,11 +96,7 @@ func (t *SF6Tracker) Start(cfn string, restoreData bool, refreshInterval time.Du
 	}
 
 	fmt.Println(`Loading profile`)
-	cfnID, err := t.fetchCfnIDByCfn(cfn)
-	if err != nil {
-		return fmt.Errorf(`cfn not exists: %v`, err)
-	}
-	battleLog := t.fetchBattleLog(cfnID)
+	battleLog := t.fetchBattleLog(userCode)
 	if battleLog.Props.PageProps.Common.StatusCode != 200 {
 		t.stopped()
 		return ErrUnauthenticated
@@ -117,7 +112,7 @@ func (t *SF6Tracker) Start(cfn string, restoreData bool, refreshInterval time.Du
 
 	ctx, cancel := context.WithCancel(context.Background())
 	t.stopTracking = cancel
-	go t.poll(ctx, cfnID, refreshInterval)
+	go t.poll(ctx, userCode, refreshInterval)
 
 	return nil
 }
@@ -147,31 +142,6 @@ func (t *SF6Tracker) poll(ctx context.Context, cfnID string, refreshInterval tim
 	}
 }
 
-func (t *SF6Tracker) fetchCfnIDByCfn(cfn string) (string, error) {
-	t.Page.MustNavigate(fmt.Sprintf(`%s/fighterslist/search/result?fighter_id=%s`, BASE_URL, cfn)).
-		MustWaitLoad().
-		MustWaitIdle()
-
-	body := t.Page.MustElement(`#__NEXT_DATA__`).MustText()
-
-	var searchResult SearchResult
-	err := json.Unmarshal([]byte(body), &searchResult)
-	if err != nil {
-		return "", fmt.Errorf(`unmarshal cfn search: %v`, err)
-	}
-
-	cfnID := 0
-	for _, fighter := range searchResult.Props.PageProps.FighterBannerList {
-		cfnID = int(fighter.PersonalInfo.ShortID)
-	}
-
-	if cfnID == 0 {
-		return "", fmt.Errorf(`cfn "%s" missing in search result`, cfn)
-	}
-
-	return strconv.Itoa(cfnID), nil
-}
-
 func (t *SF6Tracker) fetchBattleLog(cfnID string) *BattleLog {
 	fmt.Println(`Fetched battle log`)
 	t.Page.MustNavigate(fmt.Sprintf(`%s/profile/%s/battlelog/rank`, BASE_URL, cfnID)).
@@ -190,16 +160,15 @@ func (t *SF6Tracker) fetchBattleLog(cfnID string) *BattleLog {
 }
 
 func (t *SF6Tracker) refreshMatchHistory(battleLog *BattleLog) {
-	// Assign player infos
-	var me *PlayerInfo
-	var opponent *PlayerInfo
+	t.mh.CFN = battleLog.Props.PageProps.FighterBannerInfo.PersonalInfo.FighterID
 
 	if len(battleLog.Props.PageProps.ReplayList) == 0 {
 		return
 	}
 
 	replay := battleLog.Props.PageProps.ReplayList[0]
-
+	var me *PlayerInfo
+	var opponent *PlayerInfo
 	if t.mh.CFN == replay.Player1Info.Player.FighterID {
 		me = &replay.Player1Info
 		opponent = &replay.Player2Info
@@ -207,7 +176,6 @@ func (t *SF6Tracker) refreshMatchHistory(battleLog *BattleLog) {
 		me = &replay.Player2Info
 		opponent = &replay.Player1Info
 	}
-
 	if me == nil || opponent == nil {
 		t.stopped()
 		return
