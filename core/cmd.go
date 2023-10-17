@@ -76,7 +76,7 @@ func (ch *CommandHandler) GetMatchLog(cfn string) []data.MatchHistory {
 	return mhLog
 }
 
-func (ch *CommandHandler) GetAvailableLogs() []string {
+func (ch *CommandHandler) GetAvailableLogs() []data.PlayerInfo {
 	loggedCfns, err := data.GetLoggedCFNs()
 	if err != nil {
 		fmt.Println(err)

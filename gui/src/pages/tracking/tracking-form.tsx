@@ -7,6 +7,7 @@ import { GetAvailableLogs } from "@@/go/core/CommandHandler";
 
 import { ActionButton } from "@/ui/action-button";
 import { Checkbox } from "@/ui/checkbox";
+import { data } from "@@/go/models";
 
 export const TrackingForm: React.FC = () => {
   const { t } = useTranslation();
@@ -15,11 +16,13 @@ export const TrackingForm: React.FC = () => {
   const cfnInputRef = React.useRef<HTMLInputElement>(null);
   const restoreRef = React.useRef<HTMLInputElement>(null);
 
-  const [cfnInput, setCfnInput] = React.useState<string>("")
-  const [oldCfns, setOldCfns] = React.useState<string[] | null>(null);
+  const [cfnInput, setCfnInput] = React.useState<string>("");
+  const [oldPlayers, setOldPlayers] = React.useState<data.PlayerInfo[] | null>(
+    null
+  );
 
   React.useEffect(() => {
-    GetAvailableLogs().then(logs => setOldCfns(logs));
+    GetAvailableLogs().then((logs) => setOldPlayers(logs));
   }, []);
 
   const onSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
@@ -27,9 +30,19 @@ export const TrackingForm: React.FC = () => {
     if (cfnInput == "") return;
     send({
       type: "submit",
-      cfn: cfnInput, 
+      cfn: cfnInput,
       restore: restoreRef.current && restoreRef.current.checked,
     });
+  };
+
+  const containsPlayerWithId = (
+    players: data.PlayerInfo[],
+    id: string
+  ): boolean => {
+    return players.some(
+      (p) =>
+        p.cfn === id || (p.userCode && p.userCode !== "" && p.userCode === id)
+    );
   };
 
   return (
@@ -43,7 +56,7 @@ export const TrackingForm: React.FC = () => {
       <h3 className="text-lg">{t("enterCfnName")}</h3>
       <input
         ref={cfnInputRef}
-        onChange={e => setCfnInput(e.target.value)}
+        onChange={(e) => setCfnInput(e.target.value)}
         className="bg-transparent border-b-2 border-0 focus:ring-offset-transparent focus:ring-transparent border-b-[rgba(255,255,255,0.275)] focus:border-white hover:border-white outline-none focus:outline-none hover:text-white transition-colors py-3 px-4 block w-full text-lg text-gray-300"
         type="text"
         placeholder={t("cfnName")!}
@@ -52,36 +65,40 @@ export const TrackingForm: React.FC = () => {
         autoCorrect="off"
         autoSave="off"
       />
-      {oldCfns && (
+      {oldPlayers && (
         <div className="flex flex-wrap gap-2 content-center items-center text-center">
-          {oldCfns.map(cfn => (
+          {oldPlayers.map((player) => (
             <button
-              key={cfn}
+              key={player.cfn}
               type="button"
               onClick={(_) => {
                 if (cfnInputRef.current) {
-                  cfnInputRef.current.value = cfn;
-                  setCfnInput(cfn)
+                  const playerId = player.userCode || player.cfn;
+                  cfnInputRef.current.value = playerId;
+                  setCfnInput(playerId);
                 }
               }}
               className="whitespace-nowrap bg-[rgb(255,255,255,0.075)] hover:bg-[rgb(255,255,255,0.125)] text-base rounded-2xl transition-all items-center px-3 pt-1"
             >
-              {cfn}
+              {player.cfn}
             </button>
-          ))} 
+          ))}
         </div>
       )}
       <footer className="flex items-center w-full">
-        {oldCfns && oldCfns.includes(cfnInput) &&
+        {oldPlayers && containsPlayerWithId(oldPlayers, cfnInput) && (
           <div className="group flex items-center">
-            <Checkbox ref={restoreRef} id="restore-session"/> 
-            <label htmlFor="restore-session" className="text-lg cursor-pointer text-gray-300 group-hover:text-white transition-colors">
+            <Checkbox ref={restoreRef} id="restore-session" />
+            <label
+              htmlFor="restore-session"
+              className="text-lg cursor-pointer text-gray-300 group-hover:text-white transition-colors"
+            >
               {t("restoreSession")}
             </label>
           </div>
-        }
-        <ActionButton 
-          type="submit" 
+        )}
+        <ActionButton
+          type="submit"
           style={{ filter: "hue-rotate(-65deg)" }}
           className="ml-auto"
         >

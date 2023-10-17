@@ -32,7 +32,9 @@ export const HistoryPage: React.FC = () => {
   };
 
   React.useEffect(() => {
-    GetAvailableLogs().then((logs) => logs && setAvailableLogs(cur => logs));
+    GetAvailableLogs().then(
+      (logs) => logs && setAvailableLogs((cur) => logs.map((log) => log.cfn))
+    );
   }, []);
 
   React.useEffect(() => {
@@ -136,13 +138,13 @@ export const HistoryPage: React.FC = () => {
         )}
         {matchLog && chosenLog && (
           <>
-          {totalWinRate != null && (
-            <div className="flex items-center pt-1 px-8 mb-2 h-10 border-b border-slate-50 border-opacity-10 ">
-              <span>
-                {t("winRate")}: <b>{totalWinRate}</b>%
-              </span>
-            </div>
-          )}
+            {totalWinRate != null && (
+              <div className="flex items-center pt-1 px-8 mb-2 h-10 border-b border-slate-50 border-opacity-10 ">
+                <span>
+                  {t("winRate")}: <b>{totalWinRate}</b>%
+                </span>
+              </div>
+            )}
             <div className="overflow-y-scroll max-h-[340px] h-full mx-4 px-4 pb-4">
               <motion.table
                 initial={{ opacity: 0 }}
