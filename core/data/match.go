@@ -36,8 +36,8 @@ type MatchHistory struct {
 }
 
 type PlayerInfo struct {
-	CFN string	`json:"cfn"`
-	UserCode *string 		`json:"userCode"`
+	CFN      string  `json:"cfn"`
+	UserCode *string `json:"userCode"`
 }
 
 func NewMatchHistory(cfn string) *MatchHistory {
@@ -151,7 +151,6 @@ func (mh *MatchHistory) Reset() {
 	}
 	cleanMh.Save()
 }
-
 
 func GetLog(cfn string) ([]MatchHistory, error) {
 	var matchLog []MatchHistory
