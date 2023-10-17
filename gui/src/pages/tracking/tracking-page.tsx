@@ -11,22 +11,14 @@ export const TrackingPage: React.FC = () => {
   const { t } = useTranslation();
   const [state] = CFNMachineContext.useActor();
 
-  return (
-    <>
-      <PageHeader
-        {...(state.matches("tracking") && { text: t("tracking") })}
-        {...(state.matches("idle") && { text: t("startTracking") })}
-        {...(state.matches("gamePicking") && { text: t("pickGame") })}
-        {...((state.matches("loading") || state.matches("loadingCfn")) && {
-          text: t("loading"),
-        })}
-        {...(!(state.matches("idle") || state.matches("gamePicking")) && {
-          showSpinner: true,
-        })}
-      />
-        {state.matches("gamePicking") && <TrackingGamePicker />}
-        {state.matches("tracking") && <TrackingLiveUpdater />}
-        {state.matches("idle") && <TrackingForm />}
-    </>
-  );
+  switch (state.value) {
+    case "gamePicking":
+      return <TrackingGamePicker />
+    case "tracking":
+      return <TrackingLiveUpdater />
+    case "idle":
+      return <TrackingForm />
+    default:
+      return <PageHeader text={t("loading")} showSpinner />
+  }
 };
