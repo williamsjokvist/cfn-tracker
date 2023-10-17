@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"strconv"
 	"time"
 
 	wails "github.com/wailsapp/wails/v2/pkg/runtime"
@@ -188,6 +189,7 @@ func (t *SF6Tracker) refreshMatchHistory(battleLog *BattleLog) {
 	if t.currentCharacter != me.CharacterName && t.startingPoints[me.CharacterName] == 0 {
 		t.mh = &data.MatchHistory{
 			CFN: me.Player.FighterID,
+			UserCode: strconv.FormatInt(me.Player.ShortID, 10),
 			LP:  newLP,
 			MR:  newMR,
 		}
@@ -246,6 +248,7 @@ func (t *SF6Tracker) refreshMatchHistory(battleLog *BattleLog) {
 
 	t.mh = &data.MatchHistory{
 		CFN:          me.Player.FighterID,
+		UserCode: strconv.FormatInt(me.Player.ShortID, 10),
 		LP:           newLP,
 		LPGain:       newLPGain,
 		MR:           newMR,
