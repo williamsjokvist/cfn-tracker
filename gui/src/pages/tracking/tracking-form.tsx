@@ -89,19 +89,12 @@ export const TrackingForm: React.FC = () => {
         {oldPlayers && containsPlayerWithId(oldPlayers, cfnInput) && (
           <div className="group flex items-center">
             <Checkbox ref={restoreRef} id="restore-session" />
-            <label
-              htmlFor="restore-session"
-              className="text-lg cursor-pointer text-gray-300 group-hover:text-white transition-colors"
-            >
+            <label htmlFor="restore-session" className="text-lg cursor-pointer text-gray-300 group-hover:text-white transition-colors">
               {t("restoreSession")}
             </label>
           </div>
         )}
-        <ActionButton
-          type="submit"
-          style={{ filter: "hue-rotate(-65deg)" }}
-          className="ml-auto"
-        >
+        <ActionButton type="submit" style={{ filter: "hue-rotate(-65deg)" }} className="ml-auto">
           {t("start")}
         </ActionButton>
       </footer>
