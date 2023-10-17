@@ -35,6 +35,11 @@ type MatchHistory struct {
 	WinStreak         int    `json:"winStreak"`
 }
 
+type PlayerInfo struct {
+	CFN string	`json:"cfn"`
+	UserCode *string 		`json:"userCode"`
+}
+
 func NewMatchHistory(cfn string) *MatchHistory {
 	return &MatchHistory{
 		CFN:               cfn,
@@ -147,6 +152,7 @@ func (mh *MatchHistory) Reset() {
 	cleanMh.Save()
 }
 
+
 func GetLog(cfn string) ([]MatchHistory, error) {
 	var matchLog []MatchHistory
 	pastMatches, err := os.ReadFile(fmt.Sprintf(`results/%s-log.json`, cfn))
@@ -166,13 +172,13 @@ func DeleteLog(cfn string) error {
 	return nil
 }
 
-func GetLoggedCFNs() ([]string, error) {
+func GetLoggedCFNs() ([]PlayerInfo, error) {
 	files, err := ioutil.ReadDir(`results`)
 	if err != nil {
 		return nil, fmt.Errorf(`read results directory: %w`, err)
 	}
 
-	cfns := []string{}
+	players := []PlayerInfo{}
 
 	for _, file := range files {
 		fileName := file.Name()
@@ -181,11 +187,20 @@ func GetLoggedCFNs() ([]string, error) {
 			continue
 		}
 
-		cfn := strings.Split(fileName, `-`)[0]
-		cfns = append(cfns, cfn)
+		pIds := strings.Split(fileName, `-`)
+
+		p := PlayerInfo{
+			CFN: pIds[0],
+		}
+
+		if len(pIds) >= 2 {
+			p.UserCode = &pIds[1]
+		}
+
+		players = append(players, p)
 	}
 
-	return cfns, nil
+	return players, nil
 }
 
 func ExportLog(cfn string) error {
