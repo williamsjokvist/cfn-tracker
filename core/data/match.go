@@ -192,7 +192,7 @@ func GetLoggedCFNs() ([]PlayerInfo, error) {
 			CFN: pIds[0],
 		}
 
-		if len(pIds) >= 2 {
+		if len(pIds) > 2 {
 			p.UserCode = &pIds[1]
 		}
 
