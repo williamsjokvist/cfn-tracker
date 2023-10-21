@@ -57,19 +57,23 @@ func NewSF6Tracker(ctx context.Context, browser *shared.Browser) *SF6Tracker {
 	}
 }
 
-// Stop will stop any current tracking
+// Stop will stop any current trackingz
 func (t *SF6Tracker) Stop() {
 	t.stopTracking()
 }
 
 // Start will update the MatchHistory when new matches are played.
 func (t *SF6Tracker) Start(userCode string, restoreData bool, refreshInterval time.Duration) error {
+	log.Println(`starting sf6 tracker`)
+
 	// safe guard
 	if t.isTracking {
+		log.Println(`already tracking`)
 		return nil
 	}
 
 	if !t.isAuthenticated {
+		log.Println(`tracker not authenticated`)
 		return ErrUnauthenticated
 	}
 
@@ -96,9 +100,10 @@ func (t *SF6Tracker) Start(userCode string, restoreData bool, refreshInterval ti
 		t.startingMR = make(map[string]int, 42)
 	}
 
-	fmt.Println(`Loading profile`)
+	log.Println(`Loading profile`)
 	battleLog := t.fetchBattleLog(userCode)
 	if battleLog.Props.PageProps.Common.StatusCode != 200 {
+		log.Printf(`failed fetching battle log, received status code %d`, battleLog.Props.PageProps.Common.StatusCode)
 		t.stopped()
 		return ErrUnauthenticated
 	}
@@ -106,7 +111,7 @@ func (t *SF6Tracker) Start(userCode string, restoreData bool, refreshInterval ti
 		t.refreshMatchHistory(battleLog)
 	}
 
-	fmt.Println(`Profile loaded `)
+	log.Println(`Profile loaded `)
 	t.isTracking = true
 	wails.EventsEmit(t.ctx, `started-tracking`)
 	wails.EventsEmit(t.ctx, `cfn-data`, t.mh)
@@ -133,9 +138,10 @@ func (t *SF6Tracker) poll(ctx context.Context, cfnID string, refreshInterval tim
 			t.stopped()
 		}
 
+		log.Println(`polling battle log`)
 		battleLog := t.fetchBattleLog(cfnID)
 		if battleLog.Props.PageProps.Common.StatusCode != 200 {
-			fmt.Printf(`%v`, ErrUnauthenticated)
+			log.Printf(`failed to fetch battle log, received status code %v`, battleLog.Props.PageProps.Common.StatusCode)
 			t.stopped()
 		}
 
@@ -188,10 +194,10 @@ func (t *SF6Tracker) refreshMatchHistory(battleLog *BattleLog) {
 	// assign new starting values
 	if t.currentCharacter != me.CharacterName && t.startingPoints[me.CharacterName] == 0 {
 		t.mh = &data.MatchHistory{
-			CFN: me.Player.FighterID,
+			CFN:      me.Player.FighterID,
 			UserCode: strconv.FormatInt(me.Player.ShortID, 10),
-			LP:  newLP,
-			MR:  newMR,
+			LP:       newLP,
+			MR:       newMR,
 		}
 
 		t.currentCharacter = me.CharacterName
@@ -248,7 +254,7 @@ func (t *SF6Tracker) refreshMatchHistory(battleLog *BattleLog) {
 
 	t.mh = &data.MatchHistory{
 		CFN:          me.Player.FighterID,
-		UserCode: strconv.FormatInt(me.Player.ShortID, 10),
+		UserCode:     strconv.FormatInt(me.Player.ShortID, 10),
 		LP:           newLP,
 		LPGain:       newLPGain,
 		MR:           newMR,
@@ -277,7 +283,7 @@ func (t *SF6Tracker) refreshMatchHistory(battleLog *BattleLog) {
 
 func (t *SF6Tracker) stopped() {
 	t.isTracking = false
-	fmt.Println(`Stopped tracking`)
+	log.Println(`Stopped tracking`)
 	wails.EventsEmit(t.ctx, `stopped-tracking`)
 }
 
