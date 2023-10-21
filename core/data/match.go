@@ -337,7 +337,7 @@ func saveTextToFile(directory string, fileName string, text string) {
 	if directory != `` {
 		_, err := os.ReadDir(directory)
 		if err != nil {
-			_ = os.Mkdir(directory, os.FileMode(0755))
+			_ = os.MkdirAll(directory, os.FileMode(0755))
 		}
 		path = fmt.Sprintf(`%s/%s`, directory, fileName)
 	} else {
