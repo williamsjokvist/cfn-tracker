@@ -107,6 +107,7 @@ func (t *SF6Tracker) Start(userCode string, restoreData bool, refreshInterval ti
 		t.stopped()
 		return ErrUnauthenticated
 	}
+
 	if !restoreData {
 		t.refreshMatchHistory(battleLog)
 	}
@@ -136,9 +137,9 @@ func (t *SF6Tracker) poll(ctx context.Context, cfnID string, refreshInterval tim
 
 		if didBreak {
 			t.stopped()
+			break
 		}
 
-		log.Println(`polling battle log`)
 		battleLog := t.fetchBattleLog(cfnID)
 		if battleLog.Props.PageProps.Common.StatusCode != 200 {
 			log.Printf(`failed to fetch battle log, received status code %v`, battleLog.Props.PageProps.Common.StatusCode)
