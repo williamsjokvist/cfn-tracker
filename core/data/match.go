@@ -36,8 +36,8 @@ type MatchHistory struct {
 }
 
 type PlayerInfo struct {
-	CFN      string  `json:"cfn"`
-	UserCode *string `json:"userCode"`
+	DisplayName string `json:"displayName"`
+	Id          string `json:"id"`
 }
 
 func NewMatchHistory(cfn string) *MatchHistory {
@@ -189,11 +189,13 @@ func GetLoggedCFNs() ([]PlayerInfo, error) {
 		pIds := strings.Split(fileName, `-`)
 
 		p := PlayerInfo{
-			CFN: pIds[0],
+			DisplayName: pIds[0],
 		}
 
 		if len(pIds) > 2 {
-			p.UserCode = &pIds[1]
+			p.Id = pIds[1]
+		} else {
+			p.Id = pIds[0]
 		}
 
 		players = append(players, p)

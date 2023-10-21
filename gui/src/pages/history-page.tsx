@@ -17,8 +17,8 @@ import { PageHeader } from "@/ui/page-header";
 export const HistoryPage: React.FC = () => {
   const { t } = useTranslation();
 
-  const [availableLogs, setAvailableLogs] = React.useState<string[]>([]);
-  const [chosenLog, setLog] = React.useState<string>();
+  const [availablePlayers, setAvailablePlayers] = React.useState<model.PlayerInfo[]>([]);
+  const [selectedPlayer, setLog] = React.useState<model.PlayerInfo>();
   const [matchLog, setMatchLog] = React.useState<model.MatchHistory[]>([]);
 
   const [isSpecified, setSpecified] = React.useState(false);
@@ -33,13 +33,13 @@ export const HistoryPage: React.FC = () => {
 
   React.useEffect(() => {
     GetAvailableLogs().then(
-      (logs) => logs && setAvailableLogs((cur) => logs.map((log) => log.cfn))
+      (playersWithLogs) => setAvailablePlayers((_) => playersWithLogs)
     );
   }, []);
 
   React.useEffect(() => {
-    if (chosenLog && !matchLog) fetchLog(chosenLog);
-  }, [chosenLog, matchLog]);
+    if (selectedPlayer && !matchLog) fetchLog(selectedPlayer.id);
+  }, [selectedPlayer, matchLog]);
 
   React.useEffect(() => {
     if (!matchLog) return;
@@ -64,15 +64,15 @@ export const HistoryPage: React.FC = () => {
   return (
     <>
       <PageHeader
-        text={chosenLog ? `${t("history")}/${chosenLog}` : t("history")}
+        text={selectedPlayer ? `${t("history")}/${selectedPlayer}` : t("history")}
       >
-        {chosenLog && (
+        {selectedPlayer && (
           <div className="flex items-center justify-end w-full ml-4">
             <motion.button
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               onClick={() =>
-                isSpecified ? fetchLog(chosenLog) : setLog(undefined)
+                isSpecified ? fetchLog(selectedPlayer.id) : setLog(undefined)
               }
               className="crumb-btn-dark mr-3"
             >
@@ -86,7 +86,7 @@ export const HistoryPage: React.FC = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               onClick={() => {
-                ExportLogToCSV(chosenLog);
+                ExportLogToCSV(selectedPlayer.id);
                 OpenResultsDirectory();
               }}
               className="crumb-btn-dark mr-3"
@@ -101,7 +101,7 @@ export const HistoryPage: React.FC = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               onClick={() => {
-                chosenLog && DeleteMatchLog(chosenLog);
+                selectedPlayer && DeleteMatchLog(selectedPlayer.id);
                 setTimeout(() => setMatchLog([]), 50);
                 setLog(undefined);
               }}
@@ -115,28 +115,28 @@ export const HistoryPage: React.FC = () => {
       </PageHeader>
 
       <div className="relative w-full">
-        {!chosenLog && availableLogs && availableLogs.length > 0 && (
+        {!selectedPlayer && availablePlayers && availablePlayers.length > 0 && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.225 }}
             className="grid max-h-[340px] h-full m-4 justify-center content-start overflow-y-scroll gap-5"
           >
-            {availableLogs.map((cfn) => (
+            {availablePlayers.map((playerInfo) => (
               <button
                 className="bg-[rgb(255,255,255,0.075)] hover:bg-[rgb(255,255,255,0.125)] text-xl backdrop-blur rounded-2xl transition-all items-center border-transparent border-opacity-5 border-[1px] px-3 py-1"
-                key={cfn}
+                key={playerInfo.displayName}
                 onClick={() => {
-                  setLog(cfn);
-                  fetchLog(cfn);
+                  setLog(playerInfo);
+                  fetchLog(playerInfo.id);
                 }}
               >
-                {cfn}
+                {playerInfo.displayName}
               </button>
             ))}
           </motion.div>
         )}
-        {matchLog && chosenLog && (
+        {matchLog && selectedPlayer && (
           <>
             {totalWinRate != null && (
               <div className="flex items-center pt-1 px-8 mb-2 h-10 border-b border-slate-50 border-opacity-10 ">
