@@ -88,6 +88,7 @@ func (t *SF6Tracker) Start(userCode string, restoreData bool, refreshInterval ti
 		t.startingPoints[t.mh.Character] = t.mh.LP
 		t.gains[t.mh.Character] = t.mh.LPGain
 		t.gainsMR[t.mh.Character] = t.mh.MRGain
+		t.currentCharacter = t.mh.Character
 
 	} else if !restoreData {
 		t.mh.Reset()
@@ -195,10 +196,11 @@ func (t *SF6Tracker) refreshMatchHistory(battleLog *BattleLog) {
 	// assign new starting values
 	if t.currentCharacter != me.CharacterName && t.startingPoints[me.CharacterName] == 0 {
 		t.mh = &data.MatchHistory{
-			CFN:      me.Player.FighterID,
-			UserCode: strconv.FormatInt(me.Player.ShortID, 10),
-			LP:       newLP,
-			MR:       newMR,
+			CFN:       me.Player.FighterID,
+			UserCode:  strconv.FormatInt(me.Player.ShortID, 10),
+			LP:        newLP,
+			MR:        newMR,
+			Character: me.CharacterName,
 		}
 
 		t.currentCharacter = me.CharacterName
@@ -262,6 +264,7 @@ func (t *SF6Tracker) refreshMatchHistory(battleLog *BattleLog) {
 		MRGain:       newMRGain,
 		WinRate:      int((float64(newWins) / float64(newWins+newLosses)) * 100),
 		TotalMatches: t.mh.TotalMatches + 1,
+		Character:    me.CharacterName,
 
 		IsWin:     isWin,
 		Wins:      newWins,
