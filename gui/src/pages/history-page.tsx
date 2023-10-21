@@ -64,7 +64,7 @@ export const HistoryPage: React.FC = () => {
   return (
     <>
       <PageHeader
-        text={selectedPlayer ? `${t("history")}/${selectedPlayer}` : t("history")}
+        text={selectedPlayer ? `${t("history")}/${selectedPlayer.displayName}` : t("history")}
       >
         {selectedPlayer && (
           <div className="flex items-center justify-end w-full ml-4">
