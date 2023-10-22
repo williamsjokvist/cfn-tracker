@@ -3,6 +3,7 @@ package core
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"runtime"
@@ -45,6 +46,7 @@ func (ch *CommandHandler) StopTracking() {
 }
 
 func (ch *CommandHandler) StartTracking(cfn string, restore bool) {
+	log.Printf(`starting tracking for %s, restoring = %v`, cfn, restore)
 	err := ch.tracker.Start(cfn, restore, RefreshInterval)
 	if err != nil {
 		wails.EventsEmit(ch.ctx, `error-cfn`, err.Error())
@@ -76,7 +78,7 @@ func (ch *CommandHandler) GetMatchLog(cfn string) []data.MatchHistory {
 	return mhLog
 }
 
-func (ch *CommandHandler) GetAvailableLogs() []string {
+func (ch *CommandHandler) GetAvailableLogs() []data.PlayerInfo {
 	loggedCfns, err := data.GetLoggedCFNs()
 	if err != nil {
 		fmt.Println(err)

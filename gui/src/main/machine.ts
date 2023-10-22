@@ -6,14 +6,14 @@ import {
   StopTracking,
   SelectGame,
 } from "@@/go/core/CommandHandler";
-import type { data as model } from "@@/go/models";
+import type { data, data as model } from "@@/go/models";
 
 export type MatchEvent = {
   matchHistory: model.MatchHistory;
 } & EventObject;
 
 type CFNMachineContext = {
-  cfn: string;
+  playerInfo: data.PlayerInfo;
   game?: "sfv" | "sf6";
   restore: boolean;
   isTracking: boolean;
@@ -72,7 +72,7 @@ export const cfnMachine = createMachine(
         on: {
           submit: {
             actions: assign({
-              cfn: (_, e: any) => e.cfn,
+              playerInfo: (_, e: any) => e.playerInfo,
               restore: (_, e: any) => e.restore,
             }),
             target: "loadingCfn",
@@ -110,14 +110,14 @@ export const cfnMachine = createMachine(
       initializeGame: ({ game }) => {
         SelectGame(game);
       },
-      startTracking: ({ cfn, restore, isTracking }) => {
-        if (cfn && !isTracking) {
-          StartTracking(cfn, restore).then(() => {
+      startTracking: ({ playerInfo, restore, isTracking }) => {
+        if (playerInfo && !isTracking) {
+          StartTracking(playerInfo.id, restore).then(() => {
             isTracking = true;
           });
         }
       },
-      stopTracking: ({ cfn, isTracking }) => {
+      stopTracking: ({ playerInfo, isTracking }) => {
         if (!isTracking) return;
         StopTracking().then((_) => {
           isTracking = false;

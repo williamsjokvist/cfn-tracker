@@ -5,7 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -13,6 +15,7 @@ import (
 
 type MatchHistory struct {
 	CFN               string `json:"cfn"`
+	UserCode          string `json:"userCode"`
 	LP                int    `json:"lp"`
 	LPGain            int    `json:"lpGain"`
 	MR                int    `json:"mr"`
@@ -23,7 +26,7 @@ type MatchHistory struct {
 	TotalMatches      int    `json:"totalMatches"`
 	Losses            int    `json:"losses"`
 	WinRate           int    `json:"winRate"`
-	Character         string `json:"character",`
+	Character         string `json:"character"`
 	Opponent          string `json:"opponent"`
 	OpponentCharacter string `json:"opponentCharacter"`
 	OpponentLP        int    `json:"opponentLP"`
@@ -32,6 +35,41 @@ type MatchHistory struct {
 	TimeStamp         string `json:"timestamp"`
 	Date              string `json:"date"`
 	WinStreak         int    `json:"winStreak"`
+}
+
+type PlayerInfo struct {
+	DisplayName string `json:"displayName"`
+	Id          string `json:"id"`
+}
+
+const (
+	logsFolder = `results/match-logs/`
+)
+
+func findLogFileFor(cfn string) (*string, error) {
+	files, err := ioutil.ReadDir(logsFolder)
+	if err != nil {
+		return nil, fmt.Errorf(`read results directory: %w`, err)
+	}
+
+	for _, file := range files {
+		fileName := file.Name()
+
+		parts := strings.Split(fileName, `-`)
+		if len(parts) != 2 {
+			continue
+		}
+
+		if strings.HasPrefix(parts[1], cfn) {
+			return &fileName, nil
+		}
+	}
+
+	return nil, nil
+}
+
+func getLogFileNameFor(displayName string, id string) string {
+	return fmt.Sprintf(`%s-%s.json`, displayName, id)
 }
 
 func NewMatchHistory(cfn string) *MatchHistory {
@@ -103,11 +141,17 @@ func (mh *MatchHistory) Save() error {
 	// Now save current results to the entire log
 	var arr []MatchHistory
 
-	pastMatches, err := os.ReadFile(`results/` + mh.CFN + `-log.json`)
+	displayName := mh.CFN
+	var id string
+	if mh.UserCode != `` {
+		id = mh.UserCode
+	} else {
+		id = mh.CFN
+	}
+	fileName := getLogFileNameFor(displayName, id)
+	pastMatches, err := os.ReadFile(logsFolder + fileName)
 	if err != nil {
-		// No past matches
-		str := "[" + string(mhMarshalled) + "]"
-		saveTextToFile(`results`, mh.CFN+`-log.json`, str)
+		saveTextToFile(logsFolder, fileName, fmt.Sprintf(`[%s]`, string(mhMarshalled)))
 		return nil
 	}
 
@@ -122,7 +166,7 @@ func (mh *MatchHistory) Save() error {
 		return fmt.Errorf(`marshal match history: %w`, err)
 	}
 
-	saveTextToFile(`results`, mh.CFN+`-log.json`, string(newArrMarshalled))
+	saveTextToFile(logsFolder, fileName, string(newArrMarshalled))
 	return nil
 }
 
@@ -149,48 +193,84 @@ func (mh *MatchHistory) Reset() {
 
 func GetLog(cfn string) ([]MatchHistory, error) {
 	var matchLog []MatchHistory
-	pastMatches, err := os.ReadFile(fmt.Sprintf(`results/%s-log.json`, cfn))
+
+	fileName, err := findLogFileFor(cfn)
 	if err != nil {
-		return nil, fmt.Errorf(`read match history: %w`, err)
+		return nil, fmt.Errorf(`error finding log file: %w`, err)
 	}
 
-	json.Unmarshal(pastMatches, &matchLog)
+	if fileName == nil {
+		return nil, fmt.Errorf(`no log file found for %s`, cfn)
+	}
+
+	pastMatches, err := os.ReadFile(logsFolder + *fileName)
+	if err != nil {
+		return nil, fmt.Errorf(`error reading match history: %w`, err)
+	}
+
+	err = json.Unmarshal(pastMatches, &matchLog)
+	if err != nil {
+		return nil, err
+	}
+
 	return matchLog, nil
 }
 
 func DeleteLog(cfn string) error {
-	err := os.Remove(fmt.Sprintf(`results/%s-log.json`, cfn))
+	fileName, err := findLogFileFor(cfn)
+	if err != nil {
+		return err
+	}
+
+	if fileName == nil {
+		return fmt.Errorf(`could not find log file for %s`, cfn)
+	}
+
+	err = os.Remove(logsFolder + *fileName)
 	if err != nil {
 		return fmt.Errorf(`delete match history db: %w`, err)
 	}
+
 	return nil
 }
 
-func GetLoggedCFNs() ([]string, error) {
-	files, err := ioutil.ReadDir(`results`)
+func GetLoggedCFNs() ([]PlayerInfo, error) {
+	files, err := ioutil.ReadDir(logsFolder)
 	if err != nil {
 		return nil, fmt.Errorf(`read results directory: %w`, err)
 	}
 
-	cfns := []string{}
+	players := []PlayerInfo{}
 
 	for _, file := range files {
-		fileName := file.Name()
+		fileName := strings.TrimSuffix(file.Name(), filepath.Ext(file.Name()))
 
-		if !strings.Contains(fileName, `-log.json`) {
+		parts := strings.Split(fileName, `-`)
+		if len(parts) != 2 {
+			log.Printf(`found abnormal log file: %s`, fileName)
 			continue
 		}
 
-		cfn := strings.Split(fileName, `-log.json`)[0]
-		cfns = append(cfns, cfn)
+		player := PlayerInfo{
+			DisplayName: parts[0],
+			Id:          parts[1],
+		}
+
+		players = append(players, player)
 	}
 
-	return cfns, nil
+	return players, nil
 }
 
 func ExportLog(cfn string) error {
 	var matchHistories []MatchHistory
-	pastMatches, err := os.ReadFile(fmt.Sprintf(`results/%s-log.json`, cfn))
+
+	logFileName, err := findLogFileFor(cfn)
+	if err != nil || logFileName == nil {
+		return fmt.Errorf(`could not find log file for %s`, cfn)
+	}
+
+	pastMatches, err := os.ReadFile(logsFolder + *logFileName)
 	if err != nil {
 		return fmt.Errorf(`read match history: %w`, err)
 	}
@@ -255,9 +335,9 @@ func saveTextToFile(directory string, fileName string, text string) {
 
 	var path string
 	if directory != `` {
-		_, err := os.ReadDir(`results`)
+		_, err := os.ReadDir(directory)
 		if err != nil {
-			_ = os.Mkdir(`results`, os.FileMode(0755))
+			_ = os.MkdirAll(directory, os.FileMode(0755))
 		}
 		path = fmt.Sprintf(`%s/%s`, directory, fileName)
 	} else {

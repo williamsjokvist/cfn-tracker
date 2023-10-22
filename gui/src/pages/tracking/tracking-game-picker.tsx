@@ -29,7 +29,7 @@ export const TrackingGamePicker: React.FC = () => {
 
   return (
     <>
-      <PageHeader text={t("pickGame")} />
+      <PageHeader text={t("pickGame")}/>
       <div className="flex items-center flex-col gap-10 justify-self-center justify-center">
         <motion.ul
           initial={{ opacity: 0 }}
