@@ -9,7 +9,6 @@ import { OutputPage } from "@/pages/output-page";
 import { HistoryPage } from "@/pages/history-page";
 import { AppWrapper } from "./app-layout/app-wrapper";
 import { CFNMachineContext } from "./machine";
-import { ErrorMessageProvider } from "./error-message";
 
 import "@/styles/globals.sass";
 
@@ -38,9 +37,7 @@ const App: React.FC = () => {
   return (
     <React.StrictMode>
       <CFNMachineContext.Provider>
-        <ErrorMessageProvider>
-          <RouterProvider router={router} />
-        </ErrorMessageProvider>
+        <RouterProvider router={router} />
       </CFNMachineContext.Provider>
     </React.StrictMode>
   );

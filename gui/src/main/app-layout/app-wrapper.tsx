@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 
 import { CFNMachineContext } from "@/main/machine";
 import { AppSidebar } from "@/main/app-layout/app-sidebar";
-import { ErrorMessage, useErrorMessage } from "@/main/error-message";
+import { ErrorMessage } from "@/main/error-message";
 
 import { LoadingBar } from "@/ui/loading-bar";
 import { UpdatePrompt } from "@/ui/update-prompt";
@@ -15,7 +15,7 @@ export const AppWrapper: React.FC = () => {
   const { t } = useTranslation();
   const [loaded, setLoaded] = React.useState(0);
   const [hasNewVersion, setNewVersion] = React.useState(false);
-  const { setErrorMessage } = useErrorMessage()
+  const [errorMessage, setErrorMessage] = React.useState(null);
 
   const [_, send] = CFNMachineContext.useActor();
 
@@ -51,12 +51,15 @@ export const AppWrapper: React.FC = () => {
     <>
       <AppSidebar />
       <main>
-        <ErrorMessage />
+        <ErrorMessage
+          errorMessage={errorMessage}
+          onFadedOut={() => setErrorMessage(null)}
+        />
         <LoadingBar percentage={loaded} />
         {hasNewVersion && (
           <UpdatePrompt
             onDismiss={() => {
-              BrowserOpenURL("https://williamsjokvist.github.io/cfn-tracker/");
+              BrowserOpenURL("https://cfn.williamsjokvist.se/");
               setNewVersion(false);
             }}
             text={t("newVersionAvailable")}
