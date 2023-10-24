@@ -291,10 +291,6 @@ func (t *SF6Tracker) stopped() {
 	wails.EventsEmit(t.ctx, `stopped-tracking`)
 }
 
-func (t *SF6Tracker) GetMatchHistory() *data.MatchHistory {
-	return t.mh
-}
-
 func getLeagueFromLP(lp int) string {
 	if lp >= 25000 {
 		return `Master`
