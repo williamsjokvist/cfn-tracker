@@ -36,6 +36,11 @@ export const ErrorMessage: React.FC<ErrorMessageProps> = ({
           "px-8 py-3 rounded-r-xl text-xl backdrop-blur-sm pointer-events-none",
           "bg-[rgba(255,0,0,.125)]"
         )}
+        {...(errorMessage === null && {
+          style: {
+            opacity: 0,
+          },
+        })}
       >
         <Icon
           icon="material-symbols:warning-outline"
