@@ -25,5 +25,15 @@ func NewStorage() (*Storage, error) {
 		return nil, err
 	}
 
+	err = storage.createSessionsTable()
+	if err != nil {
+		return nil, err
+	}
+
+	err = storage.createMatchesTable()
+	if err != nil {
+		return nil, err
+	}
+
 	return storage, nil
 }
