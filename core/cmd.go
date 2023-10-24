@@ -54,11 +54,6 @@ func (ch *CommandHandler) StartTracking(cfn string, restore bool) {
 	}
 }
 
-func (ch *CommandHandler) GetMatchHistory() data.MatchHistory {
-	mh := ch.tracker.GetMatchHistory()
-	return *mh
-}
-
 func (ch *CommandHandler) OpenResultsDirectory() {
 	switch runtime.GOOS {
 	case `darwin`:

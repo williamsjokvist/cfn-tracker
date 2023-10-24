@@ -191,10 +191,6 @@ func (t *SFVTracker) refreshMatchHistory(cfn string, isFirstFetch bool) {
 	t.mh.Log()
 }
 
-func (t *SFVTracker) GetMatchHistory() *data.MatchHistory {
-	return t.mh
-}
-
 func getLeagueFromLP(lp int) string {
 	if lp >= 300000 {
 		return `Warlord`

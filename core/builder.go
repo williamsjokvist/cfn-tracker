@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/williamsjokvist/cfn-tracker/core/data"
 	"github.com/williamsjokvist/cfn-tracker/core/impl/sf6"
 	"github.com/williamsjokvist/cfn-tracker/core/impl/sfv"
 	"github.com/williamsjokvist/cfn-tracker/core/shared"
@@ -14,7 +13,6 @@ import (
 type GameTracker interface {
 	Start(cfn string, restore bool, refreshInterval time.Duration) error
 	Stop()
-	GetMatchHistory() *data.MatchHistory
 }
 
 type GameType uint8
