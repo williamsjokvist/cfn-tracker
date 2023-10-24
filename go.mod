@@ -5,7 +5,9 @@ go 1.21
 require github.com/go-rod/rod v0.112.2
 
 require (
+	github.com/jmoiron/sqlx v1.3.5
 	github.com/joho/godotenv v1.4.0
+	github.com/mattn/go-sqlite3 v1.14.17
 	github.com/shirou/gopsutil v3.21.11+incompatible
 	github.com/wailsapp/wails/v2 v2.6.0
 	golang.org/x/sys v0.10.0
