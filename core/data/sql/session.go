@@ -1,4 +1,4 @@
-package storage
+package sql
 
 type Session struct {
 	Id               int    `db:"id"`

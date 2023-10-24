@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-type MatchHistory struct {
+type TrackingState struct {
 	CFN               string `json:"cfn"`
 	UserCode          string `json:"userCode"`
 	LP                int    `json:"lp"`
@@ -72,8 +72,8 @@ func getLogFileNameFor(displayName string, id string) string {
 	return fmt.Sprintf(`%s-%s.json`, displayName, id)
 }
 
-func NewMatchHistory(cfn string) *MatchHistory {
-	return &MatchHistory{
+func NewTrackingState(cfn string) *TrackingState {
+	return &TrackingState{
 		CFN:               cfn,
 		LP:                0,
 		LPGain:            0,
@@ -97,7 +97,7 @@ func NewMatchHistory(cfn string) *MatchHistory {
 	}
 }
 
-func (mh *MatchHistory) Log() {
+func (mh *TrackingState) Log() {
 	fmt.Println(`
 		[`+time.Now().Format(`15:04`)+`]	
 		LP:`, mh.LP, `/ 
@@ -110,7 +110,7 @@ func (mh *MatchHistory) Log() {
 	)
 }
 
-func (mh *MatchHistory) Save() error {
+func (mh *TrackingState) Save() error {
 	saveTextToFile(`results`, `wins.txt`, strconv.Itoa(mh.Wins))
 	saveTextToFile(`results`, `losses.txt`, strconv.Itoa(mh.Losses))
 	saveTextToFile(`results`, `win-rate.txt`, strconv.Itoa(mh.WinRate)+`%`)
@@ -139,7 +139,7 @@ func (mh *MatchHistory) Save() error {
 	saveTextToFile(`results`, `results.json`, string(mhMarshalled))
 
 	// Now save current results to the entire log
-	var arr []MatchHistory
+	var arr []TrackingState
 
 	displayName := mh.CFN
 	var id string
@@ -160,7 +160,7 @@ func (mh *MatchHistory) Save() error {
 		return fmt.Errorf(`unmarshal past match history: %v`, err)
 	}
 
-	newArr := append([]MatchHistory{*mh}, arr...)
+	newArr := append([]TrackingState{*mh}, arr...)
 	newArrMarshalled, err := json.Marshal(&newArr)
 	if err != nil {
 		return fmt.Errorf(`marshal match history: %w`, err)
@@ -170,8 +170,8 @@ func (mh *MatchHistory) Save() error {
 	return nil
 }
 
-func (mh *MatchHistory) Reset() {
-	cleanMh := MatchHistory{
+func (mh *TrackingState) Reset() {
+	cleanMh := TrackingState{
 		CFN:          ``,
 		LP:           0,
 		LPGain:       0,
@@ -191,8 +191,8 @@ func (mh *MatchHistory) Reset() {
 	cleanMh.Save()
 }
 
-func GetLog(cfn string) ([]MatchHistory, error) {
-	var matchLog []MatchHistory
+func GetLog(cfn string) ([]TrackingState, error) {
+	var matchLog []TrackingState
 
 	fileName, err := findLogFileFor(cfn)
 	if err != nil {
@@ -263,7 +263,7 @@ func GetLoggedCFNs() ([]PlayerInfo, error) {
 }
 
 func ExportLog(cfn string) error {
-	var matchHistories []MatchHistory
+	var matchHistories []TrackingState
 
 	logFileName, err := findLogFileFor(cfn)
 	if err != nil || logFileName == nil {
@@ -321,7 +321,7 @@ func ExportLog(cfn string) error {
 	return nil
 }
 
-func GetSavedMatchHistory(cfn string) (*MatchHistory, error) {
+func GetSavedMatchHistory(cfn string) (*TrackingState, error) {
 	mh, err := GetLog(cfn)
 	if err != nil {
 		return nil, err

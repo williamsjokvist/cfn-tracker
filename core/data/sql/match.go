@@ -1,4 +1,4 @@
-package storage
+package sql
 
 type Match struct {
 	Id                int    `db:"id"`
@@ -18,7 +18,7 @@ type Match struct {
 type MatchStorage interface {
 	createMatchesTable() error
 	GetMatches(sessionId string) ([]*Match, error)
-	AddMatch() error
+	SaveMatch() error
 	RemoveMatches(sessionId string) error
 }
 
@@ -26,7 +26,7 @@ func (s *Storage) GetMatches(sessionId string) ([]*Match, error) {
 	return nil, nil
 }
 
-func (s *Storage) AddMatch() error {
+func (s *Storage) SaveMatch() error {
 	return nil
 }
 

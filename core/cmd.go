@@ -63,7 +63,7 @@ func (ch *CommandHandler) OpenResultsDirectory() {
 	}
 }
 
-func (ch *CommandHandler) GetMatchLog(cfn string) []data.MatchHistory {
+func (ch *CommandHandler) GetMatchLog(cfn string) []data.TrackingState {
 	mhLog, err := data.GetLog(cfn)
 	if err != nil {
 		fmt.Println(err)
