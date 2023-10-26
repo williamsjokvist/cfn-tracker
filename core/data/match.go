@@ -5,9 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
-	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -35,11 +33,6 @@ type TrackingState struct {
 	TimeStamp         string `json:"timestamp"`
 	Date              string `json:"date"`
 	WinStreak         int    `json:"winStreak"`
-}
-
-type PlayerInfo struct {
-	DisplayName string `json:"displayName"`
-	Id          string `json:"id"`
 }
 
 const (
@@ -232,34 +225,6 @@ func DeleteLog(cfn string) error {
 	}
 
 	return nil
-}
-
-func GetLoggedCFNs() ([]PlayerInfo, error) {
-	files, err := ioutil.ReadDir(logsFolder)
-	if err != nil {
-		return nil, fmt.Errorf(`read results directory: %w`, err)
-	}
-
-	players := []PlayerInfo{}
-
-	for _, file := range files {
-		fileName := strings.TrimSuffix(file.Name(), filepath.Ext(file.Name()))
-
-		parts := strings.Split(fileName, `-`)
-		if len(parts) != 2 {
-			log.Printf(`found abnormal log file: %s`, fileName)
-			continue
-		}
-
-		player := PlayerInfo{
-			DisplayName: parts[0],
-			Id:          parts[1],
-		}
-
-		players = append(players, player)
-	}
-
-	return players, nil
 }
 
 func ExportLog(cfn string) error {
