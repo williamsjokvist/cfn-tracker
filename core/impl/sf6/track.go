@@ -158,7 +158,6 @@ func (t *SF6Tracker) poll(ctx context.Context, cfnID string, refreshInterval tim
 			t.state.Save()
 			t.state.Log()
 
-			t.TrackerRepository.SaveMatch()
 			wails.EventsEmit(t.ctx, `cfn-data`, t.state)
 		}
 	}

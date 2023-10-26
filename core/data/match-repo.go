@@ -24,15 +24,6 @@ func (m *TrackerRepository) GetUsers(ctx context.Context) ([]User, error) {
 	return users, nil
 }
 
-func (m *TrackerRepository) SaveMatch() error {
-	log.Println("saving match")
-	err := m.Storage.SaveMatch()
-	if err != nil {
-		return fmt.Errorf("save match: %w", err)
-	}
-	return nil
-}
-
 func (m *TrackerRepository) SaveUser(ctx context.Context, displayName, code string) error {
 	log.Println("saving user")
 	err := m.Storage.SaveUser(ctx, displayName, code)
@@ -41,14 +32,6 @@ func (m *TrackerRepository) SaveUser(ctx context.Context, displayName, code stri
 	}
 	return nil
 }
-
-func (m *TrackerRepository) ExportLog(userId string) {}
-
-func (m *TrackerRepository) DeleteLog(userId string) {}
-
-func (m *TrackerRepository) GetSessionsByUserId(userId string) {}
-
-func (m *TrackerRepository) GetSessionById(sessionId string) {}
 
 type User struct {
 	DisplayName string `json:"displayName"`
