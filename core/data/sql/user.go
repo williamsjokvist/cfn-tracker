@@ -16,7 +16,7 @@ type User struct {
 type UserStorage interface {
 	createUsersTable() error
 	GetUsers() ([]User, error)
-	AddUser(displayName, id string) error
+	SaveUser(displayName, id string) error
 	RemoveUser(id string) error
 }
 
@@ -29,7 +29,7 @@ func (s *Storage) GetUsers(ctx context.Context) ([]*User, error) {
 	return users, nil
 }
 
-func (s *Storage) AddUser(ctx context.Context, displayName, code string) error {
+func (s *Storage) SaveUser(ctx context.Context, displayName, code string) error {
 	user := User{
 		DisplayName: displayName,
 		Code:        code,
@@ -42,8 +42,6 @@ func (s *Storage) AddUser(ctx context.Context, displayName, code string) error {
 	if err != nil {
 		return fmt.Errorf("create user: %w", err)
 	}
-
-	fmt.Println("added user", user)
 
 	return nil
 }

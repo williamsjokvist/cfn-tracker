@@ -38,7 +38,7 @@ type SF6Tracker struct {
 	*data.TrackerRepository
 }
 
-func NewSF6Tracker(ctx context.Context, browser *shared.Browser) *SF6Tracker {
+func NewSF6Tracker(ctx context.Context, browser *shared.Browser, trackerRepo *data.TrackerRepository) *SF6Tracker {
 	return &SF6Tracker{
 		ctx:              ctx,
 		isTracking:       false,
@@ -53,8 +53,9 @@ func NewSF6Tracker(ctx context.Context, browser *shared.Browser) *SF6Tracker {
 		startingPoints: make(map[string]int, 42),
 
 		// MR
-		gainsMR:    make(map[string]int, 42),
-		startingMR: make(map[string]int, 42),
+		gainsMR:           make(map[string]int, 42),
+		startingMR:        make(map[string]int, 42),
+		TrackerRepository: trackerRepo,
 	}
 }
 
@@ -90,14 +91,11 @@ func (t *SF6Tracker) Start(userCode string, restoreData bool, refreshInterval ti
 		t.gains[t.state.Character] = t.state.LPGain
 		t.gainsMR[t.state.Character] = t.state.MRGain
 		t.currentCharacter = t.state.Character
-
 	} else if !restoreData {
-		t.state.Reset()
 		t.currentCharacter = ``
 		t.state = data.NewTrackingState(userCode)
 		t.gains = make(map[string]int, 42)
 		t.startingPoints = make(map[string]int, 42)
-
 		t.gainsMR = make(map[string]int, 42)
 		t.startingMR = make(map[string]int, 42)
 	}
@@ -116,6 +114,11 @@ func (t *SF6Tracker) Start(userCode string, restoreData bool, refreshInterval ti
 
 	log.Println(`Profile loaded `)
 	t.isTracking = true
+
+	err := t.TrackerRepository.SaveUser(t.ctx, t.state.CFN, t.state.UserCode)
+	if err != nil {
+		log.Fatalf("save user: %v", err)
+	}
 	wails.EventsEmit(t.ctx, `started-tracking`)
 	wails.EventsEmit(t.ctx, `cfn-data`, t.state)
 
@@ -251,22 +254,13 @@ func (t *SF6Tracker) getNewTrackingState(battleLog *BattleLog) *data.TrackingSta
 		newLosses++
 	}
 
-	newLPGain := t.gains[me.CharacterName]
-	newMRGain := t.gainsMR[me.CharacterName]
-
-	// Don't track lpgain on placement matches
-	if newLP == -1 {
-		newLPGain = 0
-		newMRGain = 0
-	}
-
 	return &data.TrackingState{
 		CFN:          me.Player.FighterID,
 		UserCode:     strconv.FormatInt(me.Player.ShortID, 10),
 		LP:           newLP,
-		LPGain:       newLPGain,
 		MR:           newMR,
-		MRGain:       newMRGain,
+		LPGain:       t.gains[me.CharacterName],
+		MRGain:       t.gainsMR[me.CharacterName],
 		WinRate:      int((float64(newWins) / float64(newWins+newLosses)) * 100),
 		TotalMatches: t.state.TotalMatches + 1,
 		Character:    me.CharacterName,

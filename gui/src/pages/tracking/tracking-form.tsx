@@ -18,9 +18,7 @@ export const TrackingForm: React.FC = () => {
   const restoreRef = React.useRef<HTMLInputElement>(null);
 
   const [playerIdInput, setPlayerIdInput] = React.useState<string>("");
-  const [oldPlayers, setOldPlayers] = React.useState<data.PlayerInfo[] | null>(
-    null
-  );
+  const [oldPlayers, setOldPlayers] = React.useState<data.User[] | null>(null);
 
   React.useEffect(() => {
     GetAvailableLogs().then((logs) => setOldPlayers(logs));
@@ -32,17 +30,18 @@ export const TrackingForm: React.FC = () => {
     send({
       type: "submit",
       playerInfo: {
-        displayName: oldPlayers?.find((old) => old.id == playerIdInput) ?? playerIdInput,
+        displayName:
+          oldPlayers?.find((old) => old.code == playerIdInput) ?? playerIdInput,
         id: playerIdInput,
       },
       restore: restoreRef.current && restoreRef.current.checked,
     });
   };
 
-  const playerChipClicked = (player: data.PlayerInfo) => {
+  const playerChipClicked = (player: data.User) => {
     if (playerIdInputRef.current) {
-      playerIdInputRef.current.value = player.id;
-      setPlayerIdInput(player.id);
+      playerIdInputRef.current.value = player.code;
+      setPlayerIdInput(player.code);
     }
   };
 
@@ -83,15 +82,23 @@ export const TrackingForm: React.FC = () => {
           </div>
         )}
         <footer className="flex items-center w-full">
-          {oldPlayers && oldPlayers.some(old => old.id == playerIdInput) && (
-            <div className="group flex items-center">
-              <Checkbox ref={restoreRef} id="restore-session" />
-              <label htmlFor="restore-session" className="text-lg cursor-pointer text-gray-300 group-hover:text-white transition-colors">
-                {t("restoreSession")}
-              </label>
-            </div>
-          )}
-          <ActionButton type="submit" style={{ filter: "hue-rotate(-65deg)" }} className="ml-auto">
+          {oldPlayers &&
+            oldPlayers.some((old) => old.code == playerIdInput) && (
+              <div className="group flex items-center">
+                <Checkbox ref={restoreRef} id="restore-session" />
+                <label
+                  htmlFor="restore-session"
+                  className="text-lg cursor-pointer text-gray-300 group-hover:text-white transition-colors"
+                >
+                  {t("restoreSession")}
+                </label>
+              </div>
+            )}
+          <ActionButton
+            type="submit"
+            style={{ filter: "hue-rotate(-65deg)" }}
+            className="ml-auto"
+          >
             {t("start")}
           </ActionButton>
         </footer>

@@ -31,10 +31,13 @@ type CommandHandler struct {
 	ctx     context.Context
 	tracker GameTracker
 	browser *shared.Browser
+	*data.TrackerRepository
 }
 
-func NewCommandHandler() *CommandHandler {
-	return &CommandHandler{}
+func NewCommandHandler(trackerRepo *data.TrackerRepository) *CommandHandler {
+	return &CommandHandler{
+		TrackerRepository: trackerRepo,
+	}
 }
 
 func (ch *CommandHandler) GetAppVersion() string {
@@ -73,14 +76,13 @@ func (ch *CommandHandler) GetMatchLog(cfn string) []data.TrackingState {
 	return mhLog
 }
 
-func (ch *CommandHandler) GetAvailableLogs() []data.PlayerInfo {
-	loggedCfns, err := data.GetLoggedCFNs()
+func (ch *CommandHandler) GetAvailableLogs() []data.User {
+	users, err := ch.TrackerRepository.GetUsers(ch.ctx)
 	if err != nil {
 		fmt.Println(err)
 		return nil
 	}
-
-	return loggedCfns
+	return users
 }
 
 func (ch *CommandHandler) GetThemeList() []string {
@@ -110,7 +112,7 @@ func (ch *CommandHandler) ExportLogToCSV(cfn string) {
 func (ch *CommandHandler) SelectGame(game string) {
 	switch game {
 	case GameTypeSF6.String():
-		ch.tracker, _ = MakeSF6Tracker(ch.ctx, ch.browser, CapIDEmail, CapIDPassword)
+		ch.tracker, _ = MakeSF6Tracker(ch.ctx, ch.browser, CapIDEmail, CapIDPassword, ch.TrackerRepository)
 	case GameTypeSFV.String():
 		ch.tracker, _ = MakeSFVTracker(ch.ctx, ch.browser, SteamUsername, SteamPassword)
 	}

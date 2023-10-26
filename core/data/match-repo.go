@@ -12,12 +12,12 @@ type TrackerRepository struct {
 	*sql.Storage
 }
 
-func (m *TrackerRepository) GetUsers(ctx context.Context) ([]*User, error) {
+func (m *TrackerRepository) GetUsers(ctx context.Context) ([]User, error) {
 	dbUsers, err := m.Storage.GetUsers(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("get users: %w", err)
 	}
-	users := make([]*User, len(dbUsers))
+	users := make([]User, 0, len(dbUsers))
 	for _, u := range dbUsers {
 		users = append(users, convSqlUserToModelUser(u))
 	}
@@ -33,8 +33,13 @@ func (m *TrackerRepository) SaveMatch() error {
 	return nil
 }
 
-func (m *TrackerRepository) SaveUser() {
+func (m *TrackerRepository) SaveUser(ctx context.Context, displayName, code string) error {
 	log.Println("saving user")
+	err := m.Storage.SaveUser(ctx, displayName, code)
+	if err != nil {
+		return fmt.Errorf("save user: %w", err)
+	}
+	return nil
 }
 
 func (m *TrackerRepository) ExportLog(userId string) {}
@@ -50,8 +55,8 @@ type User struct {
 	Code        string `json:"code"`
 }
 
-func convSqlUserToModelUser(dbUser *sql.User) *User {
-	return &User{
+func convSqlUserToModelUser(dbUser *sql.User) User {
+	return User{
 		DisplayName: dbUser.DisplayName,
 		Code:        dbUser.Code,
 	}
