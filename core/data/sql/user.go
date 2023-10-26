@@ -16,8 +16,8 @@ type User struct {
 type UserStorage interface {
 	createUsersTable() error
 	GetUsers() ([]User, error)
-	SaveUser(displayName, id string) error
-	RemoveUser(id string) error
+	SaveUser(displayName, code string) error
+	RemoveUser(code string) error
 }
 
 func (s *Storage) GetUsers(ctx context.Context) ([]*User, error) {
@@ -46,11 +46,11 @@ func (s *Storage) SaveUser(ctx context.Context, displayName, code string) error 
 	return nil
 }
 
-func (s *Storage) RemoveUser(ctx context.Context, id string) error {
+func (s *Storage) RemoveUser(ctx context.Context, code string) error {
 	query, args, err := sqlx.In(`
 		DELETE * FROM users 
-		WHERE id = (?)
-	`, id)
+		WHERE code = (?)
+	`, code)
 	if err != nil {
 		return fmt.Errorf("prepare delete user clause: %w", err)
 	}
