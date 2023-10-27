@@ -9,11 +9,11 @@ import (
 )
 
 type TrackerRepository struct {
-	*sql.Storage
+	sqlDb *sql.Storage
 }
 
 func (m *TrackerRepository) GetUsers(ctx context.Context) ([]User, error) {
-	dbUsers, err := m.Storage.GetUsers(ctx)
+	dbUsers, err := m.sqlDb.GetUsers(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("get users: %w", err)
 	}
@@ -26,9 +26,9 @@ func (m *TrackerRepository) GetUsers(ctx context.Context) ([]User, error) {
 
 func (m *TrackerRepository) SaveUser(ctx context.Context, displayName, code string) error {
 	log.Println("saving user")
-	err := m.Storage.SaveUser(ctx, displayName, code)
+	err := m.sqlDb.SaveUser(ctx, displayName, code)
 	if err != nil {
-		return fmt.Errorf("save user: %w", err)
+		return fmt.Errorf("save user in storage: %w", err)
 	}
 	return nil
 }

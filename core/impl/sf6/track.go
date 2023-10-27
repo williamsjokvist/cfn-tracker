@@ -117,7 +117,7 @@ func (t *SF6Tracker) Start(userCode string, restoreData bool, refreshInterval ti
 
 	err := t.TrackerRepository.SaveUser(t.ctx, t.state.CFN, t.state.UserCode)
 	if err != nil {
-		log.Fatalf("save user: %v", err)
+		return fmt.Errorf("failed to save user: %w", err)
 	}
 	wails.EventsEmit(t.ctx, `started-tracking`)
 	wails.EventsEmit(t.ctx, `cfn-data`, t.state)
