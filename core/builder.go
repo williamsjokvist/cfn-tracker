@@ -37,7 +37,7 @@ func (s GameType) String() string {
 }
 
 // Make a SF6Tracker and expose it as a GameTracker
-func MakeSF6Tracker(ctx context.Context, browser *shared.Browser, username, password string, trackerRepository *data.TrackerRepository) (GameTracker, error) {
+func MakeSF6Tracker(ctx context.Context, browser *shared.Browser, username, password string, trackerRepository *data.CFNTrackerRepository) (GameTracker, error) {
 	sf6Tracker := sf6.NewSF6Tracker(ctx, browser, trackerRepository)
 	err := sf6Tracker.Authenticate(username, password, false)
 	if err != nil {

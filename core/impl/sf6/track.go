@@ -35,10 +35,10 @@ type SF6Tracker struct {
 	currentCharacter string
 	cookie           string
 	*shared.Browser
-	*data.TrackerRepository
+	*data.CFNTrackerRepository
 }
 
-func NewSF6Tracker(ctx context.Context, browser *shared.Browser, trackerRepo *data.TrackerRepository) *SF6Tracker {
+func NewSF6Tracker(ctx context.Context, browser *shared.Browser, trackerRepo *data.CFNTrackerRepository) *SF6Tracker {
 	return &SF6Tracker{
 		ctx:              ctx,
 		isTracking:       false,
@@ -53,9 +53,9 @@ func NewSF6Tracker(ctx context.Context, browser *shared.Browser, trackerRepo *da
 		startingPoints: make(map[string]int, 42),
 
 		// MR
-		gainsMR:           make(map[string]int, 42),
-		startingMR:        make(map[string]int, 42),
-		TrackerRepository: trackerRepo,
+		gainsMR:              make(map[string]int, 42),
+		startingMR:           make(map[string]int, 42),
+		CFNTrackerRepository: trackerRepo,
 	}
 }
 
@@ -115,7 +115,7 @@ func (t *SF6Tracker) Start(userCode string, restoreData bool, refreshInterval ti
 	log.Println(`Profile loaded `)
 	t.isTracking = true
 
-	err := t.TrackerRepository.SaveUser(t.ctx, t.state.CFN, t.state.UserCode)
+	err := t.CFNTrackerRepository.SaveUser(t.ctx, t.state.CFN, t.state.UserCode)
 	if err != nil {
 		return fmt.Errorf("failed to save user: %w", err)
 	}

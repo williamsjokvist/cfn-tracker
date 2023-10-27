@@ -65,7 +65,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("init db: %v", err)
 	}
-	trackerRepo := &data.TrackerRepository{
+	trackerRepo := &data.CFNTrackerRepository{
 		Storage: sqlStorage,
 	}
 	cmdHandler := core.NewCommandHandler(trackerRepo)

@@ -8,11 +8,11 @@ import (
 	"github.com/williamsjokvist/cfn-tracker/core/data/sql"
 )
 
-type TrackerRepository struct {
+type CFNTrackerRepository struct {
 	sqlDb *sql.Storage
 }
 
-func (m *TrackerRepository) GetUsers(ctx context.Context) ([]User, error) {
+func (m *CFNTrackerRepository) GetUsers(ctx context.Context) ([]User, error) {
 	dbUsers, err := m.sqlDb.GetUsers(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("get users: %w", err)
@@ -24,7 +24,7 @@ func (m *TrackerRepository) GetUsers(ctx context.Context) ([]User, error) {
 	return users, nil
 }
 
-func (m *TrackerRepository) SaveUser(ctx context.Context, displayName, code string) error {
+func (m *CFNTrackerRepository) SaveUser(ctx context.Context, displayName, code string) error {
 	log.Println("saving user")
 	err := m.sqlDb.SaveUser(ctx, displayName, code)
 	if err != nil {

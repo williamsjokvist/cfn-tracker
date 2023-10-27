@@ -31,12 +31,12 @@ type CommandHandler struct {
 	ctx     context.Context
 	tracker GameTracker
 	browser *shared.Browser
-	*data.TrackerRepository
+	*data.CFNTrackerRepository
 }
 
-func NewCommandHandler(trackerRepo *data.TrackerRepository) *CommandHandler {
+func NewCommandHandler(trackerRepo *data.CFNTrackerRepository) *CommandHandler {
 	return &CommandHandler{
-		TrackerRepository: trackerRepo,
+		CFNTrackerRepository: trackerRepo,
 	}
 }
 
@@ -77,7 +77,7 @@ func (ch *CommandHandler) GetMatchLog(cfn string) []data.TrackingState {
 }
 
 func (ch *CommandHandler) GetAvailableLogs() []data.User {
-	users, err := ch.TrackerRepository.GetUsers(ch.ctx)
+	users, err := ch.CFNTrackerRepository.GetUsers(ch.ctx)
 	if err != nil {
 		fmt.Println(err)
 		return nil
@@ -112,7 +112,7 @@ func (ch *CommandHandler) ExportLogToCSV(cfn string) {
 func (ch *CommandHandler) SelectGame(game string) {
 	switch game {
 	case GameTypeSF6.String():
-		ch.tracker, _ = MakeSF6Tracker(ch.ctx, ch.browser, CapIDEmail, CapIDPassword, ch.TrackerRepository)
+		ch.tracker, _ = MakeSF6Tracker(ch.ctx, ch.browser, CapIDEmail, CapIDPassword, ch.CFNTrackerRepository)
 	case GameTypeSFV.String():
 		ch.tracker, _ = MakeSFVTracker(ch.ctx, ch.browser, SteamUsername, SteamPassword)
 	}
