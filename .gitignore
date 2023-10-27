@@ -32,3 +32,5 @@ node_modules
 resource.syso
 
 .DS_Store
+
+*.db

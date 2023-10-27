@@ -22,7 +22,7 @@ type SFVTracker struct {
 	isTracking      bool
 	isAuthenticated bool
 	stopTracking    context.CancelFunc
-	mh              *data.MatchHistory
+	mh              *data.TrackingState
 	*shared.Browser
 }
 
@@ -35,7 +35,7 @@ func NewSFVTracker(ctx context.Context, browser *shared.Browser) *SFVTracker {
 	return &SFVTracker{
 		ctx:          ctx,
 		isTracking:   false,
-		mh:           data.NewMatchHistory(``),
+		mh:           data.NewTrackingState(``),
 		Browser:      browser,
 		stopTracking: func() {},
 	}
@@ -82,7 +82,7 @@ func (t *SFVTracker) Start(cfn string, restoreData bool, refreshInterval time.Du
 
 	fmt.Println(`Profile loaded`)
 	t.isTracking = true
-	t.mh = data.NewMatchHistory(cfn)
+	t.mh = data.NewTrackingState(cfn)
 	wails.EventsEmit(t.ctx, `started-tracking`)
 
 	// First fetch

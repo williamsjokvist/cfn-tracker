@@ -53,7 +53,7 @@ func Serve(ctx context.Context) {
 	var mhJson *[]byte
 
 	wails.EventsOn(ctx, `cfn-data`, func(incomingData ...interface{}) {
-		mh, ok := incomingData[0].(*data.MatchHistory)
+		mh, ok := incomingData[0].(*data.TrackingState)
 		if !ok {
 			return
 		}

@@ -15,6 +15,8 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/options/windows"
 
 	"github.com/williamsjokvist/cfn-tracker/core"
+	"github.com/williamsjokvist/cfn-tracker/core/data"
+	"github.com/williamsjokvist/cfn-tracker/core/data/sql"
 )
 
 var (
@@ -59,9 +61,16 @@ func init() {
 }
 
 func main() {
-	cmdHandler := core.NewCommandHandler()
+	sqlStorage, err := sql.NewStorage()
+	if err != nil {
+		log.Fatalf("init db: %v", err)
+	}
+	trackerRepo := &data.CFNTrackerRepository{
+		Storage: sqlStorage,
+	}
+	cmdHandler := core.NewCommandHandler(trackerRepo)
 
-	err := wails.Run(&options.App{
+	err = wails.Run(&options.App{
 		Title:             `CFN Tracker v3`,
 		Assets:            assets,
 		Width:             920,
