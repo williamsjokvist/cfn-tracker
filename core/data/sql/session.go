@@ -1,19 +1,10 @@
 package sql
 
 type Session struct {
-	Id               int    `db:"id"`
-	UserId           string `db:"userId"`
-	LP               int    `db:"lp"`
-	MR               int    `db:"mr"`
-	LPGain           int    `db:"lpGain"`
-	MRGain           int    `db:"mrGain"`
-	Wins             int    `db:"wins"`
-	Losses           int    `db:"losses"`
-	WinRate          int    `db:"winRate"`
-	WinStreak        int    `db:"winStreak"`
-	LongestWinStreak int    `db:"longestWinStreak"`
-	MatchesPlayed    int    `db:"matchesPlayed"`
-	StartedAt        string `db:"startedAt"`
+	Id      int            `db:"id"`
+	UserId  string         `db:"userId"`
+	Stats   []*SessionStat `db:"stats"`
+	Matches []*Match       `db:"matches"`
 }
 
 type SessionStorage interface {
