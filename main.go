@@ -61,13 +61,11 @@ func init() {
 }
 
 func main() {
-	sqlStorage, err := sql.NewStorage()
+	sqlDb, err := sql.NewStorage()
 	if err != nil {
 		log.Fatalf("init db: %v", err)
 	}
-	trackerRepo := &data.CFNTrackerRepository{
-		Storage: sqlStorage,
-	}
+	trackerRepo := data.NewCFNTrackerRepository(sqlDb)
 	cmdHandler := core.NewCommandHandler(trackerRepo)
 
 	err = wails.Run(&options.App{

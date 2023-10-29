@@ -12,6 +12,12 @@ type CFNTrackerRepository struct {
 	sqlDb *sql.Storage
 }
 
+func NewCFNTrackerRepository(sqlDb *sql.Storage) *CFNTrackerRepository {
+	return &CFNTrackerRepository{
+		sqlDb: sqlDb,
+	}
+}
+
 func (m *CFNTrackerRepository) GetUsers(ctx context.Context) ([]User, error) {
 	dbUsers, err := m.sqlDb.GetUsers(ctx)
 	if err != nil {
