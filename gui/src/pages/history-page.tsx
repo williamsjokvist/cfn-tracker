@@ -17,9 +17,9 @@ import { PageHeader } from "@/ui/page-header";
 export const HistoryPage: React.FC = () => {
   const { t } = useTranslation();
 
-  const [availablePlayers, setAvailablePlayers] = React.useState<model.User[]>([]);
-  const [selectedPlayer, setLog] = React.useState<model.User>();
-  const [matchLog, setMatchLog] = React.useState<model.TrackingState[]>([]);
+  const [availablePlayers, setAvailablePlayers] = React.useState<model.PlayerInfo[]>([]);
+  const [selectedPlayer, setLog] = React.useState<model.PlayerInfo>();
+  const [matchLog, setMatchLog] = React.useState<model.MatchHistory[]>([]);
 
   const [isSpecified, setSpecified] = React.useState(false);
   const [totalWinRate, setTotalWinRate] = React.useState<number | null>(null);
@@ -38,7 +38,7 @@ export const HistoryPage: React.FC = () => {
   }, []);
 
   React.useEffect(() => {
-    if (selectedPlayer && !matchLog) fetchLog(selectedPlayer.code);
+    if (selectedPlayer && !matchLog) fetchLog(selectedPlayer.id);
   }, [selectedPlayer, matchLog]);
 
   React.useEffect(() => {
@@ -72,7 +72,7 @@ export const HistoryPage: React.FC = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               onClick={() =>
-                isSpecified ? fetchLog(selectedPlayer.code) : setLog(undefined)
+                isSpecified ? fetchLog(selectedPlayer.id) : setLog(undefined)
               }
               className="crumb-btn-dark mr-3"
             >
@@ -86,7 +86,7 @@ export const HistoryPage: React.FC = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               onClick={() => {
-                ExportLogToCSV(selectedPlayer.code);
+                ExportLogToCSV(selectedPlayer.id);
                 OpenResultsDirectory();
               }}
               className="crumb-btn-dark mr-3"
@@ -101,7 +101,7 @@ export const HistoryPage: React.FC = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               onClick={() => {
-                selectedPlayer && DeleteMatchLog(selectedPlayer.code);
+                selectedPlayer && DeleteMatchLog(selectedPlayer.id);
                 setTimeout(() => setMatchLog([]), 50);
                 setLog(undefined);
               }}
@@ -128,7 +128,7 @@ export const HistoryPage: React.FC = () => {
                 key={playerInfo.displayName}
                 onClick={() => {
                   setLog(playerInfo);
-                  fetchLog(playerInfo.code);
+                  fetchLog(playerInfo.id);
                 }}
               >
                 {playerInfo.displayName}
