@@ -9,16 +9,16 @@ import {
 import type { data, data as model } from "@@/go/models";
 
 export type MatchEvent = {
-  matchHistory: model.TrackingState;
+  matchHistory: model.MatchHistory;
 } & EventObject;
 
 type CFNMachineContext = {
-  playerInfo: data.User;
+  playerInfo: data.PlayerInfo;
   game?: "sfv" | "sf6";
   restore: boolean;
   isTracking: boolean;
   error: string;
-  matchHistory: model.TrackingState;
+  matchHistory: model.MatchHistory;
 };
 
 export const cfnMachine = createMachine(
@@ -30,7 +30,7 @@ export const cfnMachine = createMachine(
     context: <CFNMachineContext>{
       restore: false,
       isTracking: false,
-      matchHistory: <model.TrackingState>{
+      matchHistory: <model.MatchHistory>{
         cfn: "",
         wins: 0,
         losses: 0,
@@ -112,7 +112,7 @@ export const cfnMachine = createMachine(
       },
       startTracking: ({ playerInfo, restore, isTracking }) => {
         if (playerInfo && !isTracking) {
-          StartTracking(playerInfo.code, restore).then(() => {
+          StartTracking(playerInfo.id, restore).then(() => {
             isTracking = true;
           });
         }
