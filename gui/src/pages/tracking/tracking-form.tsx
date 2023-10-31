@@ -30,8 +30,9 @@ export const TrackingForm: React.FC = () => {
     send({
       type: "submit",
       playerInfo: {
-        displayName: oldPlayers?.find((old) => old.code == playerIdInput) ?? playerIdInput,
-        id: playerIdInput,
+        displayName:
+          oldPlayers?.find((old) => old.code == playerIdInput) ?? playerIdInput,
+        code: playerIdInput,
       },
       restore: restoreRef.current && restoreRef.current.checked,
     });
@@ -81,15 +82,23 @@ export const TrackingForm: React.FC = () => {
           </div>
         )}
         <footer className="flex items-center w-full">
-          {oldPlayers && oldPlayers.some(old => old.code == playerIdInput) && (
-            <div className="group flex items-center">
-              <Checkbox ref={restoreRef} id="restore-session" />
-              <label htmlFor="restore-session" className="text-lg cursor-pointer text-gray-300 group-hover:text-white transition-colors">
-                {t("restoreSession")}
-              </label>
-            </div>
-          )}
-          <ActionButton type="submit" style={{ filter: "hue-rotate(-65deg)" }} className="ml-auto">         
+          {oldPlayers &&
+            oldPlayers.some((old) => old.code == playerIdInput) && (
+              <div className="group flex items-center">
+                <Checkbox ref={restoreRef} id="restore-session" />
+                <label
+                  htmlFor="restore-session"
+                  className="text-lg cursor-pointer text-gray-300 group-hover:text-white transition-colors"
+                >
+                  {t("restoreSession")}
+                </label>
+              </div>
+            )}
+          <ActionButton
+            type="submit"
+            style={{ filter: "hue-rotate(-65deg)" }}
+            className="ml-auto"
+          >
             {t("start")}
           </ActionButton>
         </footer>
