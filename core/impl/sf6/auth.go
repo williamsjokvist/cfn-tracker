@@ -2,6 +2,7 @@ package sf6
 
 import (
 	"fmt"
+	"log"
 	"math/rand"
 	"strconv"
 	"strings"
@@ -11,16 +12,27 @@ import (
 )
 
 func (t *SF6Tracker) Authenticate(email string, password string, dry bool) error {
-	if t.isAuthenticated || t.cookie != `` || strings.Contains(t.Page.MustInfo().URL, `buckler`) {
+	if t.isAuthenticated || strings.Contains(t.Page.MustInfo().URL, `buckler`) {
 		t.isAuthenticated = true
 		return nil
 	}
-
-	fmt.Println(`Logging in`)
+	
+	log.Println(`Logging in`)
 	t.Page.MustNavigate(`https://cid.capcom.com/ja/login/?guidedBy=web`).MustWaitLoad().MustWaitIdle()
 	if !dry {
 		wails.EventsEmit(t.ctx, `auth-loaded`, 10)
 	}
+
+	log.Print("Checking if already authed")
+	if strings.Contains(t.Page.MustInfo().URL, `cid.capcom.com/ja/mypage`) {
+		log.Print("Not authed, continuing with auth process")
+		t.isAuthenticated = true
+		wails.EventsEmit(t.ctx, `initialized`, true)
+		return nil
+	}
+	log.Print("Not authed, continuing with auth process")
+
+
 
 	// Bypass age check
 	if strings.Contains(t.Page.MustInfo().URL, `agecheck`) {
@@ -66,25 +78,5 @@ func (t *SF6Tracker) Authenticate(email string, password string, dry bool) error
 		t.isAuthenticated = true
 	}
 
-	t.assignCookie()
 	return nil
-}
-
-func (t *SF6Tracker) assignCookie() {
-	cookies := t.Page.Browser().MustGetCookies()
-	cookie := ``
-
-	for i, c := range cookies {
-		if !strings.Contains(c.Name, `buckler`) {
-			continue
-		}
-
-		cookie += c.Name + `=` + c.Value
-		if i != len(cookies)-1 {
-			cookie += `; `
-		}
-	}
-
-	t.cookie = cookie
-	fmt.Println(`Cookie`, t.cookie)
 }
