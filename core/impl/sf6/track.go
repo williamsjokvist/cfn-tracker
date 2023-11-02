@@ -33,7 +33,6 @@ type SF6Tracker struct {
 	gainsMR          map[string]int
 	startingMR       map[string]int
 	currentCharacter string
-	cookie           string
 	*shared.Browser
 	*data.CFNTrackerRepository
 }
@@ -46,7 +45,6 @@ func NewSF6Tracker(ctx context.Context, browser *shared.Browser, trackerRepo *da
 		Browser:          browser,
 		stopTracking:     func() {},
 		currentCharacter: ``,
-		cookie:           ``,
 
 		// LP
 		gains:          make(map[string]int, 42),
