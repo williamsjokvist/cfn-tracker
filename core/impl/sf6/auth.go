@@ -25,14 +25,12 @@ func (t *SF6Tracker) Authenticate(email string, password string, dry bool) error
 
 	log.Print("Checking if already authed")
 	if strings.Contains(t.Page.MustInfo().URL, `cid.capcom.com/ja/mypage`) {
-		log.Print("Not authed, continuing with auth process")
+		log.Print("User already authed")
 		t.isAuthenticated = true
 		wails.EventsEmit(t.ctx, `initialized`, true)
 		return nil
 	}
 	log.Print("Not authed, continuing with auth process")
-
-
 
 	// Bypass age check
 	if strings.Contains(t.Page.MustInfo().URL, `agecheck`) {
