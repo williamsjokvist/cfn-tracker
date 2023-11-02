@@ -1,18 +1,19 @@
 package sql
 
+import "fmt"
+
 type Match struct {
 	Id                int    `db:"id"`
-	SessionId         string `db:"sessionId"`
+	SessionId         string `db:"session_id"`
 	Character         string `db:"character"`
 	LP                int    `db:"lp"`
 	MR                int    `db:"mr"`
 	Opponent          string `db:"opponent"`
-	OpponentCharacter string `db:"opponentCharacter"`
-	OpponentLP        int    `db:"opponentLP"`
-	OpponentMR        int    `db:"opponentMR"`
-	OpponentLeague    string `db:"opponentLeague"`
+	OpponentCharacter string `db:"opponent_character"`
+	OpponentLP        int    `db:"opponent_lp"`
+	OpponentMR        int    `db:"opponent_mr"`
 	Victory           bool   `db:"victory"`
-	DateTime          string `db:"dateTime"`
+	DateTime          string `db:"datetime"`
 }
 
 type MatchStorage interface {
@@ -35,5 +36,23 @@ func (s *Storage) RemoveMatches(sessionId string) error {
 }
 
 func (s *Storage) createMatchesTable() error {
+	_, err := s.db.Exec(`
+	CREATE TABLE IF NOT EXISTS matches (
+		id INTEGER PRIMARY KEY,
+		session_id INTEGER,
+		character TEXT NOT NULL,
+		lp INTEGER,
+		mr INTEGER,
+		opponent TEXT,
+		opponent_character TEXT,
+		opponent_lp TEXT,
+		opponent_mr INTEGER,
+		victory BOOLEAN,
+		datetime TEXT,
+		FOREIGN KEY(session_id) REFERENCES sessions(id)
+	)`)
+	if err != nil {
+		return fmt.Errorf("create users table: %w", err)
+	}
 	return nil
 }
