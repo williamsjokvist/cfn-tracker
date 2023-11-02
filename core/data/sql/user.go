@@ -9,13 +9,13 @@ import (
 
 type User struct {
 	Id          uint8  `db:"id"`
-	DisplayName string `db:"displayName"`
+	DisplayName string `db:"display_name"`
 	Code        string `db:"code"`
 }
 
 type UserStorage interface {
 	createUsersTable() error
-	GetUsers() ([]User, error)
+	GetUsers() ([]*User, error)
 	SaveUser(displayName, code string) error
 	RemoveUser(code string) error
 }
@@ -35,8 +35,8 @@ func (s *Storage) SaveUser(ctx context.Context, displayName, code string) error 
 		Code:        code,
 	}
 	query := `
-		INSERT OR IGNORE INTO users (displayName, code)
-		VALUES (:displayName, :code)
+		INSERT OR IGNORE INTO users (display_name, code)
+		VALUES (:display_name, :code)
 	`
 	_, err := s.db.NamedExecContext(ctx, query, user)
 	if err != nil {
@@ -66,7 +66,7 @@ func (s *Storage) createUsersTable() error {
 	CREATE TABLE IF NOT EXISTS users (
 		id INTEGER PRIMARY KEY,
 		code TEXT NOT NULL UNIQUE,
-		displayName TEXT NOT NULL
+		display_name TEXT NOT NULL
 	)`)
 	if err != nil {
 		return fmt.Errorf("create users table: %w", err)

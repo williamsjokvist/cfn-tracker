@@ -39,6 +39,10 @@ func (m *CFNTrackerRepository) SaveUser(ctx context.Context, displayName, code s
 	return nil
 }
 
+func (m *CFNTrackerRepository) SaveMatch(ctx context.Context) error {
+	return nil
+}
+
 type User struct {
 	DisplayName string `json:"displayName"`
 	Code        string `json:"code"`

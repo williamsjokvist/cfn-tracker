@@ -1,10 +1,12 @@
 package sql
 
+import "fmt"
+
 type Session struct {
-	Id      int            `db:"id"`
-	UserId  string         `db:"userId"`
-	Stats   []*SessionStat `db:"stats"`
-	Matches []*Match       `db:"matches"`
+	Id      int    `db:"id"`
+	UserId  string `db:"user_id"`
+	Stats   []*CharacterSessionStats
+	Matches []*Match
 }
 
 type SessionStorage interface {
@@ -24,5 +26,14 @@ func (s *Storage) GetLastSession(userId string) (Session, error) {
 }
 
 func (s *Storage) createSessionsTable() error {
+	_, err := s.db.Exec(`
+	CREATE TABLE IF NOT EXISTS sessions (
+		id INTEGER PRIMARY KEY,
+		user_id INTEGER,
+		FOREIGN KEY(user_id) REFERENCES users(id)
+	)`)
+	if err != nil {
+		return fmt.Errorf("create users table: %w", err)
+	}
 	return nil
 }
