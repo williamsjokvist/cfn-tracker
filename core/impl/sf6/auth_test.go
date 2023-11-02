@@ -15,7 +15,7 @@ func TestSF6Authentication(t *testing.T) {
 	assert := assert.New(t)
 
 	ctx := context.Background()
-	browser := shared.NewBrowser(ctx, true)
+	browser, _ := shared.NewBrowser(ctx, true)
 	sf6Tracker := NewSF6Tracker(ctx, browser, nil)
 	err := sf6Tracker.Authenticate(os.Getenv(`CAP_ID_EMAIL`), os.Getenv(`CAP_ID_PASSWORD`), true)
 

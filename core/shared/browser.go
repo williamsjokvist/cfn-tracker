@@ -3,10 +3,13 @@ package shared
 import (
 	"context"
 	"fmt"
+	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/go-rod/rod"
 	"github.com/go-rod/rod/lib/launcher"
+	"github.com/go-rod/rod/lib/launcher/flags"
 	"github.com/go-rod/rod/lib/proto"
 	"github.com/hashicorp/go-version"
 	wails "github.com/wailsapp/wails/v2/pkg/runtime"
@@ -18,9 +21,17 @@ type Browser struct {
 	HijackRouter *rod.HijackRouter
 }
 
-func NewBrowser(ctx context.Context, headless bool) *Browser {
+func NewBrowser(ctx context.Context, headless bool) (*Browser, error) {
 	fmt.Println(`Setting up browser`)
-	u := launcher.New().Leakless(false).Headless(headless).MustLaunch()
+	
+	userHomeDir, err := os.UserCacheDir()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get cache dir for browser: %w", err)
+	}
+	userDataDir := filepath.Join(userHomeDir, "cfn-tracker")
+	l := launcher.New()
+	l.Set(flags.UserDataDir, userDataDir)
+	u := l.Leakless(false).Headless(headless).MustLaunch()
 
 	// TODO: Connection to browser error handling
 	page := rod.New().ControlURL(u).MustConnect().MustPage(``)
@@ -49,7 +60,7 @@ func NewBrowser(ctx context.Context, headless bool) *Browser {
 		ctx:          ctx,
 		Page:         page,
 		HijackRouter: router,
-	}
+	}, nil
 }
 
 // TODO: Error Handling
