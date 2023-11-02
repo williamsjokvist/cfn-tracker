@@ -10,6 +10,7 @@ import (
 	"github.com/hashicorp/go-version"
 	"github.com/joho/godotenv"
 	"github.com/wailsapp/wails/v2"
+	"github.com/wailsapp/wails/v2/pkg/logger"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/mac"
 	"github.com/wailsapp/wails/v2/pkg/options/windows"
@@ -69,19 +70,21 @@ func main() {
 	cmdHandler := core.NewCommandHandler(trackerRepo)
 
 	err = wails.Run(&options.App{
-		Title:             `CFN Tracker v3`,
-		Assets:            assets,
-		Width:             920,
-		Height:            450,
-		MinWidth:          800,
-		MinHeight:         450,
-		DisableResize:     true,
-		Fullscreen:        false,
-		Frameless:         true,
-		StartHidden:       false,
-		HideWindowOnClose: false,
-		BackgroundColour:  options.NewRGBA(0, 0, 0, 1),
-		CSSDragProperty:   `--draggable`,
+		Title:              `CFN Tracker v3`,
+		Assets:             assets,
+		Width:              920,
+		Height:             450,
+		MinWidth:           800,
+		MinHeight:          450,
+		DisableResize:      true,
+		Fullscreen:         false,
+		Frameless:          true,
+		StartHidden:        false,
+		HideWindowOnClose:  false,
+		LogLevel:           logger.WARNING,
+		LogLevelProduction: logger.ERROR,
+		BackgroundColour:   options.NewRGBA(0, 0, 0, 1),
+		CSSDragProperty:    `--draggable`,
 		Windows: &windows.Options{
 			WebviewIsTransparent:              false,
 			WindowIsTranslucent:               false,
