@@ -68,25 +68,26 @@ func getLogFileNameFor(displayName string, id string) string {
 func NewTrackingState(cfn string) *TrackingState {
 	return &TrackingState{
 		CFN:               cfn,
+		UserCode:          "",
 		LP:                0,
 		LPGain:            0,
 		MR:                0,
 		MRGain:            0,
 		Wins:              0,
-		Losses:            0,
 		TotalWins:         0,
 		TotalLosses:       0,
 		TotalMatches:      0,
+		Losses:            0,
 		WinRate:           0,
-		WinStreak:         0,
-		IsWin:             false,
-		TimeStamp:         ``,
-		Date:              ``,
 		Character:         ``,
 		Opponent:          ``,
 		OpponentCharacter: ``,
 		OpponentLP:        0,
 		OpponentLeague:    ``,
+		IsWin:             false,
+		TimeStamp:         ``,
+		Date:              ``,
+		WinStreak:         0,
 	}
 }
 
