@@ -9,25 +9,26 @@ import (
 	"time"
 
 	wails "github.com/wailsapp/wails/v2/pkg/runtime"
+	"golang.org/x/net/context"
 )
 
-func (t *SF6Tracker) Authenticate(email string, password string, dry bool) error {
+func (t *SF6Tracker) Authenticate(ctx context.Context, email string, password string, dry bool) error {
 	if t.isAuthenticated || strings.Contains(t.Page.MustInfo().URL, `buckler`) {
 		t.isAuthenticated = true
 		return nil
 	}
-	
+
 	log.Println(`Logging in`)
 	t.Page.MustNavigate(`https://cid.capcom.com/ja/login/?guidedBy=web`).MustWaitLoad().MustWaitIdle()
 	if !dry {
-		wails.EventsEmit(t.ctx, `auth-loaded`, 10)
+		wails.EventsEmit(ctx, `auth-loaded`, 10)
 	}
 
 	log.Print("Checking if already authed")
 	if strings.Contains(t.Page.MustInfo().URL, `cid.capcom.com/ja/mypage`) {
 		log.Print("User already authed")
 		t.isAuthenticated = true
-		wails.EventsEmit(t.ctx, `initialized`, true)
+		wails.EventsEmit(ctx, `initialized`, true)
 		return nil
 	}
 	log.Print("Not authed, continuing with auth process")
@@ -41,7 +42,7 @@ func (t *SF6Tracker) Authenticate(email string, password string, dry bool) error
 		t.Page.MustElement(`form button[type="submit"]`).MustClick()
 		t.Page.MustWaitLoad().MustWaitRequestIdle()
 		if !dry {
-			wails.EventsEmit(t.ctx, `auth-loaded`, 20)
+			wails.EventsEmit(ctx, `auth-loaded`, 20)
 		}
 	}
 
@@ -50,7 +51,7 @@ func (t *SF6Tracker) Authenticate(email string, password string, dry bool) error
 	t.Page.MustElement(`input[name="password"]`).Input(password)
 	t.Page.MustElement(`button[type="submit"]`).MustClick()
 	if !dry {
-		wails.EventsEmit(t.ctx, `auth-loaded`, 30)
+		wails.EventsEmit(ctx, `auth-loaded`, 30)
 	}
 	// Wait for redirection
 	var secondsWaited time.Duration = 0
@@ -64,7 +65,7 @@ func (t *SF6Tracker) Authenticate(email string, password string, dry bool) error
 		secondsWaited += time.Second
 		fmt.Println(`Waiting for gateway to pass...`, secondsWaited)
 		if secondsWaited > (3*time.Second) && !dry {
-			wails.EventsEmit(t.ctx, `auth-loaded`, (secondsWaited/time.Second)*10)
+			wails.EventsEmit(ctx, `auth-loaded`, (secondsWaited/time.Second)*10)
 		}
 	}
 
@@ -72,7 +73,7 @@ func (t *SF6Tracker) Authenticate(email string, password string, dry bool) error
 	t.Page.MustWaitLoad().MustWaitRequestIdle()
 
 	if !dry {
-		wails.EventsEmit(t.ctx, `initialized`, true)
+		wails.EventsEmit(ctx, `initialized`, true)
 		t.isAuthenticated = true
 	}
 

@@ -16,18 +16,15 @@ import (
 )
 
 type SF6Tracker struct {
-	ctx              context.Context
-	isAuthenticated  bool
-	stopPolling      context.CancelFunc
-	state            map[string]*data.TrackingState
-	currentCharacter string
+	isAuthenticated bool
+	stopPolling     context.CancelFunc
+	state           map[string]*data.TrackingState
 	*shared.Browser
 	*data.CFNTrackerRepository
 }
 
-func NewSF6Tracker(ctx context.Context, browser *shared.Browser, trackerRepo *data.CFNTrackerRepository) *SF6Tracker {
+func NewSF6Tracker(browser *shared.Browser, trackerRepo *data.CFNTrackerRepository) *SF6Tracker {
 	return &SF6Tracker{
-		ctx:                  ctx,
 		Browser:              browser,
 		stopPolling:          func() {},
 		CFNTrackerRepository: trackerRepo,
@@ -36,14 +33,13 @@ func NewSF6Tracker(ctx context.Context, browser *shared.Browser, trackerRepo *da
 }
 
 // Start will update the tracking state when new matches are played.
-func (t *SF6Tracker) Start(userCode string, restore bool, pollRate time.Duration) error {
-	log.Println(`starting sf6 tracker`)
+func (t *SF6Tracker) Start(ctx context.Context, userCode string, restore bool, pollRate time.Duration) error {
 	if !t.isAuthenticated {
 		log.Println(`tracker not authenticated`)
 		return errors.New(`sf6 authentication err or invalid cfn`)
 	}
 
-	wails.EventsEmit(t.ctx, `started-tracking`)
+	wails.EventsEmit(ctx, `started-tracking`)
 
 	t.state = make(map[string]*data.TrackingState, 42)
 	if restore {
@@ -52,14 +48,13 @@ func (t *SF6Tracker) Start(userCode string, restore bool, pollRate time.Duration
 		if err != nil {
 			return fmt.Errorf(`failed to restore session: %w`, err)
 		}
-		t.currentCharacter = storedState.Character
-		t.state[t.currentCharacter] = storedState
-		wails.EventsEmit(t.ctx, `cfn-data`, t.state[t.currentCharacter])
+		t.state[storedState.Character] = storedState
+		wails.EventsEmit(ctx, `cfn-data`, t.state[storedState.Character])
 	}
 
-	ctx, cancel := context.WithCancel(context.Background())
-	t.stopPolling = cancel
-	go t.poll(ctx, userCode, pollRate)
+	pollCtx, cancelFn := context.WithCancel(ctx)
+	t.stopPolling = cancelFn
+	go t.poll(pollCtx, userCode, pollRate)
 
 	return nil
 }
@@ -76,18 +71,18 @@ func (t *SF6Tracker) poll(ctx context.Context, userCode string, pollRate time.Du
 			break
 		}
 
-		t.currentCharacter = bl.GetCharacter()
+		char := bl.GetCharacter()
 
 		// reset on character switch
-		if t.state[t.currentCharacter] == nil {
-			t.state[t.currentCharacter] = &data.TrackingState{
+		if t.state[char] == nil {
+			t.state[char] = &data.TrackingState{
 				CFN:       bl.GetCFN(),
 				UserCode:  bl.GetUserCode(),
 				LP:        bl.GetLP(),
 				MR:        bl.GetMR(),
 				Character: bl.GetCharacter(),
 			}
-			wails.EventsEmit(t.ctx, `cfn-data`, t.state[t.currentCharacter])
+			wails.EventsEmit(ctx, `cfn-data`, t.state[char])
 		}
 
 		stoppedPolling := utils.SleepOrBreak(pollRate, func() bool {
@@ -100,21 +95,22 @@ func (t *SF6Tracker) poll(ctx context.Context, userCode string, pollRate time.Du
 		})
 
 		if stoppedPolling {
+			wails.EventsEmit(ctx, `stopped-tracking`)
 			break
 		}
 
 		// no new match played
-		if len(bl.ReplayList) == 0 || bl.GetLP() == t.state[t.currentCharacter].LP {
+		if len(bl.ReplayList) == 0 || bl.GetLP() == t.state[char].LP {
 			continue
 		}
 
-		t.state[t.currentCharacter] = t.getUpdatedTrackingState(bl)
+		t.state[char] = t.getUpdatedTrackingState(bl)
 
-		wails.EventsEmit(t.ctx, `cfn-data`, t.state[t.currentCharacter])
-		t.state[t.currentCharacter].Save()
-		t.state[t.currentCharacter].Log()
+		wails.EventsEmit(ctx, `cfn-data`, t.state[char])
+		t.state[char].Save()
+		t.state[char].Log()
 
-		t.CFNTrackerRepository.SaveUser(t.ctx, t.state[t.currentCharacter].CFN, userCode)
+		t.CFNTrackerRepository.SaveUser(ctx, t.state[char].CFN, userCode)
 	}
 }
 
@@ -201,8 +197,6 @@ func isVictory(roundResults []int) bool {
 // Stop will stop any current trackingz
 func (t *SF6Tracker) Stop() {
 	t.stopPolling()
-	log.Println(`Stopped tracking`)
-	wails.EventsEmit(t.ctx, `stopped-tracking`)
 }
 
 func getLeagueFromLP(lp int) string {
