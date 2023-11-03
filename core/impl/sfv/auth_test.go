@@ -16,8 +16,8 @@ func TestSFVAuthentication(t *testing.T) {
 
 	ctx := context.Background()
 	browser, _ := shared.NewBrowser(ctx, true)
-	sf5Tracker := NewSFVTracker(ctx, browser)
-	err := sf5Tracker.Authenticate(os.Getenv(`STEAM_USERNAME`), os.Getenv(`STEAM_PASSWORD`), true)
+	sf5Tracker := NewSFVTracker(browser)
+	err := sf5Tracker.Authenticate(ctx, os.Getenv(`STEAM_USERNAME`), os.Getenv(`STEAM_PASSWORD`), true)
 
 	assert.Equal(nil, err)
 }
