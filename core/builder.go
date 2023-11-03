@@ -12,7 +12,7 @@ import (
 )
 
 type GameTracker interface {
-	Start(cfn string, restore bool, refreshInterval time.Duration) error
+	Start(ctx context.Context, cfn string, restore bool, refreshInterval time.Duration) error
 	Stop()
 }
 
@@ -38,8 +38,8 @@ func (s GameType) String() string {
 
 // Make a SF6Tracker and expose it as a GameTracker
 func MakeSF6Tracker(ctx context.Context, browser *shared.Browser, username, password string, trackerRepository *data.CFNTrackerRepository) (GameTracker, error) {
-	sf6Tracker := sf6.NewSF6Tracker(ctx, browser, trackerRepository)
-	err := sf6Tracker.Authenticate(username, password, false)
+	sf6Tracker := sf6.NewSF6Tracker(browser, trackerRepository)
+	err := sf6Tracker.Authenticate(ctx, username, password, false)
 	if err != nil {
 		return nil, fmt.Errorf(`auth err: %v`, err)
 	}
@@ -49,8 +49,8 @@ func MakeSF6Tracker(ctx context.Context, browser *shared.Browser, username, pass
 
 // Make a SFVTracker and expose it as a GameTracker
 func MakeSFVTracker(ctx context.Context, browser *shared.Browser, username string, password string) (GameTracker, error) {
-	sfvTracker := sfv.NewSFVTracker(ctx, browser)
-	err := sfvTracker.Authenticate(username, password, false)
+	sfvTracker := sfv.NewSFVTracker(browser)
+	err := sfvTracker.Authenticate(ctx, username, password, false)
 	if err != nil {
 		return nil, fmt.Errorf(`auth err: %v`, err)
 	}

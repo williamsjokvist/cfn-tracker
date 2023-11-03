@@ -1,6 +1,7 @@
 package sfv
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"strings"
@@ -14,7 +15,7 @@ var (
 	ErrCaptcha = errors.New(`encountered a captcha`)
 )
 
-func (t *SFVTracker) Authenticate(username string, password string, dry bool) error {
+func (t *SFVTracker) Authenticate(ctx context.Context, username string, password string, dry bool) error {
 	fmt.Println(`Accepting CFN terms`)
 	t.Page.MustNavigate(`https://game.capcom.com/cfn/sfv/consent/steam`).MustWaitLoad()
 	t.Page.MustElement(`input[type="submit"]`).MustClick()
@@ -22,7 +23,7 @@ func (t *SFVTracker) Authenticate(username string, password string, dry bool) er
 	fmt.Println(`CFN terms accepted`)
 
 	if t.Page.MustInfo().URL == `https://game.capcom.com/cfn/sfv/` && !dry {
-		t.setInitialized()
+		t.setInitialized(ctx)
 		return nil
 	}
 
@@ -33,7 +34,7 @@ func (t *SFVTracker) Authenticate(username string, password string, dry bool) er
 	isConfirmPageOpen := t.Page.MustHas(`#imageLogin`)
 
 	if !isSteamOpen && isConfirmPageOpen && !dry {
-		t.setInitialized()
+		t.setInitialized(ctx)
 		return nil
 	}
 
@@ -84,14 +85,14 @@ func (t *SFVTracker) Authenticate(username string, password string, dry bool) er
 		}
 	}
 	if !dry {
-		t.setInitialized()
+		t.setInitialized(ctx)
 	}
 
 	return nil
 }
 
-func (t *SFVTracker) setInitialized() {
+func (t *SFVTracker) setInitialized(ctx context.Context) {
 	fmt.Println(`Gateway passed`)
 	t.isAuthenticated = true
-	wails.EventsEmit(t.ctx, `initialized`, true)
+	wails.EventsEmit(ctx, `initialized`, true)
 }

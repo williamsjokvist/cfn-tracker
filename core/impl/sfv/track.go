@@ -17,7 +17,6 @@ import (
 )
 
 type SFVTracker struct {
-	ctx             context.Context
 	firstLPRecorded int
 	isTracking      bool
 	isAuthenticated bool
@@ -31,9 +30,8 @@ var (
 	ErrInvalidCFN      = errors.New(`invalid cfn provided`)
 )
 
-func NewSFVTracker(ctx context.Context, browser *shared.Browser) *SFVTracker {
+func NewSFVTracker(browser *shared.Browser) *SFVTracker {
 	return &SFVTracker{
-		ctx:          ctx,
 		isTracking:   false,
 		mh:           data.NewTrackingState(``),
 		Browser:      browser,
@@ -46,14 +44,14 @@ func (t *SFVTracker) Stop() {
 	t.stopTracking()
 }
 
-func (t *SFVTracker) stopFn() {
+func (t *SFVTracker) stopFn(ctx context.Context) {
 	fmt.Println(`Stopped tracking`)
 	t.isTracking = false
-	wails.EventsEmit(t.ctx, `stopped-tracking`)
+	wails.EventsEmit(ctx, `stopped-tracking`)
 }
 
 // Start will update the MatchHistory when new matches are played.
-func (t *SFVTracker) Start(cfn string, restoreData bool, refreshInterval time.Duration) error {
+func (t *SFVTracker) Start(ctx context.Context, cfn string, restoreData bool, refreshInterval time.Duration) error {
 	// safe guard
 	if t.isTracking {
 		return nil
@@ -76,21 +74,21 @@ func (t *SFVTracker) Start(cfn string, restoreData bool, refreshInterval time.Du
 	t.Page.MustNavigate(fmt.Sprintf(`https://game.capcom.com/cfn/sfv/profile/%s`, cfn)).MustWaitLoad()
 	isValidProfile := t.Page.MustHas(`.leagueInfo`)
 	if !isValidProfile {
-		t.stopFn()
+		t.stopFn(ctx)
 		return ErrInvalidCFN
 	}
 
 	fmt.Println(`Profile loaded`)
 	t.isTracking = true
 	t.mh = data.NewTrackingState(cfn)
-	wails.EventsEmit(t.ctx, `started-tracking`)
+	wails.EventsEmit(ctx, `started-tracking`)
 
 	// First fetch
-	t.refreshMatchHistory(cfn, true)
+	t.refreshMatchHistory(ctx, cfn, true)
 
-	ctx, cancel := context.WithCancel(context.Background())
+	pollCtx, cancel := context.WithCancel(context.Background())
 	t.stopTracking = cancel
-	go t.poll(ctx, cfn, refreshInterval)
+	go t.poll(pollCtx, cfn, refreshInterval)
 
 	return nil
 }
@@ -107,15 +105,15 @@ func (t *SFVTracker) poll(ctx context.Context, cfn string, refreshInterval time.
 		})
 
 		if didBreak {
-			t.stopFn()
+			t.stopFn(ctx)
 			break
 		}
 
-		t.refreshMatchHistory(cfn, false)
+		t.refreshMatchHistory(ctx, cfn, false)
 	}
 }
 
-func (t *SFVTracker) refreshMatchHistory(cfn string, isFirstFetch bool) {
+func (t *SFVTracker) refreshMatchHistory(ctx context.Context, cfn string, isFirstFetch bool) {
 	if !isFirstFetch && t.Page.MustInfo().URL != fmt.Sprintf(`https://game.capcom.com/cfn/sfv/profile/%s`, cfn) {
 		return
 	}
@@ -186,7 +184,7 @@ func (t *SFVTracker) refreshMatchHistory(cfn string, isFirstFetch bool) {
 	t.mh.TimeStamp = time.Now().Format(`15:04`)
 	t.mh.Date = time.Now().Format(`2006-01-02`)
 
-	wails.EventsEmit(t.ctx, `cfn-data`, t.mh)
+	wails.EventsEmit(ctx, `cfn-data`, t.mh)
 	t.mh.Save()
 	t.mh.Log()
 }

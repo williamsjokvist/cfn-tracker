@@ -45,12 +45,13 @@ func (ch *CommandHandler) GetAppVersion() string {
 }
 
 func (ch *CommandHandler) StopTracking() {
+	log.Println(`Stopped tracking`)
 	ch.tracker.Stop()
 }
 
 func (ch *CommandHandler) StartTracking(cfn string, restore bool) {
 	log.Printf(`starting tracking for %s, restoring = %v`, cfn, restore)
-	err := ch.tracker.Start(cfn, restore, RefreshInterval)
+	err := ch.tracker.Start(ch.ctx, cfn, restore, RefreshInterval)
 	if err != nil {
 		wails.EventsEmit(ch.ctx, `error-cfn`, err.Error())
 		fmt.Println(err)
