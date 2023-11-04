@@ -39,8 +39,6 @@ func (t *SF6Tracker) Start(ctx context.Context, userCode string, restore bool, p
 		return errors.New(`sf6 authentication err or invalid cfn`)
 	}
 
-	wails.EventsEmit(ctx, `started-tracking`)
-
 	t.state = make(map[string]*data.TrackingState, 42)
 	if restore {
 		// todo: replace with sqldb

@@ -20,7 +20,6 @@ export const AppWrapper: React.FC = () => {
   const [_, send] = CFNMachineContext.useActor();
 
   React.useEffect(() => {
-    EventsOn("started-tracking", () => send("startedTracking"));
     EventsOn("stopped-tracking", () => send("stoppedTracking"));
     EventsOn("auth-loaded", (percentage) => setLoaded(percentage));
     EventsOn("version-update", (hasNewVersion) => setNewVersion(hasNewVersion));
@@ -31,12 +30,13 @@ export const AppWrapper: React.FC = () => {
       setTimeout(() => setLoaded(0), 10);
     });
 
-    EventsOn("cfn-data", (matchHistory) =>
+    EventsOn("cfn-data", (matchHistory) => {
+      send("startedTracking");
       send({
         type: "matchPlayed",
         matchHistory,
-      })
-    );
+      });
+    });
 
     EventsOn("error-cfn", (error) => {
       send({
