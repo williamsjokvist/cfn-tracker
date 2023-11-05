@@ -23,7 +23,7 @@ type Browser struct {
 
 func NewBrowser(ctx context.Context, headless bool) (*Browser, error) {
 	fmt.Println(`Setting up browser`)
-	
+
 	userHomeDir, err := os.UserCacheDir()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get cache dir for browser: %w", err)
@@ -31,10 +31,21 @@ func NewBrowser(ctx context.Context, headless bool) (*Browser, error) {
 	userDataDir := filepath.Join(userHomeDir, "cfn-tracker")
 	l := launcher.New()
 	l.Set(flags.UserDataDir, userDataDir)
-	u := l.Leakless(false).Headless(headless).MustLaunch()
+	l.RemoteDebuggingPort(6969)
+	u, err := l.Leakless(false).Headless(headless).Launch()
+	if err != nil {
+		println("Failed to launch brosfsdfwsers", err)
+		u = "127.0.0.1:6969"
+	}
 
 	// TODO: Connection to browser error handling
-	page := rod.New().ControlURL(u).MustConnect().MustPage(``)
+	browser := rod.New().ControlURL(u).MustConnect()
+	var page *rod.Page
+	if browser.MustPages().Empty() {
+		page = browser.MustPage("")
+	} else {
+		page = browser.MustPages().First()
+	}
 	router := page.HijackRequests()
 
 	// Block the browser from fetching unnecessary resources
