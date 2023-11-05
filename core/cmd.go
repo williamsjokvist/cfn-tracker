@@ -126,7 +126,13 @@ func (ch *CommandHandler) ResultsJSONExist() bool {
 
 func (ch *CommandHandler) StartBrowser(ctx context.Context) {
 	ch.ctx = ctx
-	ch.browser, _ = shared.NewBrowser(ctx, RunHeadless)
+	browser, err := shared.NewBrowser(ctx, RunHeadless)
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+	ch.browser = browser
+
 	ch.browser.CheckForVersionUpdate(AppVersion)
 	go shared.Serve(ctx)
 }

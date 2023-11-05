@@ -3,6 +3,7 @@ package shared
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -22,8 +23,8 @@ type Browser struct {
 }
 
 func NewBrowser(ctx context.Context, headless bool) (*Browser, error) {
-	fmt.Println(`Setting up browser`)
-	
+	log.Println(`Setting up browser`)
+
 	userHomeDir, err := os.UserCacheDir()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get cache dir for browser: %w", err)
@@ -31,12 +32,27 @@ func NewBrowser(ctx context.Context, headless bool) (*Browser, error) {
 	userDataDir := filepath.Join(userHomeDir, "cfn-tracker")
 	l := launcher.New()
 	l.Set(flags.UserDataDir, userDataDir)
-	u := l.Leakless(false).Headless(headless).MustLaunch()
+	l.RemoteDebuggingPort(6969)
+	u, err := l.Leakless(false).Headless(headless).Launch()
+	if err != nil {
+		return nil, fmt.Errorf("Failed to launch temp browser %w", err)
+	}
 
-	// TODO: Connection to browser error handling
-	page := rod.New().ControlURL(u).MustConnect().MustPage(``)
+	log.Println("Browser connecting to", u)
+	browser := rod.New().ControlURL(u)
+	err = browser.Connect()
+	if err != nil {
+		return nil, fmt.Errorf("Failed to connect to browser, received %w", err)
+	}
+	
+	var page *rod.Page
+	if browser.MustPages().Empty() {
+		page = browser.MustPage("")
+	} else {
+		page = browser.MustPages().First()
+	}
+
 	router := page.HijackRequests()
-
 	// Block the browser from fetching unnecessary resources
 	router.MustAdd(`*`, func(ctx *rod.Hijack) {
 		if ctx.Request.Type() == proto.NetworkResourceTypeImage ||
@@ -65,7 +81,7 @@ func NewBrowser(ctx context.Context, headless bool) (*Browser, error) {
 
 // TODO: Error Handling
 func (b *Browser) CheckForVersionUpdate(currentVersion *version.Version) {
-	fmt.Println(`Check for new version`)
+	log.Println(`Check for new version`)
 	b.Page.MustNavigate(`https://github.com/williamsjokvist/cfn-tracker/releases`).MustWaitLoad()
 	el := b.Page.MustElement(`turbo-frame div.mr-md-0:nth-child(3) > a:nth-child(1)`)
 	latestVerEl := el.MustText()
@@ -73,7 +89,7 @@ func (b *Browser) CheckForVersionUpdate(currentVersion *version.Version) {
 	latestVersion, _ := version.NewVersion(latestVersionText)
 	hasNewVersion := currentVersion.LessThan(latestVersion)
 	if hasNewVersion {
-		fmt.Println(`Has new version: `, latestVersionText)
+		log.Println(`Has new version: `, latestVersionText)
 		wails.EventsEmit(b.ctx, `version-update`, hasNewVersion)
 	}
 }
