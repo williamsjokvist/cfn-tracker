@@ -28,7 +28,7 @@ func NewSF6Tracker(browser *shared.Browser, trackerRepo *data.CFNTrackerReposito
 		Browser:              browser,
 		stopPolling:          func() {},
 		CFNTrackerRepository: trackerRepo,
-		state:                make(map[string]*data.TrackingState, 42),
+		state:                make(map[string]*data.TrackingState, 4),
 	}
 }
 
@@ -39,7 +39,7 @@ func (t *SF6Tracker) Start(ctx context.Context, userCode string, restore bool, p
 		return errors.New(`sf6 authentication err or invalid cfn`)
 	}
 
-	t.state = make(map[string]*data.TrackingState, 42)
+	t.state = make(map[string]*data.TrackingState, 4)
 	if restore {
 		// todo: replace with sqldb
 		storedState, err := data.GetSavedMatchHistory(userCode)
@@ -59,6 +59,18 @@ func (t *SF6Tracker) Start(ctx context.Context, userCode string, restore bool, p
 
 func (t *SF6Tracker) poll(ctx context.Context, userCode string, pollRate time.Duration) {
 	i := 0
+	retries := 0
+
+	didStop := func() bool {
+		return utils.SleepOrBreak(pollRate, func() bool {
+			select {
+			case <-ctx.Done():
+				return true
+			default:
+				return false
+			}
+		})
+	}
 
 	for {
 		i++
@@ -66,12 +78,18 @@ func (t *SF6Tracker) poll(ctx context.Context, userCode string, pollRate time.Du
 
 		bl, err := t.fetchBattleLog(userCode)
 		if err != nil {
-			break
+			retries++
+			log.Println(`failed to poll battle log: `, err, `(retry: `, retries, `)`)
+			if didStop() || retries > 5 {
+				wails.EventsEmit(ctx, `stopped-tracking`)
+				break
+			}
+			continue
 		}
 
 		char := bl.GetCharacter()
 
-		// reset on character switch
+		// assign new state on new character
 		if t.state[char] == nil {
 			t.state[char] = &data.TrackingState{
 				CFN:       bl.GetCFN(),
@@ -83,45 +101,41 @@ func (t *SF6Tracker) poll(ctx context.Context, userCode string, pollRate time.Du
 			wails.EventsEmit(ctx, `cfn-data`, t.state[char])
 		}
 
-		stoppedPolling := utils.SleepOrBreak(pollRate, func() bool {
-			select {
-			case <-ctx.Done():
-				return true
-			default:
-				return false
-			}
-		})
-
-		if stoppedPolling {
+		if didStop() {
 			wails.EventsEmit(ctx, `stopped-tracking`)
 			break
 		}
 
-		// no new match played
-		if len(bl.ReplayList) == 0 || bl.GetLP() == t.state[char].LP {
-			continue
+		updatedTrackingState := t.getUpdatedTrackingState(bl)
+
+		if t.state[char] != updatedTrackingState {
+			t.state[char] = updatedTrackingState
+			wails.EventsEmit(ctx, `cfn-data`, t.state[char])
+			t.state[char].Save()
+			t.state[char].Log()
+
+			t.CFNTrackerRepository.SaveUser(ctx, t.state[char].CFN, userCode)
 		}
-
-		t.state[char] = t.getUpdatedTrackingState(bl)
-
-		wails.EventsEmit(ctx, `cfn-data`, t.state[char])
-		t.state[char].Save()
-		t.state[char].Log()
-
-		t.CFNTrackerRepository.SaveUser(ctx, t.state[char].CFN, userCode)
 	}
 }
 
 func (t *SF6Tracker) fetchBattleLog(userCode string) (*BattleLog, error) {
 	err := t.Page.Navigate(fmt.Sprintf(`https://www.streetfighter.com/6/buckler/profile/%s/battlelog/rank`, userCode))
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf(`navigate to cfn: %w`, err)
 	}
 	err = t.Page.WaitLoad()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf(`wait for cfn to load: %w`, err)
 	}
-	body := t.Page.MustElement(`#__NEXT_DATA__`).MustText()
+	nextData, err := t.Page.Element(`#__NEXT_DATA__`)
+	if err != nil {
+		return nil, fmt.Errorf(`get next_data element: %w`, err)
+	}
+	body, err := nextData.Text()
+	if err != nil {
+		return nil, fmt.Errorf(`get next_data json: %w`, err)
+	}
 
 	var profilePage ProfilePage
 	err = json.Unmarshal([]byte(body), &profilePage)
@@ -137,6 +151,10 @@ func (t *SF6Tracker) fetchBattleLog(userCode string) (*BattleLog, error) {
 }
 
 func (t *SF6Tracker) getUpdatedTrackingState(bl *BattleLog) *data.TrackingState {
+	// no new match played
+	if len(bl.ReplayList) == 0 || bl.GetLP() == t.state[bl.GetCharacter()].LP {
+		return t.state[bl.GetCharacter()]
+	}
 	var opponent PlayerInfo
 	replay := bl.ReplayList[0]
 	if bl.GetCFN() == replay.Player1Info.Player.FighterID {
