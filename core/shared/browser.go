@@ -3,6 +3,7 @@ package shared
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -34,20 +35,24 @@ func NewBrowser(ctx context.Context, headless bool) (*Browser, error) {
 	l.RemoteDebuggingPort(6969)
 	u, err := l.Leakless(false).Headless(headless).Launch()
 	if err != nil {
-		println("Failed to launch brosfsdfwsers", err)
-		u = "127.0.0.1:6969"
+		return nil, fmt.Errorf("Failed to launch temp browser %w", err)
 	}
 
-	// TODO: Connection to browser error handling
-	browser := rod.New().ControlURL(u).MustConnect()
+	log.Println("Browser connecting to", u)
+	browser := rod.New().ControlURL(u)
+	err = browser.Connect()
+	if err != nil {
+		return nil, fmt.Errorf("Failed to connect to browser, received %w", err)
+	}
+	
 	var page *rod.Page
 	if browser.MustPages().Empty() {
 		page = browser.MustPage("")
 	} else {
 		page = browser.MustPages().First()
 	}
-	router := page.HijackRequests()
 
+	router := page.HijackRequests()
 	// Block the browser from fetching unnecessary resources
 	router.MustAdd(`*`, func(ctx *rod.Hijack) {
 		if ctx.Request.Type() == proto.NetworkResourceTypeImage ||
