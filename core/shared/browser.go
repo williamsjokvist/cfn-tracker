@@ -23,7 +23,7 @@ type Browser struct {
 }
 
 func NewBrowser(ctx context.Context, headless bool) (*Browser, error) {
-	fmt.Println(`Setting up browser`)
+	log.Println(`Setting up browser`)
 
 	userHomeDir, err := os.UserCacheDir()
 	if err != nil {
@@ -81,7 +81,7 @@ func NewBrowser(ctx context.Context, headless bool) (*Browser, error) {
 
 // TODO: Error Handling
 func (b *Browser) CheckForVersionUpdate(currentVersion *version.Version) {
-	fmt.Println(`Check for new version`)
+	log.Println(`Check for new version`)
 	b.Page.MustNavigate(`https://github.com/williamsjokvist/cfn-tracker/releases`).MustWaitLoad()
 	el := b.Page.MustElement(`turbo-frame div.mr-md-0:nth-child(3) > a:nth-child(1)`)
 	latestVerEl := el.MustText()
@@ -89,7 +89,7 @@ func (b *Browser) CheckForVersionUpdate(currentVersion *version.Version) {
 	latestVersion, _ := version.NewVersion(latestVersionText)
 	hasNewVersion := currentVersion.LessThan(latestVersion)
 	if hasNewVersion {
-		fmt.Println(`Has new version: `, latestVersionText)
+		log.Println(`Has new version: `, latestVersionText)
 		wails.EventsEmit(b.ctx, `version-update`, hasNewVersion)
 	}
 }
