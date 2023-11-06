@@ -28,7 +28,10 @@ func (t *SF6Tracker) Authenticate(ctx context.Context, email string, password st
 	if strings.Contains(t.Page.MustInfo().URL, `cid.capcom.com/ja/mypage`) {
 		log.Print("User already authed")
 		t.isAuthenticated = true
-		wails.EventsEmit(ctx, `initialized`, true)
+
+		if !dry {
+			wails.EventsEmit(ctx, `initialized`, true)
+		}
 		return nil
 	}
 	log.Print("Not authed, continuing with auth process")
