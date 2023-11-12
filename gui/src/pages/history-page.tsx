@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { Icon } from "@iconify/react";
 
 import {
-  GetAvailableLogs,
+  GetUsers,
   GetMatchLog,
   DeleteMatchLog,
   ExportLogToCSV,
@@ -17,7 +17,7 @@ import { PageHeader } from "@/ui/page-header";
 export const HistoryPage: React.FC = () => {
   const { t } = useTranslation();
 
-  const [availablePlayers, setAvailablePlayers] = React.useState<model.User[]>([]);
+  const [users, setUsers] = React.useState<model.User[]>([]);
   const [selectedPlayer, setLog] = React.useState<model.User>();
   const [matchLog, setMatchLog] = React.useState<model.TrackingState[]>([]);
 
@@ -32,8 +32,8 @@ export const HistoryPage: React.FC = () => {
   };
 
   React.useEffect(() => {
-    GetAvailableLogs().then(
-      (playersWithLogs) => setAvailablePlayers((_) => playersWithLogs)
+    GetUsers().then(
+      (users) => setUsers((_) => users)
     );
   }, []);
 
@@ -115,14 +115,14 @@ export const HistoryPage: React.FC = () => {
       </PageHeader>
 
       <div className="relative w-full">
-        {!selectedPlayer && availablePlayers && availablePlayers.length > 0 && (
+        {!selectedPlayer && users && users.length > 0 && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.225 }}
             className="grid max-h-[340px] h-full m-4 justify-center content-start overflow-y-scroll gap-5"
           >
-            {availablePlayers.map((playerInfo) => (
+            {users.map((playerInfo) => (
               <button
                 className="bg-[rgb(255,255,255,0.075)] hover:bg-[rgb(255,255,255,0.125)] text-xl backdrop-blur rounded-2xl transition-all items-center border-transparent border-opacity-5 border-[1px] px-3 py-1"
                 key={playerInfo.displayName}
