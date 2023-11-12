@@ -39,6 +39,16 @@ func (m *CFNTrackerRepository) SaveUser(ctx context.Context, displayName, code s
 	return nil
 }
 
+// CreateSession creates a session if it does not exist
+func (m *CFNTrackerRepository) CreateSession(ctx context.Context, userId string) error {
+	log.Println("saving user")
+	err := m.sqlDb.CreateSession(ctx, userId)
+	if err != nil {
+		return fmt.Errorf("create session: %w", err)
+	}
+	return nil
+}
+
 func (m *CFNTrackerRepository) SaveMatch(ctx context.Context) error {
 	return nil
 }
