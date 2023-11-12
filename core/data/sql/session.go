@@ -1,20 +1,44 @@
 package sql
 
-import "fmt"
+import (
+	"context"
+	"fmt"
+	"time"
+)
 
 type Session struct {
-	Id      int    `db:"id"`
-	UserId  string `db:"user_id"`
-	Stats   []*CharacterSessionStats
-	Matches []*Match
+	UserId    string `db:"user_id"`
+	Stats     []*CharacterSessionStats
+	Matches   []*Match
+	CreatedAt string `db:"created_at"`
+	UpdatedAt string `db:"updated_at"`
 }
 
 type SessionStorage interface {
 	createSessionsTable() error
-	UpsertSession(userId, startedAt string, lp, mr, lpGain, mrGain, wins, losses, winRate, winStreak, longestWinStreak, matchesPlayed int)
+	CreateSession(ctx context.Context, userId string) error
 	GetSessions(sessionId, userId string, directionOrder string, limit int) ([]*Session, error)
 	GetLastSession(userId string) (Session, error)
 	RemoveSession(sessionId string) error
+}
+
+func (s *Storage) CreateSession(ctx context.Context, userId string) error {
+	sesh := Session{
+		UserId:    userId,
+		CreatedAt: time.Now().String(),
+		UpdatedAt: time.Now().String(),
+	}
+
+	query := `
+		INSERT OR IGNORE INTO sessions (user_id, created_at, updated_at)
+		VALUES (:user_id, :created_at, :updated_at)
+	`
+	_, err := s.db.NamedExecContext(ctx, query, sesh)
+	if err != nil {
+		return fmt.Errorf("create session: %w", err)
+	}
+
+	return nil
 }
 
 func (s *Storage) GetSessions(sessionId, userId string, directionOrder string, limit int) ([]*Session, error) {
@@ -28,9 +52,11 @@ func (s *Storage) GetLastSession(userId string) (Session, error) {
 func (s *Storage) createSessionsTable() error {
 	_, err := s.db.Exec(`
 	CREATE TABLE IF NOT EXISTS sessions (
-		id INTEGER PRIMARY KEY,
 		user_id INTEGER,
-		FOREIGN KEY(user_id) REFERENCES users(id)
+		created_at TEXT,
+		updated_at TEXT,
+		PRIMARY KEY (user_id, created_at),
+		FOREIGN KEY (user_id) REFERENCES users(id)
 	)`)
 	if err != nil {
 		return fmt.Errorf("create users table: %w", err)

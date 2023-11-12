@@ -28,12 +28,12 @@ func NewStorage() (*Storage, error) {
 		return nil, err
 	}
 
-	err = storage.createCharacterSessionStatsTable()
+	err = storage.createSessionsTable()
 	if err != nil {
 		return nil, err
 	}
 
-	err = storage.createSessionsTable()
+	err = storage.createCharacterSessionStatsTable()
 	if err != nil {
 		return nil, err
 	}
