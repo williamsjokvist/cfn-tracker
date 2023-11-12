@@ -77,7 +77,7 @@ func (ch *CommandHandler) GetMatchLog(cfn string) []data.TrackingState {
 	return mhLog
 }
 
-func (ch *CommandHandler) GetAvailableLogs() []data.User {
+func (ch *CommandHandler) GetUsers() []data.User {
 	users, err := ch.repo.GetUsers(ch.ctx)
 	if err != nil {
 		fmt.Println(err)
