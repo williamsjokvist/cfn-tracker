@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 
 import { CFNMachineContext } from "@/main/machine";
-import { GetAvailableLogs } from "@@/go/core/CommandHandler";
+import { GetUsers } from "@@/go/core/CommandHandler";
 
 import { ActionButton } from "@/ui/action-button";
 import { Checkbox } from "@/ui/checkbox";
@@ -18,10 +18,10 @@ export const TrackingForm: React.FC = () => {
   const restoreRef = React.useRef<HTMLInputElement>(null);
 
   const [playerIdInput, setPlayerIdInput] = React.useState<string>("");
-  const [oldPlayers, setOldPlayers] = React.useState<data.User[] | null>(null);
+  const [users, setUsers] = React.useState<data.User[] | null>(null);
 
   React.useEffect(() => {
-    GetAvailableLogs().then((logs) => setOldPlayers(logs));
+    GetUsers().then((users) => setUsers(users));
   }, []);
 
   const onSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
@@ -31,7 +31,7 @@ export const TrackingForm: React.FC = () => {
       type: "submit",
       playerInfo: {
         displayName:
-          oldPlayers?.find((old) => old.code == playerIdInput) ?? playerIdInput,
+          users?.find((old) => old.code == playerIdInput) ?? playerIdInput,
         code: playerIdInput,
       },
       restore: restoreRef.current && restoreRef.current.checked,
@@ -67,9 +67,9 @@ export const TrackingForm: React.FC = () => {
           autoCorrect="off"
           autoSave="off"
         />
-        {oldPlayers && (
+        {users && (
           <div className="flex flex-wrap gap-2 content-center items-center text-center">
-            {oldPlayers.map((player) => (
+            {users.map((player) => (
               <button
                 key={player.displayName}
                 type="button"
@@ -82,8 +82,8 @@ export const TrackingForm: React.FC = () => {
           </div>
         )}
         <footer className="flex items-center w-full">
-          {oldPlayers &&
-            oldPlayers.some((old) => old.code == playerIdInput) && (
+          {users &&
+            users.some((old) => old.code == playerIdInput) && (
               <div className="group flex items-center">
                 <Checkbox ref={restoreRef} id="restore-session" />
                 <label
