@@ -135,10 +135,12 @@ func (t *SF6Tracker) updateState(ctx context.Context, userCode string, bl *Battl
 	t.state[char].Save()
 	t.state[char].Log()
 
-	err := t.CFNTrackerRepository.SaveMatch(ctx, t.sesh.SessionId, trackingStateToMatch(t.state[char]))
+	match := calcMatchStats(t.sesh, bl)
+	err := t.CFNTrackerRepository.SaveMatch(ctx, t.sesh.SessionId, match)
 	if err != nil {
 		log.Println(err)
 	}
+	t.sesh.Matches = append(t.sesh.Matches, &match)
 
 	t.CFNTrackerRepository.SaveUser(ctx, t.state[char].CFN, userCode)
 	if err != nil {
@@ -192,18 +194,20 @@ func (t *SF6Tracker) fetchBattleLog(userCode string) (*BattleLog, error) {
 	return bl, nil
 }
 
+func getOpponentInfo(myCfn string, replay *Replay) PlayerInfo {
+	if myCfn == replay.Player1Info.Player.FighterID {
+		return replay.Player2Info
+	} else {
+		return replay.Player1Info
+	}
+}
+
 func (t *SF6Tracker) getUpdatedTrackingState(bl *BattleLog) *data.TrackingState {
 	// no new match played
 	if len(bl.ReplayList) == 0 || bl.GetLP() == t.state[bl.GetCharacter()].LP {
 		return t.state[bl.GetCharacter()]
 	}
-	var opponent PlayerInfo
-	replay := bl.ReplayList[0]
-	if bl.GetCFN() == replay.Player1Info.Player.FighterID {
-		opponent = replay.Player2Info
-	} else if bl.GetCFN() == replay.Player2Info.Player.FighterID {
-		opponent = replay.Player1Info
-	}
+	opponent := getOpponentInfo(bl.GetCFN(), &bl.ReplayList[0])
 	state := t.state[bl.GetCharacter()]
 	isWin := !isVictory(opponent.RoundResults)
 	wins := state.Wins
@@ -239,6 +243,40 @@ func (t *SF6Tracker) getUpdatedTrackingState(bl *BattleLog) *data.TrackingState 
 		Date:              time.Now().Format(`2006-01-02`),
 		WinStreak:         winStreak,
 	}
+}
+
+func calcMatchStats(sesh *data.Session, bl *BattleLog) data.Match {
+	opponent := getOpponentInfo(bl.GetCFN(), &bl.ReplayList[0])
+	isWin := !isVictory(opponent.RoundResults)
+	datetime := time.Now().Format(`2006-01-02 15:04`)
+
+	match := data.Match{
+		Character:         bl.GetCharacter(),
+		LP:                bl.GetLP(),
+		MR:                bl.GetMR(),
+		Opponent:          opponent.Player.FighterID,
+		OpponentCharacter: opponent.CharacterName,
+		OpponentLP:        opponent.LeaguePoint,
+		OpponentLeague:    getLeagueFromLP(opponent.LeaguePoint),
+		Victory:           isWin,
+		DateTime:          datetime,
+	}
+
+	lastMatch := getLastMatchWithCharacter(sesh.Matches, match.Character)
+	if lastMatch != nil {
+		match.LPGain = match.LP - lastMatch.LP
+		match.MRGain = match.MR - lastMatch.MR
+	}
+	return match
+}
+
+func getLastMatchWithCharacter(matches []*data.Match, char string) *data.Match {
+	for _, match := range matches {
+		if match.Character == char {
+			return match
+		}
+	}
+	return nil
 }
 
 func isVictory(roundResults []int) bool {
