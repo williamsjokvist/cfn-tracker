@@ -12,6 +12,24 @@ type CFNTrackerRepository struct {
 	sqlDb *sql.Storage
 }
 
+type Session struct {
+	UserId  string
+	Started string
+	Matches []Match
+}
+
+type Match struct {
+	Character         string
+	LP                int
+	MR                int
+	Opponent          string
+	OpponentCharacter string
+	OpponentLP        int
+	OpponentMR        int
+	Victory           bool
+	DateTime          string
+}
+
 func NewCFNTrackerRepository(sqlDb *sql.Storage) *CFNTrackerRepository {
 	return &CFNTrackerRepository{
 		sqlDb: sqlDb,
@@ -49,7 +67,8 @@ func (m *CFNTrackerRepository) CreateSession(ctx context.Context, userId string)
 	return nil
 }
 
-func (m *CFNTrackerRepository) SaveMatch(ctx context.Context) error {
+func (m *CFNTrackerRepository) SaveMatch(ctx context.Context, sesh *Session, match Match) error {
+	log.Println("saving match")
 	return nil
 }
 
