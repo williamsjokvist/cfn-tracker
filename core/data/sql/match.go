@@ -7,7 +7,7 @@ import (
 
 type Match struct {
 	UserId            uint8  `db:"user_id"`
-	SessionCreatedAt  string `db:"session_created_at"`
+	SessionId         uint8  `db:"session_id"`
 	Character         string `db:"character"`
 	LP                int    `db:"lp"`
 	MR                int    `db:"mr"`
@@ -34,7 +34,7 @@ func (s *Storage) SaveMatch(ctx context.Context, match Match) error {
 	query := `
 		INSERT OR IGNORE INTO matches (
 			user_id,
-			session_created_at,
+			session_id,
 			character,
 			lp,
 			mr,
@@ -47,7 +47,7 @@ func (s *Storage) SaveMatch(ctx context.Context, match Match) error {
 		)
 		VALUES (
 			:user_id,
-			:session_created_at,
+			:session_id,
 			:character,
 			:lp,
 			:mr,
@@ -75,7 +75,7 @@ func (s *Storage) createMatchesTable() error {
 	_, err := s.db.Exec(`
 	CREATE TABLE IF NOT EXISTS matches (
 		user_id INTEGER,
-		session_created_at TEXT,
+		session_id INTEGER,
 		character TEXT NOT NULL,
 		lp INTEGER,
 		mr INTEGER,
@@ -86,7 +86,7 @@ func (s *Storage) createMatchesTable() error {
 		victory BOOLEAN,
 		datetime TEXT,
 		PRIMARY KEY (user_id, datetime),
-		FOREIGN KEY(user_id, session_created_at) REFERENCES sessions(user_id, created_at)
+		FOREIGN KEY(session_id) REFERENCES sessions(id)
 	)`)
 	if err != nil {
 		return fmt.Errorf("create users table: %w", err)
