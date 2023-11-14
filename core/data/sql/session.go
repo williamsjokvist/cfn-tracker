@@ -9,7 +9,6 @@ import (
 type Session struct {
 	SessionId int64  `db:"id"`
 	UserId    string `db:"user_id"`
-	Stats     []*CharacterSessionStats
 	Matches   []*Match
 	CreatedAt string `db:"created_at"`
 	UpdatedAt string `db:"updated_at"`
