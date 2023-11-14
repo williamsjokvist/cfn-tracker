@@ -28,6 +28,7 @@ type Match struct {
 	Opponent          string
 	OpponentCharacter string
 	OpponentLP        int
+	OpponentMR        int
 	OpponentLeague    string
 	Victory           bool
 	DateTime          string
@@ -90,7 +91,7 @@ func (m *CFNTrackerRepository) SaveMatch(ctx context.Context, sessionId int, mat
 		OpponentCharacter: match.OpponentCharacter,
 		OpponentLP:        match.OpponentLP,
 		OpponentLeague:    match.OpponentLeague,
-		OpponentMR:        0,
+		OpponentMR:        match.OpponentMR,
 		Victory:           match.Victory,
 		DateTime:          match.DateTime,
 	}

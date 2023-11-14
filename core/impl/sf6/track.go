@@ -258,6 +258,7 @@ func calcMatchStats(sesh *data.Session, bl *BattleLog) data.Match {
 		OpponentCharacter: opponent.CharacterName,
 		OpponentLP:        opponent.LeaguePoint,
 		OpponentLeague:    getLeagueFromLP(opponent.LeaguePoint),
+		OpponentMR:        opponent.MasterRating,
 		Victory:           isWin,
 		DateTime:          datetime,
 	}
