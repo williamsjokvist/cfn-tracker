@@ -150,19 +150,6 @@ func (t *SF6Tracker) updateState(ctx context.Context, userCode string, bl *Battl
 	return nil
 }
 
-func trackingStateToMatch(state *data.TrackingState) data.Match {
-	return data.Match{
-		Character:         state.Character,
-		LP:                state.LP,
-		MR:                state.MR,
-		Opponent:          state.Opponent,
-		OpponentCharacter: state.OpponentCharacter,
-		OpponentLP:        state.OpponentLP,
-		Victory:           state.IsWin,
-		DateTime:          state.Date + ` ` + state.TimeStamp,
-	}
-}
-
 func (t *SF6Tracker) fetchBattleLog(userCode string) (*BattleLog, error) {
 	err := t.Page.Navigate(fmt.Sprintf(`https://www.streetfighter.com/6/buckler/profile/%s/battlelog/rank`, userCode))
 	if err != nil {
