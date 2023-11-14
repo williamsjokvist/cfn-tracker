@@ -16,17 +16,26 @@ type Session struct {
 	SessionId int
 	UserId    string
 	Started   string
+	Matches   []*Match
 }
 
 type Match struct {
 	Character         string
 	LP                int
+	LPGain            int
 	MR                int
+	MRGain            int
 	Opponent          string
 	OpponentCharacter string
 	OpponentLP        int
+	OpponentLeague    string
 	Victory           bool
 	DateTime          string
+}
+
+type User struct {
+	DisplayName string `json:"displayName"`
+	Code        string `json:"code"`
 }
 
 func NewCFNTrackerRepository(sqlDb *sql.Storage) *CFNTrackerRepository {
@@ -74,10 +83,13 @@ func (m *CFNTrackerRepository) SaveMatch(ctx context.Context, sessionId int, mat
 		SessionId:         uint8(sessionId),
 		Character:         match.Character,
 		LP:                match.LP,
+		LPGain:            match.LPGain,
 		MR:                match.MR,
+		MRGain:            match.MRGain,
 		Opponent:          match.Opponent,
 		OpponentCharacter: match.OpponentCharacter,
 		OpponentLP:        match.OpponentLP,
+		OpponentLeague:    match.OpponentLeague,
 		OpponentMR:        0,
 		Victory:           match.Victory,
 		DateTime:          match.DateTime,
@@ -87,11 +99,6 @@ func (m *CFNTrackerRepository) SaveMatch(ctx context.Context, sessionId int, mat
 		return fmt.Errorf("save match in storage: %w", err)
 	}
 	return nil
-}
-
-type User struct {
-	DisplayName string `json:"displayName"`
-	Code        string `json:"code"`
 }
 
 func convSqlUserToModelUser(dbUser *sql.User) User {
