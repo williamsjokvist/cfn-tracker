@@ -16,7 +16,20 @@ import (
 )
 
 type Session struct {
-	UserId string
+	UserId  string
+	Matches []Match
+}
+
+type Match struct {
+	Character         string
+	LP                int
+	MR                int
+	Opponent          string
+	OpponentCharacter string
+	OpponentLP        int
+	OpponentMR        int
+	Victory           bool
+	DateTime          string
 }
 
 type SF6Tracker struct {
