@@ -108,31 +108,32 @@ func (t *SF6Tracker) poll(ctx context.Context, userCode string, pollRate time.Du
 		}
 
 		updatedTrackingState := t.getUpdatedTrackingState(bl)
+		if t.state[char] == updatedTrackingState {
+			continue
+		}
 
-		if t.state[char] != updatedTrackingState {
-			if t.sesh == nil {
-				sesh, err := t.CFNTrackerRepository.CreateSession(ctx, userCode)
-				if err != nil {
-					log.Println(err)
-				}
-				t.sesh = sesh
-			}
-
-			t.state[char] = updatedTrackingState
-			wails.EventsEmit(ctx, `cfn-data`, t.state[char])
-
-			t.state[char].Save()
-			t.state[char].Log()
-
-			err := t.CFNTrackerRepository.SaveMatch(ctx, t.sesh.SessionId, trackingStateToMatch(t.state[char]))
+		if t.sesh == nil {
+			sesh, err := t.CFNTrackerRepository.CreateSession(ctx, userCode)
 			if err != nil {
 				log.Println(err)
 			}
+			t.sesh = sesh
+		}
 
-			t.CFNTrackerRepository.SaveUser(ctx, t.state[char].CFN, userCode)
-			if err != nil {
-				log.Println(err)
-			}
+		t.state[char] = updatedTrackingState
+		wails.EventsEmit(ctx, `cfn-data`, t.state[char])
+
+		t.state[char].Save()
+		t.state[char].Log()
+
+		err = t.CFNTrackerRepository.SaveMatch(ctx, t.sesh.SessionId, trackingStateToMatch(t.state[char]))
+		if err != nil {
+			log.Println(err)
+		}
+
+		t.CFNTrackerRepository.SaveUser(ctx, t.state[char].CFN, userCode)
+		if err != nil {
+			log.Println(err)
 		}
 	}
 }
