@@ -19,7 +19,7 @@ type SF6Tracker struct {
 	isAuthenticated bool
 	stopPolling     context.CancelFunc
 	state           map[string]*data.TrackingState
-	sesh            data.Session
+	sesh            *data.Session
 	*shared.Browser
 	*data.CFNTrackerRepository
 }
@@ -110,12 +110,15 @@ func (t *SF6Tracker) poll(ctx context.Context, userCode string, pollRate time.Du
 		updatedTrackingState := t.getUpdatedTrackingState(bl)
 
 		if t.state[char] != updatedTrackingState {
-			sesh, err := t.CFNTrackerRepository.CreateSession(ctx, userCode)
-			if err != nil {
-				log.Println(err)
+			if t.sesh == nil {
+				sesh, err := t.CFNTrackerRepository.CreateSession(ctx, userCode)
+				if err != nil {
+					log.Println(err)
+				}
+				t.sesh = sesh
 			}
 
-			log.Println(sesh.SessionId)
+			log.Println(t.sesh.SessionId)
 
 			t.state[char] = updatedTrackingState
 			wails.EventsEmit(ctx, `cfn-data`, t.state[char])
