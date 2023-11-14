@@ -52,10 +52,10 @@ func (s *Storage) GetLastSession(userId string) (Session, error) {
 func (s *Storage) createSessionsTable() error {
 	_, err := s.db.Exec(`
 	CREATE TABLE IF NOT EXISTS sessions (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		user_id INTEGER,
 		created_at TEXT,
 		updated_at TEXT,
-		PRIMARY KEY (user_id, created_at),
 		FOREIGN KEY (user_id) REFERENCES users(id)
 	)`)
 	if err != nil {
