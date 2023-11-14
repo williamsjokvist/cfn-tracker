@@ -15,28 +15,11 @@ import (
 	"github.com/williamsjokvist/cfn-tracker/core/utils"
 )
 
-type Session struct {
-	UserId  string
-	Matches []Match
-}
-
-type Match struct {
-	Character         string
-	LP                int
-	MR                int
-	Opponent          string
-	OpponentCharacter string
-	OpponentLP        int
-	OpponentMR        int
-	Victory           bool
-	DateTime          string
-}
-
 type SF6Tracker struct {
 	isAuthenticated bool
 	stopPolling     context.CancelFunc
 	state           map[string]*data.TrackingState
-	sesh            Session
+	sesh            data.Session
 	*shared.Browser
 	*data.CFNTrackerRepository
 }
@@ -127,15 +110,17 @@ func (t *SF6Tracker) poll(ctx context.Context, userCode string, pollRate time.Du
 		updatedTrackingState := t.getUpdatedTrackingState(bl)
 
 		if t.state[char] != updatedTrackingState {
-			t.state[char] = updatedTrackingState
-			wails.EventsEmit(ctx, `cfn-data`, t.state[char])
-			t.state[char].Save()
-			t.state[char].Log()
-
 			err = t.CFNTrackerRepository.CreateSession(ctx, userCode)
 			if err != nil {
 				log.Println(err)
 			}
+
+			t.state[char] = updatedTrackingState
+			wails.EventsEmit(ctx, `cfn-data`, t.state[char])
+
+			t.state[char].Save()
+			t.state[char].Log()
+
 			t.CFNTrackerRepository.SaveUser(ctx, t.state[char].CFN, userCode)
 			if err != nil {
 				log.Println(err)
