@@ -13,9 +13,9 @@ type CFNTrackerRepository struct {
 }
 
 type Session struct {
-	UserId  string
-	Started string
-	Matches []Match
+	SessionId int
+	UserId    string
+	Started   string
 }
 
 type Match struct {
@@ -58,13 +58,15 @@ func (m *CFNTrackerRepository) SaveUser(ctx context.Context, displayName, code s
 }
 
 // CreateSession creates a session if it does not exist
-func (m *CFNTrackerRepository) CreateSession(ctx context.Context, userId string) error {
+func (m *CFNTrackerRepository) CreateSession(ctx context.Context, userId string) (*Session, error) {
 	log.Println("saving user")
-	err := m.sqlDb.CreateSession(ctx, userId)
+	dbSesh, err := m.sqlDb.CreateSession(ctx, userId)
 	if err != nil {
-		return fmt.Errorf("create session: %w", err)
+		return nil, fmt.Errorf("create session: %w", err)
 	}
-	return nil
+
+	sesh := convSqlSessionToModelSession(dbSesh)
+	return &sesh, nil
 }
 
 func (m *CFNTrackerRepository) SaveMatch(ctx context.Context, sesh *Session, match Match) error {
@@ -81,5 +83,13 @@ func convSqlUserToModelUser(dbUser *sql.User) User {
 	return User{
 		DisplayName: dbUser.DisplayName,
 		Code:        dbUser.Code,
+	}
+}
+
+func convSqlSessionToModelSession(dbSesh *sql.Session) Session {
+	return Session{
+		SessionId: int(dbSesh.SessionId),
+		UserId:    dbSesh.UserId,
+		Started:   dbSesh.CreatedAt,
 	}
 }

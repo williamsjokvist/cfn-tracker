@@ -7,6 +7,7 @@ import (
 )
 
 type Session struct {
+	SessionId int64  `db:"id"`
 	UserId    string `db:"user_id"`
 	Stats     []*CharacterSessionStats
 	Matches   []*Match
@@ -22,7 +23,7 @@ type SessionStorage interface {
 	RemoveSession(sessionId string) error
 }
 
-func (s *Storage) CreateSession(ctx context.Context, userId string) error {
+func (s *Storage) CreateSession(ctx context.Context, userId string) (*Session, error) {
 	sesh := Session{
 		UserId:    userId,
 		CreatedAt: time.Now().String(),
@@ -33,12 +34,14 @@ func (s *Storage) CreateSession(ctx context.Context, userId string) error {
 		INSERT OR IGNORE INTO sessions (user_id, created_at, updated_at)
 		VALUES (:user_id, :created_at, :updated_at)
 	`
-	_, err := s.db.NamedExecContext(ctx, query, sesh)
+	res, err := s.db.NamedExecContext(ctx, query, sesh)
 	if err != nil {
-		return fmt.Errorf("create session: %w", err)
+		return nil, fmt.Errorf("create session: %w", err)
 	}
 
-	return nil
+	sesh.SessionId, err = res.LastInsertId()
+
+	return &sesh, nil
 }
 
 func (s *Storage) GetSessions(sessionId, userId string, directionOrder string, limit int) ([]*Session, error) {
