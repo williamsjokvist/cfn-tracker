@@ -110,10 +110,12 @@ func (t *SF6Tracker) poll(ctx context.Context, userCode string, pollRate time.Du
 		updatedTrackingState := t.getUpdatedTrackingState(bl)
 
 		if t.state[char] != updatedTrackingState {
-			err = t.CFNTrackerRepository.CreateSession(ctx, userCode)
+			sesh, err := t.CFNTrackerRepository.CreateSession(ctx, userCode)
 			if err != nil {
 				log.Println(err)
 			}
+
+			log.Println(sesh.SessionId)
 
 			t.state[char] = updatedTrackingState
 			wails.EventsEmit(ctx, `cfn-data`, t.state[char])
