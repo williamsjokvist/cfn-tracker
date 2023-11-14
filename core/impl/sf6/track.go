@@ -118,19 +118,35 @@ func (t *SF6Tracker) poll(ctx context.Context, userCode string, pollRate time.Du
 				t.sesh = sesh
 			}
 
-			log.Println(t.sesh.SessionId)
-
 			t.state[char] = updatedTrackingState
 			wails.EventsEmit(ctx, `cfn-data`, t.state[char])
 
 			t.state[char].Save()
 			t.state[char].Log()
 
+			err := t.CFNTrackerRepository.SaveMatch(ctx, t.sesh.SessionId, trackingStateToMatch(t.state[char]))
+			if err != nil {
+				log.Println(err)
+			}
+
 			t.CFNTrackerRepository.SaveUser(ctx, t.state[char].CFN, userCode)
 			if err != nil {
 				log.Println(err)
 			}
 		}
+	}
+}
+
+func trackingStateToMatch(state *data.TrackingState) data.Match {
+	return data.Match{
+		Character:         state.Character,
+		LP:                state.LP,
+		MR:                state.MR,
+		Opponent:          state.Opponent,
+		OpponentCharacter: state.OpponentCharacter,
+		OpponentLP:        state.OpponentLP,
+		Victory:           state.IsWin,
+		DateTime:          state.Date + ` ` + state.TimeStamp,
 	}
 }
 

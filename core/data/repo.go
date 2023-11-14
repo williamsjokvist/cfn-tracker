@@ -25,7 +25,6 @@ type Match struct {
 	Opponent          string
 	OpponentCharacter string
 	OpponentLP        int
-	OpponentMR        int
 	Victory           bool
 	DateTime          string
 }
@@ -59,7 +58,7 @@ func (m *CFNTrackerRepository) SaveUser(ctx context.Context, displayName, code s
 
 // CreateSession creates a session if it does not exist
 func (m *CFNTrackerRepository) CreateSession(ctx context.Context, userId string) (*Session, error) {
-	log.Println("saving user")
+	log.Println("saving session")
 	dbSesh, err := m.sqlDb.CreateSession(ctx, userId)
 	if err != nil {
 		return nil, fmt.Errorf("create session: %w", err)
@@ -69,8 +68,24 @@ func (m *CFNTrackerRepository) CreateSession(ctx context.Context, userId string)
 	return &sesh, nil
 }
 
-func (m *CFNTrackerRepository) SaveMatch(ctx context.Context, sesh *Session, match Match) error {
+func (m *CFNTrackerRepository) SaveMatch(ctx context.Context, sessionId int, match Match) error {
 	log.Println("saving match")
+	dbMatch := sql.Match{
+		SessionId:         uint8(sessionId),
+		Character:         match.Character,
+		LP:                match.LP,
+		MR:                match.MR,
+		Opponent:          match.Opponent,
+		OpponentCharacter: match.OpponentCharacter,
+		OpponentLP:        match.OpponentLP,
+		OpponentMR:        0,
+		Victory:           match.Victory,
+		DateTime:          match.DateTime,
+	}
+	err := m.sqlDb.SaveMatch(ctx, dbMatch)
+	if err != nil {
+		return fmt.Errorf("save match in storage: %w", err)
+	}
 	return nil
 }
 
