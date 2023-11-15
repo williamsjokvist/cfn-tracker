@@ -18,7 +18,7 @@ type SessionStorage interface {
 	createSessionsTable() error
 	CreateSession(ctx context.Context, userId string) error
 	GetSessions(sessionId, userId string, directionOrder string, limit int) ([]*Session, error)
-	GetLastSession(userId string) (Session, error)
+	GetLastSession(ctx context.Context, userId string) (Session, error)
 	RemoveSession(sessionId string) error
 }
 
@@ -39,7 +39,9 @@ func (s *Storage) CreateSession(ctx context.Context, userId string) (*Session, e
 	}
 
 	sesh.SessionId, err = res.LastInsertId()
-
+	if err != nil {
+		return nil, err
+	}
 	return &sesh, nil
 }
 
@@ -47,8 +49,8 @@ func (s *Storage) GetSessions(sessionId, userId string, directionOrder string, l
 	return nil, nil
 }
 
-func (s *Storage) GetLastSession(userId string) (Session, error) {
-	return Session{}, nil
+func (s *Storage) GetLastSession(ctx context.Context, userId string) (*Session, error) {
+	return nil, nil
 }
 
 func (s *Storage) createSessionsTable() error {

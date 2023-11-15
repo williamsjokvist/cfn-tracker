@@ -17,6 +17,17 @@ type Session struct {
 	UserId    string
 	Started   string
 	Matches   []*Match
+	CFN       string
+	UserCode  string
+	Character string
+	LP        int
+	MR        int
+	LPGain    int
+	MRGain    int
+	Wins      int
+	Losses    int
+	WinStreak int
+	WinRate   int
 }
 
 type Match struct {
@@ -70,6 +81,17 @@ func (m *CFNTrackerRepository) SaveUser(ctx context.Context, displayName, code s
 func (m *CFNTrackerRepository) CreateSession(ctx context.Context, userId string) (*Session, error) {
 	log.Println("saving session")
 	dbSesh, err := m.sqlDb.CreateSession(ctx, userId)
+	if err != nil {
+		return nil, fmt.Errorf("create session: %w", err)
+	}
+
+	sesh := convSqlSessionToModelSession(dbSesh)
+	return &sesh, nil
+}
+
+func (m *CFNTrackerRepository) GetSession(ctx context.Context, userId string) (*Session, error) {
+	log.Println("get last session", userId)
+	dbSesh, err := m.sqlDb.GetLastSession(ctx, userId)
 	if err != nil {
 		return nil, fmt.Errorf("create session: %w", err)
 	}
