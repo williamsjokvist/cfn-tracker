@@ -12,6 +12,33 @@ type CFNTrackerRepository struct {
 	sqlDb *sql.Storage
 }
 
+type Session struct {
+	SessionId int
+	UserId    string
+	Started   string
+	Matches   []*Match
+}
+
+type Match struct {
+	Character         string
+	LP                int
+	LPGain            int
+	MR                int
+	MRGain            int
+	Opponent          string
+	OpponentCharacter string
+	OpponentLP        int
+	OpponentMR        int
+	OpponentLeague    string
+	Victory           bool
+	DateTime          string
+}
+
+type User struct {
+	DisplayName string `json:"displayName"`
+	Code        string `json:"code"`
+}
+
 func NewCFNTrackerRepository(sqlDb *sql.Storage) *CFNTrackerRepository {
 	return &CFNTrackerRepository{
 		sqlDb: sqlDb,
@@ -40,27 +67,52 @@ func (m *CFNTrackerRepository) SaveUser(ctx context.Context, displayName, code s
 }
 
 // CreateSession creates a session if it does not exist
-func (m *CFNTrackerRepository) CreateSession(ctx context.Context, userId string) error {
-	log.Println("saving user")
-	err := m.sqlDb.CreateSession(ctx, userId)
+func (m *CFNTrackerRepository) CreateSession(ctx context.Context, userId string) (*Session, error) {
+	log.Println("saving session")
+	dbSesh, err := m.sqlDb.CreateSession(ctx, userId)
 	if err != nil {
-		return fmt.Errorf("create session: %w", err)
+		return nil, fmt.Errorf("create session: %w", err)
+	}
+
+	sesh := convSqlSessionToModelSession(dbSesh)
+	return &sesh, nil
+}
+
+func (m *CFNTrackerRepository) SaveMatch(ctx context.Context, sessionId int, match Match) error {
+	log.Println("saving match")
+	dbMatch := sql.Match{
+		SessionId:         uint8(sessionId),
+		Character:         match.Character,
+		LP:                match.LP,
+		LPGain:            match.LPGain,
+		MR:                match.MR,
+		MRGain:            match.MRGain,
+		Opponent:          match.Opponent,
+		OpponentCharacter: match.OpponentCharacter,
+		OpponentLP:        match.OpponentLP,
+		OpponentLeague:    match.OpponentLeague,
+		OpponentMR:        match.OpponentMR,
+		Victory:           match.Victory,
+		DateTime:          match.DateTime,
+	}
+	err := m.sqlDb.SaveMatch(ctx, dbMatch)
+	if err != nil {
+		return fmt.Errorf("save match in storage: %w", err)
 	}
 	return nil
-}
-
-func (m *CFNTrackerRepository) SaveMatch(ctx context.Context) error {
-	return nil
-}
-
-type User struct {
-	DisplayName string `json:"displayName"`
-	Code        string `json:"code"`
 }
 
 func convSqlUserToModelUser(dbUser *sql.User) User {
 	return User{
 		DisplayName: dbUser.DisplayName,
 		Code:        dbUser.Code,
+	}
+}
+
+func convSqlSessionToModelSession(dbSesh *sql.Session) Session {
+	return Session{
+		SessionId: int(dbSesh.SessionId),
+		UserId:    dbSesh.UserId,
+		Started:   dbSesh.CreatedAt,
 	}
 }

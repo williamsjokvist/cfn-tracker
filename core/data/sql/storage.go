@@ -33,11 +33,6 @@ func NewStorage() (*Storage, error) {
 		return nil, err
 	}
 
-	err = storage.createCharacterSessionStatsTable()
-	if err != nil {
-		return nil, err
-	}
-
 	err = storage.createMatchesTable()
 	if err != nil {
 		return nil, err
