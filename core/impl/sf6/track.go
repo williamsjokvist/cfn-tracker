@@ -42,17 +42,17 @@ func (t *SF6Tracker) Start(ctx context.Context, userCode string, restore bool, p
 	}
 
 	if restore {
-		sesh, err := t.CFNTrackerRepository.GetSession(ctx, userCode)
+		sesh, err := t.CFNTrackerRepository.GetLatestSession(ctx, userCode)
 		if err != nil {
 			return fmt.Errorf(`failed to get last session: %w`, err)
 		}
 		t.sesh = sesh
-		wails.EventsEmit(ctx, `cfn-data`, t.getTrackingState())
-
 		t.user, err = t.CFNTrackerRepository.GetUserByCode(ctx, userCode)
 		if err != nil {
 			return fmt.Errorf(`failed to get user: %w`, err)
 		}
+
+		wails.EventsEmit(ctx, `cfn-data`, t.getTrackingState())
 	} else {
 		bl, err := t.fetchBattleLog(userCode)
 		if err != nil {
@@ -153,17 +153,17 @@ func (t *SF6Tracker) updateSession(ctx context.Context, userCode string, bl *Bat
 
 	t.sesh.WinRate = (t.sesh.Wins / (t.sesh.Wins + t.sesh.Losses)) * 100
 	match := getLatestMatch(t.sesh, bl)
-	err := t.CFNTrackerRepository.SaveMatch(ctx, t.sesh.SessionId, match)
+	t.sesh.Matches = append(t.sesh.Matches, &match)
+	err := t.CFNTrackerRepository.UpdateSession(ctx, t.sesh, match, userCode)
 	if err != nil {
-		return fmt.Errorf("update session: %w", err)
+		return fmt.Errorf("failed to update session: %w", err)
 	}
 
-	t.sesh.Matches = append(t.sesh.Matches, &match)
 	trackingState := t.getTrackingState()
-	wails.EventsEmit(ctx, `cfn-data`, trackingState)
 	trackingState.Log()
 	trackingState.Save()
 
+	wails.EventsEmit(ctx, `cfn-data`, trackingState)
 	return nil
 }
 

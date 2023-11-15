@@ -91,26 +91,41 @@ func (m *CFNTrackerRepository) CreateSession(ctx context.Context, userId string)
 	if err != nil {
 		return nil, fmt.Errorf("create session: %w", err)
 	}
-
 	sesh := convSqlSessionToModelSession(dbSesh)
 	return &sesh, nil
 }
 
-func (m *CFNTrackerRepository) GetSession(ctx context.Context, userId string) (*Session, error) {
-	log.Println("get last session", userId)
-	dbSesh, err := m.sqlDb.GetLastSession(ctx, userId)
+func (m *CFNTrackerRepository) GetLatestSession(ctx context.Context, userId string) (*Session, error) {
+	log.Println("get latest session", userId)
+	dbSesh, err := m.sqlDb.GetLatestSession(ctx, userId)
 	if err != nil {
-		return nil, fmt.Errorf("create session: %w", err)
+		return nil, fmt.Errorf("get session: %w", err)
+	}
+	sesh := convSqlSessionToModelSession(dbSesh)
+
+	dbMatches, err := m.sqlDb.GetMatchesFromSession(ctx, sesh.SessionId)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get matches by session: %w", err)
+	}
+	matches := make([]*Match, 0, len(dbMatches))
+	for _, m := range dbMatches {
+		match := convSqlMatchToModelMatch(m)
+		matches = append(matches, &match)
+	}
+	sesh.Matches = matches
+	return &sesh, nil
+}
+
+func (m *CFNTrackerRepository) UpdateSession(ctx context.Context, sesh *Session, match Match, userId string) error {
+	log.Println("updating session")
+	err := m.sqlDb.UpdateLatestSession(ctx, sesh.LP, sesh.MR, sesh.LPGain, sesh.MRGain, sesh.Wins, sesh.Losses, sesh.WinStreak, sesh.WinRate, userId)
+	if err != nil {
+		return fmt.Errorf("update session: %w", err)
 	}
 
-	sesh := convSqlSessionToModelSession(dbSesh)
-	return &sesh, nil
-}
-
-func (m *CFNTrackerRepository) SaveMatch(ctx context.Context, sessionId int, match Match) error {
 	log.Println("saving match")
 	dbMatch := sql.Match{
-		SessionId:         uint8(sessionId),
+		SessionId:         uint8(sesh.SessionId),
 		Character:         match.Character,
 		LP:                match.LP,
 		LPGain:            match.LPGain,
@@ -125,10 +140,11 @@ func (m *CFNTrackerRepository) SaveMatch(ctx context.Context, sessionId int, mat
 		Date:              match.Date,
 		Time:              match.Time,
 	}
-	err := m.sqlDb.SaveMatch(ctx, dbMatch)
+	err = m.sqlDb.SaveMatch(ctx, dbMatch)
 	if err != nil {
 		return fmt.Errorf("save match in storage: %w", err)
 	}
+
 	return nil
 }
 
@@ -144,5 +160,31 @@ func convSqlSessionToModelSession(dbSesh *sql.Session) Session {
 		SessionId: int(dbSesh.SessionId),
 		UserId:    dbSesh.UserId,
 		Started:   dbSesh.CreatedAt,
+		LP:        dbSesh.LP,
+		MR:        dbSesh.MR,
+		LPGain:    dbSesh.LPGain,
+		MRGain:    dbSesh.MRGain,
+		Wins:      dbSesh.Wins,
+		Losses:    dbSesh.Losses,
+		WinStreak: dbSesh.WinStreak,
+		WinRate:   dbSesh.WinRate,
+	}
+}
+
+func convSqlMatchToModelMatch(dbMatch *sql.Match) Match {
+	return Match{
+		Character:         dbMatch.Character,
+		LP:                dbMatch.LP,
+		LPGain:            dbMatch.LPGain,
+		MR:                dbMatch.MR,
+		MRGain:            dbMatch.MRGain,
+		Opponent:          dbMatch.Opponent,
+		OpponentCharacter: dbMatch.OpponentCharacter,
+		OpponentLP:        dbMatch.OpponentLP,
+		OpponentMR:        dbMatch.OpponentMR,
+		OpponentLeague:    dbMatch.OpponentLeague,
+		Victory:           dbMatch.Victory,
+		Date:              dbMatch.Date,
+		Time:              dbMatch.Time,
 	}
 }
