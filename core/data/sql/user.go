@@ -20,6 +20,22 @@ type UserStorage interface {
 	RemoveUser(code string) error
 }
 
+func (s *Storage) GetUserByCode(ctx context.Context, code string) (*User, error) {
+	query, args, err := sqlx.In(`
+		GET * FROM users 
+		WHERE code = (?)
+	`, code)
+	if err != nil {
+		return nil, fmt.Errorf("prepare get user clause: %w", err)
+	}
+	var user *User
+	err = s.db.Get(&user, query, args)
+	if err != nil {
+		return nil, fmt.Errorf("get user by code: %w", err)
+	}
+	return user, nil
+}
+
 func (s *Storage) GetUsers(ctx context.Context) ([]*User, error) {
 	var users []*User
 	err := s.db.SelectContext(ctx, &users, "SELECT * FROM users")

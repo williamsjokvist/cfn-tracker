@@ -20,6 +20,7 @@ type SF6Tracker struct {
 	stopPolling     context.CancelFunc
 	state           map[string]*data.TrackingState
 	sesh            *data.Session
+	user            *data.User
 	*shared.Browser
 	*data.CFNTrackerRepository
 }
@@ -41,13 +42,17 @@ func (t *SF6Tracker) Start(ctx context.Context, userCode string, restore bool, p
 	}
 
 	if restore {
-		// todo: replace with sqldb
-		lastSession, err := t.CFNTrackerRepository.GetSession(ctx, userCode)
+		sesh, err := t.CFNTrackerRepository.GetSession(ctx, userCode)
 		if err != nil {
 			return fmt.Errorf(`failed to get last session: %w`, err)
 		}
-		t.sesh = lastSession
+		t.sesh = sesh
 		wails.EventsEmit(ctx, `cfn-data`, t.getTrackingState())
+
+		t.user, err = t.CFNTrackerRepository.GetUserByCode(ctx, userCode)
+		if err != nil {
+			return fmt.Errorf(`failed to get user: %w`, err)
+		}
 	} else {
 		bl, err := t.fetchBattleLog(userCode)
 		if err != nil {
@@ -57,7 +62,10 @@ func (t *SF6Tracker) Start(ctx context.Context, userCode string, restore bool, p
 		if err != nil {
 			return fmt.Errorf(`failed to save user: %w`, err)
 		}
-
+		t.user = &data.User{
+			DisplayName: bl.GetCFN(),
+			Code:        userCode,
+		}
 		sesh, err := t.CFNTrackerRepository.CreateSession(ctx, userCode)
 		if err != nil {
 			return fmt.Errorf(`failed to create session: %w`, err)
@@ -122,9 +130,6 @@ func (t *SF6Tracker) updateSession(ctx context.Context, userCode string, bl *Bat
 		return nil
 	}
 
-	t.sesh.Character = bl.GetCharacter()
-	t.sesh.UserCode = bl.GetUserCode()
-	t.sesh.CFN = bl.GetCFN()
 	t.sesh.LP = bl.GetLP()
 	t.sesh.MR = bl.GetMR()
 	t.sesh.LPGain = t.sesh.LPGain + (bl.GetLP() - t.sesh.LP)
@@ -156,17 +161,24 @@ func (t *SF6Tracker) updateSession(ctx context.Context, userCode string, bl *Bat
 }
 
 func (t *SF6Tracker) getTrackingState() data.TrackingState {
+	lastMatch := t.sesh.Matches[len(t.sesh.Matches)-1]
 	return data.TrackingState{
-		Wins:      t.sesh.Wins,
-		Losses:    t.sesh.Losses,
-		CFN:       t.sesh.CFN,
-		MR:        t.sesh.MR,
-		LP:        t.sesh.LP,
-		LPGain:    t.sesh.LPGain,
-		MRGain:    t.sesh.MRGain,
-		UserCode:  t.sesh.UserCode,
-		Character: t.sesh.Character,
-		IsWin:     t.sesh.Matches[len(t.sesh.Matches)-1].Victory,
+		Wins:              t.sesh.Wins,
+		Losses:            t.sesh.Losses,
+		UserCode:          t.user.Code,
+		CFN:               t.user.DisplayName,
+		WinRate:           t.sesh.WinRate,
+		MR:                lastMatch.MR,
+		LP:                lastMatch.LP,
+		LPGain:            lastMatch.LPGain,
+		MRGain:            lastMatch.MRGain,
+		Character:         lastMatch.Character,
+		IsWin:             lastMatch.Victory,
+		Opponent:          lastMatch.Opponent,
+		OpponentCharacter: lastMatch.OpponentCharacter,
+		OpponentLP:        lastMatch.OpponentLP,
+		OpponentLeague:    lastMatch.OpponentLeague,
+		Date:              lastMatch.DateTime,
 	}
 }
 

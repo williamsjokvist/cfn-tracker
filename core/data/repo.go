@@ -17,9 +17,6 @@ type Session struct {
 	UserId    string
 	Started   string
 	Matches   []*Match
-	CFN       string
-	UserCode  string
-	Character string
 	LP        int
 	MR        int
 	LPGain    int
@@ -54,6 +51,15 @@ func NewCFNTrackerRepository(sqlDb *sql.Storage) *CFNTrackerRepository {
 	return &CFNTrackerRepository{
 		sqlDb: sqlDb,
 	}
+}
+
+func (m *CFNTrackerRepository) GetUserByCode(ctx context.Context, code string) (*User, error) {
+	dbUser, err := m.sqlDb.GetUserByCode(ctx, code)
+	if err != nil {
+		return nil, fmt.Errorf("get user by code: %w", err)
+	}
+	user := convSqlUserToModelUser(dbUser)
+	return &user, nil
 }
 
 func (m *CFNTrackerRepository) GetUsers(ctx context.Context) ([]User, error) {
