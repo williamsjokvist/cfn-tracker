@@ -39,7 +39,8 @@ type Match struct {
 	OpponentMR        int
 	OpponentLeague    string
 	Victory           bool
-	DateTime          string
+	Date              string
+	Time              string
 }
 
 type User struct {
@@ -121,7 +122,8 @@ func (m *CFNTrackerRepository) SaveMatch(ctx context.Context, sessionId int, mat
 		OpponentLeague:    match.OpponentLeague,
 		OpponentMR:        match.OpponentMR,
 		Victory:           match.Victory,
-		DateTime:          match.DateTime,
+		Date:              match.Date,
+		Time:              match.Time,
 	}
 	err := m.sqlDb.SaveMatch(ctx, dbMatch)
 	if err != nil {

@@ -73,6 +73,13 @@ func (t *SF6Tracker) Start(ctx context.Context, userCode string, restore bool, p
 		t.sesh = sesh
 		// set starting LP so we don't count the first polled match
 		t.sesh.LP = bl.GetLP()
+
+		wails.EventsEmit(ctx, `cfn-data`, data.TrackingState{
+			CFN:       bl.GetCFN(),
+			LP:        bl.GetLP(),
+			MR:        bl.GetMR(),
+			Character: bl.GetCharacter(),
+		})
 	}
 
 	pollCtx, cancelFn := context.WithCancel(ctx)
@@ -178,7 +185,8 @@ func (t *SF6Tracker) getTrackingState() data.TrackingState {
 		OpponentCharacter: lastMatch.OpponentCharacter,
 		OpponentLP:        lastMatch.OpponentLP,
 		OpponentLeague:    lastMatch.OpponentLeague,
-		Date:              lastMatch.DateTime,
+		Date:              lastMatch.Date,
+		TimeStamp:         lastMatch.Time,
 	}
 }
 
@@ -221,49 +229,6 @@ func getOpponentInfo(myCfn string, replay *Replay) PlayerInfo {
 	}
 }
 
-// func (t *SF6Tracker) getUpdatedTrackingState(bl *BattleLog) *data.TrackingState {
-// 	// no new match played
-// 	if len(bl.ReplayList) == 0 || bl.GetLP() == t.state[bl.GetCharacter()].LP {
-// 		return t.state[bl.GetCharacter()]
-// 	}
-// 	opponent := getOpponentInfo(bl.GetCFN(), &bl.ReplayList[0])
-// 	state := t.state[bl.GetCharacter()]
-// 	isWin := !isVictory(opponent.RoundResults)
-// 	wins := state.Wins
-// 	losses := state.Losses
-// 	winStreak := state.WinStreak
-// 	if isWin {
-// 		wins++
-// 		winStreak++
-// 	} else {
-// 		losses++
-// 		winStreak = 0
-// 	}
-// 	return &data.TrackingState{
-// 		CFN:               bl.GetCFN(),
-// 		UserCode:          bl.GetUserCode(),
-// 		LP:                bl.GetLP(),
-// 		MR:                bl.GetMR(),
-// 		LPGain:            state.LPGain + (bl.GetLP() - state.LP),
-// 		MRGain:            state.MRGain + (bl.GetMR() - state.MR),
-// 		Wins:              wins,
-// 		TotalWins:         wins,
-// 		TotalLosses:       losses,
-// 		TotalMatches:      state.TotalMatches + 1,
-// 		Losses:            losses,
-// 		WinRate:           int((float64(wins) / float64(wins+losses)) * 100),
-// 		Character:         bl.GetCharacter(),
-// 		Opponent:          opponent.Player.FighterID,
-// 		OpponentCharacter: opponent.CharacterName,
-// 		OpponentLP:        opponent.LeaguePoint,
-// 		OpponentLeague:    getLeagueFromLP(opponent.LeaguePoint),
-// 		IsWin:             isWin,
-// 		TimeStamp:         time.Now().Format(`15:04`),
-// 		Date:              time.Now().Format(`2006-01-02`),
-// 		WinStreak:         winStreak,
-// 	}
-// }
-
 func getLatestMatch(sesh *data.Session, bl *BattleLog) data.Match {
 	opponent := getOpponentInfo(bl.GetCFN(), &bl.ReplayList[0])
 	latestMatch := data.Match{
@@ -276,7 +241,8 @@ func getLatestMatch(sesh *data.Session, bl *BattleLog) data.Match {
 		OpponentLeague:    getLeagueFromLP(opponent.LeaguePoint),
 		OpponentMR:        opponent.MasterRating,
 		Victory:           !isVictory(opponent.RoundResults),
-		DateTime:          time.Now().Format(`2006-01-02 15:04`),
+		Date:              time.Now().Format(`2006-01-02`),
+		Time:              time.Now().Format(`15:04`),
 	}
 	for _, match := range sesh.Matches {
 		if match.Character == latestMatch.Character {

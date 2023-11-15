@@ -19,7 +19,8 @@ type Match struct {
 	OpponentMR        int    `db:"opponent_mr"`
 	OpponentLeague    string `db:"opponent_league"`
 	Victory           bool   `db:"victory"`
-	DateTime          string `db:"datetime"`
+	Date              string `db:"date"`
+	Time              string `db:"time"`
 }
 
 type MatchStorage interface {
@@ -49,7 +50,8 @@ func (s *Storage) SaveMatch(ctx context.Context, match Match) error {
 			opponent_mr,
 			opponent_league,
 			victory,
-			datetime
+			date,
+			time
 		)
 		VALUES (
 			:user_id,
@@ -65,7 +67,8 @@ func (s *Storage) SaveMatch(ctx context.Context, match Match) error {
 			:opponent_mr,
 			:opponent_league,
 			:victory,
-			:datetime
+			:date,
+			:time
 		)
 	`
 	_, err := s.db.NamedExecContext(ctx, query, match)
@@ -96,8 +99,9 @@ func (s *Storage) createMatchesTable() error {
 		opponent_mr INTEGER,
 		opponent_league TEXT,
 		victory BOOLEAN,
-		datetime TEXT,
-		PRIMARY KEY (user_id, datetime),
+		date TEXT,
+		time TEXT,
+		PRIMARY KEY (user_id, date, time),
 		FOREIGN KEY(session_id) REFERENCES sessions(id)
 	)`)
 	if err != nil {
