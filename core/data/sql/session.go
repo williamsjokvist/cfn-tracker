@@ -12,15 +12,8 @@ type Session struct {
 	SessionId int64  `db:"id"`
 	UserId    string `db:"user_id"`
 	CreatedAt string `db:"created_at"`
-	UpdatedAt string `db:"updated_at"`
 	LP        int    `db:"lp"`
-	LPGain    int    `db:"lp_gain"`
 	MR        int    `db:"mr"`
-	MRGain    int    `db:"mr_gain"`
-	Wins      int    `db:"wins"`
-	Losses    int    `db:"losses"`
-	WinStreak int    `db:"win_streak"`
-	WinRate   int    `db:"win_rate"`
 }
 
 type SessionStorage interface {
@@ -33,12 +26,11 @@ func (s *Storage) CreateSession(ctx context.Context, userId string) (*Session, e
 	sesh := Session{
 		UserId:    userId,
 		CreatedAt: time.Now().String(),
-		UpdatedAt: time.Now().String(),
 	}
 
 	query := `
-		INSERT OR IGNORE INTO sessions (user_id, created_at, updated_at)
-		VALUES (:user_id, :created_at, :updated_at)
+		INSERT OR IGNORE INTO sessions (user_id, created_at)
+		VALUES (:user_id, :created_at)
 	`
 	res, err := s.db.NamedExecContext(ctx, query, sesh)
 	if err != nil {
@@ -69,22 +61,14 @@ func (s *Storage) GetLatestSession(ctx context.Context, userId string) (*Session
 	return &sesh, nil
 }
 
-func (s *Storage) UpdateLatestSession(ctx context.Context, lp, mr, lpGain, mrGain, wins, losses, winStreak, winRate int, userId string) error {
+func (s *Storage) UpdateLatestSession(ctx context.Context, lp, mr int, sessionId int) error {
 	query, args, err := sqlx.In(`
 		UPDATE sessions
 		SET 
 			lp = ?,
-			mr = ?,
-			lp_gain = ?,
-			mr_gain = ?,
-			wins = ?,
-			losses = ?,
-			win_streak = ?,
-			win_rate = ?
-		WHERE user_id = (?)
-		ORDER BY id DESC
-		LIMIT 1
-`, lp, mr, lpGain, mrGain, wins, losses, winStreak, winRate, userId)
+			mr = ?
+		WHERE id = (?)
+`, lp, mr, sessionId)
 	if err != nil {
 		return fmt.Errorf("prepare update session query: %w", err)
 	}
@@ -101,15 +85,8 @@ func (s *Storage) createSessionsTable() error {
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		user_id TEXT,
 		lp INTEGER,
-		lp_gain INTEGER,
 		mr INTEGER,
-		mr_gain INTEGER,
-		wins INTEGER,
-		losses INTEGER,
-		win_streak INTEGER,
-		win_rate INTEGER,
 		created_at TEXT,
-		updated_at TEXT,
 		FOREIGN KEY (user_id) REFERENCES users(code)
 	)`)
 	if err != nil {

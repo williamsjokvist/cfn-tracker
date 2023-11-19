@@ -23,6 +23,10 @@ type Match struct {
 	Victory           bool   `db:"victory"`
 	Date              string `db:"date"`
 	Time              string `db:"time"`
+	WinStreak         int    `db:"win_streak"`
+	Wins              int    `db:"wins"`
+	Losses            int    `db:"losses"`
+	WinRate           int    `db:"win_rate"`
 }
 
 type MatchStorage interface {
@@ -45,6 +49,10 @@ func (s *Storage) SaveMatch(ctx context.Context, match Match) error {
 			opponent_lp,
 			opponent_mr,
 			opponent_league,
+			wins,
+			losses,
+			win_rate,
+			win_streak,
 			victory,
 			date,
 			time
@@ -62,6 +70,10 @@ func (s *Storage) SaveMatch(ctx context.Context, match Match) error {
 			:opponent_lp,
 			:opponent_mr,
 			:opponent_league,
+			:wins,
+			:losses,
+			:win_rate,
+			:win_streak,
 			:victory,
 			:date,
 			:time
@@ -107,6 +119,10 @@ func (s *Storage) createMatchesTable() error {
 		opponent_mr INTEGER,
 		opponent_league TEXT,
 		victory BOOLEAN,
+		wins INTEGER,
+		losses INTEGER,
+		win_streak INTEGER,
+		win_rate INTEGER,
 		date TEXT,
 		time TEXT,
 		PRIMARY KEY (user_id, date, time),
