@@ -42,6 +42,12 @@ func (t *SF6Tracker) Start(ctx context.Context, userCode string, restore bool, p
 		return errors.New(`sf6 authentication err or invalid cfn`)
 	}
 
+	startPolling := func() {
+		pollCtx, cancelFn := context.WithCancel(ctx)
+		t.stopPolling = cancelFn
+		go t.poll(pollCtx, userCode, pollRate)
+	}
+
 	if restore {
 		sesh, err := t.CFNTrackerRepository.GetLatestSession(ctx, userCode)
 		if err != nil {
@@ -52,41 +58,53 @@ func (t *SF6Tracker) Start(ctx context.Context, userCode string, restore bool, p
 		if err != nil {
 			return fmt.Errorf(`failed to get user: %w`, err)
 		}
-
-		wails.EventsEmit(ctx, `cfn-data`, t.getTrackingState())
-	} else {
-		bl, err := t.fetchBattleLog(userCode)
-		if err != nil {
-			return fmt.Errorf(`failed to fetch battle log: %w`, err)
+		trackingState := t.getTrackingStateForLastMatch()
+		if trackingState == nil {
+			bl, err := t.fetchBattleLog(userCode)
+			if err != nil {
+				return fmt.Errorf(`failed to fetch battle log: %w`, err)
+			}
+			trackingState = &data.TrackingState{
+				CFN:       bl.GetCFN(),
+				LP:        bl.GetLP(),
+				MR:        bl.GetMR(),
+				Character: bl.GetCharacter(),
+			}
 		}
-		err = t.CFNTrackerRepository.SaveUser(ctx, bl.GetCFN(), userCode)
-		if err != nil {
-			return fmt.Errorf(`failed to save user: %w`, err)
-		}
-		t.user = &model.User{
-			DisplayName: bl.GetCFN(),
-			Code:        userCode,
-		}
-		sesh, err := t.CFNTrackerRepository.CreateSession(ctx, userCode)
-		if err != nil {
-			return fmt.Errorf(`failed to create session: %w`, err)
-		}
-		t.sesh = sesh
-		// set starting LP so we don't count the first polled match
-		t.sesh.LP = bl.GetLP()
-		t.sesh.MR = bl.GetMR()
-		wails.EventsEmit(ctx, `cfn-data`, data.TrackingState{
-			CFN:       bl.GetCFN(),
-			LP:        bl.GetLP(),
-			MR:        bl.GetMR(),
-			Character: bl.GetCharacter(),
-		})
+		wails.EventsEmit(ctx, `cfn-data`, trackingState)
+		startPolling()
+		return nil
 	}
 
-	pollCtx, cancelFn := context.WithCancel(ctx)
-	t.stopPolling = cancelFn
-	go t.poll(pollCtx, userCode, pollRate)
+	bl, err := t.fetchBattleLog(userCode)
+	if err != nil {
+		return fmt.Errorf(`failed to fetch battle log: %w`, err)
+	}
+	err = t.CFNTrackerRepository.SaveUser(ctx, bl.GetCFN(), userCode)
+	if err != nil {
+		return fmt.Errorf(`failed to save user: %w`, err)
+	}
+	t.user = &model.User{
+		DisplayName: bl.GetCFN(),
+		Code:        userCode,
+	}
+	sesh, err := t.CFNTrackerRepository.CreateSession(ctx, userCode)
+	if err != nil {
+		return fmt.Errorf(`failed to create session: %w`, err)
+	}
+	t.sesh = sesh
 
+	// set starting LP so we don't count the first polled match
+	t.sesh.LP = bl.GetLP()
+	t.sesh.MR = bl.GetMR()
+	wails.EventsEmit(ctx, `cfn-data`, data.TrackingState{
+		CFN:       bl.GetCFN(),
+		LP:        bl.GetLP(),
+		MR:        bl.GetMR(),
+		Character: bl.GetCharacter(),
+	})
+
+	startPolling()
 	return nil
 }
 
@@ -147,17 +165,22 @@ func (t *SF6Tracker) updateSession(ctx context.Context, userCode string, bl *Bat
 		return fmt.Errorf("failed to update session: %w", err)
 	}
 
-	trackingState := t.getTrackingState()
-	trackingState.Log()
-	trackingState.Save()
+	trackingState := t.getTrackingStateForLastMatch()
+	if trackingState != nil {
+		trackingState.Log()
+		trackingState.Save()
+		wails.EventsEmit(ctx, `cfn-data`, trackingState)
+	}
 
-	wails.EventsEmit(ctx, `cfn-data`, trackingState)
 	return nil
 }
 
-func (t *SF6Tracker) getTrackingState() data.TrackingState {
+func (t *SF6Tracker) getTrackingStateForLastMatch() *data.TrackingState {
+	if len(t.sesh.Matches) == 0 {
+		return nil
+	}
 	lastMatch := t.sesh.Matches[len(t.sesh.Matches)-1]
-	return data.TrackingState{
+	return &data.TrackingState{
 		UserCode:          t.user.Code,
 		CFN:               t.user.DisplayName,
 		Wins:              lastMatch.Wins,
