@@ -2,6 +2,8 @@ package sql
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3"
@@ -12,7 +14,8 @@ type Storage struct {
 }
 
 func NewStorage() (*Storage, error) {
-	db, err := sqlx.Open("sqlite3", "cfn-tracker.db")
+	dataSource := getDataSource()
+	db, err := sqlx.Open("sqlite3", dataSource)
 	if err != nil {
 		return nil, fmt.Errorf("open sqlite3 connection: %w", err)
 	}
@@ -25,5 +28,22 @@ func NewStorage() (*Storage, error) {
 		return nil, err
 	}
 
+	err = storage.createSessionsTable()
+	if err != nil {
+		return nil, err
+	}
+
+	err = storage.createMatchesTable()
+	if err != nil {
+		return nil, err
+	}
+
 	return storage, nil
+}
+
+func getDataSource() string {
+	cacheDir, _ := os.UserCacheDir()
+	dataDir := filepath.Join(cacheDir, "cfn-tracker")
+	os.MkdirAll(dataDir, os.FileMode(0755))
+	return filepath.Join(dataDir, "cfn-tracker.db")
 }

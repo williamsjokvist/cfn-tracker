@@ -5,23 +5,36 @@ import (
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
+
+	"github.com/williamsjokvist/cfn-tracker/core/model"
 )
 
-type User struct {
-	Id          uint8  `db:"id"`
-	DisplayName string `db:"displayName"`
-	Code        string `db:"code"`
-}
-
 type UserStorage interface {
-	createUsersTable() error
-	GetUsers() ([]User, error)
-	SaveUser(displayName, code string) error
-	RemoveUser(code string) error
+	GetUserByCode(ctx context.Context, code string) (*model.User, error)
+	GetUsers(ctx context.Context) ([]*model.User, error)
+	SaveUser(ctx context.Context, displayName, code string) error
+	RemoveUser(ctx context.Context, code string) error
 }
 
-func (s *Storage) GetUsers(ctx context.Context) ([]*User, error) {
-	var users []*User
+func (s *Storage) GetUserByCode(ctx context.Context, code string) (*model.User, error) {
+	query, args, err := sqlx.In(`
+		SELECT * FROM users
+		WHERE code = (?)
+		LIMIT 1
+	`, code)
+	if err != nil {
+		return nil, fmt.Errorf("prepare get user clause: %w", err)
+	}
+	var user model.User
+	err = s.db.GetContext(ctx, &user, query, args...)
+	if err != nil {
+		return nil, fmt.Errorf("get user by code: %w", err)
+	}
+	return &user, nil
+}
+
+func (s *Storage) GetUsers(ctx context.Context) ([]*model.User, error) {
+	var users []*model.User
 	err := s.db.SelectContext(ctx, &users, "SELECT * FROM users")
 	if err != nil {
 		return nil, fmt.Errorf("select sql users: %w", err)
@@ -30,13 +43,13 @@ func (s *Storage) GetUsers(ctx context.Context) ([]*User, error) {
 }
 
 func (s *Storage) SaveUser(ctx context.Context, displayName, code string) error {
-	user := User{
+	user := model.User{
 		DisplayName: displayName,
 		Code:        code,
 	}
 	query := `
-		INSERT OR IGNORE INTO users (displayName, code)
-		VALUES (:displayName, :code)
+		INSERT OR IGNORE INTO users (display_name, code)
+		VALUES (:display_name, :code)
 	`
 	_, err := s.db.NamedExecContext(ctx, query, user)
 	if err != nil {
@@ -64,9 +77,9 @@ func (s *Storage) RemoveUser(ctx context.Context, code string) error {
 func (s *Storage) createUsersTable() error {
 	_, err := s.db.Exec(`
 	CREATE TABLE IF NOT EXISTS users (
-		id INTEGER PRIMARY KEY,
-		code TEXT NOT NULL UNIQUE,
-		displayName TEXT NOT NULL
+		code TEXT NOT NULL,
+		display_name TEXT NOT NULL,
+		PRIMARY KEY (code)
 	)`)
 	if err != nil {
 		return fmt.Errorf("create users table: %w", err)

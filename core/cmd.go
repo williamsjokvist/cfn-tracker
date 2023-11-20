@@ -13,6 +13,7 @@ import (
 	wails "github.com/wailsapp/wails/v2/pkg/runtime"
 
 	"github.com/williamsjokvist/cfn-tracker/core/data"
+	"github.com/williamsjokvist/cfn-tracker/core/model"
 	"github.com/williamsjokvist/cfn-tracker/core/shared"
 )
 
@@ -31,12 +32,12 @@ type CommandHandler struct {
 	ctx     context.Context
 	tracker GameTracker
 	browser *shared.Browser
-	*data.CFNTrackerRepository
+	repo    *data.CFNTrackerRepository
 }
 
 func NewCommandHandler(trackerRepo *data.CFNTrackerRepository) *CommandHandler {
 	return &CommandHandler{
-		CFNTrackerRepository: trackerRepo,
+		repo: trackerRepo,
 	}
 }
 
@@ -67,18 +68,17 @@ func (ch *CommandHandler) OpenResultsDirectory() {
 	}
 }
 
-func (ch *CommandHandler) GetMatchLog(cfn string) []data.TrackingState {
-	mhLog, err := data.GetLog(cfn)
+func (ch *CommandHandler) GetAllMatchesForUser(userId string) []*model.Match {
+	matches, err := ch.repo.GetMatches(ch.ctx, 0, userId)
 	if err != nil {
 		fmt.Println(err)
 		return nil
 	}
-
-	return mhLog
+	return matches
 }
 
-func (ch *CommandHandler) GetAvailableLogs() []data.User {
-	users, err := ch.CFNTrackerRepository.GetUsers(ch.ctx)
+func (ch *CommandHandler) GetUsers() []*model.User {
+	users, err := ch.repo.GetUsers(ch.ctx)
 	if err != nil {
 		fmt.Println(err)
 		return nil
@@ -113,7 +113,7 @@ func (ch *CommandHandler) ExportLogToCSV(cfn string) {
 func (ch *CommandHandler) SelectGame(game string) {
 	switch game {
 	case GameTypeSF6.String():
-		ch.tracker, _ = MakeSF6Tracker(ch.ctx, ch.browser, CapIDEmail, CapIDPassword, ch.CFNTrackerRepository)
+		ch.tracker, _ = MakeSF6Tracker(ch.ctx, ch.browser, CapIDEmail, CapIDPassword, ch.repo)
 	case GameTypeSFV.String():
 		ch.tracker, _ = MakeSFVTracker(ch.ctx, ch.browser, SteamUsername, SteamPassword)
 	}
@@ -141,4 +141,8 @@ func (ch *CommandHandler) CloseBrowser(ctx context.Context) {
 	if ch.browser.Page != nil {
 		ch.browser.Page.Browser().Close()
 	}
+}
+
+func (ch *CommandHandler) GetTrackingStateUnused() *data.TrackingState {
+	return nil
 }

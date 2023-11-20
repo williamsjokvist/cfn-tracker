@@ -140,7 +140,7 @@ export const TrackingLiveUpdater: React.FC = () => {
             </ActionButton>
           </motion.div>
         </div>
-        <img className="grayscale h-full absolute top-0 -right-20 z-[-1] opacity-10 pointer-events-none" src={`https://www.streetfighter.com/6/buckler/assets/images/material/character/character_${character.toLowerCase().replace(/\s/g, "")}_r.png`} alt={character} />
+        <img className="grayscale h-full absolute top-0 -right-20 z-[-1] opacity-10 pointer-events-none" src={`https://www.streetfighter.com/6/buckler/assets/images/material/character/character_${character.toLowerCase().replace(/\s/g, "").replace(".", "")}_r.png`} alt={character} />
       </motion.section>
     </>
   );
