@@ -7,7 +7,7 @@ import { GetUsers } from "@@/go/core/CommandHandler";
 
 import { ActionButton } from "@/ui/action-button";
 import { Checkbox } from "@/ui/checkbox";
-import { data } from "@@/go/models";
+import { model } from "@@/go/models";
 import { PageHeader } from "@/ui/page-header";
 
 export const TrackingForm: React.FC = () => {
@@ -18,7 +18,7 @@ export const TrackingForm: React.FC = () => {
   const restoreRef = React.useRef<HTMLInputElement>(null);
 
   const [playerIdInput, setPlayerIdInput] = React.useState<string>("");
-  const [users, setUsers] = React.useState<data.User[] | null>(null);
+  const [users, setUsers] = React.useState<model.User[] | null>(null);
 
   React.useEffect(() => {
     GetUsers().then((users) => setUsers(users));
@@ -38,7 +38,7 @@ export const TrackingForm: React.FC = () => {
     });
   };
 
-  const playerChipClicked = (player: data.User) => {
+  const playerChipClicked = (player: model.User) => {
     if (playerIdInputRef.current) {
       playerIdInputRef.current.value = player.code;
       setPlayerIdInput(player.code);

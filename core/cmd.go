@@ -142,3 +142,7 @@ func (ch *CommandHandler) CloseBrowser(ctx context.Context) {
 		ch.browser.Page.Browser().Close()
 	}
 }
+
+func (ch *CommandHandler) GetTrackingStateUnused() *data.TrackingState {
+	return nil
+}
