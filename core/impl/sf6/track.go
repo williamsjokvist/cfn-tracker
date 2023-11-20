@@ -256,7 +256,8 @@ func getNewestMatch(sesh *data.Session, bl *BattleLog) data.Match {
 }
 
 func getPreviousMatchForCharacter(sesh *data.Session, character string) *data.Match {
-	for _, match := range sesh.Matches {
+	for i := len(sesh.Matches) - 1; i >= 0; i-- {
+		match := sesh.Matches[i]
 		if match.Character == character {
 			return match
 		}
