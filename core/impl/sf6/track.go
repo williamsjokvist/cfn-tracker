@@ -245,8 +245,8 @@ func getNewestMatch(sesh *data.Session, bl *BattleLog) data.Match {
 		WinStreak:         winStreak,
 		Date:              time.Now().Format(`2006-01-02`),
 		Time:              time.Now().Format(`15:04`),
-		LPGain:            bl.GetLP() - sesh.LP,
-		MRGain:            bl.GetMR() - sesh.MR,
+		LPGain:            prevMatch.LPGain + (bl.GetLP() - sesh.LP),
+		MRGain:            prevMatch.MRGain + (bl.GetMR() - sesh.MR),
 		WinRate:           int((float64(wins) / float64(wins+losses)) * 100),
 	}
 }
