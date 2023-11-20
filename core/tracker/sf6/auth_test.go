@@ -15,7 +15,7 @@ func TestSF6Authentication(t *testing.T) {
 	assert := assert.New(t)
 
 	ctx := context.Background()
-	browser, err := browser.NewBrowser(ctx, true)
+	browser, err := browser.NewBrowser(true)
 	assert.Nil(err)
 
 	sf6Tracker := NewSF6Tracker(browser, nil)

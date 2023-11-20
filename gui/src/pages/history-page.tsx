@@ -29,13 +29,13 @@ export const HistoryPage: React.FC = () => {
     GetAllMatchesForUser(u).then((matches) => {
       setMatches(matches);
       setSpecified(false);
-    });
+    }).catch(err => console.error(err));
   };
 
   React.useEffect(() => {
     GetUsers().then(
       (users) => setUsers((_) => users)
-    );
+    ).catch(err => console.error(err));
   }, []);
 
   React.useEffect(() => {

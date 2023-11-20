@@ -1,7 +1,6 @@
 package browser
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"os"
@@ -13,16 +12,14 @@ import (
 	"github.com/go-rod/rod/lib/launcher/flags"
 	"github.com/go-rod/rod/lib/proto"
 	"github.com/hashicorp/go-version"
-	wails "github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 type Browser struct {
-	ctx          context.Context
 	Page         *rod.Page
 	HijackRouter *rod.HijackRouter
 }
 
-func NewBrowser(ctx context.Context, headless bool) (*Browser, error) {
+func NewBrowser(headless bool) (*Browser, error) {
 	log.Println(`Setting up browser`)
 
 	userHomeDir, err := os.UserCacheDir()
@@ -35,14 +32,14 @@ func NewBrowser(ctx context.Context, headless bool) (*Browser, error) {
 	l.RemoteDebuggingPort(6969)
 	u, err := l.Leakless(false).Headless(headless).Launch()
 	if err != nil {
-		return nil, fmt.Errorf("Failed to launch temp browser %w", err)
+		return nil, fmt.Errorf("failed to launch temp browser: %w", err)
 	}
 
 	log.Println("Browser connecting to", u)
 	browser := rod.New().ControlURL(u)
 	err = browser.Connect()
 	if err != nil {
-		return nil, fmt.Errorf("Failed to connect to browser, received %w", err)
+		return nil, fmt.Errorf("failed to connect to browser: %w", err)
 	}
 
 	var page *rod.Page
@@ -73,23 +70,33 @@ func NewBrowser(ctx context.Context, headless bool) (*Browser, error) {
 	go router.Run()
 
 	return &Browser{
-		ctx:          ctx,
 		Page:         page,
 		HijackRouter: router,
 	}, nil
 }
 
-// TODO: Error Handling
-func (b *Browser) CheckForVersionUpdate(currentVersion *version.Version) {
+func (b *Browser) GetLatestAppVersion() (*version.Version, error) {
 	log.Println(`Check for new version`)
-	b.Page.MustNavigate(`https://github.com/williamsjokvist/cfn-tracker/releases`).MustWaitLoad()
-	el := b.Page.MustElement(`turbo-frame div.mr-md-0:nth-child(3) > a:nth-child(1)`)
-	latestVerEl := el.MustText()
-	latestVersionText := strings.Split(latestVerEl, `v`)[1]
-	latestVersion, _ := version.NewVersion(latestVersionText)
-	hasNewVersion := currentVersion.LessThan(latestVersion)
-	if hasNewVersion {
-		log.Println(`Has new version: `, latestVersionText)
-		wails.EventsEmit(b.ctx, `version-update`, hasNewVersion)
+	err := b.Page.Navigate(`https://github.com/williamsjokvist/cfn-tracker/releases`)
+	if err != nil {
+		return nil, fmt.Errorf(`navigate to github: %w`, err)
 	}
+	b.Page.WaitLoad()
+	if err != nil {
+		return nil, fmt.Errorf(`wait for github to load: %w`, err)
+	}
+	versionElement, err := b.Page.Element(`turbo-frame div.mr-md-0:nth-child(3) > a:nth-child(1)`)
+	if err != nil {
+		return nil, fmt.Errorf(`get version element: %w`, err)
+	}
+	versionText, err := versionElement.Text()
+	if err != nil {
+		return nil, fmt.Errorf(`get version element text: %w`, err)
+	}
+	versionNumber := strings.Split(versionText, `v`)[1]
+	latestVersion, err := version.NewVersion(versionNumber)
+	if err != nil {
+		return nil, fmt.Errorf(`parse version: %w`, err)
+	}
+	return latestVersion, nil
 }

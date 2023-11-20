@@ -114,6 +114,8 @@ export const cfnMachine = createMachine(
         if (playerInfo && !isTracking) {
           StartTracking(playerInfo.code, restore).then(() => {
             isTracking = true;
+          }).catch(err => {
+            console.error(err);
           });
         }
       },
@@ -121,6 +123,8 @@ export const cfnMachine = createMachine(
         if (!isTracking) return;
         StopTracking().then((_) => {
           isTracking = false;
+        }).catch(err => {
+          console.error(err);
         });
       },
     },
