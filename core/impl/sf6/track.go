@@ -254,6 +254,7 @@ func getNewestMatch(sesh *model.Session, bl *BattleLog) model.Match {
 		MRGain:            mrGain,
 		WinRate:           int((float64(wins) / float64(wins+losses)) * 100),
 		UserId:            sesh.UserId,
+		SessionId:         sesh.Id,
 	}
 }
 
