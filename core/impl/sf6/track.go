@@ -224,11 +224,15 @@ func getNewestMatch(sesh *data.Session, bl *BattleLog) data.Match {
 	wins := biota
 	losses := (1 - biota)
 	winStreak := biota
+	lpGain := bl.GetLP() - sesh.LP
+	mrGain := bl.GetMR() - sesh.MR
 	prevMatch := getPreviousMatchForCharacter(sesh, bl.GetCharacter())
 	if prevMatch != nil {
 		wins = prevMatch.Wins + biota
 		losses = prevMatch.Losses + (1 - biota)
 		winStreak = prevMatch.WinStreak + biota
+		lpGain = prevMatch.LPGain + lpGain
+		mrGain = prevMatch.MRGain + mrGain
 	}
 	return data.Match{
 		Character:         bl.GetCharacter(),
@@ -245,14 +249,15 @@ func getNewestMatch(sesh *data.Session, bl *BattleLog) data.Match {
 		WinStreak:         winStreak,
 		Date:              time.Now().Format(`2006-01-02`),
 		Time:              time.Now().Format(`15:04`),
-		LPGain:            prevMatch.LPGain + (bl.GetLP() - sesh.LP),
-		MRGain:            prevMatch.MRGain + (bl.GetMR() - sesh.MR),
+		LPGain:            lpGain,
+		MRGain:            mrGain,
 		WinRate:           int((float64(wins) / float64(wins+losses)) * 100),
 	}
 }
 
 func getPreviousMatchForCharacter(sesh *data.Session, character string) *data.Match {
-	for _, match := range sesh.Matches {
+	for i := len(sesh.Matches) - 1; i >= 0; i-- {
+		match := sesh.Matches[i]
 		if match.Character == character {
 			return match
 		}
