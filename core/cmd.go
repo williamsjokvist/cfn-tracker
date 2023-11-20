@@ -67,14 +67,13 @@ func (ch *CommandHandler) OpenResultsDirectory() {
 	}
 }
 
-func (ch *CommandHandler) GetMatchLog(cfn string) []data.TrackingState {
-	mhLog, err := data.GetLog(cfn)
+func (ch *CommandHandler) GetAllMatchesForUser(userId string) []data.Match {
+	matches, err := ch.repo.GetMatches(ch.ctx, 0, userId)
 	if err != nil {
 		fmt.Println(err)
 		return nil
 	}
-
-	return mhLog
+	return matches
 }
 
 func (ch *CommandHandler) GetUsers() []data.User {

@@ -5,7 +5,7 @@ import { Icon } from "@iconify/react";
 
 import {
   GetUsers,
-  GetMatchLog,
+  GetAllMatchesForUser,
   DeleteMatchLog,
   ExportLogToCSV,
   OpenResultsDirectory,
@@ -18,15 +18,16 @@ export const HistoryPage: React.FC = () => {
   const { t } = useTranslation();
 
   const [users, setUsers] = React.useState<model.User[]>([]);
-  const [selectedPlayer, setLog] = React.useState<model.User>();
-  const [matchLog, setMatchLog] = React.useState<model.TrackingState[]>([]);
+  
+  const [user, setUser] = React.useState<model.User>();
+  const [matches, setMatches] = React.useState<model.Match[]>([]);
 
   const [isSpecified, setSpecified] = React.useState(false);
   const [totalWinRate, setTotalWinRate] = React.useState<number | null>(null);
 
-  const fetchLog = (log: string) => {
-    GetMatchLog(log).then((log) => {
-      setMatchLog(log);
+  const getMatches = (u: string) => {
+    GetAllMatchesForUser(u).then((matches) => {
+      setMatches(matches);
       setSpecified(false);
     });
   };
@@ -38,21 +39,22 @@ export const HistoryPage: React.FC = () => {
   }, []);
 
   React.useEffect(() => {
-    if (selectedPlayer && !matchLog) fetchLog(selectedPlayer.code);
-  }, [selectedPlayer, matchLog]);
+    if (user && !matches) getMatches(user.code);
+  }, [user, matches]);
 
   React.useEffect(() => {
-    if (!matchLog) return;
-    const wonMatches = matchLog.filter((log) => log.result == true).length;
-    const winRate = Math.floor((wonMatches / matchLog.length) * 100);
+    if (!matches) return;
+    console.log(matches)
+    const wonMatches = matches.filter((log) => log.victory === true).length;
+    const winRate = Math.floor((wonMatches / matches.length) * 100);
     !isNaN(winRate) && setTotalWinRate(winRate);
-  }, [matchLog]);
+  }, [matches]);
 
   const filterLog = (property: string, value: string) => {
-    if (!matchLog) return;
+    if (!matches) return;
 
-    setMatchLog(
-      matchLog.filter(
+    setMatches(
+      matches.filter(
         (ml) =>
           ((ml as any)[property] as string).toLowerCase() ===
           value.toLowerCase()
@@ -64,15 +66,15 @@ export const HistoryPage: React.FC = () => {
   return (
     <>
       <PageHeader
-        text={selectedPlayer ? `${t("history")}/${selectedPlayer.displayName}` : t("history")}
+        text={user ? `${t("history")}/${user.displayName}` : t("history")}
       >
-        {selectedPlayer && (
+        {user && (
           <div className="flex items-center justify-end w-full ml-4">
             <motion.button
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               onClick={() =>
-                isSpecified ? fetchLog(selectedPlayer.code) : setLog(undefined)
+                isSpecified ? getMatches(user.code) : setUser(undefined)
               }
               className="crumb-btn-dark mr-3"
             >
@@ -86,7 +88,7 @@ export const HistoryPage: React.FC = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               onClick={() => {
-                ExportLogToCSV(selectedPlayer.code);
+                ExportLogToCSV(user.code);
                 OpenResultsDirectory();
               }}
               className="crumb-btn-dark mr-3"
@@ -101,9 +103,9 @@ export const HistoryPage: React.FC = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               onClick={() => {
-                selectedPlayer && DeleteMatchLog(selectedPlayer.code);
-                setTimeout(() => setMatchLog([]), 50);
-                setLog(undefined);
+                user && DeleteMatchLog(user.code);
+                setTimeout(() => setMatches([]), 50);
+                setUser(undefined);
               }}
               className="crumb-btn-dark"
             >
@@ -115,28 +117,28 @@ export const HistoryPage: React.FC = () => {
       </PageHeader>
 
       <div className="relative w-full">
-        {!selectedPlayer && users && users.length > 0 && (
+        {!user && users && users.length > 0 && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.225 }}
             className="grid max-h-[340px] h-full m-4 justify-center content-start overflow-y-scroll gap-5"
           >
-            {users.map((playerInfo) => (
+            {users.map((u) => (
               <button
                 className="bg-[rgb(255,255,255,0.075)] hover:bg-[rgb(255,255,255,0.125)] text-xl backdrop-blur rounded-2xl transition-all items-center border-transparent border-opacity-5 border-[1px] px-3 py-1"
-                key={playerInfo.displayName}
+                key={u.displayName}
                 onClick={() => {
-                  setLog(playerInfo);
-                  fetchLog(playerInfo.code);
+                  setUser(u);
+                  getMatches(u.code);
                 }}
               >
-                {playerInfo.displayName}
+                {u.displayName}
               </button>
             ))}
           </motion.div>
         )}
-        {matchLog && selectedPlayer && (
+        {matches && user && (
           <>
             {totalWinRate != null && (
               <div className="flex items-center pt-1 px-8 mb-2 h-10 border-b border-slate-50 border-opacity-10 ">
@@ -175,9 +177,9 @@ export const HistoryPage: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {matchLog.map((log) => (
+                  {matches.map((log) => (
                     <tr
-                      key={`${log.timestamp}-${log.totalMatches}`}
+                      key={`${log.date}-${log.time}`}
                       className="backdrop-blur group"
                     >
                       <td
@@ -187,7 +189,7 @@ export const HistoryPage: React.FC = () => {
                         {log.date}
                       </td>
                       <td className="whitespace-nowrap text-left bg-slate-50 bg-opacity-5 group-hover:bg-opacity-10 transition-colors px-3 py-2">
-                        {log.timestamp}
+                        {log.time}
                       </td>
                       <td
                         onClick={() => filterLog("opponent", log.opponent)}
@@ -197,25 +199,25 @@ export const HistoryPage: React.FC = () => {
                       </td>
                       <td
                         onClick={() =>
-                          filterLog("opponentLeague", log.opponentLeague)
+                          filterLog("opponentLeague", log.opponent_league)
                         }
                         className="whitespace-nowrap rounded-none bg-slate-50 bg-opacity-5 group-hover:bg-opacity-10 transition-colors px-3 py-2 hover:underline cursor-pointer"
                       >
-                        {log.opponentLeague}
+                        {log.opponent_league}
                       </td>
                       <td
                         onClick={() =>
-                          filterLog("opponentCharacter", log.opponentCharacter)
+                          filterLog("opponentCharacter", log.opponent_character)
                         }
                         className="rounded-none bg-slate-50 bg-opacity-5 group-hover:bg-opacity-10 transition-colors px-3 py-2 text-center hover:underline cursor-pointer"
                       >
-                        {log.opponentCharacter}
+                        {log.opponent_character}
                       </td>
                       <td
                         className="rounded-r-xl rounded-l-none bg-slate-50 bg-opacity-5 group-hover:bg-opacity-10 transition-colors px-3 py-2 text-center"
-                        style={{ color: log.result == true ? "lime" : "red" }}
+                        style={{ color: log.victory == true ? "lime" : "red" }}
                       >
-                        {log.result == true ? "W" : "L"}
+                        {log.victory == true ? "W" : "L"}
                       </td>
                     </tr>
                   ))}

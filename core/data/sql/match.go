@@ -3,13 +3,14 @@ package sql
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/jmoiron/sqlx"
 )
 
 type Match struct {
-	UserId            uint8  `db:"user_id"`
-	SessionId         uint8  `db:"session_id"`
+	UserId            string `db:"user_id"`
+	SessionId         int    `db:"session_id"`
 	Character         string `db:"character"`
 	LP                int    `db:"lp"`
 	LPGain            int    `db:"lp_gain"`
@@ -87,11 +88,26 @@ func (s *Storage) SaveMatch(ctx context.Context, match Match) error {
 	return nil
 }
 
-func (s *Storage) GetMatchesFromSession(ctx context.Context, sessionId int) ([]*Match, error) {
-	query, args, err := sqlx.In(`
-		SELECT * FROM matches 
-		WHERE session_id = (?)
-`, sessionId)
+func (s *Storage) GetMatches(ctx context.Context, sessionId int, userId string) ([]*Match, error) {
+	whereStmts := []string{}
+	var whereArgs []interface{}
+	where := ``
+	if sessionId != 0 {
+		whereStmts = append(whereStmts, `session_id = (?)`)
+		whereArgs = append(whereArgs, sessionId)
+	}
+	if userId != "" {
+		whereStmts = append(whereStmts, `user_id = (?)`)
+		whereArgs = append(whereArgs, userId)
+	}
+	if len(whereStmts) > 0 {
+		where = fmt.Sprintf(`WHERE %s`, strings.Join(whereStmts, ` AND `))
+	}
+
+	query, args, err := sqlx.In(fmt.Sprintf(`
+		SELECT * FROM matches %s
+`, where), whereArgs...)
+
 	if err != nil {
 		return nil, fmt.Errorf("prepare matches by session query: %w", err)
 	}
@@ -100,6 +116,7 @@ func (s *Storage) GetMatchesFromSession(ctx context.Context, sessionId int) ([]*
 	if err != nil {
 		return nil, fmt.Errorf("execute matches query: %w", err)
 	}
+
 	return matches, nil
 }
 
@@ -125,8 +142,9 @@ func (s *Storage) createMatchesTable() error {
 		win_rate INTEGER,
 		date TEXT,
 		time TEXT,
-		PRIMARY KEY (user_id, date, time),
+		PRIMARY KEY (session_id, date, time),
 		FOREIGN KEY (session_id) REFERENCES sessions(id)
+		FOREIGN KEY (user_id) REFERENCES users(code)
 	)`)
 	if err != nil {
 		return fmt.Errorf("create users table: %w", err)

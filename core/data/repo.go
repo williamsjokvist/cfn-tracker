@@ -22,23 +22,24 @@ type Session struct {
 }
 
 type Match struct {
-	Character         string
-	LP                int
-	LPGain            int
-	MR                int
-	MRGain            int
-	Opponent          string
-	OpponentCharacter string
-	OpponentLP        int
-	OpponentMR        int
-	OpponentLeague    string
-	Victory           bool
-	Date              string
-	Time              string
-	WinStreak         int
-	Wins              int
-	Losses            int
-	WinRate           int
+	UserId            string `json:"user_id"`
+	Character         string `json:"character"`
+	LP                int    `json:"lp"`
+	LPGain            int    `json:"lp_gain"`
+	MR                int    `json:"mr"`
+	MRGain            int    `json:"mr_gain"`
+	Opponent          string `json:"opponent"`
+	OpponentCharacter string `json:"opponent_character"`
+	OpponentLP        int    `json:"opponent_lp"`
+	OpponentMR        int    `json:"opponent_mr"`
+	OpponentLeague    string `json:"opponent_league"`
+	Victory           bool   `json:"victory"`
+	Date              string `json:"date"`
+	Time              string `json:"time"`
+	WinStreak         int    `json:"win_streak"`
+	Wins              int    `json:"wins"`
+	Losses            int    `json:"losses"`
+	WinRate           int    `json:"win_rate"`
 }
 
 type User struct {
@@ -93,6 +94,18 @@ func (m *CFNTrackerRepository) CreateSession(ctx context.Context, userId string)
 	return &sesh, nil
 }
 
+func (m *CFNTrackerRepository) GetMatches(ctx context.Context, sessionId int, userId string) ([]Match, error) {
+	dbMatches, err := m.sqlDb.GetMatches(ctx, sessionId, userId)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get matches: %w", err)
+	}
+	matches := make([]Match, 0, len(dbMatches))
+	for _, m := range dbMatches {
+		matches = append(matches, convSqlMatchToModelMatch(m))
+	}
+	return matches, err
+}
+
 func (m *CFNTrackerRepository) GetLatestSession(ctx context.Context, userId string) (*Session, error) {
 	log.Println("get latest session", userId)
 	dbSesh, err := m.sqlDb.GetLatestSession(ctx, userId)
@@ -101,7 +114,7 @@ func (m *CFNTrackerRepository) GetLatestSession(ctx context.Context, userId stri
 	}
 	sesh := convSqlSessionToModelSession(dbSesh)
 
-	dbMatches, err := m.sqlDb.GetMatchesFromSession(ctx, sesh.SessionId)
+	dbMatches, err := m.sqlDb.GetMatches(ctx, sesh.SessionId, userId)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get matches by session: %w", err)
 	}
@@ -123,7 +136,7 @@ func (m *CFNTrackerRepository) UpdateSession(ctx context.Context, sesh *Session,
 
 	log.Println("saving match")
 	dbMatch := sql.Match{
-		SessionId:         uint8(sesh.SessionId),
+		SessionId:         sesh.SessionId,
 		Character:         match.Character,
 		LP:                match.LP,
 		LPGain:            match.LPGain,
@@ -186,5 +199,6 @@ func convSqlMatchToModelMatch(dbMatch *sql.Match) Match {
 		Wins:              dbMatch.Wins,
 		Losses:            dbMatch.Losses,
 		WinRate:           dbMatch.WinRate,
+		UserId:            dbMatch.UserId,
 	}
 }
