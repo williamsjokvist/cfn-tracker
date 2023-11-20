@@ -76,10 +76,10 @@ func (s *Storage) createSessionsTable() error {
 	_, err := s.db.Exec(`
 	CREATE TABLE IF NOT EXISTS sessions (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
-		user_id TEXT,
-		lp INTEGER,
-		mr INTEGER,
-		created_at TEXT,
+		user_id TEXT NOT NULL,
+		lp INTEGER DEFAULT 0 NOT NULL,
+		mr INTEGER DEFAULT 0 NOT NULL,
+		created_at TEXT DEFAULT (DATETIME('NOW')) NOT NULL,
 		FOREIGN KEY (user_id) REFERENCES users(code)
 	)`)
 	if err != nil {
