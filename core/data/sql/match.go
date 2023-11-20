@@ -3,6 +3,8 @@ package sql
 import (
 	"context"
 	"fmt"
+
+	"github.com/jmoiron/sqlx"
 )
 
 type Match struct {
@@ -19,18 +21,17 @@ type Match struct {
 	OpponentMR        int    `db:"opponent_mr"`
 	OpponentLeague    string `db:"opponent_league"`
 	Victory           bool   `db:"victory"`
-	DateTime          string `db:"datetime"`
+	Date              string `db:"date"`
+	Time              string `db:"time"`
+	WinStreak         int    `db:"win_streak"`
+	Wins              int    `db:"wins"`
+	Losses            int    `db:"losses"`
+	WinRate           int    `db:"win_rate"`
 }
 
 type MatchStorage interface {
-	createMatchesTable() error
-	GetMatches(sessionId string) ([]*Match, error)
-	SaveMatch() error
-	RemoveMatches(sessionId string) error
-}
-
-func (s *Storage) GetMatches(sessionId string) ([]*Match, error) {
-	return nil, nil
+	GetMatchesFromSession(ctx context.Context, sessionId int) ([]*Match, error)
+	SaveMatch(ctx context.Context, match Match) error
 }
 
 func (s *Storage) SaveMatch(ctx context.Context, match Match) error {
@@ -48,8 +49,13 @@ func (s *Storage) SaveMatch(ctx context.Context, match Match) error {
 			opponent_lp,
 			opponent_mr,
 			opponent_league,
+			wins,
+			losses,
+			win_rate,
+			win_streak,
 			victory,
-			datetime
+			date,
+			time
 		)
 		VALUES (
 			:user_id,
@@ -64,8 +70,13 @@ func (s *Storage) SaveMatch(ctx context.Context, match Match) error {
 			:opponent_lp,
 			:opponent_mr,
 			:opponent_league,
+			:wins,
+			:losses,
+			:win_rate,
+			:win_streak,
 			:victory,
-			:datetime
+			:date,
+			:time
 		)
 	`
 	_, err := s.db.NamedExecContext(ctx, query, match)
@@ -76,14 +87,26 @@ func (s *Storage) SaveMatch(ctx context.Context, match Match) error {
 	return nil
 }
 
-func (s *Storage) RemoveMatches(sessionId string) error {
-	return nil
+func (s *Storage) GetMatchesFromSession(ctx context.Context, sessionId int) ([]*Match, error) {
+	query, args, err := sqlx.In(`
+		SELECT * FROM matches 
+		WHERE session_id = (?)
+`, sessionId)
+	if err != nil {
+		return nil, fmt.Errorf("prepare matches by session query: %w", err)
+	}
+	var matches []*Match
+	err = s.db.SelectContext(ctx, &matches, query, args...)
+	if err != nil {
+		return nil, fmt.Errorf("execute matches query: %w", err)
+	}
+	return matches, nil
 }
 
 func (s *Storage) createMatchesTable() error {
 	_, err := s.db.Exec(`
 	CREATE TABLE IF NOT EXISTS matches (
-		user_id INTEGER,
+		user_id TEXT,
 		session_id INTEGER,
 		character TEXT NOT NULL,
 		lp INTEGER,
@@ -96,9 +119,14 @@ func (s *Storage) createMatchesTable() error {
 		opponent_mr INTEGER,
 		opponent_league TEXT,
 		victory BOOLEAN,
-		datetime TEXT,
-		PRIMARY KEY (user_id, datetime),
-		FOREIGN KEY(session_id) REFERENCES sessions(id)
+		wins INTEGER,
+		losses INTEGER,
+		win_streak INTEGER,
+		win_rate INTEGER,
+		date TEXT,
+		time TEXT,
+		PRIMARY KEY (user_id, date, time),
+		FOREIGN KEY (session_id) REFERENCES sessions(id)
 	)`)
 	if err != nil {
 		return fmt.Errorf("create users table: %w", err)

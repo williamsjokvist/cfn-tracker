@@ -14,10 +14,27 @@ type User struct {
 }
 
 type UserStorage interface {
-	createUsersTable() error
-	GetUsers() ([]*User, error)
-	SaveUser(displayName, code string) error
-	RemoveUser(code string) error
+	GetUserByCode(ctx context.Context, code string) (*User, error)
+	GetUsers(ctx context.Context) ([]*User, error)
+	SaveUser(ctx context.Context, displayName, code string) error
+	RemoveUser(ctx context.Context, code string) error
+}
+
+func (s *Storage) GetUserByCode(ctx context.Context, code string) (*User, error) {
+	query, args, err := sqlx.In(`
+		SELECT * FROM users
+		WHERE code = (?)
+		LIMIT 1
+	`, code)
+	if err != nil {
+		return nil, fmt.Errorf("prepare get user clause: %w", err)
+	}
+	var user User
+	err = s.db.GetContext(ctx, &user, query, args...)
+	if err != nil {
+		return nil, fmt.Errorf("get user by code: %w", err)
+	}
+	return &user, nil
 }
 
 func (s *Storage) GetUsers(ctx context.Context) ([]*User, error) {
@@ -64,9 +81,9 @@ func (s *Storage) RemoveUser(ctx context.Context, code string) error {
 func (s *Storage) createUsersTable() error {
 	_, err := s.db.Exec(`
 	CREATE TABLE IF NOT EXISTS users (
-		id INTEGER PRIMARY KEY,
-		code TEXT NOT NULL UNIQUE,
-		display_name TEXT NOT NULL
+		code TEXT NOT NULL,
+		display_name TEXT NOT NULL,
+		PRIMARY KEY (code)
 	)`)
 	if err != nil {
 		return fmt.Errorf("create users table: %w", err)

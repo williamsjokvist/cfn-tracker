@@ -20,6 +20,7 @@ type SF6Tracker struct {
 	stopPolling     context.CancelFunc
 	state           map[string]*data.TrackingState
 	sesh            *data.Session
+	user            *data.User
 	*shared.Browser
 	*data.CFNTrackerRepository
 }
@@ -40,15 +41,45 @@ func (t *SF6Tracker) Start(ctx context.Context, userCode string, restore bool, p
 		return errors.New(`sf6 authentication err or invalid cfn`)
 	}
 
-	t.state = make(map[string]*data.TrackingState, 4)
 	if restore {
-		// todo: replace with sqldb
-		storedState, err := data.GetSavedMatchHistory(userCode)
+		sesh, err := t.CFNTrackerRepository.GetLatestSession(ctx, userCode)
 		if err != nil {
-			return fmt.Errorf(`failed to restore session: %w`, err)
+			return fmt.Errorf(`failed to get last session: %w`, err)
 		}
-		t.state[storedState.Character] = storedState
-		wails.EventsEmit(ctx, `cfn-data`, t.state[storedState.Character])
+		t.sesh = sesh
+		t.user, err = t.CFNTrackerRepository.GetUserByCode(ctx, userCode)
+		if err != nil {
+			return fmt.Errorf(`failed to get user: %w`, err)
+		}
+
+		wails.EventsEmit(ctx, `cfn-data`, t.getTrackingState())
+	} else {
+		bl, err := t.fetchBattleLog(userCode)
+		if err != nil {
+			return fmt.Errorf(`failed to fetch battle log: %w`, err)
+		}
+		err = t.CFNTrackerRepository.SaveUser(ctx, bl.GetCFN(), userCode)
+		if err != nil {
+			return fmt.Errorf(`failed to save user: %w`, err)
+		}
+		t.user = &data.User{
+			DisplayName: bl.GetCFN(),
+			Code:        userCode,
+		}
+		sesh, err := t.CFNTrackerRepository.CreateSession(ctx, userCode)
+		if err != nil {
+			return fmt.Errorf(`failed to create session: %w`, err)
+		}
+		t.sesh = sesh
+		// set starting LP so we don't count the first polled match
+		t.sesh.LP = bl.GetLP()
+		t.sesh.MR = bl.GetMR()
+		wails.EventsEmit(ctx, `cfn-data`, data.TrackingState{
+			CFN:       bl.GetCFN(),
+			LP:        bl.GetLP(),
+			MR:        bl.GetMR(),
+			Character: bl.GetCharacter(),
+		})
 	}
 
 	pollCtx, cancelFn := context.WithCancel(ctx)
@@ -93,61 +124,58 @@ func (t *SF6Tracker) poll(ctx context.Context, userCode string, pollRate time.Du
 			break
 		}
 
-		err = t.updateState(ctx, userCode, bl)
+		err = t.updateSession(ctx, userCode, bl)
 		if err != nil {
-			log.Println(`failed to update state: `, err)
-			continue
+			log.Println(`failed to update session: `, err)
 		}
 	}
 }
 
-func (t *SF6Tracker) updateState(ctx context.Context, userCode string, bl *BattleLog) error {
-	char := bl.GetCharacter()
-
-	// assign new state on new character
-	if t.state[char] == nil {
-		t.state[char] = &data.TrackingState{
-			CFN:       bl.GetCFN(),
-			UserCode:  bl.GetUserCode(),
-			LP:        bl.GetLP(),
-			MR:        bl.GetMR(),
-			Character: bl.GetCharacter(),
-		}
-		wails.EventsEmit(ctx, `cfn-data`, t.state[char])
-	}
-
-	updatedTrackingState := t.getUpdatedTrackingState(bl)
-	if t.state[char] == updatedTrackingState {
+func (t *SF6Tracker) updateSession(ctx context.Context, userCode string, bl *BattleLog) error {
+	// no new match played
+	if t.sesh.LP == bl.GetLP() {
 		return nil
 	}
+	match := getNewestMatch(t.sesh, bl)
 
-	if t.sesh == nil {
-		sesh, err := t.CFNTrackerRepository.CreateSession(ctx, userCode)
-		if err != nil {
-			log.Println(err)
-		}
-		t.sesh = sesh
-	}
-
-	t.state[char] = updatedTrackingState
-	wails.EventsEmit(ctx, `cfn-data`, t.state[char])
-
-	t.state[char].Save()
-	t.state[char].Log()
-
-	match := calcMatchStats(t.sesh, bl)
-	err := t.CFNTrackerRepository.SaveMatch(ctx, t.sesh.SessionId, match)
-	if err != nil {
-		log.Println(err)
-	}
+	t.sesh.LP = bl.GetLP()
+	t.sesh.MR = bl.GetMR()
 	t.sesh.Matches = append(t.sesh.Matches, &match)
-
-	t.CFNTrackerRepository.SaveUser(ctx, t.state[char].CFN, userCode)
+	err := t.CFNTrackerRepository.UpdateSession(ctx, t.sesh, match, t.sesh.SessionId)
 	if err != nil {
-		log.Println(err)
+		return fmt.Errorf("failed to update session: %w", err)
 	}
 
+	trackingState := t.getTrackingState()
+	trackingState.Log()
+	trackingState.Save()
+
+	wails.EventsEmit(ctx, `cfn-data`, trackingState)
 	return nil
+}
+
+func (t *SF6Tracker) getTrackingState() data.TrackingState {
+	lastMatch := t.sesh.Matches[len(t.sesh.Matches)-1]
+	return data.TrackingState{
+		UserCode:          t.user.Code,
+		CFN:               t.user.DisplayName,
+		Wins:              lastMatch.Wins,
+		Losses:            lastMatch.Losses,
+		WinRate:           lastMatch.WinRate,
+		WinStreak:         lastMatch.WinStreak,
+		MR:                lastMatch.MR,
+		LP:                lastMatch.LP,
+		LPGain:            lastMatch.LPGain,
+		MRGain:            lastMatch.MRGain,
+		Character:         lastMatch.Character,
+		IsWin:             lastMatch.Victory,
+		Opponent:          lastMatch.Opponent,
+		OpponentCharacter: lastMatch.OpponentCharacter,
+		OpponentLP:        lastMatch.OpponentLP,
+		OpponentLeague:    lastMatch.OpponentLeague,
+		Date:              lastMatch.Date,
+		TimeStamp:         lastMatch.Time,
+	}
 }
 
 func (t *SF6Tracker) fetchBattleLog(userCode string) (*BattleLog, error) {
@@ -189,55 +217,24 @@ func getOpponentInfo(myCfn string, replay *Replay) PlayerInfo {
 	}
 }
 
-func (t *SF6Tracker) getUpdatedTrackingState(bl *BattleLog) *data.TrackingState {
-	// no new match played
-	if len(bl.ReplayList) == 0 || bl.GetLP() == t.state[bl.GetCharacter()].LP {
-		return t.state[bl.GetCharacter()]
-	}
+func getNewestMatch(sesh *data.Session, bl *BattleLog) data.Match {
 	opponent := getOpponentInfo(bl.GetCFN(), &bl.ReplayList[0])
-	state := t.state[bl.GetCharacter()]
-	isWin := !isVictory(opponent.RoundResults)
-	wins := state.Wins
-	losses := state.Losses
-	winStreak := state.WinStreak
-	if isWin {
-		wins++
-		winStreak++
-	} else {
-		losses++
-		winStreak = 0
+	victory := !isVictory(opponent.RoundResults)
+	biota := utils.Biota(victory)
+	wins := biota
+	losses := (1 - biota)
+	winStreak := biota
+	lpGain := bl.GetLP() - sesh.LP
+	mrGain := bl.GetMR() - sesh.MR
+	prevMatch := getPreviousMatchForCharacter(sesh, bl.GetCharacter())
+	if prevMatch != nil {
+		wins = prevMatch.Wins + biota
+		losses = prevMatch.Losses + (1 - biota)
+		winStreak = prevMatch.WinStreak + biota
+		lpGain = prevMatch.LPGain + lpGain
+		mrGain = prevMatch.MRGain + mrGain
 	}
-	return &data.TrackingState{
-		CFN:               bl.GetCFN(),
-		UserCode:          bl.GetUserCode(),
-		LP:                bl.GetLP(),
-		MR:                bl.GetMR(),
-		LPGain:            state.LPGain + (bl.GetLP() - state.LP),
-		MRGain:            state.MRGain + (bl.GetMR() - state.MR),
-		Wins:              wins,
-		TotalWins:         wins,
-		TotalLosses:       losses,
-		TotalMatches:      state.TotalMatches + 1,
-		Losses:            losses,
-		WinRate:           int((float64(wins) / float64(wins+losses)) * 100),
-		Character:         bl.GetCharacter(),
-		Opponent:          opponent.Player.FighterID,
-		OpponentCharacter: opponent.CharacterName,
-		OpponentLP:        opponent.LeaguePoint,
-		OpponentLeague:    getLeagueFromLP(opponent.LeaguePoint),
-		IsWin:             isWin,
-		TimeStamp:         time.Now().Format(`15:04`),
-		Date:              time.Now().Format(`2006-01-02`),
-		WinStreak:         winStreak,
-	}
-}
-
-func calcMatchStats(sesh *data.Session, bl *BattleLog) data.Match {
-	opponent := getOpponentInfo(bl.GetCFN(), &bl.ReplayList[0])
-	isWin := !isVictory(opponent.RoundResults)
-	datetime := time.Now().Format(`2006-01-02 15:04`)
-
-	match := data.Match{
+	return data.Match{
 		Character:         bl.GetCharacter(),
 		LP:                bl.GetLP(),
 		MR:                bl.GetMR(),
@@ -246,21 +243,22 @@ func calcMatchStats(sesh *data.Session, bl *BattleLog) data.Match {
 		OpponentLP:        opponent.LeaguePoint,
 		OpponentLeague:    getLeagueFromLP(opponent.LeaguePoint),
 		OpponentMR:        opponent.MasterRating,
-		Victory:           isWin,
-		DateTime:          datetime,
+		Victory:           victory,
+		Wins:              wins,
+		Losses:            losses,
+		WinStreak:         winStreak,
+		Date:              time.Now().Format(`2006-01-02`),
+		Time:              time.Now().Format(`15:04`),
+		LPGain:            lpGain,
+		MRGain:            mrGain,
+		WinRate:           int((float64(wins) / float64(wins+losses)) * 100),
 	}
-
-	lastMatch := getLastMatchWithCharacter(sesh.Matches, match.Character)
-	if lastMatch != nil {
-		match.LPGain = match.LP - lastMatch.LP
-		match.MRGain = match.MR - lastMatch.MR
-	}
-	return match
 }
 
-func getLastMatchWithCharacter(matches []*data.Match, char string) *data.Match {
-	for _, match := range matches {
-		if match.Character == char {
+func getPreviousMatchForCharacter(sesh *data.Session, character string) *data.Match {
+	for i := len(sesh.Matches) - 1; i >= 0; i-- {
+		match := sesh.Matches[i]
+		if match.Character == character {
 			return match
 		}
 	}

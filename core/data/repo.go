@@ -17,6 +17,8 @@ type Session struct {
 	UserId    string
 	Started   string
 	Matches   []*Match
+	LP        int
+	MR        int
 }
 
 type Match struct {
@@ -31,7 +33,12 @@ type Match struct {
 	OpponentMR        int
 	OpponentLeague    string
 	Victory           bool
-	DateTime          string
+	Date              string
+	Time              string
+	WinStreak         int
+	Wins              int
+	Losses            int
+	WinRate           int
 }
 
 type User struct {
@@ -43,6 +50,15 @@ func NewCFNTrackerRepository(sqlDb *sql.Storage) *CFNTrackerRepository {
 	return &CFNTrackerRepository{
 		sqlDb: sqlDb,
 	}
+}
+
+func (m *CFNTrackerRepository) GetUserByCode(ctx context.Context, code string) (*User, error) {
+	dbUser, err := m.sqlDb.GetUserByCode(ctx, code)
+	if err != nil {
+		return nil, fmt.Errorf("get user by code: %w", err)
+	}
+	user := convSqlUserToModelUser(dbUser)
+	return &user, nil
 }
 
 func (m *CFNTrackerRepository) GetUsers(ctx context.Context) ([]User, error) {
@@ -73,15 +89,41 @@ func (m *CFNTrackerRepository) CreateSession(ctx context.Context, userId string)
 	if err != nil {
 		return nil, fmt.Errorf("create session: %w", err)
 	}
-
 	sesh := convSqlSessionToModelSession(dbSesh)
 	return &sesh, nil
 }
 
-func (m *CFNTrackerRepository) SaveMatch(ctx context.Context, sessionId int, match Match) error {
+func (m *CFNTrackerRepository) GetLatestSession(ctx context.Context, userId string) (*Session, error) {
+	log.Println("get latest session", userId)
+	dbSesh, err := m.sqlDb.GetLatestSession(ctx, userId)
+	if err != nil {
+		return nil, fmt.Errorf("get session: %w", err)
+	}
+	sesh := convSqlSessionToModelSession(dbSesh)
+
+	dbMatches, err := m.sqlDb.GetMatchesFromSession(ctx, sesh.SessionId)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get matches by session: %w", err)
+	}
+	matches := make([]*Match, 0, len(dbMatches))
+	for _, m := range dbMatches {
+		match := convSqlMatchToModelMatch(m)
+		matches = append(matches, &match)
+	}
+	sesh.Matches = matches
+	return &sesh, nil
+}
+
+func (m *CFNTrackerRepository) UpdateSession(ctx context.Context, sesh *Session, match Match, sessionId int) error {
+	log.Println("updating session")
+	err := m.sqlDb.UpdateLatestSession(ctx, sesh.LP, sesh.MR, sessionId)
+	if err != nil {
+		return fmt.Errorf("update session: %w", err)
+	}
+
 	log.Println("saving match")
 	dbMatch := sql.Match{
-		SessionId:         uint8(sessionId),
+		SessionId:         uint8(sesh.SessionId),
 		Character:         match.Character,
 		LP:                match.LP,
 		LPGain:            match.LPGain,
@@ -93,12 +135,18 @@ func (m *CFNTrackerRepository) SaveMatch(ctx context.Context, sessionId int, mat
 		OpponentLeague:    match.OpponentLeague,
 		OpponentMR:        match.OpponentMR,
 		Victory:           match.Victory,
-		DateTime:          match.DateTime,
+		Date:              match.Date,
+		Time:              match.Time,
+		WinStreak:         match.WinStreak,
+		Wins:              match.Wins,
+		Losses:            match.Losses,
+		WinRate:           match.WinRate,
 	}
-	err := m.sqlDb.SaveMatch(ctx, dbMatch)
+	err = m.sqlDb.SaveMatch(ctx, dbMatch)
 	if err != nil {
 		return fmt.Errorf("save match in storage: %w", err)
 	}
+
 	return nil
 }
 
@@ -114,5 +162,29 @@ func convSqlSessionToModelSession(dbSesh *sql.Session) Session {
 		SessionId: int(dbSesh.SessionId),
 		UserId:    dbSesh.UserId,
 		Started:   dbSesh.CreatedAt,
+		LP:        dbSesh.LP,
+		MR:        dbSesh.MR,
+	}
+}
+
+func convSqlMatchToModelMatch(dbMatch *sql.Match) Match {
+	return Match{
+		Character:         dbMatch.Character,
+		LP:                dbMatch.LP,
+		LPGain:            dbMatch.LPGain,
+		MR:                dbMatch.MR,
+		MRGain:            dbMatch.MRGain,
+		Opponent:          dbMatch.Opponent,
+		OpponentCharacter: dbMatch.OpponentCharacter,
+		OpponentLP:        dbMatch.OpponentLP,
+		OpponentMR:        dbMatch.OpponentMR,
+		OpponentLeague:    dbMatch.OpponentLeague,
+		Victory:           dbMatch.Victory,
+		Date:              dbMatch.Date,
+		Time:              dbMatch.Time,
+		WinStreak:         dbMatch.WinStreak,
+		Wins:              dbMatch.Wins,
+		Losses:            dbMatch.Losses,
+		WinRate:           dbMatch.WinRate,
 	}
 }
