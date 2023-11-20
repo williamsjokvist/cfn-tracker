@@ -7,7 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/williamsjokvist/cfn-tracker/core/shared"
+	"github.com/williamsjokvist/cfn-tracker/core/browser"
 )
 
 // The most crucial test, to make sure authentication is always working.
@@ -15,7 +15,7 @@ func TestSF6Authentication(t *testing.T) {
 	assert := assert.New(t)
 
 	ctx := context.Background()
-	browser, err := shared.NewBrowser(ctx, true)
+	browser, err := browser.NewBrowser(ctx, true)
 	assert.Nil(err)
 
 	sf6Tracker := NewSF6Tracker(browser, nil)
