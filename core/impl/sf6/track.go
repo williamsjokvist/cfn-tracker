@@ -11,6 +11,7 @@ import (
 	wails "github.com/wailsapp/wails/v2/pkg/runtime"
 
 	"github.com/williamsjokvist/cfn-tracker/core/data"
+	"github.com/williamsjokvist/cfn-tracker/core/model"
 	"github.com/williamsjokvist/cfn-tracker/core/shared"
 	"github.com/williamsjokvist/cfn-tracker/core/utils"
 )
@@ -19,8 +20,8 @@ type SF6Tracker struct {
 	isAuthenticated bool
 	stopPolling     context.CancelFunc
 	state           map[string]*data.TrackingState
-	sesh            *data.Session
-	user            *data.User
+	sesh            *model.Session
+	user            *model.User
 	*shared.Browser
 	*data.CFNTrackerRepository
 }
@@ -62,7 +63,7 @@ func (t *SF6Tracker) Start(ctx context.Context, userCode string, restore bool, p
 		if err != nil {
 			return fmt.Errorf(`failed to save user: %w`, err)
 		}
-		t.user = &data.User{
+		t.user = &model.User{
 			DisplayName: bl.GetCFN(),
 			Code:        userCode,
 		}
@@ -141,7 +142,7 @@ func (t *SF6Tracker) updateSession(ctx context.Context, userCode string, bl *Bat
 	t.sesh.LP = bl.GetLP()
 	t.sesh.MR = bl.GetMR()
 	t.sesh.Matches = append(t.sesh.Matches, &match)
-	err := t.CFNTrackerRepository.UpdateSession(ctx, t.sesh, match, t.sesh.SessionId)
+	err := t.CFNTrackerRepository.UpdateSession(ctx, t.sesh, match, t.sesh.Id)
 	if err != nil {
 		return fmt.Errorf("failed to update session: %w", err)
 	}
@@ -217,7 +218,7 @@ func getOpponentInfo(myCfn string, replay *Replay) PlayerInfo {
 	}
 }
 
-func getNewestMatch(sesh *data.Session, bl *BattleLog) data.Match {
+func getNewestMatch(sesh *model.Session, bl *BattleLog) model.Match {
 	opponent := getOpponentInfo(bl.GetCFN(), &bl.ReplayList[0])
 	victory := !isVictory(opponent.RoundResults)
 	biota := utils.Biota(victory)
@@ -234,7 +235,7 @@ func getNewestMatch(sesh *data.Session, bl *BattleLog) data.Match {
 		lpGain = prevMatch.LPGain + lpGain
 		mrGain = prevMatch.MRGain + mrGain
 	}
-	return data.Match{
+	return model.Match{
 		Character:         bl.GetCharacter(),
 		LP:                bl.GetLP(),
 		MR:                bl.GetMR(),
@@ -255,7 +256,7 @@ func getNewestMatch(sesh *data.Session, bl *BattleLog) data.Match {
 	}
 }
 
-func getPreviousMatchForCharacter(sesh *data.Session, character string) *data.Match {
+func getPreviousMatchForCharacter(sesh *model.Session, character string) *model.Match {
 	for i := len(sesh.Matches) - 1; i >= 0; i-- {
 		match := sesh.Matches[i]
 		if match.Character == character {

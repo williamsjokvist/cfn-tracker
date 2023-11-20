@@ -6,36 +6,16 @@ import (
 	"strings"
 
 	"github.com/jmoiron/sqlx"
+
+	"github.com/williamsjokvist/cfn-tracker/core/model"
 )
 
-type Match struct {
-	UserId            string `db:"user_id"`
-	SessionId         int    `db:"session_id"`
-	Character         string `db:"character"`
-	LP                int    `db:"lp"`
-	LPGain            int    `db:"lp_gain"`
-	MR                int    `db:"mr"`
-	MRGain            int    `db:"mr_gain"`
-	Opponent          string `db:"opponent"`
-	OpponentCharacter string `db:"opponent_character"`
-	OpponentLP        int    `db:"opponent_lp"`
-	OpponentMR        int    `db:"opponent_mr"`
-	OpponentLeague    string `db:"opponent_league"`
-	Victory           bool   `db:"victory"`
-	Date              string `db:"date"`
-	Time              string `db:"time"`
-	WinStreak         int    `db:"win_streak"`
-	Wins              int    `db:"wins"`
-	Losses            int    `db:"losses"`
-	WinRate           int    `db:"win_rate"`
-}
-
 type MatchStorage interface {
-	GetMatchesFromSession(ctx context.Context, sessionId int) ([]*Match, error)
-	SaveMatch(ctx context.Context, match Match) error
+	SaveMatch(ctx context.Context, match model.Match) error
+	GetMatches(ctx context.Context, sessionId uint16, userId string) ([]*model.Match, error)
 }
 
-func (s *Storage) SaveMatch(ctx context.Context, match Match) error {
+func (s *Storage) SaveMatch(ctx context.Context, match model.Match) error {
 	query := `
 		INSERT OR IGNORE INTO matches (
 			user_id,
@@ -88,7 +68,7 @@ func (s *Storage) SaveMatch(ctx context.Context, match Match) error {
 	return nil
 }
 
-func (s *Storage) GetMatches(ctx context.Context, sessionId int, userId string) ([]*Match, error) {
+func (s *Storage) GetMatches(ctx context.Context, sessionId uint16, userId string) ([]*model.Match, error) {
 	whereStmts := []string{}
 	var whereArgs []interface{}
 	where := ``
@@ -111,7 +91,7 @@ func (s *Storage) GetMatches(ctx context.Context, sessionId int, userId string) 
 	if err != nil {
 		return nil, fmt.Errorf("prepare matches by session query: %w", err)
 	}
-	var matches []*Match
+	var matches []*model.Match
 	err = s.db.SelectContext(ctx, &matches, query, args...)
 	if err != nil {
 		return nil, fmt.Errorf("execute matches query: %w", err)

@@ -5,22 +5,18 @@ import (
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
+
+	"github.com/williamsjokvist/cfn-tracker/core/model"
 )
 
-type User struct {
-	Id          uint8  `db:"id"`
-	DisplayName string `db:"display_name"`
-	Code        string `db:"code"`
-}
-
 type UserStorage interface {
-	GetUserByCode(ctx context.Context, code string) (*User, error)
-	GetUsers(ctx context.Context) ([]*User, error)
+	GetUserByCode(ctx context.Context, code string) (*model.User, error)
+	GetUsers(ctx context.Context) ([]*model.User, error)
 	SaveUser(ctx context.Context, displayName, code string) error
 	RemoveUser(ctx context.Context, code string) error
 }
 
-func (s *Storage) GetUserByCode(ctx context.Context, code string) (*User, error) {
+func (s *Storage) GetUserByCode(ctx context.Context, code string) (*model.User, error) {
 	query, args, err := sqlx.In(`
 		SELECT * FROM users
 		WHERE code = (?)
@@ -29,7 +25,7 @@ func (s *Storage) GetUserByCode(ctx context.Context, code string) (*User, error)
 	if err != nil {
 		return nil, fmt.Errorf("prepare get user clause: %w", err)
 	}
-	var user User
+	var user model.User
 	err = s.db.GetContext(ctx, &user, query, args...)
 	if err != nil {
 		return nil, fmt.Errorf("get user by code: %w", err)
@@ -37,8 +33,8 @@ func (s *Storage) GetUserByCode(ctx context.Context, code string) (*User, error)
 	return &user, nil
 }
 
-func (s *Storage) GetUsers(ctx context.Context) ([]*User, error) {
-	var users []*User
+func (s *Storage) GetUsers(ctx context.Context) ([]*model.User, error) {
+	var users []*model.User
 	err := s.db.SelectContext(ctx, &users, "SELECT * FROM users")
 	if err != nil {
 		return nil, fmt.Errorf("select sql users: %w", err)
@@ -47,7 +43,7 @@ func (s *Storage) GetUsers(ctx context.Context) ([]*User, error) {
 }
 
 func (s *Storage) SaveUser(ctx context.Context, displayName, code string) error {
-	user := User{
+	user := model.User{
 		DisplayName: displayName,
 		Code:        code,
 	}

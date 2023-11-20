@@ -13,6 +13,7 @@ import (
 	wails "github.com/wailsapp/wails/v2/pkg/runtime"
 
 	"github.com/williamsjokvist/cfn-tracker/core/data"
+	"github.com/williamsjokvist/cfn-tracker/core/model"
 	"github.com/williamsjokvist/cfn-tracker/core/shared"
 )
 
@@ -67,7 +68,7 @@ func (ch *CommandHandler) OpenResultsDirectory() {
 	}
 }
 
-func (ch *CommandHandler) GetAllMatchesForUser(userId string) []data.Match {
+func (ch *CommandHandler) GetAllMatchesForUser(userId string) []*model.Match {
 	matches, err := ch.repo.GetMatches(ch.ctx, 0, userId)
 	if err != nil {
 		fmt.Println(err)
@@ -76,7 +77,7 @@ func (ch *CommandHandler) GetAllMatchesForUser(userId string) []data.Match {
 	return matches
 }
 
-func (ch *CommandHandler) GetUsers() []data.User {
+func (ch *CommandHandler) GetUsers() []*model.User {
 	users, err := ch.repo.GetUsers(ch.ctx)
 	if err != nil {
 		fmt.Println(err)

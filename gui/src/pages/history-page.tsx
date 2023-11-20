@@ -10,7 +10,7 @@ import {
   ExportLogToCSV,
   OpenResultsDirectory,
 } from "@@/go/core/CommandHandler";
-import type { data as model } from "@@/go/models";
+import type { model } from "@@/go/models";
 
 import { PageHeader } from "@/ui/page-header";
 
@@ -44,7 +44,6 @@ export const HistoryPage: React.FC = () => {
 
   React.useEffect(() => {
     if (!matches) return;
-    console.log(matches)
     const wonMatches = matches.filter((log) => log.victory === true).length;
     const winRate = Math.floor((wonMatches / matches.length) * 100);
     !isNaN(winRate) && setTotalWinRate(winRate);
@@ -199,19 +198,19 @@ export const HistoryPage: React.FC = () => {
                       </td>
                       <td
                         onClick={() =>
-                          filterLog("opponentLeague", log.opponent_league)
+                          filterLog("opponentLeague", log.opponentLeague)
                         }
                         className="whitespace-nowrap rounded-none bg-slate-50 bg-opacity-5 group-hover:bg-opacity-10 transition-colors px-3 py-2 hover:underline cursor-pointer"
                       >
-                        {log.opponent_league}
+                        {log.opponentLeague}
                       </td>
                       <td
                         onClick={() =>
-                          filterLog("opponentCharacter", log.opponent_character)
+                          filterLog("opponentCharacter", log.opponentCharacter)
                         }
                         className="rounded-none bg-slate-50 bg-opacity-5 group-hover:bg-opacity-10 transition-colors px-3 py-2 text-center hover:underline cursor-pointer"
                       >
-                        {log.opponent_character}
+                        {log.opponentCharacter}
                       </td>
                       <td
                         className="rounded-r-xl rounded-l-none bg-slate-50 bg-opacity-5 group-hover:bg-opacity-10 transition-colors px-3 py-2 text-center"
