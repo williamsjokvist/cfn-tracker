@@ -1,13 +1,11 @@
-package shared
+package server
 
 import (
 	"context"
 	_ "embed"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
-	"strings"
 	"time"
 
 	wails "github.com/wailsapp/wails/v2/pkg/runtime"
@@ -26,7 +24,7 @@ var css []byte
 
 const PORT = 4242
 
-func Serve(ctx context.Context) {
+func Start(ctx context.Context) {
 	fmt.Println(`Starting Browser Source Server`)
 
 	fs := http.FileServer(http.Dir("./themes"))
@@ -92,26 +90,4 @@ func Serve(ctx context.Context) {
 	}
 
 	fmt.Println(`Browser Source Server listening on `, PORT)
-}
-
-func GetThemeList() ([]string, error) {
-	files, err := ioutil.ReadDir(`themes`)
-	if err != nil {
-		return nil, fmt.Errorf(`read themes directory: %w`, err)
-	}
-
-	themes := []string{}
-
-	for _, file := range files {
-		fileName := file.Name()
-
-		if !strings.Contains(fileName, `.css`) {
-			continue
-		}
-
-		theme := strings.Split(fileName, `.css`)[0]
-		themes = append(themes, theme)
-	}
-
-	return themes, nil
 }

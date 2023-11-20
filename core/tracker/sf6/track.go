@@ -10,9 +10,9 @@ import (
 
 	wails "github.com/wailsapp/wails/v2/pkg/runtime"
 
+	"github.com/williamsjokvist/cfn-tracker/core/browser"
 	"github.com/williamsjokvist/cfn-tracker/core/data"
 	"github.com/williamsjokvist/cfn-tracker/core/model"
-	"github.com/williamsjokvist/cfn-tracker/core/shared"
 	"github.com/williamsjokvist/cfn-tracker/core/utils"
 )
 
@@ -22,11 +22,11 @@ type SF6Tracker struct {
 	state           map[string]*data.TrackingState
 	sesh            *model.Session
 	user            *model.User
-	*shared.Browser
+	*browser.Browser
 	*data.CFNTrackerRepository
 }
 
-func NewSF6Tracker(browser *shared.Browser, trackerRepo *data.CFNTrackerRepository) *SF6Tracker {
+func NewSF6Tracker(browser *browser.Browser, trackerRepo *data.CFNTrackerRepository) *SF6Tracker {
 	return &SF6Tracker{
 		Browser:              browser,
 		stopPolling:          func() {},

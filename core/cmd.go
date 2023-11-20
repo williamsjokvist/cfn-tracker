@@ -3,18 +3,22 @@ package core
 import (
 	"context"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
 	"runtime"
+	"strings"
 	"time"
 
 	"github.com/hashicorp/go-version"
 	wails "github.com/wailsapp/wails/v2/pkg/runtime"
 
+	"github.com/williamsjokvist/cfn-tracker/core/browser"
 	"github.com/williamsjokvist/cfn-tracker/core/data"
 	"github.com/williamsjokvist/cfn-tracker/core/model"
-	"github.com/williamsjokvist/cfn-tracker/core/shared"
+	"github.com/williamsjokvist/cfn-tracker/core/server"
+	"github.com/williamsjokvist/cfn-tracker/core/tracker"
 )
 
 var (
@@ -30,8 +34,8 @@ var (
 // The CommandHandler is the interface between the GUI and the core
 type CommandHandler struct {
 	ctx     context.Context
-	tracker GameTracker
-	browser *shared.Browser
+	tracker tracker.GameTracker
+	browser *browser.Browser
 	repo    *data.CFNTrackerRepository
 }
 
@@ -86,14 +90,21 @@ func (ch *CommandHandler) GetUsers() []*model.User {
 	return users
 }
 
-func (ch *CommandHandler) GetThemeList() []string {
-	themes, err := shared.GetThemeList()
+func (ch *CommandHandler) GetThemeList() ([]string, error) {
+	files, err := ioutil.ReadDir(`themes`)
 	if err != nil {
-		fmt.Println(err)
-		return nil
+		return nil, fmt.Errorf(`read themes directory: %w`, err)
 	}
-
-	return themes
+	themes := make([]string, 0, len(files))
+	for _, file := range files {
+		fileName := file.Name()
+		if !strings.Contains(fileName, `.css`) {
+			continue
+		}
+		theme := strings.Split(fileName, `.css`)[0]
+		themes = append(themes, theme)
+	}
+	return themes, nil
 }
 
 func (ch *CommandHandler) DeleteMatchLog(cfn string) {
@@ -112,10 +123,10 @@ func (ch *CommandHandler) ExportLogToCSV(cfn string) {
 
 func (ch *CommandHandler) SelectGame(game string) {
 	switch game {
-	case GameTypeSF6.String():
-		ch.tracker, _ = MakeSF6Tracker(ch.ctx, ch.browser, CapIDEmail, CapIDPassword, ch.repo)
-	case GameTypeSFV.String():
-		ch.tracker, _ = MakeSFVTracker(ch.ctx, ch.browser, SteamUsername, SteamPassword)
+	case tracker.GameTypeSF6.String():
+		ch.tracker, _ = tracker.MakeSF6Tracker(ch.ctx, ch.browser, CapIDEmail, CapIDPassword, ch.repo)
+	case tracker.GameTypeSFV.String():
+		ch.tracker, _ = tracker.MakeSFVTracker(ch.ctx, ch.browser, SteamUsername, SteamPassword)
 	}
 }
 
@@ -126,7 +137,7 @@ func (ch *CommandHandler) ResultsJSONExist() bool {
 
 func (ch *CommandHandler) StartBrowser(ctx context.Context) {
 	ch.ctx = ctx
-	browser, err := shared.NewBrowser(ctx, RunHeadless)
+	browser, err := browser.NewBrowser(ctx, RunHeadless)
 	if err != nil {
 		log.Fatal(err)
 		return
@@ -134,7 +145,7 @@ func (ch *CommandHandler) StartBrowser(ctx context.Context) {
 	ch.browser = browser
 
 	ch.browser.CheckForVersionUpdate(AppVersion)
-	go shared.Serve(ctx)
+	go server.Start(ctx)
 }
 
 func (ch *CommandHandler) CloseBrowser(ctx context.Context) {

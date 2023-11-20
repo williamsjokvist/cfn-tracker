@@ -1,14 +1,14 @@
-package core
+package tracker
 
 import (
 	"context"
 	"fmt"
 	"time"
 
+	"github.com/williamsjokvist/cfn-tracker/core/browser"
 	"github.com/williamsjokvist/cfn-tracker/core/data"
-	"github.com/williamsjokvist/cfn-tracker/core/impl/sf6"
-	"github.com/williamsjokvist/cfn-tracker/core/impl/sfv"
-	"github.com/williamsjokvist/cfn-tracker/core/shared"
+	"github.com/williamsjokvist/cfn-tracker/core/tracker/sf6"
+	"github.com/williamsjokvist/cfn-tracker/core/tracker/sfv"
 )
 
 type GameTracker interface {
@@ -37,7 +37,7 @@ func (s GameType) String() string {
 }
 
 // Make a SF6Tracker and expose it as a GameTracker
-func MakeSF6Tracker(ctx context.Context, browser *shared.Browser, username, password string, trackerRepository *data.CFNTrackerRepository) (GameTracker, error) {
+func MakeSF6Tracker(ctx context.Context, browser *browser.Browser, username, password string, trackerRepository *data.CFNTrackerRepository) (GameTracker, error) {
 	sf6Tracker := sf6.NewSF6Tracker(browser, trackerRepository)
 	err := sf6Tracker.Authenticate(ctx, username, password, false)
 	if err != nil {
@@ -48,7 +48,7 @@ func MakeSF6Tracker(ctx context.Context, browser *shared.Browser, username, pass
 }
 
 // Make a SFVTracker and expose it as a GameTracker
-func MakeSFVTracker(ctx context.Context, browser *shared.Browser, username string, password string) (GameTracker, error) {
+func MakeSFVTracker(ctx context.Context, browser *browser.Browser, username string, password string) (GameTracker, error) {
 	sfvTracker := sfv.NewSFVTracker(browser)
 	err := sfvTracker.Authenticate(ctx, username, password, false)
 	if err != nil {

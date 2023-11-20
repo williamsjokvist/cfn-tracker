@@ -11,8 +11,8 @@ import (
 
 	wails "github.com/wailsapp/wails/v2/pkg/runtime"
 
+	"github.com/williamsjokvist/cfn-tracker/core/browser"
 	"github.com/williamsjokvist/cfn-tracker/core/data"
-	"github.com/williamsjokvist/cfn-tracker/core/shared"
 	"github.com/williamsjokvist/cfn-tracker/core/utils"
 )
 
@@ -22,7 +22,7 @@ type SFVTracker struct {
 	isAuthenticated bool
 	stopTracking    context.CancelFunc
 	mh              *data.TrackingState
-	*shared.Browser
+	*browser.Browser
 }
 
 var (
@@ -30,7 +30,7 @@ var (
 	ErrInvalidCFN      = errors.New(`invalid cfn provided`)
 )
 
-func NewSFVTracker(browser *shared.Browser) *SFVTracker {
+func NewSFVTracker(browser *browser.Browser) *SFVTracker {
 	return &SFVTracker{
 		isTracking:   false,
 		mh:           data.NewTrackingState(``),

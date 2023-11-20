@@ -1,4 +1,4 @@
-package shared
+package browser
 
 import (
 	"context"
@@ -44,7 +44,7 @@ func NewBrowser(ctx context.Context, headless bool) (*Browser, error) {
 	if err != nil {
 		return nil, fmt.Errorf("Failed to connect to browser, received %w", err)
 	}
-	
+
 	var page *rod.Page
 	if browser.MustPages().Empty() {
 		page = browser.MustPage("")
