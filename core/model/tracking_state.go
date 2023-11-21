@@ -31,11 +31,11 @@ type TrackingState struct {
 
 func (mh *TrackingState) Log() {
 	fmt.Printf(`[%s]\n`, time.Now().Format(`15:04`))
-	fmt.Printf(`LP: %d\n`, mh.LP)
-	fmt.Printf(`LPGain: %d\n`, mh.LPGain)
-	fmt.Printf(`MR: %d\n`, mh.MR)
-	fmt.Printf(`MRGain: %d\n`, mh.MRGain)
-	fmt.Printf(`Wins: %d\n`, mh.Wins)
-	fmt.Printf(`Losses: %d\n`, mh.Losses)
-	fmt.Printf(`WinRate: %d\n`, mh.WinRate)
+	fmt.Println(`LP: `, mh.LP)
+	fmt.Println(`LPGain: `, mh.LPGain)
+	fmt.Println(`MR: `, mh.MR)
+	fmt.Println(`MRGain: `, mh.MRGain)
+	fmt.Println(`Wins: `, mh.Wins)
+	fmt.Println(`Losses: `, mh.Losses)
+	fmt.Println(`WinRate: `, mh.WinRate)
 }

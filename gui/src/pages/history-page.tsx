@@ -6,8 +6,6 @@ import { Icon } from "@iconify/react";
 import {
   GetUsers,
   GetAllMatchesForUser,
-  DeleteMatchLog,
-  ExportLogToCSV,
   OpenResultsDirectory,
 } from "@@/go/core/CommandHandler";
 import type { model } from "@@/go/models";
@@ -82,34 +80,6 @@ export const HistoryPage: React.FC = () => {
                 className="w-4 h-4 inline mr-2"
               />
               {t("goBack")}
-            </motion.button>
-            <motion.button
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              onClick={() => {
-                ExportLogToCSV(user.code);
-                OpenResultsDirectory();
-              }}
-              className="crumb-btn-dark mr-3"
-            >
-              <Icon
-                icon="ri:file-excel-2-fill"
-                className="w-4 h-4 inline mr-2 text-white"
-              />
-              {t("exportLog")}
-            </motion.button>
-            <motion.button
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              onClick={() => {
-                user && DeleteMatchLog(user.code);
-                setTimeout(() => setMatches([]), 50);
-                setUser(undefined);
-              }}
-              className="crumb-btn-dark"
-            >
-              <Icon icon="mdi:delete" className="w-4 h-4 inline mr-2" />
-              {t("deleteLog")}
             </motion.button>
           </div>
         )}

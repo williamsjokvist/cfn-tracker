@@ -113,14 +113,6 @@ func (ch *CommandHandler) GetThemeList() ([]string, error) {
 	return themes, nil
 }
 
-func (ch *CommandHandler) DeleteMatchLog(cfn string) error {
-	return nil
-}
-
-func (ch *CommandHandler) ExportLogToCSV(cfn string) error {
-	return nil
-}
-
 func (ch *CommandHandler) SelectGame(game string) {
 	switch game {
 	case tracker.GameTypeSF6.String():

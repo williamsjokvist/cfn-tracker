@@ -14,12 +14,9 @@ type Storage struct {
 
 func NewStorage() (*Storage, error) {
 	directory := `results`
-	_, err := os.ReadDir(directory)
+	err := os.MkdirAll(directory, os.FileMode(0755))
 	if err != nil {
-		err = os.MkdirAll(directory, os.FileMode(0755))
-		if err != nil {
-			return nil, fmt.Errorf(`create directories: %w`, err)
-		}
+		return nil, fmt.Errorf(`create directories: %w`, err)
 	}
 	return &Storage{
 		directory: directory,

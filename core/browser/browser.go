@@ -81,7 +81,7 @@ func (b *Browser) GetLatestAppVersion() (*version.Version, error) {
 	if err != nil {
 		return nil, fmt.Errorf(`navigate to github: %w`, err)
 	}
-	b.Page.WaitLoad()
+	err = b.Page.WaitLoad()
 	if err != nil {
 		return nil, fmt.Errorf(`wait for github to load: %w`, err)
 	}
