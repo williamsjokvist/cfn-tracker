@@ -254,7 +254,7 @@ func getNewestMatch(sesh *model.Session, bl *BattleLog) model.Match {
 	if prevMatch != nil {
 		wins = prevMatch.Wins + biota
 		losses = prevMatch.Losses + (1 - biota)
-		winStreak = prevMatch.WinStreak + biota
+		winStreak = prevMatch.WinStreak * biota + biota
 		lpGain = prevMatch.LPGain + lpGain
 		mrGain = prevMatch.MRGain + mrGain
 	}
