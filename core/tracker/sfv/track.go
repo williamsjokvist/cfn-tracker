@@ -12,7 +12,7 @@ import (
 	wails "github.com/wailsapp/wails/v2/pkg/runtime"
 
 	"github.com/williamsjokvist/cfn-tracker/core/browser"
-	"github.com/williamsjokvist/cfn-tracker/core/data"
+	"github.com/williamsjokvist/cfn-tracker/core/model"
 	"github.com/williamsjokvist/cfn-tracker/core/utils"
 )
 
@@ -21,7 +21,7 @@ type SFVTracker struct {
 	isTracking      bool
 	isAuthenticated bool
 	stopTracking    context.CancelFunc
-	mh              *data.TrackingState
+	mh              *model.TrackingState
 	*browser.Browser
 }
 
@@ -33,7 +33,6 @@ var (
 func NewSFVTracker(browser *browser.Browser) *SFVTracker {
 	return &SFVTracker{
 		isTracking:   false,
-		mh:           data.NewTrackingState(``),
 		Browser:      browser,
 		stopTracking: func() {},
 	}
@@ -61,13 +60,22 @@ func (t *SFVTracker) Start(ctx context.Context, cfn string, restoreData bool, re
 		return ErrUnauthenticated
 	}
 
-	if restoreData {
-		lastSavedMatchHistory, err := data.GetSavedMatchHistory("result")
-		if err == nil {
-			t.mh = lastSavedMatchHistory
-		}
-	} else if !restoreData {
-		t.mh.Reset()
+	t.mh = &model.TrackingState{
+		CFN:          cfn,
+		LP:           0,
+		LPGain:       0,
+		MR:           0,
+		MRGain:       0,
+		Wins:         0,
+		Losses:       0,
+		TotalWins:    0,
+		TotalLosses:  0,
+		TotalMatches: 0,
+		WinRate:      0,
+		WinStreak:    0,
+		IsWin:        false,
+		TimeStamp:    ``,
+		Date:         ``,
 	}
 
 	fmt.Println(`Loading profile`)
@@ -80,7 +88,6 @@ func (t *SFVTracker) Start(ctx context.Context, cfn string, restoreData bool, re
 
 	fmt.Println(`Profile loaded`)
 	t.isTracking = true
-	t.mh = data.NewTrackingState(cfn)
 	wails.EventsEmit(ctx, `started-tracking`)
 
 	// First fetch
@@ -185,7 +192,6 @@ func (t *SFVTracker) refreshMatchHistory(ctx context.Context, cfn string, isFirs
 	t.mh.Date = time.Now().Format(`2006-01-02`)
 
 	wails.EventsEmit(ctx, `cfn-data`, t.mh)
-	t.mh.Save()
 	t.mh.Log()
 }
 

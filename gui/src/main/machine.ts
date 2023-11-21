@@ -6,10 +6,10 @@ import {
   StopTracking,
   SelectGame,
 } from "@@/go/core/CommandHandler";
-import type { model, data } from "@@/go/models";
+import type { model } from "@@/go/models";
 
 export type MatchEvent = {
-  matchHistory: data.TrackingState;
+  matchHistory: model.TrackingState;
 } & EventObject;
 
 type CFNMachineContext = {
@@ -18,7 +18,7 @@ type CFNMachineContext = {
   restore: boolean;
   isTracking: boolean;
   error: string;
-  matchHistory: data.TrackingState;
+  matchHistory: model.TrackingState;
 };
 
 export const cfnMachine = createMachine(
@@ -30,7 +30,7 @@ export const cfnMachine = createMachine(
     context: <CFNMachineContext>{
       restore: false,
       isTracking: false,
-      matchHistory: <data.TrackingState>{
+      matchHistory: <model.TrackingState>{
         cfn: "",
         wins: 0,
         losses: 0,

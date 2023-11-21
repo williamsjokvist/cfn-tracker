@@ -20,6 +20,7 @@ import (
 	"github.com/williamsjokvist/cfn-tracker/core/browser"
 	"github.com/williamsjokvist/cfn-tracker/core/data"
 	"github.com/williamsjokvist/cfn-tracker/core/data/sql"
+	"github.com/williamsjokvist/cfn-tracker/core/data/txt"
 	"github.com/williamsjokvist/cfn-tracker/core/server"
 )
 
@@ -80,7 +81,11 @@ func main() {
 	if err != nil {
 		closeWithError(err)
 	}
-	trackerRepo := data.NewCFNTrackerRepository(sqlDb)
+	txtDb, err := txt.NewStorage()
+	if err != nil {
+		closeWithError(err)
+	}
+	trackerRepo := data.NewCFNTrackerRepository(sqlDb, txtDb)
 	cmdHandler := core.NewCommandHandler(appBrowser, trackerRepo)
 
 	appVer, err := version.NewVersion(appVersion)

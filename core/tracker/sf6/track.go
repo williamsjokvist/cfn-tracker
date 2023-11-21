@@ -19,7 +19,7 @@ import (
 type SF6Tracker struct {
 	isAuthenticated bool
 	stopPolling     context.CancelFunc
-	state           map[string]*data.TrackingState
+	state           map[string]*model.TrackingState
 	sesh            *model.Session
 	user            *model.User
 	*browser.Browser
@@ -31,7 +31,7 @@ func NewSF6Tracker(browser *browser.Browser, trackerRepo *data.CFNTrackerReposit
 		Browser:              browser,
 		stopPolling:          func() {},
 		CFNTrackerRepository: trackerRepo,
-		state:                make(map[string]*data.TrackingState, 4),
+		state:                make(map[string]*model.TrackingState, 4),
 	}
 }
 
@@ -64,7 +64,7 @@ func (t *SF6Tracker) Start(ctx context.Context, userCode string, restore bool, p
 			if err != nil {
 				return fmt.Errorf(`failed to fetch battle log: %w`, err)
 			}
-			trackingState = &data.TrackingState{
+			trackingState = &model.TrackingState{
 				CFN:       bl.GetCFN(),
 				LP:        bl.GetLP(),
 				MR:        bl.GetMR(),
@@ -97,7 +97,7 @@ func (t *SF6Tracker) Start(ctx context.Context, userCode string, restore bool, p
 	// set starting LP so we don't count the first polled match
 	t.sesh.LP = bl.GetLP()
 	t.sesh.MR = bl.GetMR()
-	wails.EventsEmit(ctx, `cfn-data`, data.TrackingState{
+	wails.EventsEmit(ctx, `cfn-data`, model.TrackingState{
 		CFN:       bl.GetCFN(),
 		LP:        bl.GetLP(),
 		MR:        bl.GetMR(),
@@ -168,19 +168,19 @@ func (t *SF6Tracker) updateSession(ctx context.Context, userCode string, bl *Bat
 	trackingState := t.getTrackingStateForLastMatch()
 	if trackingState != nil {
 		trackingState.Log()
-		trackingState.Save()
+		t.CFNTrackerRepository.SaveTrackingState(trackingState)
 		wails.EventsEmit(ctx, `cfn-data`, trackingState)
 	}
 
 	return nil
 }
 
-func (t *SF6Tracker) getTrackingStateForLastMatch() *data.TrackingState {
+func (t *SF6Tracker) getTrackingStateForLastMatch() *model.TrackingState {
 	if len(t.sesh.Matches) == 0 {
 		return nil
 	}
 	lastMatch := t.sesh.Matches[len(t.sesh.Matches)-1]
-	return &data.TrackingState{
+	return &model.TrackingState{
 		UserCode:          t.user.Code,
 		CFN:               t.user.DisplayName,
 		Wins:              lastMatch.Wins,

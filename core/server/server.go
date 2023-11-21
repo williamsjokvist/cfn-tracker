@@ -10,8 +10,7 @@ import (
 	"time"
 
 	wails "github.com/wailsapp/wails/v2/pkg/runtime"
-
-	"github.com/williamsjokvist/cfn-tracker/core/data"
+	"github.com/williamsjokvist/cfn-tracker/core/model"
 )
 
 //go:embed static/index.html
@@ -31,7 +30,7 @@ func Start(ctx context.Context) error {
 	var mhJson *[]byte
 
 	wails.EventsOn(ctx, `cfn-data`, func(incomingData ...interface{}) {
-		mh, ok := incomingData[0].(*data.TrackingState)
+		mh, ok := incomingData[0].(*model.TrackingState)
 		if !ok {
 			return
 		}

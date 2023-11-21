@@ -114,20 +114,10 @@ func (ch *CommandHandler) GetThemeList() ([]string, error) {
 }
 
 func (ch *CommandHandler) DeleteMatchLog(cfn string) error {
-	err := data.DeleteLog(cfn)
-	if err != nil {
-		log.Println(err)
-		return err
-	}
 	return nil
 }
 
 func (ch *CommandHandler) ExportLogToCSV(cfn string) error {
-	err := data.ExportLog(cfn)
-	if err != nil {
-		log.Println(err)
-		return err
-	}
 	return nil
 }
 
@@ -140,6 +130,6 @@ func (ch *CommandHandler) SelectGame(game string) {
 	}
 }
 
-func (ch *CommandHandler) GetTrackingStateUnused() *data.TrackingState {
+func (ch *CommandHandler) GetTrackingStateUnused() *model.TrackingState {
 	return nil
 }
