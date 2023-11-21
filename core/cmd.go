@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"os"
 	"os/exec"
 	"runtime"
 	"strings"
@@ -17,7 +16,6 @@ import (
 	"github.com/williamsjokvist/cfn-tracker/core/browser"
 	"github.com/williamsjokvist/cfn-tracker/core/data"
 	"github.com/williamsjokvist/cfn-tracker/core/model"
-	"github.com/williamsjokvist/cfn-tracker/core/server"
 	"github.com/williamsjokvist/cfn-tracker/core/tracker"
 )
 
@@ -39,10 +37,16 @@ type CommandHandler struct {
 	repo    *data.CFNTrackerRepository
 }
 
-func NewCommandHandler(trackerRepo *data.CFNTrackerRepository) *CommandHandler {
+func NewCommandHandler(browser *browser.Browser, trackerRepo *data.CFNTrackerRepository) *CommandHandler {
 	return &CommandHandler{
-		repo: trackerRepo,
+		repo:    trackerRepo,
+		browser: browser,
 	}
+}
+
+// The CommandHandler needs the wails runtime context in order to emit events
+func (ch *CommandHandler) AssignRuntimeContext(ctx context.Context) {
+	ch.ctx = ctx
 }
 
 func (ch *CommandHandler) GetAppVersion() string {
@@ -54,13 +58,15 @@ func (ch *CommandHandler) StopTracking() {
 	ch.tracker.Stop()
 }
 
-func (ch *CommandHandler) StartTracking(cfn string, restore bool) {
-	log.Printf(`starting tracking for %s, restoring = %v`, cfn, restore)
+func (ch *CommandHandler) StartTracking(cfn string, restore bool) error {
+	log.Printf(`Starting tracking for %s, restoring = %v`, cfn, restore)
 	err := ch.tracker.Start(ch.ctx, cfn, restore, RefreshInterval)
 	if err != nil {
+		// TODO: remove and use a notification hook in the frontend instead
 		wails.EventsEmit(ch.ctx, `error-cfn`, err.Error())
-		fmt.Println(err)
+		log.Println(err)
 	}
+	return err
 }
 
 func (ch *CommandHandler) OpenResultsDirectory() {
@@ -72,22 +78,22 @@ func (ch *CommandHandler) OpenResultsDirectory() {
 	}
 }
 
-func (ch *CommandHandler) GetAllMatchesForUser(userId string) []*model.Match {
+func (ch *CommandHandler) GetAllMatchesForUser(userId string) ([]*model.Match, error) {
 	matches, err := ch.repo.GetMatches(ch.ctx, 0, userId)
 	if err != nil {
-		fmt.Println(err)
-		return nil
+		log.Println(err)
+		return nil, err
 	}
-	return matches
+	return matches, err
 }
 
-func (ch *CommandHandler) GetUsers() []*model.User {
+func (ch *CommandHandler) GetUsers() ([]*model.User, error) {
 	users, err := ch.repo.GetUsers(ch.ctx)
 	if err != nil {
-		fmt.Println(err)
-		return nil
+		log.Println(err)
+		return nil, err
 	}
-	return users
+	return users, nil
 }
 
 func (ch *CommandHandler) GetThemeList() ([]string, error) {
@@ -107,20 +113,6 @@ func (ch *CommandHandler) GetThemeList() ([]string, error) {
 	return themes, nil
 }
 
-func (ch *CommandHandler) DeleteMatchLog(cfn string) {
-	err := data.DeleteLog(cfn)
-	if err != nil {
-		fmt.Println(err)
-	}
-}
-
-func (ch *CommandHandler) ExportLogToCSV(cfn string) {
-	err := data.ExportLog(cfn)
-	if err != nil {
-		fmt.Println(err)
-	}
-}
-
 func (ch *CommandHandler) SelectGame(game string) {
 	switch game {
 	case tracker.GameTypeSF6.String():
@@ -130,30 +122,6 @@ func (ch *CommandHandler) SelectGame(game string) {
 	}
 }
 
-func (ch *CommandHandler) ResultsJSONExist() bool {
-	_, err := os.Stat(`results/results.json`)
-	return !os.IsNotExist(err)
-}
-
-func (ch *CommandHandler) StartBrowser(ctx context.Context) {
-	ch.ctx = ctx
-	browser, err := browser.NewBrowser(ctx, RunHeadless)
-	if err != nil {
-		log.Fatal(err)
-		return
-	}
-	ch.browser = browser
-
-	ch.browser.CheckForVersionUpdate(AppVersion)
-	go server.Start(ctx)
-}
-
-func (ch *CommandHandler) CloseBrowser(ctx context.Context) {
-	if ch.browser.Page != nil {
-		ch.browser.Page.Browser().Close()
-	}
-}
-
-func (ch *CommandHandler) GetTrackingStateUnused() *data.TrackingState {
+func (ch *CommandHandler) GetTrackingStateUnused() *model.TrackingState {
 	return nil
 }

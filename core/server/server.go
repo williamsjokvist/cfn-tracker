@@ -5,12 +5,12 @@ import (
 	_ "embed"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"time"
 
 	wails "github.com/wailsapp/wails/v2/pkg/runtime"
-
-	"github.com/williamsjokvist/cfn-tracker/core/data"
+	"github.com/williamsjokvist/cfn-tracker/core/model"
 )
 
 //go:embed static/index.html
@@ -24,8 +24,19 @@ var css []byte
 
 const PORT = 4242
 
-func Start(ctx context.Context) {
-	fmt.Println(`Starting Browser Source Server`)
+func Start(ctx context.Context) error {
+	log.Println(`Starting browser source server`)
+
+	var mhJson *[]byte
+
+	wails.EventsOn(ctx, `cfn-data`, func(incomingData ...interface{}) {
+		mh, ok := incomingData[0].(*model.TrackingState)
+		if !ok {
+			return
+		}
+		js, _ := json.Marshal(mh)
+		mhJson = &js
+	})
 
 	fs := http.FileServer(http.Dir("./themes"))
 	http.Handle("/themes/", http.StripPrefix("/themes/", fs))
@@ -46,18 +57,6 @@ func Start(ctx context.Context) {
 		w.Header().Set(`Content-Type`, `text/css`)
 		w.WriteHeader(http.StatusOK)
 		w.Write(css)
-	})
-
-	var mhJson *[]byte
-
-	wails.EventsOn(ctx, `cfn-data`, func(incomingData ...interface{}) {
-		mh, ok := incomingData[0].(*data.TrackingState)
-		if !ok {
-			return
-		}
-
-		js, _ := json.Marshal(mh)
-		mhJson = &js
 	})
 
 	http.HandleFunc(`/stream`, func(w http.ResponseWriter, _ *http.Request) {
@@ -86,8 +85,7 @@ func Start(ctx context.Context) {
 	})
 
 	if err := http.ListenAndServe(fmt.Sprintf(`:%d`, PORT), nil); err != nil {
-		fmt.Println(err)
+		return fmt.Errorf(`failed to launch browser source server: %v`, err)
 	}
-
-	fmt.Println(`Browser Source Server listening on `, PORT)
+	return nil
 }

@@ -21,7 +21,7 @@ export const TrackingForm: React.FC = () => {
   const [users, setUsers] = React.useState<model.User[] | null>(null);
 
   React.useEffect(() => {
-    GetUsers().then((users) => setUsers(users));
+    GetUsers().then((users) => setUsers(users)).catch(err => console.error(err));
   }, []);
 
   const onSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {

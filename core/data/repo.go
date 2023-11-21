@@ -6,16 +6,19 @@ import (
 	"log"
 
 	"github.com/williamsjokvist/cfn-tracker/core/data/sql"
+	"github.com/williamsjokvist/cfn-tracker/core/data/txt"
 	"github.com/williamsjokvist/cfn-tracker/core/model"
 )
 
 type CFNTrackerRepository struct {
 	sqlDb *sql.Storage
+	txtDb *txt.Storage
 }
 
-func NewCFNTrackerRepository(sqlDb *sql.Storage) *CFNTrackerRepository {
+func NewCFNTrackerRepository(sqlDb *sql.Storage, txtDb *txt.Storage) *CFNTrackerRepository {
 	return &CFNTrackerRepository{
 		sqlDb: sqlDb,
+		txtDb: txtDb,
 	}
 }
 
@@ -40,6 +43,15 @@ func (m *CFNTrackerRepository) SaveUser(ctx context.Context, displayName, code s
 	err := m.sqlDb.SaveUser(ctx, displayName, code)
 	if err != nil {
 		return fmt.Errorf("save user in storage: %w", err)
+	}
+	return nil
+}
+
+func (m *CFNTrackerRepository) SaveTrackingState(trackingState *model.TrackingState) error {
+	log.Println("saving user")
+	err := m.txtDb.SaveTrackingState(trackingState)
+	if err != nil {
+		return fmt.Errorf("save tracking state: %w", err)
 	}
 	return nil
 }

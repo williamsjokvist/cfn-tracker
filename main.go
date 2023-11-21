@@ -14,10 +14,14 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/mac"
 	"github.com/wailsapp/wails/v2/pkg/options/windows"
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 
 	"github.com/williamsjokvist/cfn-tracker/core"
+	"github.com/williamsjokvist/cfn-tracker/core/browser"
 	"github.com/williamsjokvist/cfn-tracker/core/data"
 	"github.com/williamsjokvist/cfn-tracker/core/data/sql"
+	"github.com/williamsjokvist/cfn-tracker/core/data/txt"
+	"github.com/williamsjokvist/cfn-tracker/core/server"
 )
 
 var (
@@ -62,12 +66,36 @@ func init() {
 }
 
 func main() {
+	appBrowser, err := browser.NewBrowser(runHeadless == `true`)
+	if err != nil {
+		log.Fatalf(`failed to launch browser: %v`, err)
+	}
+	closeWithError := func(err error) {
+		appBrowser.Page.Browser().Close()
+
+		// TODO: log error and/or show error message?
+		log.Fatal(err)
+	}
+
 	sqlDb, err := sql.NewStorage()
 	if err != nil {
-		log.Fatalf("init db: %v", err)
+		closeWithError(err)
 	}
-	trackerRepo := data.NewCFNTrackerRepository(sqlDb)
-	cmdHandler := core.NewCommandHandler(trackerRepo)
+	txtDb, err := txt.NewStorage()
+	if err != nil {
+		closeWithError(err)
+	}
+	trackerRepo := data.NewCFNTrackerRepository(sqlDb, txtDb)
+	cmdHandler := core.NewCommandHandler(appBrowser, trackerRepo)
+
+	appVer, err := version.NewVersion(appVersion)
+	if err != nil {
+		closeWithError(err)
+	}
+	latestVersion, err := appBrowser.GetLatestAppVersion()
+	if err != nil {
+		closeWithError(err)
+	}
 
 	err = wails.Run(&options.App{
 		Title:              `CFN Tracker v3`,
@@ -98,18 +126,30 @@ func main() {
 				Message: fmt.Sprintf(`CFN Tracker version %s © 2023 William Sjökvist <william.sjokvist@gmail.com>`, appVersion),
 			},
 		},
-		OnStartup:  cmdHandler.StartBrowser,
-		OnShutdown: cmdHandler.CloseBrowser,
-		OnBeforeClose: func(ctx context.Context) (prevent bool) {
-			cmdHandler.CloseBrowser(ctx)
+		OnStartup: func(ctx context.Context) {
+			cmdHandler.AssignRuntimeContext(ctx)
+
+			if appVer.LessThan(latestVersion) {
+				log.Println(`Has new version: `, latestVersion.String())
+				runtime.EventsEmit(ctx, `version-update`, latestVersion.String())
+			} else {
+				log.Println(`No new version, running: `, appVer.String())
+			}
+
+			go server.Start(ctx)
+		},
+		OnShutdown: func(_ context.Context) {
+			appBrowser.Page.Browser().Close()
+		},
+		OnBeforeClose: func(_ context.Context) (prevent bool) {
+			appBrowser.Page.Browser().Close()
 			return false
 		},
 		Bind: []interface{}{
 			cmdHandler,
 		},
 	})
-
 	if err != nil {
-		log.Fatal(err)
+		closeWithError(err)
 	}
 }
