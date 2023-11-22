@@ -66,7 +66,7 @@ func (ch *CommandHandler) StartTracking(cfn string, restore bool) error {
 		wails.EventsEmit(ch.ctx, `error-cfn`, err.Error())
 		log.Println(err)
 	}
-	return err
+	return UnwrapErrorWithCode(err)
 }
 
 func (ch *CommandHandler) OpenResultsDirectory() {
