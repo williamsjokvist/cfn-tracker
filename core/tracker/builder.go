@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 	"github.com/williamsjokvist/cfn-tracker/core/browser"
 	"github.com/williamsjokvist/cfn-tracker/core/data"
 	"github.com/williamsjokvist/cfn-tracker/core/tracker/sf6"
@@ -39,10 +40,18 @@ func (s GameType) String() string {
 // Make a SF6Tracker and expose it as a GameTracker
 func MakeSF6Tracker(ctx context.Context, browser *browser.Browser, username, password string, trackerRepository *data.CFNTrackerRepository) (GameTracker, error) {
 	sf6Tracker := sf6.NewSF6Tracker(browser, trackerRepository)
-	err := sf6Tracker.Authenticate(ctx, username, password, false)
-	if err != nil {
-		return nil, fmt.Errorf(`auth err: %v`, err)
+
+	progChan := make(chan int)
+	go sf6Tracker.Authenticate(ctx, username, password, progChan)
+	for progress := range progChan {
+		if progress >= 100 {
+			runtime.EventsEmit(ctx, "initialized", true)
+			close(progChan)
+			break
+		}
+		runtime.EventsEmit(ctx, "auth-loaded", progress)
 	}
+
 	var gt GameTracker = sf6Tracker
 	return gt, nil
 }

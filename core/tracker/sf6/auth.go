@@ -1,38 +1,31 @@
 package sf6
 
 import (
-	"fmt"
 	"log"
 	"math/rand"
 	"strconv"
 	"strings"
 	"time"
 
-	wails "github.com/wailsapp/wails/v2/pkg/runtime"
 	"golang.org/x/net/context"
 )
 
-func (t *SF6Tracker) Authenticate(ctx context.Context, email string, password string, dry bool) error {
+func (t *SF6Tracker) Authenticate(ctx context.Context, email string, password string, progChan chan int) {
 	if t.isAuthenticated || strings.Contains(t.Page.MustInfo().URL, `buckler`) {
 		t.isAuthenticated = true
-		return nil
+		return
 	}
 
 	log.Println(`Logging in`)
 	t.Page.MustNavigate(`https://cid.capcom.com/ja/login/?guidedBy=web`).MustWaitLoad().MustWaitIdle()
-	if !dry {
-		wails.EventsEmit(ctx, `auth-loaded`, 10)
-	}
+	progChan <- 10
 
 	log.Print("Checking if already authed")
 	if strings.Contains(t.Page.MustInfo().URL, `cid.capcom.com/ja/mypage`) {
 		log.Print("User already authed")
 		t.isAuthenticated = true
-
-		if !dry {
-			wails.EventsEmit(ctx, `initialized`, true)
-		}
-		return nil
+		progChan <- 100
+		return
 	}
 	log.Print("Not authed, continuing with auth process")
 
@@ -44,18 +37,15 @@ func (t *SF6Tracker) Authenticate(ctx context.Context, email string, password st
 		t.Page.MustElement(`#birthDay`).MustSelect(strconv.Itoa(rand.Intn(28-1) + 1))
 		t.Page.MustElement(`form button[type="submit"]`).MustClick()
 		t.Page.MustWaitLoad().MustWaitRequestIdle()
-		if !dry {
-			wails.EventsEmit(ctx, `auth-loaded`, 20)
-		}
 	}
+	progChan <- 30
 
 	// Submit form
 	t.Page.MustElement(`input[name="email"]`).Input(email)
 	t.Page.MustElement(`input[name="password"]`).Input(password)
 	t.Page.MustElement(`button[type="submit"]`).MustClick()
-	if !dry {
-		wails.EventsEmit(ctx, `auth-loaded`, 30)
-	}
+	progChan <- 50
+
 	// Wait for redirection
 	var secondsWaited time.Duration = 0
 	for {
@@ -66,19 +56,13 @@ func (t *SF6Tracker) Authenticate(ctx context.Context, email string, password st
 
 		time.Sleep(time.Second)
 		secondsWaited += time.Second
-		fmt.Println(`Waiting for gateway to pass...`, secondsWaited)
-		if secondsWaited > (3*time.Second) && !dry {
-			wails.EventsEmit(ctx, `auth-loaded`, (secondsWaited/time.Second)*10)
-		}
+		log.Println(`Waiting for gateway to pass...`, secondsWaited)
 	}
+	progChan <- 65
 
 	t.Page.MustNavigate(`https://www.streetfighter.com/6/buckler/auth/loginep?redirect_url=/`)
 	t.Page.MustWaitLoad().MustWaitRequestIdle()
 
-	if !dry {
-		wails.EventsEmit(ctx, `initialized`, true)
-		t.isAuthenticated = true
-	}
-
-	return nil
+	progChan <- 100
+	t.isAuthenticated = true
 }
