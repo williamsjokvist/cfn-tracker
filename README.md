@@ -6,13 +6,10 @@ This tool tracks any Street Fighter 6 or V CFN account's live match statistics.
 ## Who is this for? 
 This is primarily targeted toward streamers who want automatically updated win/loss counters. It can also be useful if you wanna keep track of your LP gain and other statistics during a session.
 
-## Known issues
-- In SF6, if using a CFN where other players have the same name, it will pick the first one that appears in the search result. 
-
-If you encounter any bugs, @ me on Twitter [@greensoap_](https://twitter.com/GreenSoap_)
-
 ## Support
 If you find the tool useful for your streams or otherwise, consider [buying me a coffee ☕](https://ko-fi.com/greensoap)
+
+If you encounter any bugs, @ me on Twitter [@greensoap_](https://twitter.com/GreenSoap_)
 
 ## Getting Started
 * Download the app for either Mac or Windows from [the download page](https://williamsjokvist.github.io/cfn-tracker/).
