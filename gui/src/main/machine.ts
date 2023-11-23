@@ -107,8 +107,11 @@ export const cfnMachine = createMachine(
   },
   {
     actions: {
-      initializeGame: ({ game }) => {
-        SelectGame(game);
+      initializeGame: ({ game, error }) => {
+        SelectGame(game).catch(err => {
+          error = err;
+          console.error(err);
+        });
       },
       startTracking: ({ playerInfo, restore, isTracking }) => {
         if (playerInfo && !isTracking) {
