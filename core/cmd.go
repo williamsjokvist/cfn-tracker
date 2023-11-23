@@ -113,13 +113,15 @@ func (ch *CommandHandler) GetThemeList() ([]string, error) {
 	return themes, nil
 }
 
-func (ch *CommandHandler) SelectGame(game string) {
+func (ch *CommandHandler) SelectGame(game string) error {
+	var err error
 	switch game {
 	case tracker.GameTypeSF6.String():
-		ch.tracker, _ = tracker.MakeSF6Tracker(ch.ctx, ch.browser, CapIDEmail, CapIDPassword, ch.repo)
+		ch.tracker, err = tracker.MakeSF6Tracker(ch.ctx, ch.browser, CapIDEmail, CapIDPassword, ch.repo)
 	case tracker.GameTypeSFV.String():
-		ch.tracker, _ = tracker.MakeSFVTracker(ch.ctx, ch.browser, SteamUsername, SteamPassword)
+		ch.tracker, err = tracker.MakeSFVTracker(ch.ctx, ch.browser, SteamUsername, SteamPassword)
 	}
+	return err
 }
 
 func (ch *CommandHandler) GetTrackingStateUnused() *model.TrackingState {
