@@ -41,15 +41,19 @@ func (s GameType) String() string {
 func MakeSF6Tracker(ctx context.Context, browser *browser.Browser, username, password string, trackerRepository *data.CFNTrackerRepository) (GameTracker, error) {
 	sf6Tracker := sf6.NewSF6Tracker(browser, trackerRepository)
 
-	progChan := make(chan int)
-	go sf6Tracker.Authenticate(ctx, username, password, progChan)
-	for progress := range progChan {
-		if progress >= 100 {
+	authChan := make(chan sf6.AuthStatus)
+	go sf6Tracker.Authenticate(ctx, username, password, authChan)
+	for status := range authChan {
+		if status.Err != nil {
+			return nil, fmt.Errorf(`auth err: %v`, status.Err)
+		}
+
+		if status.Progress >= 100 {
 			runtime.EventsEmit(ctx, "initialized", true)
-			close(progChan)
+			close(authChan)
 			break
 		}
-		runtime.EventsEmit(ctx, "auth-loaded", progress)
+		runtime.EventsEmit(ctx, "auth-loaded", status.Progress)
 	}
 
 	var gt GameTracker = sf6Tracker
