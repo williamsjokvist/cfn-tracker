@@ -45,7 +45,7 @@ func MakeSF6Tracker(ctx context.Context, browser *browser.Browser, username, pas
 	go sf6Tracker.Authenticate(ctx, username, password, authChan)
 	for status := range authChan {
 		if status.Err != nil {
-			return nil, fmt.Errorf(`auth err: %v`, status.Err)
+			panic(fmt.Errorf(`auth err: %v`, status.Err))
 		}
 
 		if status.Progress >= 100 {
