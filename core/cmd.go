@@ -61,12 +61,13 @@ func (ch *CommandHandler) StopTracking() {
 func (ch *CommandHandler) StartTracking(cfn string, restore bool) error {
 	log.Printf(`Starting tracking for %s, restoring = %v`, cfn, restore)
 	err := ch.tracker.Start(ch.ctx, cfn, restore, RefreshInterval)
+
 	if err != nil {
 		// TODO: remove and use a notification hook in the frontend instead
 		wails.EventsEmit(ch.ctx, `error-cfn`, err.Error())
 		log.Println(err)
 	}
-	return UnwrapErrorWithCode(err)
+	return err
 }
 
 func (ch *CommandHandler) OpenResultsDirectory() {
