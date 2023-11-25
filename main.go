@@ -1,10 +1,13 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"embed"
 	"fmt"
+	"html/template"
 	"log"
+	"net/http"
 	"os"
 
 	"github.com/hashicorp/go-version"
@@ -12,6 +15,7 @@ import (
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/logger"
 	"github.com/wailsapp/wails/v2/pkg/options"
+	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
 	"github.com/wailsapp/wails/v2/pkg/options/mac"
 	"github.com/wailsapp/wails/v2/pkg/options/windows"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
@@ -35,6 +39,9 @@ var (
 
 //go:embed all:gui/dist
 var assets embed.FS
+
+//go:embed gui/error/error.html
+var errorTmpl []byte
 
 //go:embed build/appicon.png
 var icon []byte
@@ -66,35 +73,69 @@ func init() {
 }
 
 func main() {
-	appBrowser, err := browser.NewBrowser(runHeadless == `true`)
-	if err != nil {
-		log.Fatalf(`failed to launch browser: %v`, err)
-	}
+	var appBrowser *browser.Browser
 	closeWithError := func(err error) {
-		appBrowser.Page.Browser().Close()
+		if appBrowser != nil {
+			appBrowser.Page.Browser().Close()
+		}
+		log.Println("close with error", err)
+		wails.Run(&options.App{
+			Title:                    `Error`,
+			Width:                    400,
+			Height:                   148,
+			DisableResize:            true,
+			StartHidden:              false,
+			HideWindowOnClose:        false,
+			Frameless:                true,
+			LogLevel:                 logger.WARNING,
+			LogLevelProduction:       logger.ERROR,
+			EnableDefaultContextMenu: false,
+			AssetServer: &assetserver.Options{
+				Assets: assets,
+				Middleware: assetserver.ChainMiddleware(func(next http.Handler) http.Handler {
+					return http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+						var b bytes.Buffer
+						tmpl := template.Must(template.New("errorPage").Parse(string(errorTmpl)))
+						params := struct {
+							Error string
+						}{
+							Error: err.Error(),
+						}
 
-		// TODO: log error and/or show error message?
-		log.Fatal(err)
+						tmpl.Execute(&b, params)
+						w.Write(b.Bytes())
+					})
+				}),
+			},
+		})
 	}
-
+	appBrowser, err := browser.NewBrowser(runHeadless == `true`)
+	if err == nil {
+		closeWithError(fmt.Errorf(`failed to launch browser: %v`, err))
+		return
+	}
 	sqlDb, err := sql.NewStorage()
 	if err != nil {
 		closeWithError(err)
+		return
 	}
 	txtDb, err := txt.NewStorage()
 	if err != nil {
 		closeWithError(err)
+		return
 	}
 	trackerRepo := data.NewCFNTrackerRepository(sqlDb, txtDb)
 	cmdHandler := core.NewCommandHandler(appBrowser, trackerRepo)
 
 	appVer, err := version.NewVersion(appVersion)
 	if err != nil {
-		closeWithError(err)
+		closeWithError(fmt.Errorf(`bad app version: %w`, err))
+		return
 	}
 	latestVersion, err := appBrowser.GetLatestAppVersion()
 	if err != nil {
-		closeWithError(err)
+		closeWithError(fmt.Errorf(`failed to get latest app version: %w`, err))
+		return
 	}
 
 	err = wails.Run(&options.App{
@@ -150,6 +191,6 @@ func main() {
 		},
 	})
 	if err != nil {
-		closeWithError(err)
+		closeWithError(fmt.Errorf(`failed to launch app: %w`, err))
 	}
 }
