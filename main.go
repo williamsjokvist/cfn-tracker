@@ -80,7 +80,7 @@ func main() {
 		}
 		log.Println("close with error", err)
 		wails.Run(&options.App{
-			Title:                    `Error`,
+			Title:                    `CFN Tracker - Error`,
 			Width:                    400,
 			Height:                   148,
 			DisableResize:            true,
@@ -101,7 +101,6 @@ func main() {
 						}{
 							Error: err.Error(),
 						}
-
 						tmpl.Execute(&b, params)
 						w.Write(b.Bytes())
 					})
