@@ -84,14 +84,9 @@ func main() {
 			Width:                    400,
 			Height:                   148,
 			DisableResize:            true,
-			StartHidden:              false,
-			HideWindowOnClose:        false,
 			Frameless:                true,
-			LogLevel:                 logger.WARNING,
-			LogLevelProduction:       logger.ERROR,
 			EnableDefaultContextMenu: false,
 			AssetServer: &assetserver.Options{
-				Assets: assets,
 				Middleware: assetserver.ChainMiddleware(func(next http.Handler) http.Handler {
 					return http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 						var b bytes.Buffer
@@ -109,7 +104,7 @@ func main() {
 		})
 	}
 	appBrowser, err := browser.NewBrowser(runHeadless == `true`)
-	if err == nil {
+	if err != nil {
 		closeWithError(fmt.Errorf(`failed to launch browser: %v`, err))
 		return
 	}
