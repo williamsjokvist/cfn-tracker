@@ -116,12 +116,12 @@ func main() {
 	}
 	sqlDb, err := sql.NewStorage()
 	if err != nil {
-		closeWithError(err)
+		closeWithError(fmt.Errorf(`failed to initalize database: %w`, err))
 		return
 	}
 	txtDb, err := txt.NewStorage()
 	if err != nil {
-		closeWithError(err)
+		closeWithError(fmt.Errorf(`failed to initalize text store: %w`, err))
 		return
 	}
 	trackerRepo := data.NewCFNTrackerRepository(sqlDb, txtDb)

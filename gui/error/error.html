@@ -25,6 +25,9 @@
       button {
         cursor: pointer;
       }
+      .title-bar-text, .window-body {
+        font-family: "Pixelated MS Sans Serif", Arial;
+      }
     </style>
     <script defer>
       document.addEventListener("DOMContentLoaded", () => {
@@ -43,7 +46,7 @@
     </script>
   </head>
   <body class="window">
-    <header class="title-bar --wails-draggable">
+    <header class="title-bar" style="--wails-draggable: drag">
       <div class="title-bar-text">
         A fatal error occured when launching CFN Tracker
       </div>
