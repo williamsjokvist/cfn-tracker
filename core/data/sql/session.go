@@ -12,7 +12,7 @@ import (
 
 type SessionStorage interface {
 	CreateSession(ctx context.Context, userId string) error
-	GetLatestSession(ctx context.Context, userId string) (*model.Session, error)
+	GetSessions(ctx context.Context, userId string, limit uint8, offset uint16) ([]*model.Session, error)
 	UpdateLatestSession(ctx context.Context, userId string) error
 }
 

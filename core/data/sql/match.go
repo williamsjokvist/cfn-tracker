@@ -12,7 +12,7 @@ import (
 
 type MatchStorage interface {
 	SaveMatch(ctx context.Context, match model.Match) error
-	GetMatches(ctx context.Context, sessionId uint16, userId string) ([]*model.Match, error)
+	GetMatches(ctx context.Context, sessionId uint16, userId string, limit uint8, offset uint16) ([]*model.Match, error)
 }
 
 func (s *Storage) SaveMatch(ctx context.Context, match model.Match) error {
