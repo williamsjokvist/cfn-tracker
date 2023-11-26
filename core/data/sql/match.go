@@ -84,7 +84,7 @@ func (s *Storage) GetMatches(ctx context.Context, sessionId uint16, userId strin
 		where = fmt.Sprintf(`WHERE %s`, strings.Join(whereStmts, ` AND `))
 	}
 	pagination := ``
-	if limit != 0 && offset != 0 {
+	if limit != 0 || offset != 0 {
 		pagination = fmt.Sprintf(`LIMIT %d OFFSET %d`, limit, offset)
 	}
 	query, args, err := sqlx.In(fmt.Sprintf(`

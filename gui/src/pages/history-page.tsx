@@ -5,8 +5,7 @@ import { Icon } from "@iconify/react";
 
 import {
   GetUsers,
-  GetAllMatchesForUser,
-  OpenResultsDirectory,
+  GetMatches,
 } from "@@/go/core/CommandHandler";
 import type { model } from "@@/go/models";
 
@@ -24,7 +23,7 @@ export const HistoryPage: React.FC = () => {
   const [totalWinRate, setTotalWinRate] = React.useState<number | null>(null);
 
   const getMatches = (u: string) => {
-    GetAllMatchesForUser(u).then((matches) => {
+    GetMatches(0, u, 0, 0).then((matches) => {
       setMatches(matches);
       setSpecified(false);
     }).catch(err => console.error(err));

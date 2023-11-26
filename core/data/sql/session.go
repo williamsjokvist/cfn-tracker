@@ -39,7 +39,7 @@ func (s *Storage) CreateSession(ctx context.Context, userId string) (*model.Sess
 
 func (s *Storage) GetSessions(ctx context.Context, userId string, limit uint8, offset uint16) ([]*model.Session, error) {
 	pagination := ``
-	if limit != 0 && offset != 0 {
+	if limit != 0 || offset != 0 {
 		pagination = fmt.Sprintf(`LIMIT %d OFFSET %d`, limit, offset)
 	}
 	query, args, err := sqlx.In(fmt.Sprintf(`
