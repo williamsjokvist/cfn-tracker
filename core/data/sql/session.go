@@ -37,21 +37,26 @@ func (s *Storage) CreateSession(ctx context.Context, userId string) (*model.Sess
 	return &sesh, nil
 }
 
-func (s *Storage) GetLatestSession(ctx context.Context, userId string) (*model.Session, error) {
-	query, args, err := sqlx.In(`
+func (s *Storage) GetSessions(ctx context.Context, userId string, limit uint8, offset uint16) ([]*model.Session, error) {
+	pagination := ``
+	if limit != 0 && offset != 0 {
+		pagination = fmt.Sprintf(`LIMIT %d OFFSET %d`, limit, offset)
+	}
+	query, args, err := sqlx.In(fmt.Sprintf(`
 		SELECT * FROM sessions 
 		WHERE user_id = (?)
-		LIMIT 1
-`, userId)
+		%s
+		ORDER BY created_at DESC
+`, pagination), userId)
 	if err != nil {
-		return nil, fmt.Errorf("prepare last session query: %w", err)
+		return nil, fmt.Errorf("prepare get sessions query: %w", err)
 	}
-	var sesh model.Session
-	err = s.db.GetContext(ctx, &sesh, query, args...)
+	var sessions []*model.Session
+	err = s.db.SelectContext(ctx, &sessions, query, args...)
 	if err != nil {
-		return nil, fmt.Errorf("excute select last session query: %w", err)
+		return nil, fmt.Errorf("excute get sessions query: %w", err)
 	}
-	return &sesh, nil
+	return sessions, nil
 }
 
 func (s *Storage) UpdateLatestSession(ctx context.Context, lp, mr int, sessionId uint16) error {

@@ -38,6 +38,14 @@ func (m *CFNTrackerRepository) GetUsers(ctx context.Context) ([]*model.User, err
 	return users, nil
 }
 
+func (m *CFNTrackerRepository) GetSessions(ctx context.Context, userId string, limit uint8, offset uint16) ([]*model.Session, error) {
+	sessions, err := m.sqlDb.GetSessions(ctx, userId, limit, offset)
+	if err != nil {
+		return nil, fmt.Errorf("get users: %w", err)
+	}
+	return sessions, nil
+}
+
 func (m *CFNTrackerRepository) SaveUser(ctx context.Context, displayName, code string) error {
 	log.Println("saving user")
 	err := m.sqlDb.SaveUser(ctx, displayName, code)
@@ -66,8 +74,8 @@ func (m *CFNTrackerRepository) CreateSession(ctx context.Context, userId string)
 	return sesh, nil
 }
 
-func (m *CFNTrackerRepository) GetMatches(ctx context.Context, sessionId uint16, userId string) ([]*model.Match, error) {
-	matches, err := m.sqlDb.GetMatches(ctx, sessionId, userId)
+func (m *CFNTrackerRepository) GetMatches(ctx context.Context, sessionId uint16, userId string, limit uint8, offset uint16) ([]*model.Match, error) {
+	matches, err := m.sqlDb.GetMatches(ctx, sessionId, userId, limit, offset)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get matches: %w", err)
 	}
@@ -76,11 +84,15 @@ func (m *CFNTrackerRepository) GetMatches(ctx context.Context, sessionId uint16,
 
 func (m *CFNTrackerRepository) GetLatestSession(ctx context.Context, userId string) (*model.Session, error) {
 	log.Println("get latest session", userId)
-	sesh, err := m.sqlDb.GetLatestSession(ctx, userId)
+	sessions, err := m.sqlDb.GetSessions(ctx, userId, 1, 0)
 	if err != nil {
 		return nil, fmt.Errorf("get session: %w", err)
 	}
-	matches, err := m.sqlDb.GetMatches(ctx, sesh.Id, userId)
+	if len(sessions) == 0 {
+		return nil, nil
+	}
+	sesh := sessions[0]
+	matches, err := m.sqlDb.GetMatches(ctx, sesh.Id, userId, 0, 0)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get matches by session: %w", err)
 	}
