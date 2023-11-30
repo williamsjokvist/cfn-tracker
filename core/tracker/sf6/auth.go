@@ -1,6 +1,7 @@
 package sf6
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"math/rand"
@@ -40,6 +41,11 @@ func (t *SF6Tracker) Authenticate(ctx context.Context, email string, password st
 		return
 	}
 
+	if email == "" || password == "" {
+		statChan <- *status.WithError(errors.New("missing credentials"))
+		return
+	}
+
 	log.Println(`Logging in`)
 	t.Page.MustNavigate(`https://cid.capcom.com/ja/login/?guidedBy=web`).MustWaitLoad().MustWaitIdle()
 	statChan <- *status.WithProgress(10)
@@ -65,8 +71,8 @@ func (t *SF6Tracker) Authenticate(ctx context.Context, email string, password st
 	statChan <- *status.WithProgress(30)
 
 	// Submit form
-	t.Page.MustElement(`input[name="email"]`).Input(email)
-	t.Page.MustElement(`input[name="password"]`).Input(password)
+	t.Page.MustElement(`input[name="email"]`).MustInput(email)
+	t.Page.MustElement(`input[name="password"]`).MustInput(password)
 	t.Page.MustElement(`button[type="submit"]`).MustClick()
 	statChan <- *status.WithProgress(50)
 

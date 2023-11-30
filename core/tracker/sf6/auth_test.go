@@ -15,11 +15,27 @@ func TestSF6Authentication(t *testing.T) {
 	assert := assert.New(t)
 
 	ctx := context.Background()
-	browser, err := browser.NewBrowser(true)
-	assert.Nil(err)
+	browser, err := browser.NewBrowser(false)
+
+	if !assert.Nil(err) {
+		t.Fatalf("failed to create browser: %v", err)
+	}
 
 	sf6Tracker := NewSF6Tracker(browser, nil)
-	sf6Tracker.Authenticate(ctx, os.Getenv(`CAP_ID_EMAIL`), os.Getenv(`CAP_ID_PASSWORD`), nil)
+	authChan := make(chan AuthStatus, 1)
 
-	assert.Equal(nil, err)
+	t.Cleanup(func() {
+		browser.Page.Browser().Close()
+		close(authChan)
+	})
+
+	go sf6Tracker.Authenticate(ctx, os.Getenv("CAP_ID_EMAIL"), os.Getenv("CAP_ID_PASSWORD"), authChan)
+	for status := range authChan {
+		if !assert.Nil(status.Err) {
+			t.Fatalf("failed to authenticate: %v", status.Err)
+		}
+		if status.Progress >= 100 {
+			break
+		}
+	}
 }
