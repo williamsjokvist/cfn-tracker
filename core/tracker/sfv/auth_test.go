@@ -15,9 +15,17 @@ func TestSFVAuthentication(t *testing.T) {
 	assert := assert.New(t)
 
 	ctx := context.Background()
-	browser, _ := browser.NewBrowser(true)
-	sf5Tracker := NewSFVTracker(browser)
-	err := sf5Tracker.Authenticate(ctx, os.Getenv(`STEAM_USERNAME`), os.Getenv(`STEAM_PASSWORD`), true)
+	browser, err := browser.NewBrowser(true)
+	if !assert.Nil(err) {
+		t.Fatalf("failed to create browser: %v", err)
+	}
+	t.Cleanup(func() {
+		browser.Page.Browser().Close()
+	})
 
-	assert.Equal(nil, err)
+	sf5Tracker := NewSFVTracker(browser)
+	err = sf5Tracker.Authenticate(ctx, os.Getenv(`STEAM_USERNAME`), os.Getenv(`STEAM_PASSWORD`), true)
+	if !assert.Nil(err) {
+		t.Fatalf("failed to authenticate: %v", err)
+	}
 }

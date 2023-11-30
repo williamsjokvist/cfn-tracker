@@ -27,6 +27,10 @@ func (t *SFVTracker) Authenticate(ctx context.Context, username string, password
 		return nil
 	}
 
+	if username == "" || password == "" {
+		return errors.New(`missing credentials`)
+	}
+
 	t.Page.WaitElementsMoreThan(`#loginModals`, 0)
 
 	fmt.Println(`Passing the gateway`)
@@ -39,8 +43,8 @@ func (t *SFVTracker) Authenticate(ctx context.Context, username string, password
 	}
 
 	// Submit form
-	t.Page.MustElement(`.page_content form>div:first-child input`).Input(username)
-	t.Page.MustElement(`.page_content form>div:nth-child(2) input`).Input(password)
+	t.Page.MustElement(`.page_content form>div:first-child input`).MustInput(username)
+	t.Page.MustElement(`.page_content form>div:nth-child(2) input`).MustInput(password)
 	t.Page.MustElement(`.page_content form>div:nth-child(4) button`).Click(proto.InputMouseButtonLeft, 2)
 
 	// Wait for redirection to Steam confirmation page
