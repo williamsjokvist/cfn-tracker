@@ -15,13 +15,6 @@ type FrontEndError struct {
 	Message   string `json:"message"`
 }
 
-const (
-	AuthFailed          int = 0001
-	RestoreFailed       int = 0002
-	UserNotFound        int = 0003
-	StartTrackingFailed int = 0004
-)
-
 func NewTrackingError(errorCode int, innerError error) *TrackingError {
 	return &TrackingError{
 		errorCode:  errorCode,
