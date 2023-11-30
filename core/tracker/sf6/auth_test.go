@@ -15,7 +15,7 @@ func TestSF6Authentication(t *testing.T) {
 	assert := assert.New(t)
 
 	ctx := context.Background()
-	browser, err := browser.NewBrowser(false)
+	browser, err := browser.NewBrowser(true)
 
 	if !assert.Nil(err) {
 		t.Fatalf("failed to create browser: %v", err)
