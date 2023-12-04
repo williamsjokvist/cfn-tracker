@@ -1,0 +1,85 @@
+---
+import Icon from "astro-icon";
+const { title, page, spin } = Astro.props
+---
+
+<section class="tracker">
+  <div class="sidebar">
+    <header>
+      <div class="flex justify-start">
+        <div class="mt-2 group ml-2 flex mb-3">
+          <div
+            class="mr-[8px] p-[2px] w-[14px] h-[14px] bg-slate-600 flex items-center justify-center rounded-full transition-all"
+          >
+          </div>
+          <div
+            class="p-[2px] w-[14px] h-[14px] bg-slate-600 flex items-center justify-center rounded-full transition-all"
+          >
+          </div>
+        </div>
+      </div>
+    </header>
+    <div class="mt-5 w-full flex flex-col gap-4">
+      <Icon name={`ri:search-${page == "track" ? "fill" : "line"}`} class="text-[#f85961] w-10 h-7 mr-1"/>
+      <Icon name={`ion:document-text${page == "log" ? "" : "-outline"}`} class="text-[#f85961] w-10 h-7 mr-1"/>
+      <Icon name={`clarity:sign-out-${page == "out" ? "fill" : "line"}`} class="text-[#f85961] w-10 h-7 mr-1"/>
+    </div>
+  </div>
+  <div class="w-full">
+    <header class="page-header">
+      <h2 class="whitespace-nowrap uppercase text-sm tracking-widest">
+        {title}
+      </h2>
+      {spin && (
+      <i
+        aria-label="loading"
+        class="animate-spin inline-block w-5 h-5 border-[3px] border-current border-t-transparent text-pink-600 rounded-full"
+        role="status"
+      />
+      )}
+    </header>
+    <slot />
+
+
+  </div>
+</section>
+
+<style lang="sass">
+  .tracker
+    font-family: 'League Spartan', sans-serif
+    background: radial-gradient(circle at 52.1% -29.6%, rgb(144, 17, 105) 0%, rgb(51, 0, 131) 100.2%)
+    overflow: hidden
+    height: 343px
+    width: 700px
+    z-index: 1
+    position: relative
+    display: flex
+    border-radius: 12px
+
+    .sidebar
+      position: relative
+      display: grid
+      grid-template-rows: 0fr 1fr 0fr
+      overflow: visible
+      white-space: nowrap
+      padding: 8px 0
+      user-select: none
+      background-color: rgba(3,5,19,0.33)
+      color: #fff
+      z-index: 50
+      padding: 12px 10px
+      width: 80px
+      > div
+        margin-top: 20px
+        width: 100%
+
+  .page-header
+    display: flex
+    justify-content: space-between
+    align-items: center
+    padding: 0 32px
+    border-bottom: 1px solid rgba(255,255,255,.125)
+    user-select: none
+    height: 53px
+    width: 100%
+</style>

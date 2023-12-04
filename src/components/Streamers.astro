@@ -1,0 +1,30 @@
+---
+import osl from "../../public/streamer-icons/osl.png"
+import sheldon from "../../public/streamer-icons/sheldon.png"
+import WithTooltip from "./WithTooltip.astro";
+
+const streamers = [{
+  url: "https://twitch.tv/onesteplayered",
+  img: osl.src,
+  name: "OneStepLayered"
+}, {
+  url: "https://twitch.tv/sheldontwitching",
+  img: sheldon.src,
+  name: "SheldonTwitching"
+}]
+---
+
+<section class="my-28 streamers">
+  <h2 class="text-3xl text-center font-bold">Used by</h2>
+  <div class="flex gap-6 justify-center mt-8">
+    {
+      streamers.map(s => (
+        <WithTooltip label={s.url}>
+          <a href={s.url}>
+            <img src={s.img} width="50px" height="50px" />
+          </a>  
+        </WithTooltip>
+      ))
+    }
+  </div>
+</section>

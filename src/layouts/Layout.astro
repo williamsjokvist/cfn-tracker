@@ -1,4 +1,6 @@
 ---
+import NavBar from '../components/NavBar.astro';
+import SiteFooter from '../components/SiteFooter.astro';
 export interface Props {
   title: string;
 }
@@ -11,39 +13,29 @@ const { title } = Astro.props;
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;500&display=swap"
-      rel="stylesheet"
-    />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@200;300;600&display=swap" rel="stylesheet"> 
+
     <meta name="generator" content={Astro.generator} />
     <title>CFN Tracker</title>
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
   </head>
   <body>
-    <slot />
+    <NavBar />
+    <main>
+      <slot />
+    </main>
+    <SiteFooter/>
   </body>
 </html>
 <style is:global>
-  :root {
-    --accent: 124, 58, 237;
-    --accent-gradient: linear-gradient(
-      45deg,
-      rgb(var(--accent)),
-      #ffb5f1 30%,
-      rgba(0, 0, 0, 0.75) 60%
-    );
-  }
-  html {
-  }
-
   body {
-    font-family: "Ubuntu", system-ui, sans-serif;
-    background: linear-gradient(0deg, black 0%, rgb(54, 6, 102) 100%);
-    background-attachment: fixed;
+    font-family: "Raleway", system-ui, sans-serif;
     min-height: 100%;
     color: #fff;
+    background: #000;
     width: 100%;
   }
 </style>
