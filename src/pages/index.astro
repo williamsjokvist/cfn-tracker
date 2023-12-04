@@ -2,155 +2,388 @@
 import Layout from "../layouts/Layout.astro";
 import { Icon } from "astro-icon";
 import World from "../components/World.astro";
+import MockTracker from "../components/MockTracker.astro";
+import Streamers from "../components/Streamers.astro";
+
+const matches = [
+  {
+    date: "2023-04-23",
+    time: "12:42",
+    opponent: "bboylong",
+    opponentLeague: "Diamond",
+    opponentCharacter: "Akuma",
+    victory: false,
+  },
+  {
+    date: "2023-04-23",
+    time: "12:38",
+    opponent: "bboylong",
+    opponentLeague: "Diamond",
+    opponentCharacter: "Akuma",
+    victory: false,
+  },
+  {
+    date: "2023-04-23",
+    time: "12:25",
+    opponent: "indigoinconnu",
+    opponentLeague: "Diamond",
+    opponentCharacter: "Zangief",
+    victory: true,
+  },
+  {
+    date: "2023-04-23",
+    time: "12:23",
+    opponent: "indigoinconnu",
+    opponentLeague: "Diamond",
+    opponentCharacter: "Zangief",
+    victory: true,
+  },
+];
 ---
 
-<Layout title="Welcome to Astro.">
-  <header class="text-center pt-4 px-3">
-    <img
-      src="https://raw.githubusercontent.com/williamsjokvist/cfn-tracker/master/build/appicon.png"
-      class="w-full max-w-[50ch] mx-auto"
-      alt="CFN Tracker logotype"
-    />
-    <h2 id="catchphrase" class="text-4xl mt-8 mb-12">
-      <span>Track</span>
-      <span>the</span>
-      <span class="text-gradient">live</span>
-      <span>ranked</span>
-      <span>match</span>
-      <span>data</span>
-      <span>of</span>
-      <span>any</span>
-      <span>Street</span>
-      <span>Fighter</span>
-      <span class="text-gradient">6</span>
-      <span>account</span>
-    </h2>
-  </header>
-
-  <main class="pb-8">
-    <div
-      class="fixed bottom-0 w-full py-4 bg-[rgba(46,82,128,.36)] backdrop-blur text-center z-50"
-    >
-      <span class="text-shadow-sm"
-        >If you find the tool useful for your streams or otherwise, consider</span
-      >
-      <a
-        href="https://ko-fi.com/greensoap"
-        class="hover:underline"
-        target="_blank"
-        ><span class="text-gradient">buying me a coffee</span> ☕</a
-      >
-    </div>
-    <section class="grid gap-6 mt-6 max-w-[45ch] text-center mx-auto px-6">
-      <a
-        href="https://github.com/GreenSoap/cfn-tracker/releases/download/v4.0.0/CFN_Tracker_Windows.zip"
-        class="link-card windows flex gap-2 justify-between items-center rounded-full px-6 py-4 text-2xl w-full"
-      >
-        <Icon name="mdi:microsoft-windows" class="w-8 h-8" />
-        <span>Download for Windows</span>
-      </a>
-      <a
-        href="https://github.com/GreenSoap/cfn-tracker/releases/download/v4.0.0/CFN_Tracker_macOS.zip"
-        class="link-card mac flex gap-2 justify-between items-center rounded-full px-6 py-4 text-2xl w-full"
-      >
-        <Icon name="mdi:apple" class="w-8 h-8" />
-        <span class="w-full">Download for Mac</span>
-      </a>
-
-      <span class="text-lg text-center"
-        ><b id="cfn-tracker-download-count"></b> downloads</span
-      >
-    </section>
-    <div
-      class="pt-6 justify-around lowercase max-w-[60ch] mx-auto mt-8 px-4 flex gap-7 flex-wrap"
-    >
-      <a
-        class="text-lg flex gap-4 hover:underline"
-        href="https://github.com/williamsjokvist/cfn-tracker/"
-        target="_blank">
-        <Icon name="mdi:github" class="w-8 h-8" /> Source
-      </a>
-      <a
-        class="text-lg flex gap-4 hover:underline"
-        href="https://github.com/williamsjokvist/cfn-tracker/releases/tag/v4.0.0"
-        target="_blank"
-      >
-        <Icon name="uil:clipboard-notes" class="w-8 h-8" />
-         Changelog</a
-      >
-      <a
-        class="flex gap-4 hover:underline"
-        href="https://twitter.com/greensoap_"
-        target="_blank"
-      >
-        <Icon name="mdi:twitter" class="w-8 h-8 text-[#8ee5ff]" />
-      </a>
-    </div>
-    <section class="pb-24">
-      <h2 class="text-center text-3xl mt-32 mb-16">Screenshots</h2>
-      <div class="flex flex-wrap gap-4 justify-around">
-        <img
-          class="w-full max-w-[750px]"
-          src="https://raw.githubusercontent.com/williamsjokvist/cfn-tracker/github-pages/public/tracking.png"
-          alt="Screenshot of in progress tracking"
-        />
-        <img
-          class="w-full max-w-[750px]"
-          src="https://raw.githubusercontent.com/williamsjokvist/cfn-tracker/github-pages/public/log.png"
-          alt="Screenshot of the match log"
-        />
-        <img
-          class="w-full max-w-[750px]"
-          src="https://raw.githubusercontent.com/williamsjokvist/cfn-tracker/github-pages/public/themes.png"
-          alt="Screenshot of the theme select"
-        />
-        <img
-          class="w-full max-w-[750px]"
-          src="https://raw.githubusercontent.com/williamsjokvist/cfn-tracker/github-pages/public/stats.png"
-          alt="Screenshot of the stats select"
-        />
-      </div>
-    </section>
-  </main>
-</Layout>
-
-<World />
-
 <script defer>
-const fetchCFNTrackerDownloadCount = async () => {
-  const res = await fetch(
-    `https://api.github.com/repos/williamsjokvist/cfn-tracker/releases`,
-    {
-      method: `GET`,
-    }
-  );
+  function removeNonUserAgentDownloads() {
+    const isWindows = window.navigator.userAgent.indexOf("Win") != -1;
+    const isMacOS = window.navigator.userAgent.indexOf("Mac") != -1;
+    const macDownload = document.getElementById("mac-download");
+    const windowsDownload = document.getElementById("windows-download");
 
-  if (res.status == 200) {
-    const releases = await res.json();
-
-    let downloadCount = 0;
-    for (const release of releases) {
-      for (const asset of release.assets) {
-        downloadCount += asset.download_count
-      }
+    if (!isMacOS) {
+      macDownload.remove();
     }
-    return downloadCount;
-  } else if (res.status == 404) {
-    return 0;
+    if (!isWindows) {
+      windowsDownload.remove();
+    }
   }
-};
-
-document.addEventListener("DOMContentLoaded", async () => {
-  const download_count = await fetchCFNTrackerDownloadCount();
-
-  const cfnTrackerEl = document.getElementById(`cfn-tracker-download-count`);
-  cfnTrackerEl.innerText = download_count;
-});
+  document.addEventListener("DOMContentLoaded", removeNonUserAgentDownloads);
 </script>
 
-<style>
-  main {
-    margin: auto;
+<Layout title="CFN Tracker">
+  <section
+    class="flex-wrap intro relative pt-36 pb-28 -mt-20 h-screen flex items-center justify-around"
+  >
+    <header class="min-h-[300px] mx-8 mb-8">
+      <h1 id="catchphrase" class="text-4xl font-bold">
+        <span>Track</span>
+        <span>your</span>
+        <span class="text-gradient">live</span>
+        <span>Street</span>
+        <span>Fighter</span>
+        <span class="text-gradient">6</span>
+        <span>ranked</span>
+        <span>matches</span>
+      </h1>
+      <p class="text-lg mt-12">
+        CFN Tracker lets you track your matches in realtime as you play them.
+      </p>
+
+      {/*  Download */}
+      <div class="flex flex-wrap mt-8 justify-center 2xl:justify-start">
+        <a
+          id="windows-download"
+          href="https://github.com/GreenSoap/cfn-tracker/releases/download/v4.0.0/CFN_Tracker_Windows.zip"
+          class="link-card mac inline-flex gap-2 justify-between items-center rounded-full px-6 py-4 text-2xl"
+        >
+          <Icon name="mdi:microsoft-windows" class="w-8 h-8" />
+          <span>Download for Windows</span>
+        </a>
+        <a
+          id="mac-download"
+          href="https://github.com/GreenSoap/cfn-tracker/releases/download/v4.0.0/CFN_Tracker_macOS.zip"
+          class="link-card mac inline-flex gap-2 justify-between items-center rounded-full px-6 py-4 text-2xl"
+        >
+          <Icon name="mdi:apple" class="w-8 h-8" />
+          <span class="w-full">Download for Mac</span>
+        </a>
+
+        <span class="text-lg text-center mt-4 ml-8">
+          <b id="cfn-tracker-download-count"></b> downloads
+        </span>
+      </div>
+    </header>
+
+    <MockTracker title="Tracking" page="track" spin>
+      <dl
+        class="flex whitespace-nowrap items-center justify-between w-full pt-3 px-6"
+      >
+        <div class="flex gap-3 text-xl">
+          <dt class="text-xl">CFN</dt>
+          <dd class="font-bold">Hjejjjej</dd>
+        </div>
+        <div class="flex justify-between gap-8">
+          <div class="flex gap-3 text-xl">
+            <dt class="text-xl">LP</dt>
+            <dd class="font-bold">35652</dd>
+          </div>
+          <div class="flex gap-3 text-xl">
+            <dt class="text-xl">MR</dt>
+            <dd class="font-bold">1604</dd>
+          </div>
+        </div>
+      </dl>
+
+      <dl class="text-lg whitespace-nowrap mt-2 px-6 w-[420px]">
+        <div class="flex justify-between gap-2">
+          <div
+            class="mb-2 flex flex-1 gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl"
+          >
+            <dt class="tracking-wider font-extralight">Wins</dt>
+            <dd class="text-4xl font-semibold">4</dd>
+          </div>
+          <div
+            class="mb-2 flex flex-1 gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl"
+          >
+            <dt class="tracking-wider font-extralight">Losses</dt>
+            <dd class="text-4xl font-semibold">2</dd>
+          </div>
+        </div>
+        <div class="flex justify-between gap-2">
+          <div
+            class="mb-2 flex flex-1 gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl"
+          >
+            <dt class="tracking-wider font-extralight">Win Rate</dt>
+            <dd class="text-4xl font-semibold">69%</dd>
+          </div>
+          <div
+            class="mb-2 flex flex-1 gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl"
+          >
+            <dt class="tracking-wider font-extralight">Win Streak</dt>
+            <dd class="text-4xl font-semibold">2</dd>
+          </div>
+        </div>
+        <div class="flex justify-between gap-2">
+          <div
+            class="mb-2 flex flex-1 gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl"
+          >
+            <dt class="tracking-wider font-extralight">LP Gain</dt>
+            <dd class="text-4xl font-semibold">+125</dd>
+          </div>
+          <div
+            class="mb-2 flex flex-1 gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl"
+          >
+            <dt class="tracking-wider font-extralight">MR Gain</dt>
+            <dd class="text-4xl font-semibold">+12</dd>
+          </div>
+        </div>
+      </dl>
+    </MockTracker>
+    <World />
+  </section>
+
+  <section class="[&>*:nth-child(even)]:flex-row-reverse grid gap-24">
+    <section class="flex flex-wrap items-center justify-around">
+      <header class="mb-8 max-w-[700px] w-full">
+        <h2 class="font-bold text-4xl">Live match updates</h2>
+        <p class="text-lg mt-8">
+          New matches are tracked instantly as soon as you press start!
+        </p>
+      </header>
+      <MockTracker title="Tracking" page="track" spin>
+        <dl
+          class="flex whitespace-nowrap items-center justify-between w-full pt-3 px-6"
+        >
+          <div class="flex gap-3 text-xl">
+            <dt class="text-xl">CFN</dt>
+            <dd class="font-bold">Hjejjjej</dd>
+          </div>
+          <div class="flex justify-between gap-8">
+            <div class="flex gap-3 text-xl">
+              <dt class="text-xl">LP</dt>
+              <dd class="font-bold">35652</dd>
+            </div>
+            <div class="flex gap-3 text-xl">
+              <dt class="text-xl">MR</dt>
+              <dd class="font-bold">1604</dd>
+            </div>
+          </div>
+        </dl>
+
+        <dl class="text-lg whitespace-nowrap mt-2 px-6 w-[420px]">
+          <div class="flex justify-between gap-2">
+            <div
+              class="mb-2 flex flex-1 gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl"
+            >
+              <dt class="tracking-wider font-extralight">Wins</dt>
+              <dd class="text-4xl font-semibold">4</dd>
+            </div>
+            <div
+              class="mb-2 flex flex-1 gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl"
+            >
+              <dt class="tracking-wider font-extralight">Losses</dt>
+              <dd class="text-4xl font-semibold">2</dd>
+            </div>
+          </div>
+          <div class="flex justify-between gap-2">
+            <div
+              class="mb-2 flex flex-1 gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl"
+            >
+              <dt class="tracking-wider font-extralight">Win Rate</dt>
+              <dd class="text-4xl font-semibold">69%</dd>
+            </div>
+            <div
+              class="mb-2 flex flex-1 gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl"
+            >
+              <dt class="tracking-wider font-extralight">Win Streak</dt>
+              <dd class="text-4xl font-semibold">2</dd>
+            </div>
+          </div>
+          <div class="flex justify-between gap-2">
+            <div
+              class="mb-2 flex flex-1 gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl"
+            >
+              <dt class="tracking-wider font-extralight">LP Gain</dt>
+              <dd class="text-4xl font-semibold">+125</dd>
+            </div>
+            <div
+              class="mb-2 flex flex-1 gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl"
+            >
+              <dt class="tracking-wider font-extralight">MR Gain</dt>
+              <dd class="text-4xl font-semibold">+12</dd>
+            </div>
+          </div>
+        </dl>
+      </MockTracker>
+    </section>
+
+    <section class="flex flex-wrap items-center justify-around">
+      <header class="mb-8 max-w-[700px] w-full">
+        <h2 class="font-bold text-4xl">Statistics</h2>
+        <p class="text-lg mt-8">
+          Matches are stored so you can keep track of your progress from session
+          to session. <br /> You own your match logs, not Capcom.
+        </p>
+      </header>
+      <MockTracker title="Match Log" page="log">
+        <table class="mx-6 mt-2 border-spacing-y-1 border-separate">
+          <thead>
+            <tr>
+              <th class="text-left px-3 whitespace-nowrap w-[120px]"> Date</th>
+              <th class="text-left px-3 whitespace-nowrap w-[70px]"> Time</th>
+              <th class="text-left px-3 whitespace-nowrap w-[180px]">
+                Opponent
+              </th>
+              <th class="text-left px-3 whitespace-nowrap"> League</th>
+              <th class="text-center px-3 whitespace-nowrap"> Character</th>
+              <th class="text-center px-3 whitespace-nowrap"> Result</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              matches.map((log) => (
+                <tr class="backdrop-blur group">
+                  <td class="whitespace-nowrap text-left rounded-l-xl rounded-r-none bg-slate-50 bg-opacity-5 group-hover:bg-opacity-10 transition-colors px-3 py-2  ">
+                    {log.date}
+                  </td>
+                  <td class="whitespace-nowrap text-left bg-slate-50 bg-opacity-5 group-hover:bg-opacity-10 transition-colors px-3 py-2">
+                    {log.time}
+                  </td>
+                  <td class="whitespace-nowrap rounded-none bg-slate-50 bg-opacity-5 group-hover:bg-opacity-10 transition-colors px-3 py-2  ">
+                    {log.opponent}
+                  </td>
+                  <td class="whitespace-nowrap rounded-none bg-slate-50 bg-opacity-5 group-hover:bg-opacity-10 transition-colors px-3 py-2  ">
+                    {log.opponentLeague}
+                  </td>
+                  <td class="rounded-none bg-slate-50 bg-opacity-5 group-hover:bg-opacity-10 transition-colors px-3 py-2 text-center  ">
+                    {log.opponentCharacter}
+                  </td>
+                  <td
+                    class="rounded-r-xl rounded-l-none bg-slate-50 bg-opacity-5 group-hover:bg-opacity-10 transition-colors px-3 py-2 text-center"
+                    style={{ color: log.victory == true ? "lime" : "red" }}
+                  >
+                    {log.victory == true ? "W" : "L"}
+                  </td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </MockTracker>
+    </section>
+
+    <section class="flex flex-wrap items-center justify-around">
+      <header class="mb-8 max-w-[700px] w-full">
+        <h2 class="font-bold text-4xl">Made for streamers</h2>
+        <p class="text-lg mt-8">
+          Display your stats in OBS, choose from multiple themes or create your
+          own with CSS!
+        </p>
+      </header>
+      <!-- <img
+        class="w-full max-w-[750px]"
+        src="https://raw.githubusercontent.com/williamsjokvist/cfn-tracker/github-pages/public/themes.png"
+        alt="Screenshot of the theme select"
+      /> -->
+      <!-- 
+      <img
+        class="w-full max-w-[750px]"
+        src="https://raw.githubusercontent.com/williamsjokvist/cfn-tracker/github-pages/public/stats.png"
+        alt="Screenshot of the stats select"
+      /> -->
+    </section>
+  </section>
+
+  <Streamers />
+
+  <iframe
+    class="mx-auto"
+    src="https://clips.twitch.tv/embed?clip=PeppyCuriousFungusSoBayed-CdfDcX7MJOumXGYq&parent=localhost"
+    frameborder="0"
+    allowfullscreen="true"
+    scrolling="no"
+    height="378"
+    width="620"></iframe>
+
+  <div class="fixed bottom-0 w-full py-4 bg-[#131c32] text-center z-50">
+    <span class="text-shadow-sm"
+      >If you find the tool useful, consider
+      treating me to a</span
+    >
+    <a href="https://ko-fi.com/greensoap" class="" target="_blank"
+      ><span class="text-gradient">coffee</span> ☕</a
+    >
+  </div>
+</Layout>
+
+<script defer>
+  const fetchCFNTrackerDownloadCount = async () => {
+    const res = await fetch(
+      `https://api.github.com/repos/williamsjokvist/cfn-tracker/releases`,
+      {
+        method: `GET`,
+      }
+    );
+
+    if (res.status == 200) {
+      const releases = await res.json();
+
+      let downloadCount = 0;
+      for (const release of releases) {
+        for (const asset of release.assets) {
+          downloadCount += asset.download_count;
+        }
+      }
+      return downloadCount;
+    } else if (res.status == 404) {
+      return 0;
+    }
+  };
+
+  document.addEventListener("DOMContentLoaded", async () => {
+    const download_count = await fetchCFNTrackerDownloadCount();
+
+    const cfnTrackerEl = document.getElementById(`cfn-tracker-download-count`);
+    cfnTrackerEl.innerText = download_count;
+  });
+</script>
+
+<style is:global>
+  .intro {
+    background: linear-gradient(0deg, #000 0%, rgb(25 16 34) 100%);
+    min-height: 100vh;
+  }
+  .intro > *:not(.world) {
+    position: relative;
+    z-index: 1;
   }
   h1 {
     font-size: 3rem;
