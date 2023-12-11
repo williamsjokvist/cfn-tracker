@@ -19,7 +19,7 @@ type SessionStorage interface {
 func (s *Storage) CreateSession(ctx context.Context, userId string) (*model.Session, error) {
 	sesh := model.Session{
 		UserId:    userId,
-		CreatedAt: time.Now().String(),
+		CreatedAt: time.Now().Format("2017-09-07 17:06:06"),
 	}
 	query := `
 		INSERT OR IGNORE INTO sessions (user_id, created_at)
@@ -42,12 +42,19 @@ func (s *Storage) GetSessions(ctx context.Context, userId string, limit uint8, o
 	if limit != 0 || offset != 0 {
 		pagination = fmt.Sprintf(`LIMIT %d OFFSET %d`, limit, offset)
 	}
+	where := ``
+	var whereArgs []interface{}
+	if userId != "" {
+		where = `WHERE user_id = (?)`
+		whereArgs = append(whereArgs, userId)
+	}
 	query, args, err := sqlx.In(fmt.Sprintf(`
-		SELECT * FROM sessions 
-		WHERE user_id = (?)
+		SELECT id, lp, mr, user_id, u.display_name as user_name, created_at  FROM sessions
+		JOIN main.users u on u.code = sessions.user_id
+		%s
 		%s
 		ORDER BY created_at DESC
-`, pagination), userId)
+`, where, pagination), whereArgs...)
 	if err != nil {
 		return nil, fmt.Errorf("prepare get sessions query: %w", err)
 	}
@@ -62,7 +69,7 @@ func (s *Storage) GetSessions(ctx context.Context, userId string, limit uint8, o
 func (s *Storage) UpdateLatestSession(ctx context.Context, lp, mr int, sessionId uint16) error {
 	query, args, err := sqlx.In(`
 		UPDATE sessions
-		SET 
+		SET
 			lp = ?,
 			mr = ?
 		WHERE id = (?)

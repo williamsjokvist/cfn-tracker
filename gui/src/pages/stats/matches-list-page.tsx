@@ -1,43 +1,28 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
-import { Icon } from "@iconify/react";
 
-import {
-  GetUsers,
-  GetMatches,
-} from "@@/go/core/CommandHandler";
+import { GetMatches } from "@@/go/core/CommandHandler";
 import type { model } from "@@/go/models";
 
 import { PageHeader } from "@/ui/page-header";
+import { useParams } from "react-router-dom";
 
-export const HistoryPage: React.FC = () => {
+export const MatchesListPage: React.FC = () => {
   const { t } = useTranslation();
+  const params = useParams();
+  const sessionId = Number(params["sessionId"]);
 
-  const [users, setUsers] = React.useState<model.User[]>([]);
-  
-  const [user, setUser] = React.useState<model.User>();
   const [matches, setMatches] = React.useState<model.Match[]>([]);
-
-  const [isSpecified, setSpecified] = React.useState(false);
   const [totalWinRate, setTotalWinRate] = React.useState<number | null>(null);
 
-  const getMatches = (u: string) => {
-    GetMatches(0, u, 0, 0).then((matches) => {
-      setMatches(matches);
-      setSpecified(false);
-    }).catch(err => console.error(err));
-  };
-
   React.useEffect(() => {
-    GetUsers().then(
-      (users) => setUsers((_) => users)
-    ).catch(err => console.error(err));
-  }, []);
-
-  React.useEffect(() => {
-    if (user && !matches) getMatches(user.code);
-  }, [user, matches]);
+    GetMatches(sessionId, "", 0, 0)
+      .then((matches) => {
+        setMatches(matches);
+      })
+      .catch((err) => console.error(err));
+  }, [sessionId])
 
   React.useEffect(() => {
     if (!matches) return;
@@ -56,57 +41,14 @@ export const HistoryPage: React.FC = () => {
           value.toLowerCase()
       )
     );
-    setSpecified(true);
   };
 
   return (
     <>
-      <PageHeader
-        text={user ? `${t("history")}/${user.displayName}` : t("history")}
-      >
-        {user && (
-          <div className="flex items-center justify-end w-full ml-4">
-            <motion.button
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              onClick={() =>
-                isSpecified ? getMatches(user.code) : setUser(undefined)
-              }
-              className="crumb-btn-dark mr-3"
-            >
-              <Icon
-                icon="fa6-solid:chevron-left"
-                className="w-4 h-4 inline mr-2"
-              />
-              {t("goBack")}
-            </motion.button>
-          </div>
-        )}
-      </PageHeader>
+      <PageHeader text={t("history")} />
 
       <div className="relative w-full">
-        {!user && users && users.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.225 }}
-            className="grid max-h-[340px] h-full m-4 justify-center content-start overflow-y-scroll gap-5"
-          >
-            {users.map((u) => (
-              <button
-                className="bg-[rgb(255,255,255,0.075)] hover:bg-[rgb(255,255,255,0.125)] text-xl backdrop-blur rounded-2xl transition-all items-center border-transparent border-opacity-5 border-[1px] px-3 py-1"
-                key={u.displayName}
-                onClick={() => {
-                  setUser(u);
-                  getMatches(u.code);
-                }}
-              >
-                {u.displayName}
-              </button>
-            ))}
-          </motion.div>
-        )}
-        {matches && user && (
+        {matches && (
           <>
             {totalWinRate != null && (
               <div className="flex items-center pt-1 px-8 mb-2 h-10 border-b border-slate-50 border-opacity-10 ">
