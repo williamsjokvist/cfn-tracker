@@ -8,6 +8,9 @@ import { PageHeader } from "@/ui/page-header";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
+type MonthGroup = Record<number, model.Session[]>;
+type YearGroup = Record<number, MonthGroup>;
+
 export const SessionsListPage: React.FC = () => {
   const { i18n, t } = useTranslation();
   const navigate = useNavigate();
@@ -17,8 +20,6 @@ export const SessionsListPage: React.FC = () => {
     GetSessions("").then((seshs) => setSessions(seshs));
   }, []);
 
-  type MonthGroup = Record<number, model.Session[]>;
-  type YearGroup = Record<number, MonthGroup>;
   const groupedSessions: YearGroup = sessions.reduce((group, sesh) => {
     const date = new Date(sesh.createdAt);
     const year = date.getFullYear();
@@ -63,6 +64,9 @@ export const SessionsListPage: React.FC = () => {
                             {t("user")}
                           </th>
                           <th className="text-left px-3 whitespace-nowrap">
+                            {t("mrGain")}
+                          </th>
+                          <th className="text-left px-3 whitespace-nowrap">
                             {t("lpGain")}
                           </th>
                           <th className="text-center px-3 whitespace-nowrap">
@@ -85,6 +89,7 @@ export const SessionsListPage: React.FC = () => {
                                 {new Date(sesh.createdAt).toLocaleDateString(
                                   i18n.resolvedLanguage ?? "en-GB",
                                   {
+                                    day: "numeric",
                                     weekday: "short",
                                     hour: "2-digit",
                                     minute: "2-digit",
@@ -94,6 +99,10 @@ export const SessionsListPage: React.FC = () => {
                             </td>
                             <td className="whitespace-nowrap text-left bg-slate-50 bg-opacity-5 group-hover:bg-opacity-10 transition-colors px-3 py-2">
                               {sesh.userName}
+                            </td>
+                            <td className="whitespace-nowrap text-center bg-slate-50 bg-opacity-5 group-hover:bg-opacity-10 transition-colors px-3 py-2">
+                              {sesh.mrGain > 0 && "+"}
+                              {sesh.mrGain}
                             </td>
                             <td className="whitespace-nowrap text-center bg-slate-50 bg-opacity-5 group-hover:bg-opacity-10 transition-colors px-3 py-2">
                               {sesh.lpGain > 0 && "+"}

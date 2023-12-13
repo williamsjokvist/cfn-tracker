@@ -12,5 +12,8 @@ type Session struct {
 	MatchesLost int      `db:"matches_lost" json:"matchesLost"`
 	StartingLP  int      `db:"starting_lp" json:"startingLp"`
 	EndingLP    int      `db:"ending_lp" json:"endingLp"`
+	StartingMR  int      `db:"starting_mr" json:"startingMr"`
+	EndingMR    int      `db:"ending_mr" json:"endingMr"`
 	LPGain      int      `db:"lp_gain" json:"lpGain"`
+	MRGain      int      `db:"mr_gain" json:"mrGain"`
 }

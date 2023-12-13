@@ -55,7 +55,10 @@ func (s *Storage) GetSessions(ctx context.Context, userId string, limit uint8, o
 		    COUNT(IIF(m.victory = false, 1, NULL)) as matches_lost,
 		    m.lp as starting_lp,
 		    s.lp as ending_lp,
-		    (s.lp - m.lp) as lp_gain
+		    (s.lp - m.lp) as lp_gain,
+		    m.mr as starting_mr,
+		    s.mr as ending_mr,
+		    (s.mr - m.mr) as mr_gain
 		FROM sessions as s
 		JOIN users u on u.code = s.user_id
 		JOIN matches m on s.id = m.session_id

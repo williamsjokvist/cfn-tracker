@@ -48,5 +48,9 @@
   "obsCustomize": "",
   "lastMatch": "",
   "statsWillBeDisplayed": "",
-  "selectTheme": ""
+  "selectTheme": "",
+  "started": "Commencé",
+  "user": "Nom",
+  "matchesWon": "Matchs Gagnés",
+  "matchesLost": "Matchs Perdus"
 }
