@@ -38,12 +38,9 @@ export const AppWrapper: React.FC = () => {
       });
     });
 
-    EventsOn("error-cfn", (error) => {
-      send({
-        type: "errorCfn",
-        error,
-      });
-      setErrorMessage(t("cfnError"));
+    EventsOn("error", (error) => {
+      setErrorMessage(error.message);
+      send({ type: "error" });
     });
   }, []);
 
