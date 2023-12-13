@@ -17,7 +17,9 @@ export const SessionsListPage: React.FC = () => {
   const [sessions, setSessions] = React.useState<model.Session[]>([]);
 
   React.useEffect(() => {
-    GetSessions("").then((seshs) => setSessions(seshs));
+    GetSessions("").then((seshs) => {
+      seshs && setSessions(seshs);
+    });
   }, []);
 
   const groupedSessions: YearGroup = sessions.reduce((group, sesh) => {
