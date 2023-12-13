@@ -25,6 +25,7 @@ import (
 	"github.com/williamsjokvist/cfn-tracker/core/data"
 	"github.com/williamsjokvist/cfn-tracker/core/data/sql"
 	"github.com/williamsjokvist/cfn-tracker/core/data/txt"
+	"github.com/williamsjokvist/cfn-tracker/core/errorsx"
 	"github.com/williamsjokvist/cfn-tracker/core/server"
 )
 
@@ -146,6 +147,7 @@ func main() {
 		HideWindowOnClose:  false,
 		LogLevel:           logger.WARNING,
 		LogLevelProduction: logger.ERROR,
+		ErrorFormatter:     errorsx.ConvertToFrontEndError,
 		BackgroundColour:   options.NewRGBA(0, 0, 0, 1),
 		CSSDragProperty:    `--draggable`,
 		Windows: &windows.Options{

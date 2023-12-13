@@ -53,5 +53,8 @@
   "user": "Nom",
   "matchesWon": "Matchs Gagnés",
   "matchesLost": "Matchs Perdus",
-  "sessions": "Séances"
+  "sessions": "Séances",
+  "errUnauthorized": "Échec de la connexion à CFN",
+  "errInternalServerError": "Erreur interne",
+  "errNotFound": "La ressource est introuvable"
 }

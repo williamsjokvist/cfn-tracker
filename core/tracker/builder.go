@@ -3,11 +3,13 @@ package tracker
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 	"github.com/williamsjokvist/cfn-tracker/core/browser"
 	"github.com/williamsjokvist/cfn-tracker/core/data"
+	"github.com/williamsjokvist/cfn-tracker/core/errorsx"
 	"github.com/williamsjokvist/cfn-tracker/core/tracker/sf6"
 	"github.com/williamsjokvist/cfn-tracker/core/tracker/sfv"
 )
@@ -45,7 +47,7 @@ func MakeSF6Tracker(ctx context.Context, browser *browser.Browser, username, pas
 	go sf6Tracker.Authenticate(ctx, username, password, authChan)
 	for status := range authChan {
 		if status.Err != nil {
-			panic(fmt.Errorf(`auth err: %v`, status.Err))
+			return nil, errorsx.NewError(http.StatusUnauthorized, status.Err)
 		}
 
 		if status.Progress >= 100 {

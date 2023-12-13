@@ -10,12 +10,13 @@ import { LoadingBar } from "@/ui/loading-bar";
 import { UpdatePrompt } from "@/ui/update-prompt";
 
 import { BrowserOpenURL, EventsOn } from "@@/runtime";
+import type { errorsx } from "@@/go/models";
 
 export const AppWrapper: React.FC = () => {
   const { t } = useTranslation();
   const [loaded, setLoaded] = React.useState(0);
   const [hasNewVersion, setNewVersion] = React.useState(false);
-  const [errorMessage, setErrorMessage] = React.useState(null);
+  const [err, setErr] = React.useState<errorsx.FrontEndError | null>(null);
 
   const [_, send] = CFNMachineContext.useActor();
 
@@ -38,12 +39,10 @@ export const AppWrapper: React.FC = () => {
       });
     });
 
-    EventsOn("error-cfn", (error) => {
-      send({
-        type: "errorCfn",
-        error,
-      });
-      setErrorMessage(t("cfnError"));
+    EventsOn("error", (error: errorsx.FrontEndError) => {
+      send({ type: "error" });
+      setErr(error);
+      console.error(error);
     });
   }, []);
 
@@ -52,8 +51,8 @@ export const AppWrapper: React.FC = () => {
       <AppSidebar />
       <main>
         <ErrorMessage
-          errorMessage={errorMessage}
-          onFadedOut={() => setErrorMessage(null)}
+          error={err}
+          onFadedOut={() => setErr(null)}
         />
         <LoadingBar percentage={loaded} />
         {hasNewVersion && (

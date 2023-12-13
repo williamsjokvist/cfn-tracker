@@ -7,6 +7,7 @@ import {
   SelectGame,
 } from "@@/go/core/CommandHandler";
 import type { model } from "@@/go/models";
+import { EventsEmit } from "@@/runtime/runtime";
 
 export type MatchEvent = {
   matchHistory: model.TrackingState;
@@ -17,7 +18,6 @@ type CFNMachineContext = {
   game?: "sfv" | "sf6";
   restore: boolean;
   isTracking: boolean;
-  error: string;
   matchHistory: model.TrackingState;
 };
 
@@ -66,6 +66,7 @@ export const cfnMachine = createMachine(
         entry: "initializeGame",
         on: {
           initialized: "idle",
+          error: "gamePicking"
         },
       },
       idle: {
@@ -83,12 +84,7 @@ export const cfnMachine = createMachine(
         entry: "startTracking",
         on: {
           startedTracking: "tracking",
-          errorCfn: {
-            target: "idle",
-            actions: assign({
-              error: (_, e: any) => e.error,
-            }),
-          },
+          error: "idle"
         },
       },
       tracking: {
@@ -109,8 +105,7 @@ export const cfnMachine = createMachine(
     actions: {
       initializeGame: ({ game, error }) => {
         SelectGame(game).catch(err => {
-          error = err;
-          console.error(err);
+          EventsEmit("error", err)
         });
       },
       startTracking: ({ playerInfo, restore, isTracking }) => {
@@ -118,7 +113,7 @@ export const cfnMachine = createMachine(
           StartTracking(playerInfo.code, restore).then(() => {
             isTracking = true;
           }).catch(err => {
-            console.error(err);
+            EventsEmit("error", err)
           });
         }
       },
@@ -127,7 +122,7 @@ export const cfnMachine = createMachine(
         StopTracking().then((_) => {
           isTracking = false;
         }).catch(err => {
-          console.error(err);
+          EventsEmit("error", err)
         });
       },
     },

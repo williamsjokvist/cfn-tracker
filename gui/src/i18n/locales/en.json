@@ -53,5 +53,8 @@
   "user": "User",
   "matchesWon": "Matches Won",
   "matchesLost": "Matches Lost",
-  "sessions": "Sessions"
+  "sessions": "Sessions",
+  "errUnauthorized": "Failed to connect to CFN",
+  "errInternalServerError": "Internal error",
+  "errNotFound": "Resource could not be found"
 }

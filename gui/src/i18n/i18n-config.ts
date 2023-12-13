@@ -8,6 +8,8 @@ type AppLanguage = {
   translation: Object;
 }
 
+export type LocalizationKey = keyof typeof import('./locales/en.json')
+
 export const APP_LANGUAGES: AppLanguage[] = [
   { code: 'en-GB', nativeName: 'English', translation: await import('./locales/en.json') },
   { code: 'fr', nativeName: 'Français', translation: await import('./locales/fr.json') },

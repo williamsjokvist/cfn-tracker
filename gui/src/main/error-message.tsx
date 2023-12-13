@@ -1,30 +1,39 @@
+import { LocalizationKey } from "@/i18n/i18n-config";
+import type { errorsx } from "@@/go/models";
 import { Icon } from "@iconify/react";
 import clsx from "clsx";
 import { useAnimate } from "framer-motion";
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 type ErrorMessageProps = {
-  errorMessage?: string;
+  error: errorsx.FrontEndError | null;
   onFadedOut: () => void;
 };
 
+const LocalizedErrorMessage: Record<number, LocalizationKey> = {
+  401: "errUnauthorized",
+  404: "errNotFound",
+  500: "errInternalServerError",
+};
+
 export const ErrorMessage: React.FC<ErrorMessageProps> = ({
-  errorMessage,
+  error,
   onFadedOut,
 }) => {
+  const { t } = useTranslation();
   const [scope, animate] = useAnimate();
 
   React.useEffect(() => {
-    if (!errorMessage) {
+    if (!error) {
       return;
     }
-
     animate("#error-message", { opacity: [0, 1] }).then(() => {
       animate("#error-message", { opacity: [1, 0] }, { delay: 3.5 }).then(() =>
         onFadedOut()
       );
     });
-  }, [errorMessage]);
+  }, [error]);
 
   return (
     <div ref={scope} className="absolute">
@@ -36,7 +45,7 @@ export const ErrorMessage: React.FC<ErrorMessageProps> = ({
           "px-8 py-3 rounded-r-xl text-xl backdrop-blur-sm pointer-events-none",
           "bg-[rgba(255,0,0,.125)]"
         )}
-        {...(errorMessage === null && {
+        {...(error === null && {
           style: {
             opacity: 0,
           },
@@ -46,7 +55,13 @@ export const ErrorMessage: React.FC<ErrorMessageProps> = ({
           icon="material-symbols:warning-outline"
           className="text-[#ff6388] w-8 h-8 blink-pulse"
         />
-        <span>{errorMessage}</span>
+        {error && (
+          <span>
+            {LocalizedErrorMessage[error.code]
+              ? t(LocalizedErrorMessage[error.code])
+              : error.message}
+          </span>
+        )}
       </div>
     </div>
   );
