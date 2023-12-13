@@ -53,5 +53,8 @@
   "user": "ユーザー",
   "matchesWon": "勝った試合",
   "matchesLost": "負けた試合",
-  "sessions": "セッション"
+  "sessions": "セッション",
+  "errUnauthorized": "CFNへの接続に失敗しました",
+  "errInternalServerError": "内部エラー",
+  "errNotFound": "リソースが見つかりませんでした"
 }

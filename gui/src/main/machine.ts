@@ -105,8 +105,6 @@ export const cfnMachine = createMachine(
     actions: {
       initializeGame: ({ game, error }) => {
         SelectGame(game).catch(err => {
-          error = err;
-          console.error(err);
           EventsEmit("error", err)
         });
       },
@@ -115,7 +113,6 @@ export const cfnMachine = createMachine(
           StartTracking(playerInfo.code, restore).then(() => {
             isTracking = true;
           }).catch(err => {
-            console.error(err);
             EventsEmit("error", err)
           });
         }
@@ -125,7 +122,6 @@ export const cfnMachine = createMachine(
         StopTracking().then((_) => {
           isTracking = false;
         }).catch(err => {
-          console.error(err);
           EventsEmit("error", err)
         });
       },

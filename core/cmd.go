@@ -11,10 +11,10 @@ import (
 	"time"
 
 	"github.com/hashicorp/go-version"
-	wails "github.com/wailsapp/wails/v2/pkg/runtime"
 
 	"github.com/williamsjokvist/cfn-tracker/core/browser"
 	"github.com/williamsjokvist/cfn-tracker/core/data"
+	"github.com/williamsjokvist/cfn-tracker/core/errorsx"
 	"github.com/williamsjokvist/cfn-tracker/core/model"
 	"github.com/williamsjokvist/cfn-tracker/core/tracker"
 )
@@ -130,5 +130,9 @@ func (ch *CommandHandler) SelectGame(game string) error {
 }
 
 func (ch *CommandHandler) GetTrackingStateUnused() *model.TrackingState {
+	return nil
+}
+
+func (ch *CommandHandler) GetFrontendErrorModelUnused() *errorsx.FrontEndError {
 	return nil
 }
