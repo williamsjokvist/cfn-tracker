@@ -13,8 +13,8 @@ import (
 
 	"github.com/williamsjokvist/cfn-tracker/core/browser"
 	"github.com/williamsjokvist/cfn-tracker/core/data"
+	te "github.com/williamsjokvist/cfn-tracker/core/errorsx"
 	"github.com/williamsjokvist/cfn-tracker/core/model"
-	te "github.com/williamsjokvist/cfn-tracker/core/terrors"
 	"github.com/williamsjokvist/cfn-tracker/core/utils"
 )
 
@@ -41,7 +41,7 @@ func NewSF6Tracker(browser *browser.Browser, trackerRepo *data.CFNTrackerReposit
 func (t *SF6Tracker) Start(ctx context.Context, userCode string, restore bool, pollRate time.Duration) error {
 	if !t.isAuthenticated {
 		log.Println(`tracker not authenticated`)
-		return te.NewTrackingError(http.StatusUnauthorized, errors.New(`tracker not authenticated`))
+		return te.NewError(http.StatusUnauthorized, errors.New(`tracker not authenticated`))
 	}
 
 	startPolling := func() {
@@ -53,18 +53,18 @@ func (t *SF6Tracker) Start(ctx context.Context, userCode string, restore bool, p
 	if restore {
 		sesh, err := t.CFNTrackerRepository.GetLatestSession(ctx, userCode)
 		if err != nil {
-			return te.NewTrackingError(http.StatusNotFound, fmt.Errorf(`failed to get last session: %w`, err))
+			return te.NewError(http.StatusNotFound, fmt.Errorf(`failed to get last session: %w`, err))
 		}
 		t.sesh = sesh
 		t.user, err = t.CFNTrackerRepository.GetUserByCode(ctx, userCode)
 		if err != nil {
-			return te.NewTrackingError(http.StatusNotFound, fmt.Errorf(`failed to get user: %w`, err))
+			return te.NewError(http.StatusNotFound, fmt.Errorf(`failed to get user: %w`, err))
 		}
 		trackingState := t.getTrackingStateForLastMatch()
 		if trackingState == nil {
 			bl, err := t.fetchBattleLog(userCode)
 			if err != nil {
-				return te.NewTrackingError(http.StatusInternalServerError, fmt.Errorf(`failed to fetch battle log: %w`, err))
+				return te.NewError(http.StatusInternalServerError, fmt.Errorf(`failed to fetch battle log: %w`, err))
 			}
 			trackingState = &model.TrackingState{
 				CFN:       bl.GetCFN(),
@@ -80,7 +80,7 @@ func (t *SF6Tracker) Start(ctx context.Context, userCode string, restore bool, p
 
 	bl, err := t.fetchBattleLog(userCode)
 	if err != nil {
-		return te.NewTrackingError(http.StatusInternalServerError, fmt.Errorf(`failed to fetch battle log: %w`, err))
+		return te.NewError(http.StatusInternalServerError, fmt.Errorf(`failed to fetch battle log: %w`, err))
 	}
 	err = t.CFNTrackerRepository.SaveUser(ctx, bl.GetCFN(), userCode)
 	if err != nil {

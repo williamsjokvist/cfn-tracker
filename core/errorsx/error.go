@@ -1,4 +1,4 @@
-package terrors
+package errorsx
 
 import (
 	"errors"
@@ -15,7 +15,7 @@ type FrontEndError struct {
 	Message   string `json:"message"`
 }
 
-func NewTrackingError(errorCode int, innerError error) *TrackingError {
+func NewError(errorCode int, innerError error) *TrackingError {
 	return &TrackingError{
 		errorCode:  errorCode,
 		innerError: innerError,
