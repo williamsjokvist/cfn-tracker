@@ -84,7 +84,7 @@ func (t *SF6Tracker) Start(ctx context.Context, userCode string, restore bool, p
 	}
 	err = t.CFNTrackerRepository.SaveUser(ctx, bl.GetCFN(), userCode)
 	if err != nil {
-		return fmt.Errorf(`failed to save user: %w`, err)
+		return errorsx.NewError(http.StatusInternalServerError, fmt.Errorf(`failed to save user: %w`, err))
 	}
 	t.user = &model.User{
 		DisplayName: bl.GetCFN(),
@@ -92,7 +92,7 @@ func (t *SF6Tracker) Start(ctx context.Context, userCode string, restore bool, p
 	}
 	sesh, err := t.CFNTrackerRepository.CreateSession(ctx, userCode)
 	if err != nil {
-		return fmt.Errorf(`failed to create session: %w`, err)
+		return errorsx.NewError(http.StatusInternalServerError, fmt.Errorf(`failed to create session: %w`, err))
 	}
 	t.sesh = sesh
 
