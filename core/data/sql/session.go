@@ -12,14 +12,14 @@ import (
 
 type SessionStorage interface {
 	CreateSession(ctx context.Context, userId string) error
-	GetLatestSession(ctx context.Context, userId string) (*model.Session, error)
+	GetSessions(ctx context.Context, userId string, limit uint8, offset uint16) ([]*model.Session, error)
 	UpdateLatestSession(ctx context.Context, userId string) error
 }
 
 func (s *Storage) CreateSession(ctx context.Context, userId string) (*model.Session, error) {
 	sesh := model.Session{
 		UserId:    userId,
-		CreatedAt: time.Now().String(),
+		CreatedAt: time.Now().Format(time.RFC3339),
 	}
 	query := `
 		INSERT OR IGNORE INTO sessions (user_id, created_at)
@@ -37,27 +37,51 @@ func (s *Storage) CreateSession(ctx context.Context, userId string) (*model.Sess
 	return &sesh, nil
 }
 
-func (s *Storage) GetLatestSession(ctx context.Context, userId string) (*model.Session, error) {
-	query, args, err := sqlx.In(`
-		SELECT * FROM sessions 
-		WHERE user_id = (?)
-		LIMIT 1
-`, userId)
-	if err != nil {
-		return nil, fmt.Errorf("prepare last session query: %w", err)
+func (s *Storage) GetSessions(ctx context.Context, userId string, limit uint8, offset uint16) ([]*model.Session, error) {
+	pagination := ``
+	if limit != 0 || offset != 0 {
+		pagination = fmt.Sprintf(`LIMIT %d OFFSET %d`, limit, offset)
 	}
-	var sesh model.Session
-	err = s.db.GetContext(ctx, &sesh, query, args...)
-	if err != nil {
-		return nil, fmt.Errorf("excute select last session query: %w", err)
+	where := ``
+	var whereArgs []interface{}
+	if userId != "" {
+		where = `WHERE s.user_id = (?)`
+		whereArgs = append(whereArgs, userId)
 	}
-	return &sesh, nil
+	query, args, err := sqlx.In(fmt.Sprintf(`
+		SELECT
+			s.id, s.created_at, u.display_name as user_name,
+			COUNT(IIF(m.victory, 1, NULL)) as matches_won,
+			COUNT(IIF(m.victory = false, 1, NULL)) as matches_lost,
+			m.lp as starting_lp,
+			s.lp as ending_lp,
+			(s.lp - m.lp) as lp_gain,
+			m.mr as starting_mr,
+			s.mr as ending_mr,
+			(s.mr - m.mr) as mr_gain
+		FROM sessions as s
+		JOIN users u on u.code = s.user_id
+		JOIN matches m on s.id = m.session_id
+		GROUP BY s.id
+		%s
+		%s
+		ORDER BY s.id DESC
+`, where, pagination), whereArgs...)
+	if err != nil {
+		return nil, fmt.Errorf("prepare get sessions query: %w", err)
+	}
+	var sessions []*model.Session
+	err = s.db.SelectContext(ctx, &sessions, query, args...)
+	if err != nil {
+		return nil, fmt.Errorf("excute get sessions query: %w", err)
+	}
+	return sessions, nil
 }
 
 func (s *Storage) UpdateLatestSession(ctx context.Context, lp, mr int, sessionId uint16) error {
 	query, args, err := sqlx.In(`
 		UPDATE sessions
-		SET 
+		SET
 			lp = ?,
 			mr = ?
 		WHERE id = (?)

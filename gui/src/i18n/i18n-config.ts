@@ -9,10 +9,10 @@ type AppLanguage = {
 }
 
 export const APP_LANGUAGES: AppLanguage[] = [
-  { code: 'en', nativeName: 'English', translation: await import('./locales/en.json') },
+  { code: 'en-GB', nativeName: 'English', translation: await import('./locales/en.json') },
   { code: 'fr', nativeName: 'Français', translation: await import('./locales/fr.json') },
-  { code: 'jp', nativeName: '日本', translation: await import('./locales/jp.json') },
-]; 
+  { code: 'ja-JP', nativeName: '日本', translation: await import('./locales/jp.json') },
+];
 
 // https://www.i18next.com/overview/configuration-options
 export const initLocalization = () => {
@@ -22,7 +22,7 @@ export const initLocalization = () => {
   .init({
     fallbackLng: APP_LANGUAGES[0].code,
     lng: window.localStorage.getItem('lng'),
-    resources: 
+    resources:
       APP_LANGUAGES.reduce((obj, item) => {
         return {
           ...obj,

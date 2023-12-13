@@ -78,11 +78,18 @@ func (ch *CommandHandler) OpenResultsDirectory() {
 	}
 }
 
-func (ch *CommandHandler) GetAllMatchesForUser(userId string) ([]*model.Match, error) {
-	matches, err := ch.repo.GetMatches(ch.ctx, 0, userId)
+func (ch *CommandHandler) GetSessions(userId string) ([]*model.Session, error) {
+	sessions, err := ch.repo.GetSessions(ch.ctx, userId, 0, 0)
 	if err != nil {
 		log.Println(err)
-		return nil, err
+	}
+	return sessions, err
+}
+
+func (ch *CommandHandler) GetMatches(sessionId uint16, userId string, limit uint8, offset uint16) ([]*model.Match, error) {
+	matches, err := ch.repo.GetMatches(ch.ctx, sessionId, userId, limit, offset)
+	if err != nil {
+		log.Println(err)
 	}
 	return matches, err
 }

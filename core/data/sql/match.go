@@ -12,7 +12,7 @@ import (
 
 type MatchStorage interface {
 	SaveMatch(ctx context.Context, match model.Match) error
-	GetMatches(ctx context.Context, sessionId uint16, userId string) ([]*model.Match, error)
+	GetMatches(ctx context.Context, sessionId uint16, userId string, limit uint8, offset uint16) ([]*model.Match, error)
 }
 
 func (s *Storage) SaveMatch(ctx context.Context, match model.Match) error {
@@ -68,7 +68,7 @@ func (s *Storage) SaveMatch(ctx context.Context, match model.Match) error {
 	return nil
 }
 
-func (s *Storage) GetMatches(ctx context.Context, sessionId uint16, userId string) ([]*model.Match, error) {
+func (s *Storage) GetMatches(ctx context.Context, sessionId uint16, userId string, limit uint8, offset uint16) ([]*model.Match, error) {
 	whereStmts := []string{}
 	var whereArgs []interface{}
 	where := ``
@@ -83,10 +83,15 @@ func (s *Storage) GetMatches(ctx context.Context, sessionId uint16, userId strin
 	if len(whereStmts) > 0 {
 		where = fmt.Sprintf(`WHERE %s`, strings.Join(whereStmts, ` AND `))
 	}
-
+	pagination := ``
+	if limit != 0 || offset != 0 {
+		pagination = fmt.Sprintf(`LIMIT %d OFFSET %d`, limit, offset)
+	}
 	query, args, err := sqlx.In(fmt.Sprintf(`
 		SELECT * FROM matches %s
-`, where), whereArgs...)
+		ORDER BY date DESC
+		%s
+`, where, pagination), whereArgs...)
 
 	if err != nil {
 		return nil, fmt.Errorf("prepare matches by session query: %w", err)

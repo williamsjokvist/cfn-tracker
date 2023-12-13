@@ -48,5 +48,10 @@
   "obsCustomize": "",
   "lastMatch": "",
   "statsWillBeDisplayed": "",
-  "selectTheme": ""
+  "selectTheme": "",
+  "started": "始めました",
+  "user": "ユーザー",
+  "matchesWon": "勝った試合",
+  "matchesLost": "負けた試合",
+  "sessions": "セッション"
 }

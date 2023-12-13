@@ -25,7 +25,7 @@ const NavigationItems = [
   {
     icon: "ion:document-text-outline",
     selectedIcon: "ion:document-text",
-    href: "history",
+    href: "sessions",
     main: false,
   },
   {
@@ -83,7 +83,7 @@ export const AppSidebar: React.FC = () => {
             isSelected={
               navItem.main
                 ? location.pathname == "/"
-                : location.pathname == `/${navItem.href}`
+                : location.pathname.includes(navItem.href)
             }
             isMinimized={isMinimized}
           />
