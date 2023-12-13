@@ -52,5 +52,6 @@
   "started": "Commencé",
   "user": "Nom",
   "matchesWon": "Matchs Gagnés",
-  "matchesLost": "Matchs Perdus"
+  "matchesLost": "Matchs Perdus",
+  "sessions": "Séances"
 }

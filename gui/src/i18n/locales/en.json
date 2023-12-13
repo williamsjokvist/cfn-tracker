@@ -52,5 +52,6 @@
   "started": "Started",
   "user": "User",
   "matchesWon": "Matches Won",
-  "matchesLost": "Matches Lost"
+  "matchesLost": "Matches Lost",
+  "sessions": "Sessions"
 }
