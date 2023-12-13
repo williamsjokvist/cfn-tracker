@@ -19,7 +19,7 @@ type SessionStorage interface {
 func (s *Storage) CreateSession(ctx context.Context, userId string) (*model.Session, error) {
 	sesh := model.Session{
 		UserId:    userId,
-		CreatedAt: time.Now().Format("2017-09-07 17:06:06"),
+		CreatedAt: time.Now().Format(time.RFC3339),
 	}
 	query := `
 		INSERT OR IGNORE INTO sessions (user_id, created_at)
@@ -45,15 +45,24 @@ func (s *Storage) GetSessions(ctx context.Context, userId string, limit uint8, o
 	where := ``
 	var whereArgs []interface{}
 	if userId != "" {
-		where = `WHERE user_id = (?)`
+		where = `WHERE s.user_id = (?)`
 		whereArgs = append(whereArgs, userId)
 	}
 	query, args, err := sqlx.In(fmt.Sprintf(`
-		SELECT id, lp, mr, user_id, u.display_name as user_name, created_at  FROM sessions
-		JOIN main.users u on u.code = sessions.user_id
+		SELECT
+			s.id, s.created_at, u.display_name as user_name,
+		    COUNT(IIF(m.victory, 1, NULL)) as matches_won,
+		    COUNT(IIF(m.victory = false, 1, NULL)) as matches_lost,
+		    m.lp as starting_lp,
+		    s.lp as ending_lp,
+		    (s.lp - m.lp) as lp_gain
+		FROM sessions as s
+		JOIN users u on u.code = s.user_id
+		JOIN matches m on s.id = m.session_id
+		GROUP BY s.id
 		%s
 		%s
-		ORDER BY created_at DESC
+		ORDER BY s.id DESC
 `, where, pagination), whereArgs...)
 	if err != nil {
 		return nil, fmt.Errorf("prepare get sessions query: %w", err)

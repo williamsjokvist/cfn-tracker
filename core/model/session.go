@@ -10,4 +10,7 @@ type Session struct {
 	Matches     []*Match `json:"matches"`
 	MatchesWon  int      `db:"matches_won" json:"matchesWon"`
 	MatchesLost int      `db:"matches_lost" json:"matchesLost"`
+	StartingLP  int      `db:"starting_lp" json:"startingLp"`
+	EndingLP    int      `db:"ending_lp" json:"endingLp"`
+	LPGain      int      `db:"lp_gain" json:"lpGain"`
 }
