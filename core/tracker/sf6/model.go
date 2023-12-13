@@ -445,7 +445,7 @@ type SearchResult struct {
 					TErrorLinkTop          string `json:"[t]error_link_top"`
 					TErrorNoplaydataText   string `json:"[t]error_noplaydata_text"`
 					TErrorNoplaydataTitle  string `json:"[t]error_noplaydata_title"`
-					errorsxystemText       string `json:"[t]error_system_text"`
+					TErrorSystemText       string `json:"[t]error_system_text"`
 					TLoginLogoutBtn        string `json:"[t]login_logout_btn"`
 					TLoginReloginErrorText string `json:"[t]login_relogin_error_text"`
 					TTitle                 string `json:"[t]title"`
