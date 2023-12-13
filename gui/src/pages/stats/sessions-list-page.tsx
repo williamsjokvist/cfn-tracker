@@ -37,7 +37,11 @@ export const SessionsListPage: React.FC = () => {
       <PageHeader text={t("sessions")} />
       <div className="overflow-y-scroll max-h-[340px] h-full mx-4 px-4 pb-4 mt-3">
         {Object.keys(groupedSessions).map((year) => (
-          <section>
+          <motion.section
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.125 }}
+          >
             <h2 className="text-4xl mt-2">{year}</h2>
             <div>
               {Object.keys(groupedSessions[year])
@@ -49,10 +53,7 @@ export const SessionsListPage: React.FC = () => {
                         month: "long",
                       }).format(new Date(`1999-${month}-01`))}
                     </h3>
-                    <motion.table
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 0.25 }}
+                    <table
                       className="w-full border-spacing-y-1 border-separate"
                     >
                       <thead>
@@ -117,11 +118,11 @@ export const SessionsListPage: React.FC = () => {
                           </tr>
                         ))}
                       </tbody>
-                    </motion.table>
+                    </table>
                   </section>
                 ))}
             </div>
-          </section>
+          </motion.section>
         ))}
       </div>
     </>
