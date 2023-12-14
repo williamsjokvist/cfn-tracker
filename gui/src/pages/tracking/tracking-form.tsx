@@ -2,18 +2,17 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 
-import { TRACKING_MACHINE } from "@/main/machine";
+import { TrackingMachineContext } from "@/machines/tracking-machine";
 import { GetUsers } from "@@/go/core/CommandHandler";
 
 import { ActionButton } from "@/ui/action-button";
 import { Checkbox } from "@/ui/checkbox";
 import { model } from "@@/go/models";
 import { PageHeader } from "@/ui/page-header";
-import { useMachine } from "@xstate/react";
 
 export const TrackingForm: React.FC = () => {
   const { t } = useTranslation();
-  const [_, send] = useMachine(TRACKING_MACHINE);
+  const trackingActor = TrackingMachineContext.useActorRef()
 
   const playerIdInputRef = React.useRef<HTMLInputElement>(null);
   const restoreRef = React.useRef<HTMLInputElement>(null);
@@ -28,7 +27,7 @@ export const TrackingForm: React.FC = () => {
   const onSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
     if (playerIdInput == "") return;
-    send({
+    trackingActor.send({
       type: "submit",
       user: {
         displayName:

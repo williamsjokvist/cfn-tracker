@@ -1,20 +1,14 @@
-import { assign, EventObject, setup } from "xstate";
+import { assign, setup } from "xstate";
 import { createActorContext } from "@xstate/react";
 
 import {
   StartTracking,
   StopTracking,
-  SelectGame,
 } from "@@/go/core/CommandHandler";
 import type { model } from "@@/go/models";
 
-export type MatchEvent = {
-  trackingState: model.TrackingState;
-} & EventObject;
-
 type CFNMachineContext = {
-  user?: model.User;
-  game?: "sfv" | "sf6";
+  user?: model.User
   restore: boolean;
   isTracking: boolean;
   trackingState: model.TrackingState;
@@ -25,25 +19,20 @@ export const TRACKING_MACHINE = setup({
     context: <CFNMachineContext>{},
   },
   actions: {
-    initialize: ({ context, self }) => {
-      SelectGame(context.game).catch(err => self.send({ type: "error", err }));
-    },
     startTracking: async ({ context, self }) => {
       if (!context.user || context.isTracking) return
       try {
         await StartTracking(context.user.code, context.restore)
         context.isTracking = true;
-        self.send({ type: "startedTracking" })
       } catch (err) {
         self.send({ type: "error", err })
       }
     },
     stopTracking: async ({ context, self }) => {
-      if (!context.isTracking) return;
       try {
         await StopTracking();
         context.isTracking = false;
-        self.send({ type: "stoppedTracking" })
+        self.send({ type: "cease" })
       } catch (err) {
         self.send({ type: "error", err })
       }
@@ -57,55 +46,43 @@ export const TRACKING_MACHINE = setup({
       isTracking: false,
       trackingState: <model.TrackingState>{},
     },
-    initial: "formGame",
+    initial: "cfnForm",
     states: {
-      "formGame": {
+      cfnForm: {
         on: {
           submit: {
-            actions: assign({
-              game: ({ event }) => event.game,
-            }),
-            target: "loadingGame",
+            actions: [
+              assign({
+                user: ({ event }) => event.user,
+                restore: ({ event }) => event.restore,
+              }),
+              "startTracking",
+            ],
+            target: "loading",
           },
         },
       },
-      "loadingGame": {
-        entry: "initialize",
+      loading: {
         on: {
-          loadedGame: "formCfn",
-          error: "formGame"
-        },
-      },
-      "formCfn": {
-        on: {
-          submit: {
-            actions: assign({
-              user: ({ event }) => event.user,
-              restore: ({ event }) => event.restore,
-            }),
-            target: "loadingCfn",
-          },
-        },
-      },
-      "loadingCfn": {
-        entry: "startTracking",
-        on: {
-          startedTracking: "tracking",
-          error: "formCfn"
+          matchPlayed: "tracking",
+          error: "cfnForm"
         },
       },
       tracking: {
         on: {
-          stoppedTracking: "formCfn",
+          cease: {
+            actions: "stopTracking",
+            target: "cfnForm"
+          },
           matchPlayed: {
             actions: assign({
               trackingState: ({ event }) => event.trackingState,
             }),
           },
         },
-        exit: "stopTracking",
       },
     },
   },
 );
 
+export const TrackingMachineContext = createActorContext(TRACKING_MACHINE);  

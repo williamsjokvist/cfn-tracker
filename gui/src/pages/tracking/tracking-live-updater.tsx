@@ -3,30 +3,14 @@ import { useTranslation } from "react-i18next";
 import { Icon } from "@iconify/react";
 import { PieChart as ReactMinimalPieChart } from "react-minimal-pie-chart";
 
-import { TRACKING_MACHINE } from "@/main/machine";
+import { TrackingMachineContext } from "@/machines/tracking-machine";
 import { ActionButton } from "@/ui/action-button";
-import { StopTracking } from "@@/go/core/CommandHandler";
 import { PageHeader } from "@/ui/page-header";
-import { useMachine } from "@xstate/react";
-
-type StatProps = { text: string; value: string | number; };
-const BigStat: React.FC<StatProps> = ({ text, value }) => (
-  <div className="mb-2 flex flex-1 gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl">
-    <dt className="tracking-wider font-extralight">{text}</dt>
-    <dd className="text-4xl font-semibold">{value}</dd>
-  </div>
-);
-
-const SmallStat: React.FC<StatProps> = ({ text, value }) => (
-  <div className="flex gap-3 text-2xl">
-    <dt className='text-xl leading-8'>{text}</dt>
-    <dd className="font-bold">{value}</dd>
-  </div>
-)
+import { useSelector } from "@xstate/react";
 
 export const TrackingLiveUpdater: React.FC = () => {
   const { t } = useTranslation();
-  const [state, send] = useMachine(TRACKING_MACHINE);
+  const trackingActor = TrackingMachineContext.useActorRef()
 
   const {
     cfn,
@@ -43,7 +27,7 @@ export const TrackingLiveUpdater: React.FC = () => {
     character,
     opponentLeague,
     result,
-  } = state.context.trackingState;
+  } = useSelector(trackingActor, (snapshot) => snapshot.context.trackingState)
 
   const PieChart = (
     <ReactMinimalPieChart
@@ -132,7 +116,7 @@ export const TrackingLiveUpdater: React.FC = () => {
             {PieChart}
             <ActionButton
               className="absolute bottom-0 right-0"
-              onClick={() => send({ type: "stoppedTracking "})}
+              onClick={() => trackingActor.send({ type: "cease" })}
             >
               <Icon icon="fa6-solid:stop" className="mr-3 w-5 h-5" />
               {t("stop")}
@@ -144,3 +128,18 @@ export const TrackingLiveUpdater: React.FC = () => {
     </>
   );
 };
+
+type StatProps = { text: string; value: string | number; };
+const BigStat: React.FC<StatProps> = ({ text, value }) => (
+  <div className="mb-2 flex flex-1 gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl">
+    <dt className="tracking-wider font-extralight">{text}</dt>
+    <dd className="text-4xl font-semibold">{value}</dd>
+  </div>
+);
+
+const SmallStat: React.FC<StatProps> = ({ text, value }) => (
+  <div className="flex gap-3 text-2xl">
+    <dt className='text-xl leading-8'>{text}</dt>
+    <dd className="font-bold">{value}</dd>
+  </div>
+)
