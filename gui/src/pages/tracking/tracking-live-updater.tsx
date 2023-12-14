@@ -3,10 +3,11 @@ import { useTranslation } from "react-i18next";
 import { Icon } from "@iconify/react";
 import { PieChart as ReactMinimalPieChart } from "react-minimal-pie-chart";
 
-import { CFNMachineContext } from "@/main/machine";
+import { TRACKING_MACHINE } from "@/main/machine";
 import { ActionButton } from "@/ui/action-button";
 import { StopTracking } from "@@/go/core/CommandHandler";
 import { PageHeader } from "@/ui/page-header";
+import { useMachine } from "@xstate/react";
 
 type StatProps = { text: string; value: string | number; };
 const BigStat: React.FC<StatProps> = ({ text, value }) => (
@@ -25,7 +26,8 @@ const SmallStat: React.FC<StatProps> = ({ text, value }) => (
 
 export const TrackingLiveUpdater: React.FC = () => {
   const { t } = useTranslation();
-  const [state, send] = CFNMachineContext.useActor();
+  const [state, send] = useMachine(TRACKING_MACHINE);
+
   const {
     cfn,
     lp,
@@ -41,7 +43,7 @@ export const TrackingLiveUpdater: React.FC = () => {
     character,
     opponentLeague,
     result,
-  } = state.context.matchHistory;
+  } = state.context.trackingState;
 
   const PieChart = (
     <ReactMinimalPieChart
@@ -130,10 +132,7 @@ export const TrackingLiveUpdater: React.FC = () => {
             {PieChart}
             <ActionButton
               className="absolute bottom-0 right-0"
-              onClick={() => {
-                StopTracking(); // TODO: this should be part of the state machine
-                send("stoppedTracking");
-              }}
+              onClick={() => send({ type: "stoppedTracking "})}
             >
               <Icon icon="fa6-solid:stop" className="mr-3 w-5 h-5" />
               {t("stop")}

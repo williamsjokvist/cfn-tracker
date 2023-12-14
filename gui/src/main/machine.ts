@@ -1,4 +1,4 @@
-import { createMachine, assign, EventObject, send } from "xstate";
+import { assign, EventObject, setup } from "xstate";
 import { createActorContext } from "@xstate/react";
 
 import {
@@ -7,126 +7,105 @@ import {
   SelectGame,
 } from "@@/go/core/CommandHandler";
 import type { model } from "@@/go/models";
-import { EventsEmit } from "@@/runtime/runtime";
 
 export type MatchEvent = {
-  matchHistory: model.TrackingState;
+  trackingState: model.TrackingState;
 } & EventObject;
 
 type CFNMachineContext = {
-  playerInfo: model.User;
+  user?: model.User;
   game?: "sfv" | "sf6";
   restore: boolean;
   isTracking: boolean;
-  matchHistory: model.TrackingState;
+  trackingState: model.TrackingState;
 };
 
-export const cfnMachine = createMachine(
+export const TRACKING_MACHINE = setup({
+  types: {
+    context: <CFNMachineContext>{},
+  },
+  actions: {
+    initialize: ({ context, self }) => {
+      SelectGame(context.game).catch(err => self.send({ type: "error", err }));
+    },
+    startTracking: async ({ context, self }) => {
+      if (!context.user || context.isTracking) return
+      try {
+        await StartTracking(context.user.code, context.restore)
+        context.isTracking = true;
+        self.send({ type: "startedTracking" })
+      } catch (err) {
+        self.send({ type: "error", err })
+      }
+    },
+    stopTracking: async ({ context, self }) => {
+      if (!context.isTracking) return;
+      try {
+        await StopTracking();
+        context.isTracking = false;
+        self.send({ type: "stoppedTracking" })
+      } catch (err) {
+        self.send({ type: "error", err })
+      }
+    },
+  },
+}).createMachine(
   {
-    /** @xstate-layout N4IgpgJg5mDOIC5QGMBmA7AtAFwE4ENkBrMXAOgBsB7fCAS3SgGIG7s78K6AvSAbQAMAXUSgADlVhs6VdKJAAPRJgBMZAMzqVA9QEYVAVgA0IAJ7KDa9QHZdAgJw2DAX2cm0WPIRLk6ECmBMsACuAEYAtmyCIkggElLssvJKCNZkACz2AGwOTibmqQZkWenpBnqGru4YOATEpGRexAzMsNhUYtHy8dJJsSn66RnWKlkGWYb5iDlk4yUCEy5uIB613g1NRC1M4fjYyAAWAAoU+Kb8wt2SvXL9iAAcZPp2jtbGZogq97pkKurpTlcy3QVAgcHkq02pCuCRkt1AKUwBgEGi0On07wKqgEVlsAnu1nU9xUX3SOiqKxqUPI1FoLRhN2SiB+93s9wBbymCEwul0QwJL0By0hdR8ZD8AQZiXhimZ9mK9j5C0mHwQdg0+IMryW1U8oo2ovpsR60qZCHUv3uBl04xVBV06nlmRUugJOspevW5GCYgge0gAFk9ocABJ0NpUXAFcTXU13BB-NTs+4ExzaN72Tmq3RvMj2ewutl-G34+xA5xAA */
     id: "cfn-tracker",
-    predictableActionArguments: true,
-
-    context: <CFNMachineContext>{
+    context: {
       restore: false,
       isTracking: false,
-      matchHistory: <model.TrackingState>{
-        cfn: "",
-        wins: 0,
-        losses: 0,
-        winRate: 0,
-        lpGain: 0,
-        lp: 0,
-        opponent: "",
-        opponentCharacter: "",
-        opponentLeague: "",
-        opponentLP: 0,
-        totalLosses: 0,
-        totalMatches: 0,
-        totalWins: 0,
-        result: false,
-        winStreak: 0,
-        timestamp: "",
-        date: "",
-      },
+      trackingState: <model.TrackingState>{},
     },
-    initial: "gamePicking",
+    initial: "formGame",
     states: {
-      gamePicking: {
+      "formGame": {
         on: {
           submit: {
             actions: assign({
-              game: (_, e: any) => e.game,
+              game: ({ event }) => event.game,
             }),
-            target: "loading",
+            target: "loadingGame",
           },
         },
       },
-      loading: {
-        entry: "initializeGame",
+      "loadingGame": {
+        entry: "initialize",
         on: {
-          initialized: "idle",
-          error: "gamePicking"
+          loadedGame: "formCfn",
+          error: "formGame"
         },
       },
-      idle: {
+      "formCfn": {
         on: {
           submit: {
             actions: assign({
-              playerInfo: (_, e: any) => e.playerInfo,
-              restore: (_, e: any) => e.restore,
+              user: ({ event }) => event.user,
+              restore: ({ event }) => event.restore,
             }),
             target: "loadingCfn",
           },
         },
       },
-      loadingCfn: {
+      "loadingCfn": {
         entry: "startTracking",
         on: {
           startedTracking: "tracking",
-          error: "idle"
+          error: "formCfn"
         },
       },
       tracking: {
         on: {
-          stoppedTracking: "idle",
+          stoppedTracking: "formCfn",
           matchPlayed: {
             actions: assign({
-              matchHistory: (_, e: any) => e.matchHistory,
+              trackingState: ({ event }) => event.trackingState,
             }),
           },
         },
-
         exit: "stopTracking",
-      },
-    },
-  },
-  {
-    actions: {
-      initializeGame: ({ game, error }) => {
-        SelectGame(game).catch(err => {
-          EventsEmit("error", err)
-        });
-      },
-      startTracking: ({ playerInfo, restore, isTracking }) => {
-        if (playerInfo && !isTracking) {
-          StartTracking(playerInfo.code, restore).then(() => {
-            isTracking = true;
-          }).catch(err => {
-            EventsEmit("error", err)
-          });
-        }
-      },
-      stopTracking: ({ playerInfo, isTracking }) => {
-        if (!isTracking) return;
-        StopTracking().then((_) => {
-          isTracking = false;
-        }).catch(err => {
-          EventsEmit("error", err)
-        });
       },
     },
   },
 );
 
-export const CFNMachineContext = createActorContext(cfnMachine);

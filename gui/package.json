@@ -19,7 +19,7 @@
     "react-i18next": "^12.1.4",
     "react-minimal-pie-chart": "^8.4.0",
     "react-router-dom": "^6.6.2",
-    "xstate": "^4.37.2"
+    "xstate": "latest"
   },
   "devDependencies": {
     "@iconify/react": "^4.1.1",

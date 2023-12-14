@@ -2,7 +2,7 @@ import React from "react";
 import { Outlet } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
-import { CFNMachineContext } from "@/main/machine";
+import { TRACKING_MACHINE } from "@/main/machine";
 import { AppSidebar } from "@/main/app-layout/app-sidebar";
 import { ErrorMessage } from "@/main/error-message";
 
@@ -11,6 +11,7 @@ import { UpdatePrompt } from "@/ui/update-prompt";
 
 import { BrowserOpenURL, EventsOn } from "@@/runtime";
 import type { errorsx } from "@@/go/models";
+import { useMachine } from "@xstate/react";
 
 export const AppWrapper: React.FC = () => {
   const { t } = useTranslation();
@@ -18,27 +19,23 @@ export const AppWrapper: React.FC = () => {
   const [hasNewVersion, setNewVersion] = React.useState(false);
   const [err, setErr] = React.useState<errorsx.FrontEndError | null>(null);
 
-  const [_, send] = CFNMachineContext.useActor();
+  const [_, send] = useMachine(TRACKING_MACHINE);
 
   React.useEffect(() => {
-    EventsOn("stopped-tracking", () => send("stoppedTracking"));
-    EventsOn("auth-loaded", (percentage) => setLoaded(percentage));
-    EventsOn("version-update", (hasNewVersion) => setNewVersion(hasNewVersion));
-
+    EventsOn("stopped-tracking", () => send({ type: "stoppedTracking" }));
+    EventsOn("auth-loaded", (percentage: number) => setLoaded(percentage));
+    EventsOn("version-update", (hasNewVersion: boolean) => setNewVersion(hasNewVersion));
     EventsOn("initialized", () => {
-      send("initialized");
+      send({ type: "loadedGame" })
       setLoaded(100);
       setTimeout(() => setLoaded(0), 10);
     });
-
-    EventsOn("cfn-data", (matchHistory) => {
-      send("startedTracking");
+    EventsOn("cfn-data", (trackingState) => (
       send({
         type: "matchPlayed",
-        matchHistory,
-      });
-    });
-
+        trackingState,
+      })
+    ));
     EventsOn("error", (error: errorsx.FrontEndError) => {
       send({ type: "error" });
       setErr(error);
