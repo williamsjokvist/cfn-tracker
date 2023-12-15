@@ -12,13 +12,11 @@ import { LoadingBar } from "@/ui/loading-bar";
 import { UpdatePrompt } from "@/ui/update-prompt";
 
 import { BrowserOpenURL, EventsOn } from "@@/runtime";
-import type { errorsx } from "@@/go/models";
 
 export const AppWrapper: React.FC = () => {
   const { t } = useTranslation();
   const [loaded, setLoaded] = React.useState(0);
   const [hasNewVersion, setNewVersion] = React.useState(false);
-  const [err, setErr] = React.useState<errorsx.FrontEndError | null>(null);
 
   const trackingActor = TrackingMachineContext.useActorRef()
   const authActor = AuthMachineContext.useActorRef()
@@ -38,10 +36,7 @@ export const AppWrapper: React.FC = () => {
     <>
       <AppSidebar />
       <main>
-        <ErrorMessage
-          error={err}
-          onFadedOut={() => setErr(null)}
-        />
+        <ErrorMessage />
         <LoadingBar percentage={loaded} />
         {hasNewVersion && (
           <UpdatePrompt

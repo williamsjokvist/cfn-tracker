@@ -5,13 +5,14 @@ import {
   StartTracking,
   StopTracking,
 } from "@@/go/core/CommandHandler";
-import type { model } from "@@/go/models";
+import type { errorsx, model } from "@@/go/models";
 
 type CFNMachineContext = {
   user?: model.User
   restore: boolean;
   isTracking: boolean;
   trackingState: model.TrackingState;
+  error?: errorsx.FrontEndError;
 };
 
 export const TRACKING_MACHINE = setup({
@@ -24,8 +25,8 @@ export const TRACKING_MACHINE = setup({
       try {
         await StartTracking(context.user.code, context.restore)
         context.isTracking = true;
-      } catch (err) {
-        self.send({ type: "error", err })
+      } catch (error) {
+        self.send({ type: "error", error })
       }
     },
     stopTracking: async ({ context, self }) => {
@@ -33,8 +34,8 @@ export const TRACKING_MACHINE = setup({
         await StopTracking();
         context.isTracking = false;
         self.send({ type: "cease" })
-      } catch (err) {
-        self.send({ type: "error", err })
+      } catch (error) {
+        self.send({ type: "error", error })
       }
     },
   },
@@ -65,7 +66,14 @@ export const TRACKING_MACHINE = setup({
       loading: {
         on: {
           matchPlayed: "tracking",
-          error: "cfnForm"
+          error: {
+            actions: [
+              assign({
+                error: ({ event }) => event.error,
+              }),
+            ],
+            target: "cfnForm"
+          }
         },
       },
       tracking: {
