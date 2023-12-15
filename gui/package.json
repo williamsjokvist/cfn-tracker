@@ -9,7 +9,7 @@
   "dependencies": {
     "@radix-ui/react-dialog": "^1.0.4",
     "@vitejs/plugin-react-swc": "^3.5.0",
-    "@xstate/react": "^3.2.2",
+    "@xstate/react": "^4.0.1",
     "clsx": "^2.0.0",
     "framer-motion": "^10.12.16",
     "i18next": "^22.4.14",
@@ -19,7 +19,7 @@
     "react-i18next": "^12.1.4",
     "react-minimal-pie-chart": "^8.4.0",
     "react-router-dom": "^6.6.2",
-    "xstate": "^4.37.2"
+    "xstate": "^5.3.0"
   },
   "devDependencies": {
     "@iconify/react": "^4.1.1",

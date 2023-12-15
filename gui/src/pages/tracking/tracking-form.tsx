@@ -2,7 +2,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 
-import { CFNMachineContext } from "@/main/machine";
+import { TrackingMachineContext } from "@/machines/tracking-machine";
 import { GetUsers } from "@@/go/core/CommandHandler";
 
 import { ActionButton } from "@/ui/action-button";
@@ -12,7 +12,7 @@ import { PageHeader } from "@/ui/page-header";
 
 export const TrackingForm: React.FC = () => {
   const { t } = useTranslation();
-  const [_, send] = CFNMachineContext.useActor();
+  const trackingActor = TrackingMachineContext.useActorRef()
 
   const playerIdInputRef = React.useRef<HTMLInputElement>(null);
   const restoreRef = React.useRef<HTMLInputElement>(null);
@@ -27,9 +27,9 @@ export const TrackingForm: React.FC = () => {
   const onSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
     if (playerIdInput == "") return;
-    send({
+    trackingActor.send({
       type: "submit",
-      playerInfo: {
+      user: {
         displayName:
           users?.find((old) => old.code == playerIdInput) ?? playerIdInput,
         code: playerIdInput,

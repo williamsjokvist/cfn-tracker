@@ -5,7 +5,6 @@ import { motion } from "framer-motion";
 import sfvLogo from "@/img/logo_sfv.png";
 import sf6Logo from "@/img/logo_sf6.png";
 import { ActionButton } from "@/ui/action-button";
-import { CFNMachineContext } from "@/main/machine";
 import { GameButton } from "@/ui/game-button";
 import { PageHeader } from "@/ui/page-header";
 
@@ -22,10 +21,13 @@ const GAMES = [
   },
 ];
 
-export const TrackingGamePicker: React.FC = () => {
+type TrackingGamePickerProps = {
+  onSubmit: (game: string) => void
+}
+
+export const TrackingGamePicker: React.FC<TrackingGamePickerProps> = ({ onSubmit }) => {
   const { t } = useTranslation();
   const [selectedGame, setSelectedGame] = React.useState<string | undefined>();
-  const [_, send] = CFNMachineContext.useActor();
 
   return (
     <>
@@ -54,11 +56,7 @@ export const TrackingGamePicker: React.FC = () => {
         </motion.ul>
         <ActionButton
           onClick={() => {
-            selectedGame &&
-              send({
-                type: "submit",
-                game: selectedGame,
-              });
+            selectedGame && onSubmit(selectedGame)
           }}
           disabled={!selectedGame}
         >

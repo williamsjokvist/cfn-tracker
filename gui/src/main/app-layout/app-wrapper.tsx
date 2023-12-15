@@ -2,7 +2,9 @@ import React from "react";
 import { Outlet } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
-import { CFNMachineContext } from "@/main/machine";
+import { TrackingMachineContext } from "@/machines/tracking-machine";
+import { AuthMachineContext } from "@/machines/auth-machine";
+
 import { AppSidebar } from "@/main/app-layout/app-sidebar";
 import { ErrorMessage } from "@/main/error-message";
 
@@ -18,32 +20,18 @@ export const AppWrapper: React.FC = () => {
   const [hasNewVersion, setNewVersion] = React.useState(false);
   const [err, setErr] = React.useState<errorsx.FrontEndError | null>(null);
 
-  const [_, send] = CFNMachineContext.useActor();
+  const trackingActor = TrackingMachineContext.useActorRef()
+  const authActor = AuthMachineContext.useActorRef()
 
   React.useEffect(() => {
-    EventsOn("stopped-tracking", () => send("stoppedTracking"));
-    EventsOn("auth-loaded", (percentage) => setLoaded(percentage));
-    EventsOn("version-update", (hasNewVersion) => setNewVersion(hasNewVersion));
-
+    EventsOn("stopped-tracking", () => trackingActor.send({ type: "cease" }));
     EventsOn("initialized", () => {
-      send("initialized");
-      setLoaded(100);
-      setTimeout(() => setLoaded(0), 10);
+      authActor.send({ type: "loadedGame" })
+      setTimeout(() => setLoaded(0), 10)
     });
-
-    EventsOn("cfn-data", (matchHistory) => {
-      send("startedTracking");
-      send({
-        type: "matchPlayed",
-        matchHistory,
-      });
-    });
-
-    EventsOn("error", (error: errorsx.FrontEndError) => {
-      send({ type: "error" });
-      setErr(error);
-      console.error(error);
-    });
+    EventsOn("cfn-data", (trackingState) => trackingActor.send({ type: "matchPlayed", trackingState }));
+    EventsOn("auth-loaded", (percentage: number) =>  setLoaded(percentage));
+    EventsOn("version-update", (hasNewVersion: boolean) => setNewVersion(hasNewVersion));
   }, []);
 
   return (
