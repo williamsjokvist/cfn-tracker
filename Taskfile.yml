@@ -1,0 +1,24 @@
+version: '3'
+
+dotenv: ['.env']
+
+tasks:
+  dev:
+    desc: Run the dev server without generating bindings, hot reloading, go mod sync
+    cmds:
+      - wails dev -skipbindings -noreload -nosyncgomod -nogorebuild
+
+  dev-hard:
+    desc: Run the dev server with codegen, reloading and go mod sync
+    cmds:
+      - wails dev -forcebuild
+
+  build:
+    desc: Build the app
+    vars:
+      ldflags: =-X 'main.appVersion=${APP_VERSION}' -X 'main.steamUsername=${STEAM_USERNAME}' -X 'main.steamPassword=${STEAM_PASSWORD}' -X 'main.capIDEmail=${CAP_ID_EMAIL}' -X 'main.capIDPassword=${CAP_ID_PASSWORD}' -X 'main.runHeadless="true"'
+    cmds:
+      - cmd: env GOOS=darwin GOARCH=amd64 wails build -ldflags="{{.ldflags}}"
+        platforms: [darwin]
+      - cmd: env GOOS=windows GOARCH=amd64 wails build -ldflags="{{.ldflags}}"
+        platforms: [windows]
