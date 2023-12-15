@@ -64,7 +64,7 @@ func (ch *CommandHandler) StartTracking(cfn string, restore bool) error {
 	err := ch.tracker.Start(ch.ctx, cfn, restore, RefreshInterval)
 	if err != nil {
 		log.Println(err)
-		if !errors.Is(err, &errorsx.TrackingError{}) {
+		if !errorsx.ContainsTrackingError(err) {
 			err = errorsx.NewError(500, fmt.Errorf(`Failed to start tracking %w`, err))
 		}
 	}
@@ -85,7 +85,7 @@ func (ch *CommandHandler) GetSessions(userId string) ([]*model.Session, error) {
 	err = errorsx.NewError(404, fmt.Errorf(`Failed to get sessions %w`, err))
 	if err != nil {
 		log.Println(err)
-		if !errors.Is(err, &errorsx.TrackingError{}) {
+		if !errorsx.ContainsTrackingError(err) {
 			err = errorsx.NewError(404, fmt.Errorf(`Failed to get sessions %w`, err))
 		}
 	}
@@ -96,7 +96,7 @@ func (ch *CommandHandler) GetMatches(sessionId uint16, userId string, limit uint
 	matches, err := ch.repo.GetMatches(ch.ctx, sessionId, userId, limit, offset)
 	if err != nil {
 		log.Println(err)
-		if !errors.Is(err, &errorsx.TrackingError{}) {
+		if !errorsx.ContainsTrackingError(err) {
 			err = errorsx.NewError(404, fmt.Errorf(`Failed to get matches %w`, err))
 		}
 	}
@@ -107,7 +107,7 @@ func (ch *CommandHandler) GetUsers() ([]*model.User, error) {
 	users, err := ch.repo.GetUsers(ch.ctx)
 	if err != nil {
 		log.Println(err)
-		if !errors.Is(err, &errorsx.TrackingError{}) {
+		if !errorsx.ContainsTrackingError(err) {
 			err = errorsx.NewError(404, fmt.Errorf(`Failed to get users %w`, err))
 		}
 	}
@@ -143,7 +143,7 @@ func (ch *CommandHandler) SelectGame(game string) error {
 
 	if err != nil {
 		log.Println(err)
-		if !errors.Is(err, &errorsx.TrackingError{}) {
+		if !errorsx.ContainsTrackingError(err) {
 			err = errorsx.NewError(500, fmt.Errorf(`Failed to select game %w`, err))
 		}
 	}
