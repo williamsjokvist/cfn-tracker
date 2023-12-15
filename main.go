@@ -107,13 +107,13 @@ func main() {
 		})
 	}
 
-	hasNewVersion, version, err := update.CheckForUpdate(appVersion)
+	newRelease, err := update.CheckForUpdate(appVersion)
 	if err != nil {
 		closeWithError(fmt.Errorf(`failed to check for update: %w`, err))
 		return
 	}
 
-	if hasNewVersion {
+	if newRelease != nil {
 		wails.Run(&options.App{
 			Title:                    `CFN Tracker - Update`,
 			Width:                    400,
@@ -129,7 +129,7 @@ func main() {
 						params := struct {
 							Version string
 						}{
-							Version: version,
+							Version: newRelease.Version.String(),
 						}
 						tmpl.Execute(&b, params)
 						w.Write(b.Bytes())
