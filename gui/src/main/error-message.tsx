@@ -5,7 +5,6 @@ import { errorsx } from "@@/go/models";
 import { Icon } from "@iconify/react";
 import { useSelector } from "@xstate/react";
 import clsx from "clsx";
-import { error } from "console";
 import { useAnimate } from "framer-motion";
 import React from "react";
 import { useTranslation } from "react-i18next";
