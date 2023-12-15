@@ -53,7 +53,7 @@ export const SessionsListPage: React.FC = () => {
                     <h3 className="text-2xl mt-2">
                       {Intl.DateTimeFormat(i18n.resolvedLanguage, {
                         month: "long",
-                      }).format(new Date(`1999-${month}-01`))}
+                      }).format(new Date(`1999-${Number(month)+1}-01`))}
                     </h3>
                     <table
                       className="w-full border-spacing-y-1 border-separate"
