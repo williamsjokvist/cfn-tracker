@@ -1,6 +1,6 @@
-//go:build darwin
+//go:build windows
 
-package patch
+package update
 
 func MustPatch(toVersion string) bool {
 

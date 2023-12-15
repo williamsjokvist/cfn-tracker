@@ -17,7 +17,6 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
 	"github.com/wailsapp/wails/v2/pkg/options/mac"
 	"github.com/wailsapp/wails/v2/pkg/options/windows"
-	"github.com/wailsapp/wails/v2/pkg/runtime"
 
 	"github.com/williamsjokvist/cfn-tracker/core"
 	"github.com/williamsjokvist/cfn-tracker/core/browser"
@@ -25,8 +24,8 @@ import (
 	"github.com/williamsjokvist/cfn-tracker/core/data/sql"
 	"github.com/williamsjokvist/cfn-tracker/core/data/txt"
 	"github.com/williamsjokvist/cfn-tracker/core/errorsx"
-	"github.com/williamsjokvist/cfn-tracker/core/patch"
 	"github.com/williamsjokvist/cfn-tracker/core/server"
+	"github.com/williamsjokvist/cfn-tracker/core/update"
 )
 
 var (
@@ -43,6 +42,9 @@ var assets embed.FS
 
 //go:embed gui/error/error.html
 var errorTmpl []byte
+
+//go:embed gui/update/update.html
+var updateTmpl []byte
 
 //go:embed build/appicon.png
 var icon []byte
@@ -104,7 +106,41 @@ func main() {
 			},
 		})
 	}
-	appBrowser, err := browser.NewBrowser(runHeadless == `true`)
+
+	hasNewVersion, version, err := update.CheckForUpdate(appVersion)
+	if err != nil {
+		closeWithError(fmt.Errorf(`failed to check for update: %w`, err))
+		return
+	}
+
+	if hasNewVersion {
+		wails.Run(&options.App{
+			Title:                    `CFN Tracker - Update`,
+			Width:                    400,
+			Height:                   148,
+			DisableResize:            true,
+			Frameless:                true,
+			EnableDefaultContextMenu: false,
+			AssetServer: &assetserver.Options{
+				Middleware: assetserver.ChainMiddleware(func(next http.Handler) http.Handler {
+					return http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+						var b bytes.Buffer
+						tmpl := template.Must(template.New("updatePage").Parse(string(updateTmpl)))
+						params := struct {
+							Version string
+						}{
+							Version: version,
+						}
+						tmpl.Execute(&b, params)
+						w.Write(b.Bytes())
+					})
+				}),
+			},
+		})
+		return
+	}
+
+	appBrowser, err = browser.NewBrowser(runHeadless == `true`)
 	if err != nil {
 		closeWithError(fmt.Errorf(`failed to launch browser: %v`, err))
 		return
@@ -123,8 +159,10 @@ func main() {
 	cmdHandler := core.NewCommandHandler(appBrowser, trackerRepo)
 
 	err = wails.Run(&options.App{
-		Title:              fmt.Sprintf(`CFN Tracker v%s`, appVersion),
-		Assets:             assets,
+		Title: fmt.Sprintf(`CFN Tracker v%s`, appVersion),
+		AssetServer: &assetserver.Options{
+			Assets: assets,
+		},
 		Width:              920,
 		Height:             450,
 		MinWidth:           800,
@@ -154,16 +192,6 @@ func main() {
 		},
 		OnStartup: func(ctx context.Context) {
 			cmdHandler.AssignRuntimeContext(ctx)
-
-			hasNewVersion, version, err := patch.CheckForUpdate(appVersion)
-			if err != nil {
-				closeWithError(fmt.Errorf(`failed to check for update: %w`, err))
-				return
-			}
-			if hasNewVersion {
-				runtime.EventsEmit(ctx, `version-update`, version)
-			}
-
 			go server.Start(ctx)
 		},
 		OnShutdown: func(_ context.Context) {

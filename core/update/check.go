@@ -1,4 +1,4 @@
-package patch
+package update
 
 import (
 	"fmt"
@@ -9,7 +9,9 @@ import (
 )
 
 func CheckForUpdate(appVersion string) (bool, string, error) {
+	selfupdate.EnableLog()
 	latest, found, err := selfupdate.DetectLatest(`williamsjokvist/cfn-tracker`)
+
 	if err != nil {
 		return false, "", fmt.Errorf(`get latest app version: %w`, err)
 	}
