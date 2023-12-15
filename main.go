@@ -10,7 +10,6 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/hashicorp/go-version"
 	"github.com/joho/godotenv"
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/logger"
@@ -26,6 +25,7 @@ import (
 	"github.com/williamsjokvist/cfn-tracker/core/data/sql"
 	"github.com/williamsjokvist/cfn-tracker/core/data/txt"
 	"github.com/williamsjokvist/cfn-tracker/core/errorsx"
+	"github.com/williamsjokvist/cfn-tracker/core/patch"
 	"github.com/williamsjokvist/cfn-tracker/core/server"
 )
 
@@ -65,7 +65,7 @@ func init() {
 		runHeadless = os.Getenv(`RUN_HEADLESS`)
 	}
 
-	core.AppVersion, _ = version.NewVersion(appVersion)
+	core.AppVersion = appVersion
 	core.SteamUsername = steamUsername
 	core.SteamPassword = steamPassword
 	core.RunHeadless = runHeadless == `true`
@@ -122,19 +122,8 @@ func main() {
 	trackerRepo := data.NewCFNTrackerRepository(sqlDb, txtDb)
 	cmdHandler := core.NewCommandHandler(appBrowser, trackerRepo)
 
-	appVer, err := version.NewVersion(appVersion)
-	if err != nil {
-		closeWithError(fmt.Errorf(`bad app version: %w`, err))
-		return
-	}
-	latestVersion, err := appBrowser.GetLatestAppVersion()
-	if err != nil {
-		closeWithError(fmt.Errorf(`failed to get latest app version: %w`, err))
-		return
-	}
-
 	err = wails.Run(&options.App{
-		Title:              `CFN Tracker v3`,
+		Title:              fmt.Sprintf(`CFN Tracker v%s`, appVersion),
 		Assets:             assets,
 		Width:              920,
 		Height:             450,
@@ -166,11 +155,13 @@ func main() {
 		OnStartup: func(ctx context.Context) {
 			cmdHandler.AssignRuntimeContext(ctx)
 
-			if appVer.LessThan(latestVersion) {
-				log.Println(`Has new version: `, latestVersion.String())
-				runtime.EventsEmit(ctx, `version-update`, latestVersion.String())
-			} else {
-				log.Println(`No new version, running: `, appVer.String())
+			hasNewVersion, version, err := patch.CheckForUpdate(appVersion)
+			if err != nil {
+				closeWithError(fmt.Errorf(`failed to check for update: %w`, err))
+				return
+			}
+			if hasNewVersion {
+				runtime.EventsEmit(ctx, `version-update`, version)
 			}
 
 			go server.Start(ctx)

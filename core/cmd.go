@@ -10,25 +10,12 @@ import (
 	"os/exec"
 	"runtime"
 	"strings"
-	"time"
-
-	"github.com/hashicorp/go-version"
 
 	"github.com/williamsjokvist/cfn-tracker/core/browser"
 	"github.com/williamsjokvist/cfn-tracker/core/data"
 	"github.com/williamsjokvist/cfn-tracker/core/errorsx"
 	"github.com/williamsjokvist/cfn-tracker/core/model"
 	"github.com/williamsjokvist/cfn-tracker/core/tracker"
-)
-
-var (
-	SteamUsername   string
-	SteamPassword   string
-	CapIDEmail      string
-	CapIDPassword   string
-	AppVersion      *version.Version
-	RefreshInterval time.Duration = 30 * time.Second
-	RunHeadless     bool
 )
 
 // The CommandHandler is the interface between the GUI and the core
@@ -52,7 +39,7 @@ func (ch *CommandHandler) AssignRuntimeContext(ctx context.Context) {
 }
 
 func (ch *CommandHandler) GetAppVersion() string {
-	return AppVersion.Original()
+	return AppVersion
 }
 
 func (ch *CommandHandler) StopTracking() {
