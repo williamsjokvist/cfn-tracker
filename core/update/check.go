@@ -10,7 +10,7 @@ import (
 
 func CheckForUpdate(appVersion string) (*selfupdate.Release, error) {
 	selfupdate.EnableLog()
-	latest, found, err := selfupdate.DetectLatest(`williamsjokvist/cfn-tracker`)
+	latest, found, err := selfupdate.DetectLatest(`GoogleCloudPlatform/terraformer`)
 
 	if err != nil {
 		return nil, fmt.Errorf(`get latest app version: %w`, err)

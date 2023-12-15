@@ -14,6 +14,7 @@ import (
 )
 
 func DoUpdate(to *selfupdate.Release) (bool, error) {
+	log.Println("Started updating to", to.Version)
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
 		return false, fmt.Errorf(`get user home dir: %w`, err)
@@ -26,9 +27,10 @@ func DoUpdate(to *selfupdate.Release) (bool, error) {
 
 	var appPath string
 	cmdPath, err := os.Executable()
-	appPath = strings.TrimSuffix(cmdPath, filepath.Join(`CFN Tracker.app`, `Contents`, `MacOS`, `CFN Tracker`))
 	if err != nil {
 		appPath = `/Applications/`
+	} else {
+		appPath = strings.TrimSuffix(cmdPath, filepath.Join(`CFN Tracker.app`, `Contents`, `MacOS`, `CFN Tracker`))
 	}
 
 	err = exec.Command("ditto", "-xk", downloadPath, appPath).Run()

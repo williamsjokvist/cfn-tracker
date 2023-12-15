@@ -17,6 +17,7 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
 	"github.com/wailsapp/wails/v2/pkg/options/mac"
 	"github.com/wailsapp/wails/v2/pkg/options/windows"
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 
 	"github.com/williamsjokvist/cfn-tracker/core"
 	"github.com/williamsjokvist/cfn-tracker/core/browser"
@@ -121,6 +122,13 @@ func main() {
 			DisableResize:            true,
 			Frameless:                true,
 			EnableDefaultContextMenu: false,
+			OnDomReady: func(ctx context.Context) {
+				didUpdate, err := update.DoUpdate(newRelease)
+				if err != nil || !didUpdate {
+					runtime.EventsEmit(ctx, "update-error")
+					log.Println("no update", err)
+				}
+			},
 			AssetServer: &assetserver.Options{
 				Middleware: assetserver.ChainMiddleware(func(next http.Handler) http.Handler {
 					return http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {

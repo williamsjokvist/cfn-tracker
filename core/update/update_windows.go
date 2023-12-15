@@ -11,7 +11,7 @@ import (
 )
 
 func DoUpdate(to semver.Version) (bool, error) {
-	latest, err := selfupdate.UpdateSelf(to, `williamsjokvist/cfn-tracker`)
+	latest, err := selfupdate.UpdateSelf(to, `GoogleCloudPlatform/terraformer`)
 	if err != nil {
 		return false, fmt.Errorf(`failed to update to %s: %w`, latest.Version, err)
 	}
