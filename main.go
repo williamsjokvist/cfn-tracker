@@ -123,10 +123,18 @@ func main() {
 			Frameless:                true,
 			EnableDefaultContextMenu: false,
 			OnDomReady: func(ctx context.Context) {
-				didUpdate, err := update.DoUpdate(newRelease)
-				if err != nil || !didUpdate {
-					runtime.EventsEmit(ctx, "update-error")
-					log.Println("no update", err)
+				progChan := make(chan update.ProgressStatus)
+				go update.DoUpdate(newRelease, progChan)
+
+				for progress := range progChan {
+					runtime.EventsEmit(ctx, "progress", progress.Progress)
+					fmt.Println(progress.Progress)
+					if progress.Err != nil {
+						log.Println("failed to update app", progress.Err.Error())
+						runtime.EventsEmit(ctx, "update-error", progress.Err.Error())
+						close(progChan)
+						return
+					}
 				}
 			},
 			AssetServer: &assetserver.Options{

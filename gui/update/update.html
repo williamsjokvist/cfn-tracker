@@ -43,8 +43,13 @@
           btn.addEventListener("click", window.runtime.Quit)
         }
 
-        window.runtime.EventsOn("update-error", () => {
-          document.getElementById("text").innerText = "Failed to update"
+        const progressBar = document.getElementById("progress-bar")
+        window.runtime.EventsOn("progress", (progress) => {
+          progressBar.setAttribute("value", progress)
+        })
+        
+        window.runtime.EventsOn("update-error", (reason) => {
+          document.getElementById("text").innerText = `Failed to update, reason: ${reason}`
           document.getElementById("progress-bar").remove()
         })
       })
@@ -62,7 +67,7 @@
     <div class="window-body" style="height: 101px">
       <div style="display: grid; align-items: center; justify-content: center; gap: 8px;">
         <p id="text" style="font-size: 16px;">Updating to version: <b>{{.Version}}</b></p>
-        <progress id="progress-bar" style="margin: 0 auto;"></progress>
+        <progress id="progress-bar" max="100" value="0" style="margin: 0 auto;"></progress>
       </div>
     </div>
     <audio autoplay>
