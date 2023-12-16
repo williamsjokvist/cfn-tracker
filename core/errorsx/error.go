@@ -34,6 +34,11 @@ func (e *TrackingError) Unwrap() error {
 	return e.innerError
 }
 
+func ContainsTrackingError(err error) bool {
+	var trackingErr *TrackingError
+	return errors.As(err, &trackingErr)
+}
+
 func ConvertToFrontEndError(err error) any {
 	var trackingErr *TrackingError
 	if errors.As(err, &trackingErr) {
