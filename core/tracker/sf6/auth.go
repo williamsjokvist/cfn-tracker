@@ -95,4 +95,5 @@ func (t *SF6Tracker) Authenticate(ctx context.Context, email string, password st
 
 	statChan <- *status.WithProgress(100)
 	t.isAuthenticated = true
+	log.Println(`Authentication passed`)
 }

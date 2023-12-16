@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
+
 	"github.com/williamsjokvist/cfn-tracker/core/browser"
 	"github.com/williamsjokvist/cfn-tracker/core/data"
 	"github.com/williamsjokvist/cfn-tracker/core/errorsx"
@@ -49,13 +50,12 @@ func MakeSF6Tracker(ctx context.Context, browser *browser.Browser, username, pas
 		if status.Err != nil {
 			return nil, errorsx.NewError(http.StatusUnauthorized, status.Err)
 		}
+		runtime.EventsEmit(ctx, "auth-loaded", status.Progress)
 
 		if status.Progress >= 100 {
-			runtime.EventsEmit(ctx, "initialized", true)
 			close(authChan)
 			break
 		}
-		runtime.EventsEmit(ctx, "auth-loaded", status.Progress)
 	}
 
 	var gt GameTracker = sf6Tracker

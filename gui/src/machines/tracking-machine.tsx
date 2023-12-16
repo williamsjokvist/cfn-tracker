@@ -6,8 +6,10 @@ import {
   StopTracking,
 } from "@@/go/core/CommandHandler";
 import type { errorsx, model } from "@@/go/models";
+import React from "react";
+import { EventsOn } from "@@/runtime/runtime";
 
-type CFNMachineContext = {
+type TrackingMachineContextProps = {
   user?: model.User
   restore: boolean;
   isTracking: boolean;
@@ -17,7 +19,7 @@ type CFNMachineContext = {
 
 export const TRACKING_MACHINE = setup({
   types: {
-    context: <CFNMachineContext>{},
+    context: {} as TrackingMachineContextProps,
   },
   actions: {
     startTracking: async ({ context, self }) => {
@@ -45,7 +47,7 @@ export const TRACKING_MACHINE = setup({
     context: {
       restore: false,
       isTracking: false,
-      trackingState: <model.TrackingState>{},
+      trackingState: {} as model.TrackingState,
     },
     initial: "cfnForm",
     states: {
@@ -94,3 +96,22 @@ export const TRACKING_MACHINE = setup({
 );
 
 export const TrackingMachineContext = createActorContext(TRACKING_MACHINE);  
+
+export const TrackingMachineContextProvider = ({ children }) => {
+  return (
+    <TrackingMachineContext.Provider>
+      <TrackingSubscriber>
+        {children}
+      </TrackingSubscriber>
+    </TrackingMachineContext.Provider>
+  )
+}
+
+const TrackingSubscriber = ({ children }) => {
+  const trackingActor = TrackingMachineContext.useActorRef()
+  React.useEffect(() => {
+    EventsOn("cfn-data", (trackingState) => trackingActor.send({ type: "matchPlayed", trackingState }));
+    EventsOn("stopped-tracking", () => trackingActor.send({ type: "cease" }));
+  }, []);
+  return children
+}
