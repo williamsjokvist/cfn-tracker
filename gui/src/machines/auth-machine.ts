@@ -1,10 +1,12 @@
 import { TRACKING_MACHINE } from "@/machines/tracking-machine";
 import { SelectGame } from "@@/go/core/CommandHandler";
+import { errorsx } from "@@/go/models";
 import { createActorContext } from "@xstate/react";
 import { setup, assign } from "xstate";
 
 type AuthMachineContext = {
-  game?: "sfv" | "sf6"
+  game?: "sfv" | "sf6";
+  error?: errorsx.FrontEndError;
 }
 export const AUTH_MACHINE = setup({
   types: {
@@ -14,7 +16,7 @@ export const AUTH_MACHINE = setup({
     selectGame: ({ context, self }) => {
       SelectGame(context.game).then(() => {
         self.send({ type: "loadedGame" })
-      }).catch(err => self.send({ type: "error", err }));
+      }).catch(error => self.send({ type: "error", error }));
     },
   }
 }).createMachine({
@@ -37,7 +39,14 @@ export const AUTH_MACHINE = setup({
     loading: {
       on: {
         loadedGame: "connected",
-        error: "gameForm"
+        error: {
+          actions: [
+            assign({
+              error: ({ event }) => event.error,
+            }),
+          ],
+          target: "gameForm"
+        }
       },
     },
     connected: {
