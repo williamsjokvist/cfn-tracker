@@ -66,7 +66,7 @@ func (ch *CommandHandler) StartTracking(cfn string, restore bool) error {
 	if err != nil {
 		log.Println(err)
 		if !errorsx.ContainsTrackingError(err) {
-			err = errorsx.NewError(http.StatusInternalServerError, fmt.Errorf(`Failed to start tracking %w`, err))
+			err = errorsx.NewError(http.StatusInternalServerError, fmt.Errorf(`failed to start tracking %w`, err))
 		}
 	}
 	return err
@@ -83,11 +83,10 @@ func (ch *CommandHandler) OpenResultsDirectory() {
 
 func (ch *CommandHandler) GetSessions(userId string) ([]*model.Session, error) {
 	sessions, err := ch.repo.GetSessions(ch.ctx, userId, 0, 0)
-	err = errorsx.NewError(http.StatusNotFound, fmt.Errorf(`Failed to get sessions %w`, err))
 	if err != nil {
 		log.Println(err)
 		if !errorsx.ContainsTrackingError(err) {
-			err = errorsx.NewError(http.StatusNotFound, fmt.Errorf(`Failed to get sessions %w`, err))
+			err = errorsx.NewError(http.StatusNotFound, fmt.Errorf(`failed to get sessions %w`, err))
 		}
 	}
 	return sessions, err
@@ -98,7 +97,7 @@ func (ch *CommandHandler) GetMatches(sessionId uint16, userId string, limit uint
 	if err != nil {
 		log.Println(err)
 		if !errorsx.ContainsTrackingError(err) {
-			err = errorsx.NewError(http.StatusNotFound, fmt.Errorf(`Failed to get matches %w`, err))
+			err = errorsx.NewError(http.StatusNotFound, fmt.Errorf(`failed to get matches %w`, err))
 		}
 	}
 	return matches, err
@@ -109,7 +108,7 @@ func (ch *CommandHandler) GetUsers() ([]*model.User, error) {
 	if err != nil {
 		log.Println(err)
 		if !errorsx.ContainsTrackingError(err) {
-			err = errorsx.NewError(http.StatusNotFound, fmt.Errorf(`Failed to get users %w`, err))
+			err = errorsx.NewError(http.StatusNotFound, fmt.Errorf(`failed to get users %w`, err))
 		}
 	}
 	return users, nil
@@ -119,7 +118,7 @@ func (ch *CommandHandler) GetThemeList() ([]string, error) {
 	files, err := ioutil.ReadDir(`themes`)
 	if err != nil {
 		log.Println(err)
-		return nil, errorsx.NewError(http.StatusInternalServerError, errors.New("Failed to read themes directory"))
+		return nil, errorsx.NewError(http.StatusInternalServerError, errors.New("failed to read themes directory"))
 	}
 	themes := make([]string, 0, len(files))
 	for _, file := range files {
@@ -145,7 +144,7 @@ func (ch *CommandHandler) SelectGame(game string) error {
 	if err != nil {
 		log.Println(err)
 		if !errorsx.ContainsTrackingError(err) {
-			err = errorsx.NewError(http.StatusInternalServerError, fmt.Errorf(`Failed to select game %w`, err))
+			err = errorsx.NewError(http.StatusInternalServerError, fmt.Errorf(`failed to select game %w`, err))
 		}
 	}
 	return err
