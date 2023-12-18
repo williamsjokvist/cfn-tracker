@@ -10,8 +10,8 @@ import { AppWrapper } from "./app-layout/app-wrapper";
 import "@/styles/globals.sass";
 import { MatchesListPage } from "@/pages/stats/matches-list-page";
 import { SessionsListPage } from "@/pages/stats/sessions-list-page";
-import { TrackingMachineContextProvider } from "@/machines/tracking-machine";
-import { AuthMachineContextProvider } from "@/machines/auth-machine";
+import { TrackingMachineContext } from "@/machines/tracking-machine";
+import { AuthMachineContext } from "@/machines/auth-machine";
 
 const router = createHashRouter([
   {
@@ -41,11 +41,11 @@ const App: React.FC = () => {
   initLocalization();
   return (
     <React.StrictMode>
-      <AuthMachineContextProvider>
-        <TrackingMachineContextProvider>
+      <AuthMachineContext.Provider>
+        <TrackingMachineContext.Provider>
           <RouterProvider router={router} />
-        </TrackingMachineContextProvider>
-      </AuthMachineContextProvider>
+        </TrackingMachineContext.Provider>
+      </AuthMachineContext.Provider>
     </React.StrictMode>
   );
 };

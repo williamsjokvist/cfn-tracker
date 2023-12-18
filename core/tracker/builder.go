@@ -50,7 +50,7 @@ func MakeSF6Tracker(ctx context.Context, browser *browser.Browser, username, pas
 		if status.Err != nil {
 			return nil, errorsx.NewError(http.StatusUnauthorized, status.Err)
 		}
-		runtime.EventsEmit(ctx, "auth-loaded", status.Progress)
+		runtime.EventsEmit(ctx, "auth-progress", status.Progress)
 
 		if status.Progress >= 100 {
 			close(authChan)
