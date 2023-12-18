@@ -22,12 +22,15 @@ export const ErrorMessage: React.FC= () => {
   const authActor = AuthMachineContext.useActorRef()
   const trackingActor = TrackingMachineContext.useActorRef()
 
-  const authContext = useSelector(authActor, (snapshot) => snapshot.context)
-  const trackingContext = useSelector(trackingActor, (snapshot) => snapshot.context)
+  const authError = useSelector(authActor, ({ context }) => context.error)
+  const trackingError = useSelector(trackingActor, ({ context }) => context.error)
 
   const [error, setError] = React.useState<errorsx.FrontEndError>(null)
 
   React.useEffect(() => {
+    if (error === null) {
+      return;
+    }
     animate("#error-message", { opacity: [0, 1] }).then(() => {
       animate("#error-message", { opacity: [1, 0] }, { delay: 3.5 }).then(() =>
         setError(null)
@@ -36,12 +39,12 @@ export const ErrorMessage: React.FC= () => {
   }, [error]);
 
   React.useEffect(() => {
-    authContext.error && setError(authContext.error)
-  }, [authContext.error])
+    authError && setError(authError)
+  }, [authError])
 
   React.useEffect(() => {
-    trackingContext.error && setError(trackingContext.error)
-  }, [trackingContext.error])
+    trackingError && setError(trackingError)
+  }, [trackingError])
 
   return (
     <div ref={scope} className="absolute">
@@ -53,11 +56,7 @@ export const ErrorMessage: React.FC= () => {
           "px-8 py-3 rounded-r-xl text-xl backdrop-blur-sm pointer-events-none",
           "bg-[rgba(255,0,0,.125)]"
         )}
-        {...(error === null && {
-          style: {
-            opacity: 0,
-          },
-        })}
+        style={{ opacity: 0 }}
       >
         <Icon
           icon="material-symbols:warning-outline"
