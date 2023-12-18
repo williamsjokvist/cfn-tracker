@@ -12,6 +12,7 @@ import (
 	"github.com/williamsjokvist/cfn-tracker/core/config"
 	"github.com/williamsjokvist/cfn-tracker/core/data"
 	"github.com/williamsjokvist/cfn-tracker/core/errorsx"
+	"github.com/williamsjokvist/cfn-tracker/core/model"
 	"github.com/williamsjokvist/cfn-tracker/core/tracker/sf6"
 	"github.com/williamsjokvist/cfn-tracker/core/tracker/sfv"
 )
@@ -19,6 +20,7 @@ import (
 type GameTracker interface {
 	Start(ctx context.Context, cfn string, restore bool, refreshInterval time.Duration) error
 	Stop()
+	Search(ctx context.Context, query string) ([]model.Player, error)
 }
 
 type GameType uint8

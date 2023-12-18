@@ -37,6 +37,23 @@ func NewSF6Tracker(browser *browser.Browser, trackerRepo *data.CFNTrackerReposit
 	}
 }
 
+func (t *SF6Tracker) Search(ctx context.Context, search string) ([]model.Player, error) {
+	t.Page.MustNavigate(fmt.Sprintf("https://www.streetfighter.com/6/buckler/fighterslist/search/result?fighter_id=%s", search)).MustWaitLoad().MustWaitIdle()
+	body := t.Page.MustElement(`#__NEXT_DATA__`).MustText()
+	var res SearchResult
+	err := json.Unmarshal([]byte(body), &res)
+	if err != nil {
+		return nil, fmt.Errorf(`unmarshal player search result: %w`, err)
+	}
+
+	players := make([]model.Player, 0, len(res.Props.PageProps.FighterBannerList))
+	for _, banner := range res.Props.PageProps.FighterBannerList {
+		players = append(players, MapFighterBannerToPlayer(&banner))
+	}
+
+	return players, nil
+}
+
 // Start will update the tracking state when new matches are played.
 func (t *SF6Tracker) Start(ctx context.Context, userCode string, restore bool, pollRate time.Duration) error {
 	if !t.isAuthenticated {
@@ -207,6 +224,7 @@ func (t *SF6Tracker) getTrackingStateForLastMatch() *model.TrackingState {
 func (t *SF6Tracker) fetchBattleLog(userCode string) (*BattleLog, error) {
 	err := t.Page.Navigate(fmt.Sprintf(`https://www.streetfighter.com/6/buckler/profile/%s/battlelog/rank`, userCode))
 	if err != nil {
+		log.Println(`navigate to cfn: `, err)
 		return nil, fmt.Errorf(`navigate to cfn: %w`, err)
 	}
 	err = t.Page.WaitLoad()

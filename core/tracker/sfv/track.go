@@ -38,6 +38,10 @@ func NewSFVTracker(browser *browser.Browser) *SFVTracker {
 	}
 }
 
+func (t *SFVTracker) Search(ctx context.Context, query string) ([]model.Player, error) {
+	panic("not implemented")
+}
+
 // Stop will stop any current tracking
 func (t *SFVTracker) Stop() {
 	t.stopTracking()
