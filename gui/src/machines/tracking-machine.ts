@@ -6,8 +6,7 @@ import {
   StopTracking,
 } from "@@/go/core/CommandHandler";
 import type { errorsx, model } from "@@/go/models";
-import React from "react";
-import { EventsOn } from "@@/runtime/runtime";
+import { EventsOff, EventsOn } from "@@/runtime/runtime";
 
 type TrackingMachineContextProps = {
   user?: model.User
@@ -19,27 +18,28 @@ type TrackingMachineContextProps = {
 
 export const TRACKING_MACHINE = setup({
   types: {
-    context: {} as TrackingMachineContextProps,
+    context: <TrackingMachineContextProps>{},
+  },
+  guards: {
+    notTracking: ({ context }) => !context.isTracking
   },
   actions: {
-    startTracking: async ({ context, self }) => {
-      if (!context.user || context.isTracking) return
-      try {
-        await StartTracking(context.user.code, context.restore)
-        context.isTracking = true;
-      } catch (error) {
-        self.send({ type: "error", error })
-      }
+    startTracking: ({ context, self }) => {
+      StartTracking(context.user.code, context.restore)
+        .catch(error => self.send({ type: "error", error }))
     },
-    stopTracking: async ({ context, self }) => {
-      try {
-        await StopTracking();
-        context.isTracking = false;
-        self.send({ type: "cease" })
-      } catch (error) {
-        self.send({ type: "error", error })
-      }
+    stopTracking: ({ self }) => {
+      StopTracking()
+        .catch((error) => self.send({ type: "error", error }))
     },
+    subscribeToTrackingEvents: ({ self }) => {
+      EventsOn("cfn-data", (trackingState) => self.send({ type: "matchPlayed", trackingState }));
+      EventsOn("stopped-tracking", () => self.send({ type: "cease" }));
+    },
+    unsubscribeToTrackingEvents: ({ self }) => {
+      EventsOff("cfn-data")
+      EventsOff("stopped-tracking");
+    }
   },
 }).createMachine(
   {
@@ -47,19 +47,22 @@ export const TRACKING_MACHINE = setup({
     context: {
       restore: false,
       isTracking: false,
-      trackingState: {} as model.TrackingState,
+      trackingState: <model.TrackingState>{},
     },
     initial: "cfnForm",
     states: {
       cfnForm: {
         on: {
           submit: {
+            guard: "notTracking",
             actions: [
               assign({
                 user: ({ event }) => event.user,
                 restore: ({ event }) => event.restore,
+                isTracking: true
               }),
               "startTracking",
+              "subscribeToTrackingEvents"
             ],
             target: "loading",
           },
@@ -67,12 +70,19 @@ export const TRACKING_MACHINE = setup({
       },
       loading: {
         on: {
-          matchPlayed: "tracking",
+          matchPlayed: {
+            actions: assign({
+              trackingState: ({ event }) => event.trackingState,
+            }),
+            target: "tracking"
+          },
           error: {
             actions: [
               assign({
                 error: ({ event }) => event.error,
+                isTracking: false,
               }),
+              "unsubscribeToTrackingEvents"
             ],
             target: "cfnForm"
           }
@@ -81,7 +91,13 @@ export const TRACKING_MACHINE = setup({
       tracking: {
         on: {
           cease: {
-            actions: "stopTracking",
+            actions: [
+              "stopTracking",
+              "unsubscribeToTrackingEvents",
+              assign({
+                isTracking: false
+              })
+            ],
             target: "cfnForm"
           },
           matchPlayed: {
@@ -96,22 +112,3 @@ export const TRACKING_MACHINE = setup({
 );
 
 export const TrackingMachineContext = createActorContext(TRACKING_MACHINE);  
-
-export const TrackingMachineContextProvider = ({ children }) => {
-  return (
-    <TrackingMachineContext.Provider>
-      <TrackingSubscriber>
-        {children}
-      </TrackingSubscriber>
-    </TrackingMachineContext.Provider>
-  )
-}
-
-const TrackingSubscriber = ({ children }) => {
-  const trackingActor = TrackingMachineContext.useActorRef()
-  React.useEffect(() => {
-    EventsOn("cfn-data", (trackingState) => trackingActor.send({ type: "matchPlayed", trackingState }));
-    EventsOn("stopped-tracking", () => trackingActor.send({ type: "cease" }));
-  }, []);
-  return children
-}
