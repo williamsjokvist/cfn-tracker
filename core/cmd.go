@@ -17,6 +17,8 @@ import (
 	"github.com/williamsjokvist/cfn-tracker/core/browser"
 	"github.com/williamsjokvist/cfn-tracker/core/data"
 	"github.com/williamsjokvist/cfn-tracker/core/errorsx"
+	"github.com/williamsjokvist/cfn-tracker/core/i18n"
+	"github.com/williamsjokvist/cfn-tracker/core/i18n/locales"
 	"github.com/williamsjokvist/cfn-tracker/core/model"
 	"github.com/williamsjokvist/cfn-tracker/core/tracker"
 )
@@ -148,6 +150,10 @@ func (ch *CommandHandler) SelectGame(game string) error {
 		}
 	}
 	return err
+}
+
+func (ch *CommandHandler) GetTranslation(locale string) locales.Localization {
+	return i18n.GetTranslation(locale)
 }
 
 func (ch *CommandHandler) GetTrackingStateUnused() *model.TrackingState {

@@ -1,7 +1,7 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { RouterProvider, createHashRouter } from "react-router-dom";
-import { initLocalization } from "@/i18n/i18n-config";
+import { initLocalization } from "@/main/i18n-config";
 
 import { TrackingPage } from "@/pages/tracking/tracking-page";
 import { OutputPage } from "@/pages/output-page";
