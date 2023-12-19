@@ -98,6 +98,7 @@ type BattleLog struct {
 	ReplayList        []Replay      `json:"replay_list"`
 	TotalPage         int           `json:"total_page"`
 	Sid               int64         `json:"sid"`
+	ErrorMessage      string        `json:"errorMessage"`
 	WeekList          []struct {
 		Value string `json:"value"`
 		Label string `json:"label"`

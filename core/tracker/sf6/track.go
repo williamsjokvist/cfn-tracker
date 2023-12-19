@@ -63,6 +63,10 @@ func (t *SF6Tracker) FetchPlayer(ctx context.Context, code string) (*model.Playe
 		return nil, fmt.Errorf(`unmarshal player profile: %w`, err)
 	}
 
+	if pp.Props.PageProps.ErrorMessage == "PageNotFound" {
+		return nil, errorsx.NewError(http.StatusNotFound, fmt.Errorf(`player not found`))
+	}
+
 	player := MapFighterBannerToPlayer(&pp.Props.PageProps.FighterBannerInfo)
 	return &player, nil
 }
