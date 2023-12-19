@@ -113,7 +113,7 @@ func (ch *CommandHandler) GetUsers() ([]*model.User, error) {
 			err = errorsx.NewError(http.StatusNotFound, fmt.Errorf(`failed to get users %w`, err))
 		}
 	}
-	return users, nil
+	return users, err
 }
 
 func (ch *CommandHandler) GetThemeList() ([]string, error) {
