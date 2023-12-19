@@ -1,4 +1,4 @@
-import { LocalizationKey } from "@/i18n/i18n-config";
+import type { LocalizationKey } from "@/main/i18n-config";
 import { AuthMachineContext } from "@/machines/auth-machine";
 import { TrackingMachineContext } from "@/machines/tracking-machine";
 import { errorsx } from "@@/go/models";

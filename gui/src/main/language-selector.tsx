@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { Icon } from "@iconify/react";
 
-import { APP_LANGUAGES } from "@/i18n/i18n-config";
+import { APP_LANGUAGES } from "@/main/i18n-config";
 import { HideableText } from "@/ui/hideable-text";
 
 import "@/styles/language-selector.sass";
