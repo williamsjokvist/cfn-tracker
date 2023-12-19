@@ -20,6 +20,7 @@ import (
 type GameTracker interface {
 	Start(ctx context.Context, cfn string, restore bool, refreshInterval time.Duration) error
 	Stop()
+	GetPlayer(ctx context.Context, code string) (*model.Player, error)
 	Search(ctx context.Context, query string) ([]model.Player, error)
 }
 

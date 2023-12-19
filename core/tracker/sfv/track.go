@@ -42,6 +42,10 @@ func (t *SFVTracker) Search(ctx context.Context, query string) ([]model.Player, 
 	panic("not implemented")
 }
 
+func (t *SFVTracker) GetPlayer(ctx context.Context, code string) (*model.Player, error) {
+	panic("not implemented")
+}
+
 // Stop will stop any current tracking
 func (t *SFVTracker) Stop() {
 	t.stopTracking()

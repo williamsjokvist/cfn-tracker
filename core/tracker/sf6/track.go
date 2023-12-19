@@ -54,6 +54,19 @@ func (t *SF6Tracker) Search(ctx context.Context, search string) ([]model.Player,
 	return players, nil
 }
 
+func (t *SF6Tracker) GetPlayer(ctx context.Context, code string) (*model.Player, error) {
+	t.Page.MustNavigate(fmt.Sprintf("https://www.streetfighter.com/6/buckler/profile/%s", code)).MustWaitLoad().MustWaitIdle()
+	body := t.Page.MustElement(`#__NEXT_DATA__`).MustText()
+	var pp ProfilePage
+	err := json.Unmarshal([]byte(body), &pp)
+	if err != nil {
+		return nil, fmt.Errorf(`unmarshal player profile: %w`, err)
+	}
+
+	player := MapFighterBannerToPlayer(&pp.Props.PageProps.FighterBannerInfo)
+	return &player, nil
+}
+
 // Start will update the tracking state when new matches are played.
 func (t *SF6Tracker) Start(ctx context.Context, userCode string, restore bool, pollRate time.Duration) error {
 	if !t.isAuthenticated {
