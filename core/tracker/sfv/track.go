@@ -38,11 +38,11 @@ func NewSFVTracker(browser *browser.Browser) *SFVTracker {
 	}
 }
 
-func (t *SFVTracker) Search(ctx context.Context, query string) ([]model.Player, error) {
+func (t *SFVTracker) SearchPlayers(ctx context.Context, query string) ([]model.Player, error) {
 	panic("not implemented")
 }
 
-func (t *SFVTracker) GetPlayer(ctx context.Context, code string) (*model.Player, error) {
+func (t *SFVTracker) FetchPlayer(ctx context.Context, code string) (*model.Player, error) {
 	panic("not implemented")
 }
 

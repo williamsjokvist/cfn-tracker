@@ -37,7 +37,7 @@ func NewSF6Tracker(browser *browser.Browser, trackerRepo *data.CFNTrackerReposit
 	}
 }
 
-func (t *SF6Tracker) Search(ctx context.Context, search string) ([]model.Player, error) {
+func (t *SF6Tracker) SearchPlayers(ctx context.Context, search string) ([]model.Player, error) {
 	t.Page.MustNavigate(fmt.Sprintf("https://www.streetfighter.com/6/buckler/fighterslist/search/result?fighter_id=%s", search)).MustWaitLoad().MustWaitIdle()
 	body := t.Page.MustElement(`#__NEXT_DATA__`).MustText()
 	var res SearchResult
@@ -54,7 +54,7 @@ func (t *SF6Tracker) Search(ctx context.Context, search string) ([]model.Player,
 	return players, nil
 }
 
-func (t *SF6Tracker) GetPlayer(ctx context.Context, code string) (*model.Player, error) {
+func (t *SF6Tracker) FetchPlayer(ctx context.Context, code string) (*model.Player, error) {
 	t.Page.MustNavigate(fmt.Sprintf("https://www.streetfighter.com/6/buckler/profile/%s", code)).MustWaitLoad().MustWaitIdle()
 	body := t.Page.MustElement(`#__NEXT_DATA__`).MustText()
 	var pp ProfilePage

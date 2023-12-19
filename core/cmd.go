@@ -142,6 +142,17 @@ func (ch *CommandHandler) GetUsers() ([]*model.User, error) {
 	return users, err
 }
 
+func (ch *CommandHandler) FetchPlayer(code string) (*model.Player, error) {
+	player, err := ch.tracker.FetchPlayer(ch.ctx, code)
+	if err != nil {
+		log.Println(err)
+		if !errorsx.ContainsTrackingError(err) {
+			err = errorsx.NewError(http.StatusNotFound, fmt.Errorf(`failed to fetch player %w`, err))
+		}
+	}
+	return player, err
+}
+
 func (ch *CommandHandler) GetThemeList() ([]string, error) {
 	files, err := ioutil.ReadDir(`themes`)
 	if err != nil {
