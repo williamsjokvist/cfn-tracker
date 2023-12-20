@@ -150,8 +150,8 @@ func main() {
 			},
 		},
 		OnStartup: func(ctx context.Context) {
-			cmdHandler.AssignRuntimeContext(ctx)
-			go server.Start(ctx)
+			cmdHandler.SetContext(ctx)
+			go server.Start(ctx, &cfg)
 		},
 		OnShutdown: func(_ context.Context) {
 			appBrowser.Page.Browser().Close()

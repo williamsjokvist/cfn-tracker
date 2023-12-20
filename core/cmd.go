@@ -12,6 +12,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/hashicorp/go-version"
+
 	"github.com/williamsjokvist/cfn-tracker/core/browser"
 	"github.com/williamsjokvist/cfn-tracker/core/config"
 	"github.com/williamsjokvist/cfn-tracker/core/data"
@@ -49,14 +51,19 @@ func (ch *CommandHandler) GetAppVersion() string {
 }
 
 func (ch *CommandHandler) CheckForUpdate() (bool, error) {
+	currentVersion, err := version.NewVersion(ch.cfg.AppVersion)
+	if err != nil {
+		log.Println(err)
+		return false, fmt.Errorf(`failed to parse current app version: %w`, err)
+	}
 	latestVersion, err := ch.browser.GetLatestAppVersion()
 	if err != nil {
 		log.Println(err)
 		return false, fmt.Errorf(`failed to check for update: %w`, err)
 	}
 
-	hasUpdate := AppVersion.LessThan(latestVersion)
-	log.Println(`Has update: `, hasUpdate, `. Current: `, AppVersion.String(), ` Latest: `, latestVersion.String())
+	hasUpdate := currentVersion.LessThan(latestVersion)
+	log.Println(`Has update: `, hasUpdate, `. Current: `, currentVersion.String(), ` Latest: `, latestVersion.String())
 	return hasUpdate, nil
 }
 

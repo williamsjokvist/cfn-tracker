@@ -11,7 +11,7 @@ import { LoadingBar } from "@/main/app-layout/loading-bar";
 export const AppWrapper: React.FC = () => (
   <>
     <AppSidebar />
-    <main>
+    <main className="relative grid grid-rows-[0fr_1fr] h-screen z-40 flex-[1] text-white mx-auto">
       <ErrorMessage />
       <LoadingBar />
       <UpdatePrompt />
