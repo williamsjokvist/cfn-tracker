@@ -9,11 +9,11 @@ import { GetThemeList, OpenResultsDirectory } from "@@/go/core/CommandHandler";
 import { Checkbox } from "@/ui/checkbox";
 import Dialog from "@/ui/dialog";
 
-import defaultThemePreview from '@/img/theme-previews/default.png'
-import bladesThemePreview from '@/img/theme-previews/blades.png'
-import jaegerThemePreview from '@/img/theme-previews/jaeger.png'
-import nordThemePreview from '@/img/theme-previews/nord.png'
-import pillsThemePreview from '@/img/theme-previews/pills.png'
+import defaultTheme from './themes/default.png'
+import bladesTheme from './themes/blades.png'
+import jaegerTheme from './themes/jaeger.png'
+import nordTheme from './themes/nord.png'
+import pillsTheme from './themes/pills.png'
 
 const defaultOptions = {
   theme: "default",
@@ -168,11 +168,11 @@ const ThemePickModal = (props: { selectedTheme: string, themes: string[], onSele
       </Dialog.Trigger>
       <Dialog.Content title="selectTheme">
         <ul className='mt-2 h-80 w-full pr-2 overflow-y-scroll'>
-          <ThemeItem name="default" img={defaultThemePreview} />
-          <ThemeItem name="blades" img={bladesThemePreview} />
-          <ThemeItem name="pills" img={pillsThemePreview}  />
-          <ThemeItem name="jaeger" img={jaegerThemePreview}  />
-          <ThemeItem name="nord" img={nordThemePreview} />
+          <ThemeItem name="default" img={defaultTheme} />
+          <ThemeItem name="blades" img={bladesTheme} />
+          <ThemeItem name="pills" img={pillsTheme}  />
+          <ThemeItem name="jaeger" img={jaegerTheme}  />
+          <ThemeItem name="nord" img={nordTheme} />
         </ul>
       </Dialog.Content>
   </Dialog.Root>

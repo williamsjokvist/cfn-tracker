@@ -2,20 +2,20 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 
-import sfvLogo from "@/img/logo_sfv.png";
-import sf6Logo from "@/img/logo_sf6.png";
+import sfv from "./games/sfv.png";
+import sf6 from "./games/sf6.png";
 import { ActionButton } from "@/ui/action-button";
 import { GameButton } from "@/ui/game-button";
 import { PageHeader } from "@/ui/page-header";
 
 const GAMES = [
   {
-    logo: sfvLogo,
+    logo: sfv,
     code: "sfv",
     alt: "Street Fighter V",
   },
   {
-    logo: sf6Logo,
+    logo: sf6,
     code: "sf6",
     alt: "Street Fighter 6",
   },
