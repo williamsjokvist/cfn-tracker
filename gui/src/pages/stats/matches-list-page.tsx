@@ -1,27 +1,30 @@
 import React from "react";
+import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 
+import { PageHeader } from "@/ui/page-header";
+import { useErrorMessage } from "@/main/app-layout/error-message";
 import { GetMatches } from "@@/go/core/CommandHandler";
 import type { model } from "@@/go/models";
 
-import { PageHeader } from "@/ui/page-header";
-import { useParams } from "react-router-dom";
 
 export const MatchesListPage: React.FC = () => {
   const { t } = useTranslation();
+  const setError = useErrorMessage()
   const params = useParams();
   const sessionId = Number(params["sessionId"]);
 
   const [matches, setMatches] = React.useState<model.Match[]>([]);
   const [totalWinRate, setTotalWinRate] = React.useState<number | null>(null);
 
+  
   React.useEffect(() => {
     GetMatches(sessionId, "", 0, 0)
       .then((matches) => {
         setMatches(matches);
       })
-      .catch((err) => console.error(err));
+      .catch(err => setError(err));
   }, [sessionId])
 
   React.useEffect(() => {

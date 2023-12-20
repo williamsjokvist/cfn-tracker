@@ -41,13 +41,11 @@ const router = createHashRouter([
 const App: React.FC = () => {
   initLocalization();
   return (
-    <React.StrictMode>
-      <AuthMachineContext.Provider>
-        <TrackingMachineContext.Provider>
-          <RouterProvider router={router} />
-        </TrackingMachineContext.Provider>
-      </AuthMachineContext.Provider>
-    </React.StrictMode>
+    <AuthMachineContext.Provider>
+      <TrackingMachineContext.Provider>
+        <RouterProvider router={router} />
+      </TrackingMachineContext.Provider>
+    </AuthMachineContext.Provider>
   );
 };
 

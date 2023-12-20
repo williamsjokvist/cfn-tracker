@@ -1,18 +1,20 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
+import { Icon } from "@iconify/react";
 
+import { useErrorMessage } from "@/main/app-layout/error-message";
 import { TrackingMachineContext } from "@/machines/tracking-machine";
 import { GetUsers } from "@@/go/core/CommandHandler";
-
 import { ActionButton } from "@/ui/action-button";
 import { Checkbox } from "@/ui/checkbox";
 import { model } from "@@/go/models";
 import { PageHeader } from "@/ui/page-header";
-import { Icon } from "@iconify/react";
 
 export const TrackingForm: React.FC = () => {
   const { t } = useTranslation();
+  const setError = useErrorMessage()
+
   const trackingActor = TrackingMachineContext.useActorRef()
 
   const playerIdInputRef = React.useRef<HTMLInputElement>(null);
@@ -22,7 +24,7 @@ export const TrackingForm: React.FC = () => {
   const [users, setUsers] = React.useState<model.User[] | null>(null);
 
   React.useEffect(() => {
-    GetUsers().then((users) => setUsers(users)).catch(err => console.error(err));
+    GetUsers().then((users) => setUsers(users)).catch(err => setError(err));
   }, []);
 
   const onSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
