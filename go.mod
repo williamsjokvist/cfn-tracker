@@ -5,9 +5,11 @@ go 1.21
 require github.com/go-rod/rod v0.112.2
 
 require (
+	github.com/blang/semver v3.5.1+incompatible
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/joho/godotenv v1.4.0
 	github.com/mattn/go-sqlite3 v1.14.17
+	github.com/rhysd/go-github-selfupdate v1.2.3
 	github.com/shirou/gopsutil v3.21.11+incompatible
 	github.com/wailsapp/wails/v2 v2.7.0
 	golang.org/x/sys v0.13.0
@@ -39,6 +41,10 @@ require (
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/godbus/dbus/v5 v5.1.0 // indirect
+	github.com/golang/protobuf v1.3.2 // indirect
+	github.com/google/go-github/v30 v30.1.0 // indirect
+	github.com/google/go-querystring v1.0.0 // indirect
+	github.com/inconshreveable/go-update v0.0.0-20160112193335-8152e7eb6ccf // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/leaanthony/u v1.1.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
@@ -46,16 +52,19 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rivo/uniseg v0.4.4 // indirect
 	github.com/rogpeppe/go-internal v1.6.1 // indirect
+	github.com/tcnksm/go-gitconfig v0.1.2 // indirect
 	github.com/tklauser/go-sysconf v0.3.11 // indirect
 	github.com/tklauser/numcpus v0.6.0 // indirect
+	github.com/ulikunitz/xz v0.5.9 // indirect
 	github.com/wailsapp/go-webview2 v1.0.10 // indirect
 	github.com/yusufpapurcu/wmi v1.2.3 // indirect
+	golang.org/x/oauth2 v0.0.0-20181106182150-f42d05182288 // indirect
+	google.golang.org/appengine v1.3.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
 require (
-	github.com/hashicorp/go-version v1.6.0
 	github.com/stretchr/testify v1.8.1
 	github.com/ysmood/goob v0.4.0 // indirect
 	github.com/ysmood/gson v0.7.3 // indirect

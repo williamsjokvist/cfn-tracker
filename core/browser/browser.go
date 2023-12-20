@@ -11,7 +11,6 @@ import (
 	"github.com/go-rod/rod/lib/launcher"
 	"github.com/go-rod/rod/lib/launcher/flags"
 	"github.com/go-rod/rod/lib/proto"
-	"github.com/hashicorp/go-version"
 )
 
 type Browser struct {
@@ -73,30 +72,4 @@ func NewBrowser(headless bool) (*Browser, error) {
 		Page:         page,
 		HijackRouter: router,
 	}, nil
-}
-
-func (b *Browser) GetLatestAppVersion() (*version.Version, error) {
-	log.Println(`Check for new version`)
-	err := b.Page.Navigate(`https://github.com/williamsjokvist/cfn-tracker/releases`)
-	if err != nil {
-		return nil, fmt.Errorf(`navigate to github: %w`, err)
-	}
-	err = b.Page.WaitLoad()
-	if err != nil {
-		return nil, fmt.Errorf(`wait for github to load: %w`, err)
-	}
-	versionElement, err := b.Page.Element(`turbo-frame div.mr-md-0:nth-child(3) > a:nth-child(1)`)
-	if err != nil {
-		return nil, fmt.Errorf(`get version element: %w`, err)
-	}
-	versionText, err := versionElement.Text()
-	if err != nil {
-		return nil, fmt.Errorf(`get version element text: %w`, err)
-	}
-	versionNumber := strings.Split(versionText, `v`)[1]
-	latestVersion, err := version.NewVersion(versionNumber)
-	if err != nil {
-		return nil, fmt.Errorf(`parse version: %w`, err)
-	}
-	return latestVersion, nil
 }
