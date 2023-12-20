@@ -60,7 +60,7 @@ export const ErrorMessage: React.FC= () => {
       >
         <Icon
           icon="material-symbols:warning-outline"
-          className="text-[#ff6388] w-8 h-8 blink-pulse"
+          className="text-[#ff6388] w-8 h-8 animate-blink-pulse"
         />
         {error && (
           <span>

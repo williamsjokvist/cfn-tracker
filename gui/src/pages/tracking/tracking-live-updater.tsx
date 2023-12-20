@@ -29,42 +29,6 @@ export const TrackingLiveUpdater: React.FC = () => {
     result,
   } = useSelector(trackingActor, (snapshot) => snapshot.context.trackingState)
 
-  const PieChart = (
-    <ReactMinimalPieChart
-      className="pie-chart animate-enter w-[150px] h-[150px] mx-auto"
-      animate
-      animationDuration={750}
-      lineWidth={85}
-      paddingAngle={0}
-      viewBoxSize={[60, 60]}
-      center={[30, 30]}
-      animationEasing="ease-in-out"
-      data={[
-        {
-          title: t("wins"),
-          value: wins,
-          color: "rgba(0, 255, 77, .65)",
-        },
-        {
-          title: t("losses"),
-          value: wins == 0 && losses == 0 ? 1 : losses,
-          color: "rgba(251, 73, 73, 0.25)",
-        },
-      ]}
-    >
-      <defs>
-        <linearGradient id="blue-gradient" direction={-65}>
-          <stop offset="0%" stopColor="#20BF55" />
-          <stop offset="100%" stopColor="#347fd0" />
-        </linearGradient>
-        <linearGradient id="red-gradient" direction={120}>
-          <stop offset="0%" stopColor="#EC9F05" />
-          <stop offset="100%" stopColor="#EE9617" />
-        </linearGradient>
-      </defs>
-    </ReactMinimalPieChart>
-  );
-
   return (
     <>
       <PageHeader text={t("tracking")} showSpinner/>
@@ -113,7 +77,39 @@ export const TrackingLiveUpdater: React.FC = () => {
             transition={{ delay: 0.35 }}
             className="relative h-full max-w-[220px] w-full text-center gap-5 pt-8"
           >
-            {PieChart}
+            <ReactMinimalPieChart
+              className="clip-circle animate-enter w-[150px] h-[150px] mx-auto"
+              animate
+              animationDuration={750}
+              lineWidth={85}
+              paddingAngle={0}
+              viewBoxSize={[60, 60]}
+              center={[30, 30]}
+              animationEasing="ease-in-out"
+              data={[
+                {
+                  title: t("wins"),
+                  value: wins,
+                  color: "rgba(0, 255, 77, .65)",
+                },
+                {
+                  title: t("losses"),
+                  value: wins == 0 && losses == 0 ? 1 : losses,
+                  color: "rgba(251, 73, 73, 0.25)",
+                },
+              ]}
+            >
+              <defs>
+                <linearGradient id="blue-gradient" direction={-65}>
+                  <stop offset="0%" stopColor="#20BF55" />
+                  <stop offset="100%" stopColor="#347fd0" />
+                </linearGradient>
+                <linearGradient id="red-gradient" direction={120}>
+                  <stop offset="0%" stopColor="#EC9F05" />
+                  <stop offset="100%" stopColor="#EE9617" />
+                </linearGradient>
+              </defs>
+            </ReactMinimalPieChart>
             <ActionButton
               className="absolute bottom-0 right-0"
               onClick={() => trackingActor.send({ type: "cease" })}

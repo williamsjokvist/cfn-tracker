@@ -13,8 +13,6 @@ import { HideableText } from "@/ui/hideable-text";
 
 import { AppTitleBar } from "./app-titlebar";
 
-import "@/styles/sidebar.sass";
-
 const NavigationItems = [
   {
     icon: "ri:search-line",
@@ -65,7 +63,7 @@ export const AppSidebar: React.FC = () => {
   return (
     <aside
       ref={scope}
-      className="sidebar"
+      className="relative grid grid-rows-[0fr_1fr_0fr] overflow-visible whitespace-nowrap py-3 px-[10px] select-none bg-[rgba(3,5,19,0.33)] text-white z-50 transition-[width_250ms_ease-out]"
       style={{
         width: isMinimized ? "76px" : "175px",
       }}
