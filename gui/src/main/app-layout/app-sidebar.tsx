@@ -5,7 +5,7 @@ import { useAnimate } from "framer-motion";
 import { Icon } from "@iconify/react";
 
 import { GetAppVersion } from "@@/go/core/CommandHandler";
-import { LanguageSelector } from "@/main/language-selector";
+import { LanguageSelector } from "@/main/app-layout/language-selector";
 import { BrowserOpenURL } from "@@/runtime";
 
 import { NavigationLink } from "@/ui/nav-link";

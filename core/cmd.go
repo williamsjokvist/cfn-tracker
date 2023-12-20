@@ -48,6 +48,18 @@ func (ch *CommandHandler) GetAppVersion() string {
 	return ch.cfg.AppVersion
 }
 
+func (ch *CommandHandler) CheckForUpdate() (bool, error) {
+	latestVersion, err := ch.browser.GetLatestAppVersion()
+	if err != nil {
+		log.Println(err)
+		return false, fmt.Errorf(`failed to check for update: %w`, err)
+	}
+
+	hasUpdate := AppVersion.LessThan(latestVersion)
+	log.Println(`Has update: `, hasUpdate, `. Current: `, AppVersion.String(), ` Latest: `, latestVersion.String())
+	return hasUpdate, nil
+}
+
 func (ch *CommandHandler) StopTracking() {
 	log.Println(`Stopped tracking`)
 	ch.tracker.Stop()
