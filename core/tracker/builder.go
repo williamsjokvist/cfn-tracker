@@ -9,6 +9,7 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 
 	"github.com/williamsjokvist/cfn-tracker/core/browser"
+	"github.com/williamsjokvist/cfn-tracker/core/config"
 	"github.com/williamsjokvist/cfn-tracker/core/data"
 	"github.com/williamsjokvist/cfn-tracker/core/errorsx"
 	"github.com/williamsjokvist/cfn-tracker/core/tracker/sf6"
@@ -41,11 +42,11 @@ func (s GameType) String() string {
 }
 
 // Make a SF6Tracker and expose it as a GameTracker
-func MakeSF6Tracker(ctx context.Context, browser *browser.Browser, username, password string, trackerRepository *data.CFNTrackerRepository) (GameTracker, error) {
+func MakeSF6Tracker(ctx context.Context, cfg *config.Config, browser *browser.Browser, trackerRepository *data.CFNTrackerRepository) (GameTracker, error) {
 	sf6Tracker := sf6.NewSF6Tracker(browser, trackerRepository)
 
 	authChan := make(chan sf6.AuthStatus)
-	go sf6Tracker.Authenticate(ctx, username, password, authChan)
+	go sf6Tracker.Authenticate(ctx, cfg.CapIDEmail, cfg.CapIDPassword, authChan)
 	for status := range authChan {
 		if status.Err != nil {
 			return nil, errorsx.NewError(http.StatusUnauthorized, status.Err)
@@ -63,9 +64,9 @@ func MakeSF6Tracker(ctx context.Context, browser *browser.Browser, username, pas
 }
 
 // Make a SFVTracker and expose it as a GameTracker
-func MakeSFVTracker(ctx context.Context, browser *browser.Browser, username string, password string) (GameTracker, error) {
+func MakeSFVTracker(ctx context.Context, cfg *config.Config, browser *browser.Browser) (GameTracker, error) {
 	sfvTracker := sfv.NewSFVTracker(browser)
-	err := sfvTracker.Authenticate(ctx, username, password, false)
+	err := sfvTracker.Authenticate(ctx, cfg.SteamUsername, cfg.SteamPassword, false)
 	if err != nil {
 		return nil, fmt.Errorf(`auth err: %v`, err)
 	}

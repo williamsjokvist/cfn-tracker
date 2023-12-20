@@ -12,9 +12,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/hashicorp/go-version"
-
 	"github.com/williamsjokvist/cfn-tracker/core/browser"
+	"github.com/williamsjokvist/cfn-tracker/core/config"
 	"github.com/williamsjokvist/cfn-tracker/core/data"
 	"github.com/williamsjokvist/cfn-tracker/core/errorsx"
 	"github.com/williamsjokvist/cfn-tracker/core/i18n"
@@ -23,38 +22,30 @@ import (
 	"github.com/williamsjokvist/cfn-tracker/core/tracker"
 )
 
-var (
-	SteamUsername   string
-	SteamPassword   string
-	CapIDEmail      string
-	CapIDPassword   string
-	AppVersion      *version.Version
-	RefreshInterval time.Duration = 30 * time.Second
-	RunHeadless     bool
-)
-
 // The CommandHandler is the interface between the GUI and the core
 type CommandHandler struct {
 	ctx     context.Context
 	tracker tracker.GameTracker
 	browser *browser.Browser
 	repo    *data.CFNTrackerRepository
+	cfg     *config.Config
 }
 
-func NewCommandHandler(browser *browser.Browser, trackerRepo *data.CFNTrackerRepository) *CommandHandler {
+func NewCommandHandler(browser *browser.Browser, trackerRepo *data.CFNTrackerRepository, cfg *config.Config) *CommandHandler {
 	return &CommandHandler{
 		repo:    trackerRepo,
 		browser: browser,
+		cfg:     cfg,
 	}
 }
 
 // The CommandHandler needs the wails runtime context in order to emit events
-func (ch *CommandHandler) AssignRuntimeContext(ctx context.Context) {
+func (ch *CommandHandler) SetContext(ctx context.Context) {
 	ch.ctx = ctx
 }
 
 func (ch *CommandHandler) GetAppVersion() string {
-	return AppVersion.Original()
+	return ch.cfg.AppVersion
 }
 
 func (ch *CommandHandler) StopTracking() {
@@ -64,7 +55,7 @@ func (ch *CommandHandler) StopTracking() {
 
 func (ch *CommandHandler) StartTracking(cfn string, restore bool) error {
 	log.Printf(`Starting tracking for %s, restoring = %v`, cfn, restore)
-	err := ch.tracker.Start(ch.ctx, cfn, restore, RefreshInterval)
+	err := ch.tracker.Start(ch.ctx, cfn, restore, 30*time.Second)
 	if err != nil {
 		log.Println(err)
 		if !errorsx.ContainsTrackingError(err) {
@@ -138,9 +129,9 @@ func (ch *CommandHandler) SelectGame(game string) error {
 	var err error
 	switch game {
 	case tracker.GameTypeSF6.String():
-		ch.tracker, err = tracker.MakeSF6Tracker(ch.ctx, ch.browser, CapIDEmail, CapIDPassword, ch.repo)
+		ch.tracker, err = tracker.MakeSF6Tracker(ch.ctx, ch.cfg, ch.browser, ch.repo)
 	case tracker.GameTypeSFV.String():
-		ch.tracker, err = tracker.MakeSFVTracker(ch.ctx, ch.browser, SteamUsername, SteamPassword)
+		ch.tracker, err = tracker.MakeSFVTracker(ch.ctx, ch.cfg, ch.browser)
 	}
 
 	if err != nil {

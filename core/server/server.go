@@ -10,6 +10,8 @@ import (
 	"time"
 
 	wails "github.com/wailsapp/wails/v2/pkg/runtime"
+
+	"github.com/williamsjokvist/cfn-tracker/core/config"
 	"github.com/williamsjokvist/cfn-tracker/core/model"
 )
 
@@ -22,9 +24,7 @@ var js []byte
 //go:embed static/default.css
 var css []byte
 
-const PORT = 4242
-
-func Start(ctx context.Context) error {
+func Start(ctx context.Context, cfg *config.Config) error {
 	log.Println(`Starting browser source server`)
 
 	var mhJson *[]byte
@@ -84,7 +84,7 @@ func Start(ctx context.Context) error {
 		}
 	})
 
-	if err := http.ListenAndServe(fmt.Sprintf(`:%d`, PORT), nil); err != nil {
+	if err := http.ListenAndServe(fmt.Sprintf(`:%s`, cfg.BrowserSourcePort), nil); err != nil {
 		return fmt.Errorf(`failed to launch browser source server: %v`, err)
 	}
 	return nil

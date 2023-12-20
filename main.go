@@ -8,10 +8,10 @@ import (
 	"html/template"
 	"log"
 	"net/http"
-	"os"
 
 	"github.com/hashicorp/go-version"
 	"github.com/joho/godotenv"
+	"github.com/kelseyhightower/envconfig"
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/logger"
 	"github.com/wailsapp/wails/v2/pkg/options"
@@ -22,6 +22,7 @@ import (
 
 	"github.com/williamsjokvist/cfn-tracker/core"
 	"github.com/williamsjokvist/cfn-tracker/core/browser"
+	"github.com/williamsjokvist/cfn-tracker/core/config"
 	"github.com/williamsjokvist/cfn-tracker/core/data"
 	"github.com/williamsjokvist/cfn-tracker/core/data/sql"
 	"github.com/williamsjokvist/cfn-tracker/core/data/txt"
@@ -47,30 +48,28 @@ var errorTmpl []byte
 //go:embed build/appicon.png
 var icon []byte
 
+var cfg config.Config
+
 func init() {
 	cleanUpProcess()
-
-	if capIDEmail == `` || capIDPassword == `` ||
-		steamUsername == `` || steamPassword == `` || appVersion == `` {
-		err := godotenv.Load(`.env`)
-		if err != nil {
-			log.Fatalf(`missing .env file: %v`, err)
+	err := godotenv.Load(`.env`)
+	if err != nil {
+		log.Println(fmt.Errorf(`missing .env file: %w`, err))
+		cfg = config.Config{
+			AppVersion:        appVersion,
+			Headless:          runHeadless == `true`,
+			SteamUsername:     steamUsername,
+			SteamPassword:     steamPassword,
+			CapIDEmail:        capIDEmail,
+			CapIDPassword:     capIDPassword,
+			BrowserSourcePort: 4242,
 		}
-
-		steamUsername = os.Getenv(`STEAM_USERNAME`)
-		steamPassword = os.Getenv(`STEAM_PASSWORD`)
-		capIDEmail = os.Getenv(`CAP_ID_EMAIL`)
-		capIDPassword = os.Getenv(`CAP_ID_PASSWORD`)
-		appVersion = os.Getenv(`APP_VERSION`)
-		runHeadless = os.Getenv(`RUN_HEADLESS`)
+		return
 	}
-
-	core.AppVersion, _ = version.NewVersion(appVersion)
-	core.SteamUsername = steamUsername
-	core.SteamPassword = steamPassword
-	core.RunHeadless = runHeadless == `true`
-	core.CapIDEmail = capIDEmail
-	core.CapIDPassword = capIDPassword
+	err = envconfig.Process("", &cfg)
+	if err != nil {
+		log.Fatalf(`failed to process envconfig: %v`, err)
+	}
 }
 
 func main() {
@@ -104,7 +103,7 @@ func main() {
 			},
 		})
 	}
-	appBrowser, err := browser.NewBrowser(runHeadless == `true`)
+	appBrowser, err := browser.NewBrowser(cfg.Headless)
 	if err != nil {
 		closeWithError(fmt.Errorf(`failed to launch browser: %v`, err))
 		return
@@ -120,9 +119,9 @@ func main() {
 		return
 	}
 	trackerRepo := data.NewCFNTrackerRepository(sqlDb, txtDb)
-	cmdHandler := core.NewCommandHandler(appBrowser, trackerRepo)
+	cmdHandler := core.NewCommandHandler(appBrowser, trackerRepo, &cfg)
 
-	appVer, err := version.NewVersion(appVersion)
+	appVer, err := version.NewVersion(cfg.AppVersion)
 	if err != nil {
 		closeWithError(fmt.Errorf(`bad app version: %w`, err))
 		return
@@ -164,7 +163,7 @@ func main() {
 			},
 		},
 		OnStartup: func(ctx context.Context) {
-			cmdHandler.AssignRuntimeContext(ctx)
+			cmdHandler.SetContext(ctx)
 
 			if appVer.LessThan(latestVersion) {
 				log.Println(`Has new version: `, latestVersion.String())
@@ -173,7 +172,7 @@ func main() {
 				log.Println(`No new version, running: `, appVer.String())
 			}
 
-			go server.Start(ctx)
+			go server.Start(ctx, &cfg)
 		},
 		OnShutdown: func(_ context.Context) {
 			appBrowser.Page.Browser().Close()
