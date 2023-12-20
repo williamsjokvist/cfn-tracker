@@ -1,40 +1,21 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
-import { useTranslation } from "react-i18next";
 
 import { AppSidebar } from "@/main/app-layout/app-sidebar";
-import { ErrorMessage } from "@/main/error-message";
+import { ErrorMessage } from "@/main/app-layout/error-message";
 
-import { UpdatePrompt } from "@/ui/update-prompt";
+import { UpdatePrompt } from "@/main/app-layout/update-prompt";
 
-import { BrowserOpenURL, EventsOn } from "@@/runtime";
-import { LoadingBar } from "@/main/loading-bar";
+import { LoadingBar } from "@/main/app-layout/loading-bar";
 
-export const AppWrapper: React.FC = () => {
-  const { t } = useTranslation();
-  const [hasNewVersion, setNewVersion] = React.useState(false);
-
-  React.useEffect(() => {
-    EventsOn("version-update", (hasNewVersion: boolean) => setNewVersion(hasNewVersion));
-  }, []);
-
-  return (
-    <>
-      <AppSidebar />
-      <main className="relative grid grid-rows-[0fr_1fr] h-screen z-40 flex-[1] text-white mx-auto">
-        <ErrorMessage />
-        <LoadingBar />
-        {hasNewVersion && (
-          <UpdatePrompt
-            onDismiss={() => {
-              BrowserOpenURL("https://cfn.williamsjokvist.se/");
-              setNewVersion(false);
-            }}
-            text={t("newVersionAvailable")}
-          />
-        )}
-        <Outlet />
-      </main>
-    </>
-  );
-};
+export const AppWrapper: React.FC = () => (
+  <>
+    <AppSidebar />
+    <main className="relative grid grid-rows-[0fr_1fr] h-screen z-40 flex-[1] text-white mx-auto">
+      <ErrorMessage />
+      <LoadingBar />
+      <UpdatePrompt />
+      <Outlet />
+    </main>
+  </>
+);

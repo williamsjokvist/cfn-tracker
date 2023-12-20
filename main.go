@@ -9,7 +9,6 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/hashicorp/go-version"
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/wailsapp/wails/v2"
@@ -18,7 +17,6 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
 	"github.com/wailsapp/wails/v2/pkg/options/mac"
 	"github.com/wailsapp/wails/v2/pkg/options/windows"
-	"github.com/wailsapp/wails/v2/pkg/runtime"
 
 	"github.com/williamsjokvist/cfn-tracker/core"
 	"github.com/williamsjokvist/cfn-tracker/core/browser"
@@ -121,17 +119,6 @@ func main() {
 	trackerRepo := data.NewCFNTrackerRepository(sqlDb, txtDb)
 	cmdHandler := core.NewCommandHandler(appBrowser, trackerRepo, &cfg)
 
-	appVer, err := version.NewVersion(cfg.AppVersion)
-	if err != nil {
-		closeWithError(fmt.Errorf(`bad app version: %w`, err))
-		return
-	}
-	latestVersion, err := appBrowser.GetLatestAppVersion()
-	if err != nil {
-		closeWithError(fmt.Errorf(`failed to get latest app version: %w`, err))
-		return
-	}
-
 	err = wails.Run(&options.App{
 		Title:              `CFN Tracker v3`,
 		Assets:             assets,
@@ -164,14 +151,6 @@ func main() {
 		},
 		OnStartup: func(ctx context.Context) {
 			cmdHandler.SetContext(ctx)
-
-			if appVer.LessThan(latestVersion) {
-				log.Println(`Has new version: `, latestVersion.String())
-				runtime.EventsEmit(ctx, `version-update`, latestVersion.String())
-			} else {
-				log.Println(`No new version, running: `, appVer.String())
-			}
-
 			go server.Start(ctx, &cfg)
 		},
 		OnShutdown: func(_ context.Context) {
