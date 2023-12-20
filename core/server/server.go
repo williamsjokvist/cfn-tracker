@@ -84,7 +84,7 @@ func Start(ctx context.Context, cfg *config.Config) error {
 		}
 	})
 
-	if err := http.ListenAndServe(fmt.Sprintf(`:%s`, cfg.BrowserSourcePort), nil); err != nil {
+	if err := http.ListenAndServe(fmt.Sprintf(`:%d`, cfg.BrowserSourcePort), nil); err != nil {
 		return fmt.Errorf(`failed to launch browser source server: %v`, err)
 	}
 	return nil
