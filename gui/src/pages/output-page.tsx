@@ -157,8 +157,8 @@ const ThemePickModal = (props: { selectedTheme: string, themes: string[], onSele
 
   return (
     <Dialog.Root>
-      <Dialog.Trigger>
-        <ActionButton style={{ filter: "hue-rotate(-180deg)" }}>
+      <Dialog.Trigger asChild>
+        <ActionButton style={{ filter: "hue-rotate(-180deg)", justifyContent: "center" }}>
           <Icon icon="ph:paint-bucket-fill" className="mr-3 w-6 h-6" />
           {t("selectTheme")}
         </ActionButton>
@@ -232,8 +232,8 @@ const StatPickModal = (props: { onSelect: (option: string, checked: boolean) => 
   const { t } = useTranslation()
   return (
     <Dialog.Root>
-      <Dialog.Trigger>
-        <ActionButton style={{ filter: "hue-rotate(-45deg)" }}>
+      <Dialog.Trigger asChild>
+        <ActionButton style={{ filter: "hue-rotate(-45deg)", justifyContent: "center" }}>
           <Icon icon="bx:stats" className="mr-3 w-6 h-6" />
           {t("displayStats")}
         </ActionButton>
