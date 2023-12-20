@@ -21,7 +21,7 @@ export const AppWrapper: React.FC = () => {
   return (
     <>
       <AppSidebar />
-      <main>
+      <main className="relative grid grid-rows-[0fr_1fr] h-screen z-40 flex-[1] text-white mx-auto">
         <ErrorMessage />
         <LoadingBar />
         {hasNewVersion && (

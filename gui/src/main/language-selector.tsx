@@ -4,8 +4,6 @@ import { Icon } from "@iconify/react";
 import { APP_LANGUAGES } from "@/main/i18n-config";
 import { HideableText } from "@/ui/hideable-text";
 
-import "@/styles/language-selector.sass";
-
 type LanguageSelectorProps = {
   isMinimized: boolean;
 };
@@ -23,7 +21,7 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
     <div className="group flex">
       <button
         type="button"
-        className="lang-btn group-hover:text-white transition-colors"
+        className="relative flex justify-center items-center h-[28px] text-[#d6d4ff] font-thin lowercase group-hover:text-white transition-colors"
       >
         <Icon
           icon="fa6-solid:globe"

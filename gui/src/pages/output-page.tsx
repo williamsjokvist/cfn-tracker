@@ -7,7 +7,7 @@ import { PageHeader } from "@/ui/page-header";
 import { ActionButton } from "@/ui/action-button";
 import { GetThemeList, OpenResultsDirectory } from "@@/go/core/CommandHandler";
 import { Checkbox } from "@/ui/checkbox";
-import * as Dialog from "@radix-ui/react-dialog";
+import Dialog from "@/ui/dialog";
 
 import defaultThemePreview from '@/img/theme-previews/default.png'
 import bladesThemePreview from '@/img/theme-previews/blades.png'
@@ -146,85 +146,36 @@ export const OutputPage: React.FC = () => {
   );
 };
 
-const CloseButton = () => (
-  <Dialog.Close className="bg-[#202020] hover:bg-[#2b2a33] w-11 h-11 rounded-full">
-    <Icon icon="ci:close-big" width={28} className='mx-auto' />
-  </Dialog.Close>
-)
-
 const ThemePickModal = (props: { selectedTheme: string, themes: string[], onSelect: (theme: string) => void }) => {
   const { t } = useTranslation()
 
+  const ThemeItem = ({ name, img }) => (
+    <li>
+      <button onClick={() => props.onSelect(name)}>
+        <img src={img} className='object-cover object-top overflow-hidden w-full rounded-md h-[76px]' 
+          style={{ border: props.selectedTheme == name ? '2px solid lime' : '2px solid transparent'}}
+        />
+      </button>
+    </li>
+  )
   return (
     <Dialog.Root>
-      <Dialog.Trigger>
-        <ActionButton style={{ filter: "hue-rotate(-180deg)" }}>
+      <Dialog.Trigger asChild>
+        <ActionButton style={{ filter: "hue-rotate(-180deg)", justifyContent: "center" }}>
           <Icon icon="ph:paint-bucket-fill" className="mr-3 w-6 h-6" />
           {t("selectTheme")}
         </ActionButton>
       </Dialog.Trigger>
-      <Dialog.Portal>
-        <Dialog.Content className="DialogContent">
-          <header className="flex justify-between">
-            <Dialog.Title className="text-2xl font-bold">
-              {t("selectTheme")}
-            </Dialog.Title>
-            <CloseButton />
-          </header>
-          <Dialog.Description>
-          </Dialog.Description>
-
-          <ul className='mt-2 h-80 w-full pr-2 overflow-y-scroll'>
-            <li>
-              <button onClick={e => {
-                props.onSelect('default')
-              }}>
-                <img src={defaultThemePreview} className='object-cover object-top overflow-hidden w-full rounded-md h-[76px]' 
-                  style={{ border: props.selectedTheme == 'default' ? '2px solid lime' : '2px solid transparent'}}
-                />
-              </button>
-            </li>
-            <li>
-              <button onClick={e => {
-                props.onSelect('blades')
-              }}>
-                <img src={bladesThemePreview} className='object-cover object-top overflow-hidden w-full rounded-md h-[67px]'
-                  style={{ border: props.selectedTheme == 'blades' ? '2px solid lime' : '2px solid transparent'}}
-                />
-              </button>
-            </li>
-            <li>
-              <button onClick={e => {
-                props.onSelect('jaeger')
-              }}>
-                <img src={jaegerThemePreview} className='object-cover object-top overflow-hidden w-full rounded-md h-[60px]'
-                  style={{ border: props.selectedTheme == 'jaeger' ? '2px solid lime' : '2px solid transparent'}}
-                />
-              </button>
-            </li>
-            <li>
-              <button onClick={e => {
-                props.onSelect('pills')
-              }}>
-                <img src={pillsThemePreview} className='object-cover object-top overflow-hidden w-full rounded-md h-[60px]' 
-                  style={{ border: props.selectedTheme == 'pills' ? '2px solid lime' : '2px solid transparent'}}
-                />
-              </button>
-            </li>
-            <li>
-              <button onClick={e => {
-                props.onSelect('nord')
-              }}>
-                <img src={nordThemePreview} className='object-cover object-top overflow-hidden w-full rounded-md h-[90px]' 
-                  style={{ border: props.selectedTheme == 'nord' ? '2px solid lime' : '2px solid transparent'}}
-                />
-              </button>
-            </li>
-          </ul>
-        </Dialog.Content>
-        <Dialog.Overlay className="DialogOverlay" />
-      </Dialog.Portal>
-    </Dialog.Root>
+      <Dialog.Content title="selectTheme">
+        <ul className='mt-2 h-80 w-full pr-2 overflow-y-scroll'>
+          <ThemeItem name="default" img={defaultThemePreview} />
+          <ThemeItem name="blades" img={bladesThemePreview} />
+          <ThemeItem name="pills" img={pillsThemePreview}  />
+          <ThemeItem name="jaeger" img={jaegerThemePreview}  />
+          <ThemeItem name="nord" img={nordThemePreview} />
+        </ul>
+      </Dialog.Content>
+  </Dialog.Root>
   )
 }
 
@@ -232,47 +183,32 @@ const StatPickModal = (props: { onSelect: (option: string, checked: boolean) => 
   const { t } = useTranslation()
   return (
     <Dialog.Root>
-      <Dialog.Trigger>
+      <Dialog.Trigger asChild>
         <ActionButton style={{ filter: "hue-rotate(-45deg)" }}>
           <Icon icon="bx:stats" className="mr-3 w-6 h-6" />
           {t("displayStats")}
         </ActionButton>
       </Dialog.Trigger>
-      <Dialog.Portal>
-        <Dialog.Content className="DialogContent">
-          <header className="flex justify-between">
-            <Dialog.Title className="text-2xl font-bold">
-              {t("displayStats")}
-            </Dialog.Title>
-            <CloseButton />
-          </header>
-          <Dialog.Description className="text-lg leading-none">
-            {t('statsWillBeDisplayed')}
-          </Dialog.Description>
-
-          <ul className="overflow-y-scroll h-72 mt-4">
-            {Object.entries(props.options).map(([key, value]) => {
-              if (key == "theme") return null;
-              return (
-                <li key={key}>
-                  <button
-                    className="w-full cursor-pointer flex py-1 px-2 justify-between items-center text-lg hover:bg-[rgba(255,255,255,0.075)]"
-                    onClick={() => props.onSelect(key, !value)}
-                  >
-                    <div>
-                      <Checkbox checked={props.options[key] == true} readOnly />
-                      <span className="ml-2 text-center cursor-pointer capitalize">
-                        {key}
-                      </span>
-                    </div>
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
-        </Dialog.Content>
-        <Dialog.Overlay className="DialogOverlay" />
-      </Dialog.Portal>
+      <Dialog.Content title="displayStats" description="statsWillBeDisplayed">
+        <ul className="overflow-y-scroll h-72 mt-4">
+          {Object.entries(props.options).map(([key, value]) => {
+            if (key == "theme") return null;
+            return (
+              <li key={key}>
+                <button
+                  className="w-full cursor-pointer flex py-1 px-2 items-center text-lg hover:bg-[rgba(255,255,255,0.075)]"
+                  onClick={() => props.onSelect(key, !value)}
+                >
+                  <Checkbox checked={props.options[key] == true} readOnly />
+                  <span className="ml-2 text-center cursor-pointer capitalize">
+                    {key}
+                  </span>
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      </Dialog.Content>
     </Dialog.Root>
   )
 }

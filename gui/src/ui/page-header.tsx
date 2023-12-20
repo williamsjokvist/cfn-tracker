@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import { motion } from "framer-motion";
 
 type PageHeaderProps = {
@@ -10,7 +11,10 @@ export const PageHeader: React.FC<React.PropsWithChildren<PageHeaderProps>> = ({
   children,
 }) => (
   <header
-    className="page-header"
+    className={clsx([
+      "flex justify-between items-center",
+      "px-8 h-[53px] select-none",
+    ])}
     style={{ "--draggable": "drag" } as React.CSSProperties}
   >
     <motion.h2
