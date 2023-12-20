@@ -8,7 +8,6 @@
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.0.4",
-    "@vitejs/plugin-react-swc": "^3.5.0",
     "@xstate/react": "^4.0.1",
     "clsx": "^2.0.0",
     "framer-motion": "^10.12.16",
@@ -28,6 +27,7 @@
     "@types/node": "^20.2.5",
     "@types/react": "^18.0.17",
     "@types/react-dom": "^18.0.6",
+    "@vitejs/plugin-react-swc": "^3.5.0",
     "autoprefixer": "^10.4.12",
     "postcss": "^8.4.17",
     "prettier": "^3.0.1",
