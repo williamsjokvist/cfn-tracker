@@ -57,12 +57,12 @@ func init() {
 		log.Println(fmt.Errorf(`missing .env file: %w`, err))
 		cfg = config.Config{
 			AppVersion:        appVersion,
-			Headless:          runHeadless,
+			Headless:          runHeadless == `true`,
 			SteamUsername:     steamUsername,
 			SteamPassword:     steamPassword,
 			CapIDEmail:        capIDEmail,
 			CapIDPassword:     capIDPassword,
-			BrowserSourcePort: "4242",
+			BrowserSourcePort: 4242,
 		}
 		return
 	}
@@ -103,7 +103,7 @@ func main() {
 			},
 		})
 	}
-	appBrowser, err := browser.NewBrowser(cfg.Headless == `true`)
+	appBrowser, err := browser.NewBrowser(cfg.Headless)
 	if err != nil {
 		closeWithError(fmt.Errorf(`failed to launch browser: %v`, err))
 		return
