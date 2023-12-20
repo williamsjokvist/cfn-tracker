@@ -9,6 +9,7 @@ import { ActionButton } from "@/ui/action-button";
 import { Checkbox } from "@/ui/checkbox";
 import { model } from "@@/go/models";
 import { PageHeader } from "@/ui/page-header";
+import { Icon } from "@iconify/react";
 
 export const TrackingForm: React.FC = () => {
   const { t } = useTranslation();
@@ -45,6 +46,11 @@ export const TrackingForm: React.FC = () => {
     }
   };
 
+  const clearInput = () => {
+    playerIdInputRef.current.value = "";
+    setPlayerIdInput("");
+  }
+
   return (
     <>
       <PageHeader text={t("startTracking")} />
@@ -52,21 +58,33 @@ export const TrackingForm: React.FC = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.125 }}
-        className="relative h-full overflow-y-scroll overflow-x-visible w-full justify-self-center flex flex-col pt-12 gap-5 px-40 pb-4"
+        className=" relative h-full overflow-y-scroll overflow-x-visible w-full justify-self-center flex flex-col pt-12 gap-5 px-56 pb-4"
         onSubmit={onSubmit}
       >
         <h3 className="text-lg">{t("enterCfnName")}</h3>
-        <input
-          ref={playerIdInputRef}
-          onChange={(e) => setPlayerIdInput(e.target.value)}
-          className="bg-transparent border-b-2 border-0 focus:ring-offset-transparent focus:ring-transparent border-b-[rgba(255,255,255,0.275)] focus:border-white hover:border-white outline-none focus:outline-none hover:text-white transition-colors py-3 px-4 block w-full text-lg text-gray-300"
-          type="text"
-          placeholder={t("cfnName")!}
-          autoCapitalize="off"
-          autoComplete="off"
-          autoCorrect="off"
-          autoSave="off"
-        />
+        <div className='relative'>
+          <input
+            ref={playerIdInputRef}
+            onChange={(e) => setPlayerIdInput(e.target.value)}
+            className="bg-transparent border-b-2 border-0 focus:ring-offset-transparent focus:ring-transparent border-b-[rgba(255,255,255,0.275)] focus:border-white hover:border-white outline-none focus:outline-none hover:text-white transition-colors pt-4 pb-3 px-4 pr-12 block w-full text-lg text-gray-300"
+            type="text"
+            placeholder={t("cfnName")!}
+            autoCapitalize="off"
+            autoComplete="off"
+            autoCorrect="off"
+            autoSave="off"
+          />
+          {playerIdInput.length > 0 && (
+            <button 
+              type="button" 
+              onClick={clearInput}
+              aria-label="Clear" 
+              className='absolute top-0 right-0 mt-4 mr-4 text-[#bfbcff] hover:text-white hover:bg-[rgba(255,255,255,.11)] transition-colors rounded-md'
+            >
+              <Icon icon="ci:close-big" className='w-6 h-6' />
+            </button>
+          )}
+        </div>
         {users && (
           <div className="flex flex-wrap gap-2 content-center items-center text-center">
             {users.map((player) => (
