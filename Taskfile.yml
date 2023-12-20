@@ -12,6 +12,11 @@ tasks:
     desc: Run the dev server with codegen, reloading and go mod sync
     cmds:
       - wails dev -forcebuild
+  
+  bind:
+    desc: Generate go->ts bindings
+    cmds:
+      - wails generate module
 
   build:
     desc: Build the app
