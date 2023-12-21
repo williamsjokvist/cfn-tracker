@@ -16,6 +16,8 @@ import { AppLoader } from "./app-layout/app-loader";
 import { AppWrapper } from "./app-layout/app-wrapper";
 import { AppErrorBoundary } from "./app-layout/app-error";
 import { ErrorMessageProvider } from "./app-layout/error-message";
+import { ConfigProvider } from "./config";
+
 import { initI18n } from "./i18n";
 
 import "./style.sass";
@@ -61,7 +63,9 @@ const App: React.FC = () => {
       <TrackingMachineContext.Provider>
         <React.Suspense fallback={<AppLoader/>}>
           <ErrorMessageProvider>
-            <RouterProvider router={router} />
+            <ConfigProvider>
+              <RouterProvider router={router} />
+            </ConfigProvider>
           </ErrorMessageProvider>
         </React.Suspense>
       </TrackingMachineContext.Provider>

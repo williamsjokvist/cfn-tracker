@@ -3,7 +3,8 @@ import { useTranslation } from "react-i18next";
 import { Icon } from "@iconify/react";
 
 import { HideableText } from "@/ui/hideable-text";
-import { GetSupportedLanguages } from "@@/go/core/CommandHandler";
+import { GetSupportedLanguages, SaveLocale } from "@@/go/core/CommandHandler";
+import { useErrorMessage } from "./error-message";
 
 type LanguageSelectorProps = {
   isMinimized: boolean;
@@ -12,8 +13,8 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
   isMinimized,
 }) => {
   const { t, i18n } = useTranslation();
-
   const [langs, setLangs] = React.useState<string[]>([]);
+  const setErrorMessage = useErrorMessage();
 
   React.useEffect(() => {
     GetSupportedLanguages().then((langs) => setLangs(langs))
@@ -21,7 +22,7 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
   
   const changeLanguage = (code: string) => {
     i18n.changeLanguage(code);
-    window.localStorage.setItem("lng", code);
+    SaveLocale(code).catch(err => setErrorMessage(err))
   };
 
   return (

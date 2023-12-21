@@ -5,20 +5,23 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/williamsjokvist/cfn-tracker/core/data/nosql"
 	"github.com/williamsjokvist/cfn-tracker/core/data/sql"
 	"github.com/williamsjokvist/cfn-tracker/core/data/txt"
 	"github.com/williamsjokvist/cfn-tracker/core/model"
 )
 
 type CFNTrackerRepository struct {
-	sqlDb *sql.Storage
-	txtDb *txt.Storage
+	sqlDb   *sql.Storage
+	nosqlDb *nosql.Storage
+	txtDb   *txt.Storage
 }
 
-func NewCFNTrackerRepository(sqlDb *sql.Storage, txtDb *txt.Storage) *CFNTrackerRepository {
+func NewCFNTrackerRepository(sqlDb *sql.Storage, nosqlDb *nosql.Storage, txtDb *txt.Storage) *CFNTrackerRepository {
 	return &CFNTrackerRepository{
-		sqlDb: sqlDb,
-		txtDb: txtDb,
+		sqlDb:   sqlDb,
+		nosqlDb: nosqlDb,
+		txtDb:   txtDb,
 	}
 }
 
@@ -112,4 +115,16 @@ func (m *CFNTrackerRepository) UpdateSession(ctx context.Context, sesh *model.Se
 		return fmt.Errorf("save match in storage: %w", err)
 	}
 	return nil
+}
+
+func (m *CFNTrackerRepository) SaveLocale(locale string) error {
+	return m.nosqlDb.SaveLocale(locale)
+}
+
+func (m *CFNTrackerRepository) SaveSidebarMinimized(sidebarMinified bool) error {
+	return m.nosqlDb.SaveSidebarMinimized(sidebarMinified)
+}
+
+func (m *CFNTrackerRepository) GetGuiConfig() (*model.GuiConfig, error) {
+	return m.nosqlDb.GetGuiConfig()
 }

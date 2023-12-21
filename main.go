@@ -22,6 +22,7 @@ import (
 	"github.com/williamsjokvist/cfn-tracker/core/browser"
 	"github.com/williamsjokvist/cfn-tracker/core/config"
 	"github.com/williamsjokvist/cfn-tracker/core/data"
+	"github.com/williamsjokvist/cfn-tracker/core/data/nosql"
 	"github.com/williamsjokvist/cfn-tracker/core/data/sql"
 	"github.com/williamsjokvist/cfn-tracker/core/data/txt"
 	"github.com/williamsjokvist/cfn-tracker/core/errorsx"
@@ -111,12 +112,17 @@ func main() {
 		closeWithError(fmt.Errorf(`failed to initalize database: %w`, err))
 		return
 	}
+	noSqlDb, err := nosql.NewStorage()
+	if err != nil {
+		closeWithError(fmt.Errorf(`failed to initalize app config: %w`, err))
+		return
+	}
 	txtDb, err := txt.NewStorage()
 	if err != nil {
 		closeWithError(fmt.Errorf(`failed to initalize text store: %w`, err))
 		return
 	}
-	trackerRepo := data.NewCFNTrackerRepository(sqlDb, txtDb)
+	trackerRepo := data.NewCFNTrackerRepository(sqlDb, noSqlDb, txtDb)
 	cmdHandler := core.NewCommandHandler(appBrowser, trackerRepo, &cfg)
 
 	err = wails.Run(&options.App{

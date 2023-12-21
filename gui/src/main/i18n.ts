@@ -17,7 +17,7 @@ export const initI18n = () => {
     .init<HttpBackendOptions>({
       fallbackLng: "en-GB",
       load: "currentOnly",
-      lng: window.localStorage.getItem("lng") ?? "en-GB",
+      lng: "en-GB",
       react: {
         useSuspense: true,
       },

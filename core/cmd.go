@@ -178,6 +178,18 @@ func (ch *CommandHandler) SelectGame(game string) error {
 	return err
 }
 
+func (ch *CommandHandler) SaveLocale(locale string) error {
+	return ch.repo.SaveLocale(locale)
+}
+
+func (ch *CommandHandler) GetGuiConfig() (*model.GuiConfig, error) {
+	return ch.repo.GetGuiConfig()
+}
+
+func (ch *CommandHandler) SaveSidebarMinimized(sidebarMinified bool) error {
+	return ch.repo.SaveSidebarMinimized(sidebarMinified)
+}
+
 func (ch *CommandHandler) GetTrackingStateUnused() *model.TrackingState {
 	return nil
 }
