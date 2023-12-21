@@ -41,6 +41,7 @@ export const SessionsListPage: React.FC = () => {
       <div className="overflow-y-scroll max-h-[340px] h-full mx-4 px-4 pb-4 mt-3">
         {Object.keys(groupedSessions).map((year) => (
           <motion.section
+            key={year}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.125 }}
@@ -50,7 +51,7 @@ export const SessionsListPage: React.FC = () => {
               {Object.keys(groupedSessions[year])
                 .reverse()
                 .map((month) => (
-                  <section>
+                  <section key={month}>
                     <h3 className="text-2xl mt-2">
                       {Intl.DateTimeFormat(i18n.resolvedLanguage, {
                         month: "long",
