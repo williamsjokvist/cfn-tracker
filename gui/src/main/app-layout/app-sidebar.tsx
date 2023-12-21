@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useAnimate } from "framer-motion";
 import { Icon } from "@iconify/react";
 
-import { GetAppVersion } from "@@/go/core/CommandHandler";
+import { GetAppVersion, SaveSidebarMinimized } from "@@/go/core/CommandHandler";
 import { LanguageSelector } from "@/main/app-layout/language-selector";
 import { BrowserOpenURL } from "@@/runtime";
 
@@ -13,6 +13,8 @@ import { HideableText } from "@/ui/hideable-text";
 
 import { AppTitleBar } from "./app-titlebar";
 import type { LocalizationKey } from "../i18n";
+import { useErrorMessage } from "./error-message";
+import { useConfig } from "../config";
 
 const NavigationItems: {
   icon: string, 
@@ -43,12 +45,11 @@ const NavigationItems: {
 export const AppSidebar: React.FC = () => {
   const { t } = useTranslation();
   const location = useLocation();
+  const setErrorMessage = useErrorMessage();
   const [appVersion, setAppVersion] = React.useState("");
-  const [isMinimized, setMinimized] = React.useState(
-    window.localStorage.getItem("sidebar-minimized") == "true"
-  );
-
   const [scope, animate] = useAnimate();
+  const [cfg, setCfg] = useConfig();
+  const isMinimized = !!cfg?.sidebarMinified
 
   React.useEffect(() => {
     animate("a, button", { opacity: [0, 1] }, { delay: 0.25 });
@@ -57,14 +58,6 @@ export const AppSidebar: React.FC = () => {
   React.useEffect(() => {
     !appVersion && GetAppVersion().then((v) => setAppVersion(v));
   }, [appVersion]);
-
-  React.useEffect(() => {
-    if (isMinimized) {
-      localStorage.setItem("sidebar-minimized", "true");
-    } else if (!isMinimized) {
-      localStorage.removeItem("sidebar-minimized");
-    }
-  }, [isMinimized]);
 
   return (
     <aside
@@ -121,7 +114,11 @@ export const AppSidebar: React.FC = () => {
         <button
           type="button"
           className={`h-[28px] cursor-pointer w-full group font-extralight flex items-center mt-1 text-[#d6d4ff] hover:text-white transition-colors`}
-          onClick={() => setMinimized(!isMinimized)}
+          onClick={() => {
+            SaveSidebarMinimized(!isMinimized).then(() => 
+              setCfg({ ...cfg, sidebarMinified: !isMinimized})
+            ).catch(err => setErrorMessage(err))
+          }}
         >
           <Icon
             icon="fa6-solid:chevron-left"
