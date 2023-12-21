@@ -1,11 +1,10 @@
 import React from "react";
+import { useLoaderData } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { Icon } from "@iconify/react";
 
-import { useErrorMessage } from "@/main/app-layout/error-message";
 import { TrackingMachineContext } from "@/machines/tracking-machine";
-import { GetUsers } from "@@/go/core/CommandHandler";
 import { ActionButton } from "@/ui/action-button";
 import { Checkbox } from "@/ui/checkbox";
 import { model } from "@@/go/models";
@@ -13,19 +12,12 @@ import { PageHeader } from "@/ui/page-header";
 
 export const TrackingForm: React.FC = () => {
   const { t } = useTranslation();
-  const setError = useErrorMessage()
-
+  const users = useLoaderData() as model.User[]
   const trackingActor = TrackingMachineContext.useActorRef()
-
+  
   const playerIdInputRef = React.useRef<HTMLInputElement>(null);
   const restoreRef = React.useRef<HTMLInputElement>(null);
-
   const [playerIdInput, setPlayerIdInput] = React.useState<string>("");
-  const [users, setUsers] = React.useState<model.User[] | null>(null);
-
-  React.useEffect(() => {
-    GetUsers().then((users) => setUsers(users)).catch(err => setError(err));
-  }, []);
 
   const onSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
@@ -33,8 +25,7 @@ export const TrackingForm: React.FC = () => {
     trackingActor.send({
       type: "submit",
       user: {
-        displayName:
-          users?.find((old) => old.code == playerIdInput) ?? playerIdInput,
+        displayName: users.find((old) => old.code == playerIdInput) ?? playerIdInput,
         code: playerIdInput,
       },
       restore: restoreRef.current && restoreRef.current.checked,
@@ -87,7 +78,7 @@ export const TrackingForm: React.FC = () => {
             </button>
           )}
         </div>
-        {users && (
+        {users.length > 0 && (
           <div className="flex flex-wrap gap-2 content-center items-center text-center">
             {users.map((player) => (
               <button
@@ -102,18 +93,17 @@ export const TrackingForm: React.FC = () => {
           </div>
         )}
         <footer className="flex items-center w-full">
-          {users &&
-            users.some((old) => old.code == playerIdInput) && (
-              <div className="group flex items-center">
-                <Checkbox ref={restoreRef} id="restore-session" />
-                <label
-                  htmlFor="restore-session"
-                  className="text-lg cursor-pointer text-gray-300 group-hover:text-white transition-colors"
-                >
-                  {t("restoreSession")}
-                </label>
-              </div>
-            )}
+          {users.some((old) => old.code == playerIdInput) && (
+            <div className="group flex items-center">
+              <Checkbox ref={restoreRef} id="restore-session" />
+              <label
+                htmlFor="restore-session"
+                className="text-lg cursor-pointer text-gray-300 group-hover:text-white transition-colors"
+              >
+                {t("restoreSession")}
+              </label>
+            </div>
+          )}
           <ActionButton
             type="submit"
             style={{ filter: "hue-rotate(-65deg)" }}

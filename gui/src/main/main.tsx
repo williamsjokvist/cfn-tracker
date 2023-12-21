@@ -10,9 +10,12 @@ import { SessionsListPage } from "@/pages/stats/sessions-list-page";
 import { TrackingMachineContext } from "@/machines/tracking-machine";
 import { AuthMachineContext } from "@/machines/auth-machine";
 
+import { GetMatches, GetSessions, GetThemeList, GetUsers } from "@@/go/core/CommandHandler";
+
 import { AppLoader } from "./app-layout/app-loader";
 import { AppWrapper } from "./app-layout/app-wrapper";
 import { AppErrorBoundary } from "./app-layout/app-error";
+import { ErrorMessageProvider } from "./app-layout/error-message";
 import { initI18n } from "./i18n";
 
 import "./style.sass";
@@ -20,24 +23,33 @@ import "./style.sass";
 const router = createHashRouter([
   {
     element: <AppWrapper />,
-    errorElement: <AppErrorBoundary />,
+    errorElement: <AppErrorBoundary outer />,
     children: [
       {
-        element: <TrackingPage />,
-        path: "/",
+        errorElement: <AppErrorBoundary />,
+        children: [
+          {
+            element: <TrackingPage />,
+            path: "/",
+            loader: GetUsers,
+          },
+          {
+            element: <OutputPage />,
+            path: "/output",
+            loader: GetThemeList
+          },
+          {
+            element: <SessionsListPage />,
+            path: "/sessions/:userId?",
+            loader: ({ params }) => GetSessions(params.userId ?? "")
+          },
+          {
+            element: <MatchesListPage />,
+            path: "/sessions/:sessionId/matches/:page?/:limit?",
+            loader: ({ params }) => GetMatches(Number(params.sessionId), "", Number(params.page ?? 0), Number(params.limit ?? 0))
+          }
+        ]
       },
-      {
-        element: <OutputPage />,
-        path: "/output",
-      },
-      {
-        element: <SessionsListPage />,
-        path: "/sessions"
-      },
-      {
-        element: <MatchesListPage />,
-        path: "/sessions/:sessionId"
-      }
     ],
   },
 ]);
@@ -48,7 +60,9 @@ const App: React.FC = () => {
     <AuthMachineContext.Provider>
       <TrackingMachineContext.Provider>
         <React.Suspense fallback={<AppLoader/>}>
-          <RouterProvider router={router} />
+          <ErrorMessageProvider>
+            <RouterProvider router={router} />
+          </ErrorMessageProvider>
         </React.Suspense>
       </TrackingMachineContext.Provider>
     </AuthMachineContext.Provider>

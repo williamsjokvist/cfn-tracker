@@ -11,7 +11,7 @@ type ErrorContextType = [error: errorsx.FrontEndError | null, setError: (error: 
 const ErrorContext = React.createContext<ErrorContextType | null>(null)
 export const useErrorMessage = () => React.useContext(ErrorContext)[1]
 
-const LocalizedErrorMessage: Record<number, LocalizationKey> = {
+export const LocalizedErrorMessage: Record<number, LocalizationKey> = {
   401: "errUnauthorized",
   404: "errNotFound",
   500: "errInternalServerError",
@@ -35,14 +35,14 @@ export const ErrorMessageProvider: React.FC<React.PropsWithChildren> = ({ childr
 
   return (
     <ErrorContext.Provider value={[error, setError]}>
-      <div ref={scope} className="absolute">
+      <div ref={scope} className="absolute w-full flex justify-end">
         <div
           id="error-message"
           className={clsx(
             "flex gap-6 items-center justify-around",
-            "fixed bottom-2 z-50",
-            "px-8 py-3 rounded-r-xl text-xl backdrop-blur-sm pointer-events-none",
-            "bg-[rgba(255,0,0,.125)]"
+            "fixed mx-auto z-50",
+            "px-8 py-3 rounded-bl-xl text-xl backdrop-blur-sm pointer-events-none",
+            "text-white bg-gradient-to-r from-[#870e65] to-[#6c086d]"
           )}
           style={{ opacity: 0 }}
         >
