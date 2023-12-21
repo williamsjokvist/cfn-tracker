@@ -1,16 +1,19 @@
+import React from "react";
+import clsx from "clsx";
+import { Icon } from "@iconify/react";
+import { useTranslation } from "react-i18next";
+
+import { useErrorMessage } from "@/main/app-layout/error-message";
 import { CheckForUpdate } from "@@/go/core/CommandHandler";
 import { BrowserOpenURL } from "@@/runtime/runtime";
-import { Icon } from "@iconify/react";
-import clsx from "clsx";
-import React from "react";
-import { useTranslation } from "react-i18next";
 
 export const UpdatePrompt: React.FC = () => {
   const { t } = useTranslation();
   const [hasUpdate, setHasUpdate] = React.useState(false);
-
+  const setError = useErrorMessage();
+  
   React.useEffect(() => {
-    CheckForUpdate().then((hasUpdate: boolean) => setHasUpdate(hasUpdate))
+    CheckForUpdate().then((hasUpdate: boolean) => setHasUpdate(hasUpdate)).catch(err => setError(err));
   }, [])
 
   if (hasUpdate === false) {

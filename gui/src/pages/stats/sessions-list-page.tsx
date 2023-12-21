@@ -1,12 +1,12 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-
-import { GetSessions } from "@@/go/core/CommandHandler";
-import type { model } from "@@/go/models";
-
-import { PageHeader } from "@/ui/page-header";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+
+import { PageHeader } from "@/ui/page-header";
+import { useErrorMessage } from "@/main/app-layout/error-message";
+import { GetSessions } from "@@/go/core/CommandHandler";
+import type { model } from "@@/go/models";
 
 type MonthGroup = Record<number, model.Session[]>;
 type YearGroup = Record<number, MonthGroup>;
@@ -14,12 +14,13 @@ type YearGroup = Record<number, MonthGroup>;
 export const SessionsListPage: React.FC = () => {
   const { i18n, t } = useTranslation();
   const navigate = useNavigate();
+  const setError = useErrorMessage();
   const [sessions, setSessions] = React.useState<model.Session[]>([]);
 
   React.useEffect(() => {
     GetSessions("").then((seshs) => {
       seshs && setSessions(seshs);
-    });
+    }).catch(err => setError(err));
   }, []);
 
   const groupedSessions: YearGroup = sessions.reduce((group, sesh) => {
