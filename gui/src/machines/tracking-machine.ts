@@ -59,7 +59,8 @@ export const TRACKING_MACHINE = setup({
               assign({
                 user: ({ event }) => event.user,
                 restore: ({ event }) => event.restore,
-                isTracking: true
+                isTracking: true,
+                error: null
               }),
               "startTracking",
               "subscribeToTrackingEvents"
@@ -95,7 +96,7 @@ export const TRACKING_MACHINE = setup({
               "stopTracking",
               "unsubscribeToTrackingEvents",
               assign({
-                isTracking: false
+                isTracking: false,
               })
             ],
             target: "cfnForm"

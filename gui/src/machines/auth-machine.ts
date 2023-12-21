@@ -47,6 +47,7 @@ export const AUTH_MACHINE = setup({
           actions: [
             assign({
               game: ({ event }) => event.game,
+              error: null,
             }),
             "selectGame",
             "subscribeToProgressEvents"
