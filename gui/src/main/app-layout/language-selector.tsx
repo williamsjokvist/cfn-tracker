@@ -1,8 +1,9 @@
+import React from "react";
 import { useTranslation } from "react-i18next";
 import { Icon } from "@iconify/react";
 
-import { APP_LANGUAGES } from "@/main/i18n-config";
 import { HideableText } from "@/ui/hideable-text";
+import { GetSupportedLanguages } from "@@/go/core/CommandHandler";
 
 type LanguageSelectorProps = {
   isMinimized: boolean;
@@ -12,6 +13,12 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
 }) => {
   const { t, i18n } = useTranslation();
 
+  const [langs, setLangs] = React.useState<string[]>([]);
+
+  React.useEffect(() => {
+    GetSupportedLanguages().then((langs) => setLangs(langs))
+  }, [])
+  
   const changeLanguage = (code: string) => {
     i18n.changeLanguage(code);
     window.localStorage.setItem("lng", code);
@@ -36,19 +43,26 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
           style={{ transform: "rotate(180deg)" }}
         />
         <ul className="relative bottom-1 w-[195px] text-[16px] uppercase flex gap-2 justify-between group hover:bg-[rgba(0,0,0,.525)] text-[#bfbcff] transition-colors backdrop-blur leading-5 text-base py-2 px-3 rounded-lg bg-[rgba(0,0,0,.625)]">
-          {APP_LANGUAGES.map((lng) => (
-            <li key={lng.code}>
+          {langs.map((code) => (
+            <li key={code}>
               <button
-                onClick={() => changeLanguage(lng.code)}
+                onClick={() => changeLanguage(code)}
                 type="button"
-                className="cursor-pointer hover:!text-white transition-colors"
-                {...(i18n.resolvedLanguage === lng.code && {
+                className="cursor-pointer hover:!text-white transition-colors first-letter:uppercase"
+                {...(i18n.resolvedLanguage === code && {
                   style: {
                     fontWeight: 600,
                   },
                 })}
               >
-                {lng.nativeName}
+                {new Intl.DisplayNames([code], { 
+                  type: "language", 
+                  languageDisplay: "standard", 
+                  style: "narrow", 
+                  fallback: "code" 
+                  })
+                  .of(code).split(/[ |（]/)[0]
+                }
               </button>
             </li>
           ))}

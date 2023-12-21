@@ -1,8 +1,9 @@
-import { LocalizationKey } from "@/main/i18n-config";
-import { Icon } from "@iconify/react";
-import * as DialogPrimitive from "@radix-ui/react-dialog";
 import React from "react";
+import { Icon } from "@iconify/react";
 import { useTranslation } from "react-i18next";
+import * as DialogPrimitive from "@radix-ui/react-dialog";
+
+import type { LocalizationKey } from "@/main/i18n";
 
 type DialogContentProps = {
   title: LocalizationKey
