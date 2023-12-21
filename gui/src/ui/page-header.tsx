@@ -14,6 +14,7 @@ export const PageHeader: React.FC<React.PropsWithChildren<PageHeaderProps>> = ({
     className={clsx([
       "flex justify-between items-center",
       "px-8 h-[53px] select-none",
+      "border-b-[1px] border-b-[rgba(255,255,255,.125)] border-solid"
     ])}
     style={{ "--draggable": "drag" } as React.CSSProperties}
   >
