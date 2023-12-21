@@ -1,27 +1,18 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
+import { useLoaderData, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
 import { PageHeader } from "@/ui/page-header";
-import { useErrorMessage } from "@/main/app-layout/error-message";
-import { GetSessions } from "@@/go/core/CommandHandler";
 import type { model } from "@@/go/models";
 
 type MonthGroup = Record<number, model.Session[]>;
 type YearGroup = Record<number, MonthGroup>;
 
 export const SessionsListPage: React.FC = () => {
+  const sessions = useLoaderData() as model.Session[];
   const { i18n, t } = useTranslation();
   const navigate = useNavigate();
-  const setError = useErrorMessage();
-  const [sessions, setSessions] = React.useState<model.Session[]>([]);
-
-  React.useEffect(() => {
-    GetSessions("").then((seshs) => {
-      seshs && setSessions(seshs);
-    }).catch(err => setError(err));
-  }, []);
 
   const groupedSessions: YearGroup = sessions.reduce((group, sesh) => {
     const date = new Date(sesh.createdAt);
@@ -86,7 +77,7 @@ export const SessionsListPage: React.FC = () => {
                           <tr
                             key={sesh.id}
                             className="backdrop-blur group cursor-pointer"
-                            onClick={() => navigate(`/sessions/${sesh.id}`)}
+                            onClick={() => navigate(`/sessions/${sesh.id}/matches`)}
                           >
                             <td className="whitespace-nowrap text-left rounded-l-xl rounded-r-none bg-slate-50 bg-opacity-5 group-hover:bg-opacity-10 transition-colors px-3 py-2">
                               <time dateTime={sesh.createdAt}>

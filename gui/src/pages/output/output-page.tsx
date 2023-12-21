@@ -1,4 +1,5 @@
 import React from "react";
+import { useLoaderData } from "react-router-dom";
 import { Trans, useTranslation } from "react-i18next";
 import { motion, useAnimate } from "framer-motion";
 import { Icon } from "@iconify/react";
@@ -7,8 +8,7 @@ import Dialog from "@/ui/dialog";
 import { Checkbox } from "@/ui/checkbox";
 import { PageHeader } from "@/ui/page-header";
 import { ActionButton } from "@/ui/action-button";
-import { useErrorMessage } from "@/main/app-layout/error-message";
-import { GetThemeList, OpenResultsDirectory } from "@@/go/core/CommandHandler";
+import { OpenResultsDirectory } from "@@/go/core/CommandHandler";
 
 import defaultTheme from './themes/default.png'
 import bladesTheme from './themes/blades.png'
@@ -40,15 +40,8 @@ const defaultOptions = {
 export const OutputPage: React.FC = () => {
   const { t } = useTranslation();
   const [options, setOptions] = React.useState(defaultOptions);
-  const [themes, setThemes] = React.useState<string[]>([]);
+  const themes = useLoaderData() as string[];
   const [scope, animate] = useAnimate();
-  const setError = useErrorMessage();
-
-  React.useEffect(() => {
-    if (themes.length == 0) {
-      GetThemeList().then((themes) => setThemes(themes)).catch(err => setError(err));
-    }
-  }, []);
 
   const copyUrlToClipBoard = () => {
     let url = `http://localhost:4242?theme=${options.theme}`;

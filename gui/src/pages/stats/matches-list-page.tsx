@@ -1,31 +1,16 @@
 import React from "react";
-import { useParams } from "react-router-dom";
+import { useLoaderData } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 
 import { PageHeader } from "@/ui/page-header";
-import { useErrorMessage } from "@/main/app-layout/error-message";
-import { GetMatches } from "@@/go/core/CommandHandler";
 import type { model } from "@@/go/models";
-
 
 export const MatchesListPage: React.FC = () => {
   const { t } = useTranslation();
-  const setError = useErrorMessage()
-  const params = useParams();
-  const sessionId = Number(params["sessionId"]);
-
-  const [matches, setMatches] = React.useState<model.Match[]>([]);
+  const totalMatches = useLoaderData() as model.Match[];
+  const [matches, setMatches] = React.useState<model.Match[]>(totalMatches);
   const [totalWinRate, setTotalWinRate] = React.useState<number | null>(null);
-
-  
-  React.useEffect(() => {
-    GetMatches(sessionId, "", 0, 0)
-      .then((matches) => {
-        setMatches(matches);
-      })
-      .catch(err => setError(err));
-  }, [sessionId])
 
   React.useEffect(() => {
     if (!matches) return;
@@ -51,7 +36,7 @@ export const MatchesListPage: React.FC = () => {
       <PageHeader text={t("history")} />
 
       <div className="relative w-full">
-        {matches && (
+        {matches.length > 0 && (
           <>
             {totalWinRate != null && (
               <div className="flex items-center pt-1 px-8 mb-2 h-10 border-b border-slate-50 border-opacity-10 ">

@@ -12,8 +12,14 @@ import { NavigationLink } from "@/ui/nav-link";
 import { HideableText } from "@/ui/hideable-text";
 
 import { AppTitleBar } from "./app-titlebar";
+import type { LocalizationKey } from "../i18n";
 
-const NavigationItems = [
+const NavigationItems: {
+  icon: string, 
+  selectedIcon: string, 
+  main: boolean, 
+  href: LocalizationKey
+}[] = [
   {
     icon: "ri:search-line",
     selectedIcon: "ri:search-fill",
