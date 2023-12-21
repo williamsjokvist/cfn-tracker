@@ -50,6 +50,22 @@ func (ch *CommandHandler) GetAppVersion() string {
 	return ch.cfg.AppVersion
 }
 
+func (ch *CommandHandler) GetTranslation(locale string) (*locales.Localization, error) {
+	lng, err := i18n.GetTranslation(locale)
+	if err != nil {
+		log.Println(err)
+		if !errorsx.ContainsTrackingError(err) {
+			err = errorsx.NewError(http.StatusNotFound, fmt.Errorf(`failed to get translation %w`, err))
+		}
+		return nil, err
+	}
+	return lng, nil
+}
+
+func (ch *CommandHandler) GetSupportedLanguages() []string {
+	return i18n.GetSupportedLanguages()
+}
+
 func (ch *CommandHandler) CheckForUpdate() (bool, error) {
 	currentVersion, err := version.NewVersion(ch.cfg.AppVersion)
 	if err != nil {
@@ -160,10 +176,6 @@ func (ch *CommandHandler) SelectGame(game string) error {
 		}
 	}
 	return err
-}
-
-func (ch *CommandHandler) GetTranslation(locale string) locales.Localization {
-	return i18n.GetTranslation(locale)
 }
 
 func (ch *CommandHandler) GetTrackingStateUnused() *model.TrackingState {

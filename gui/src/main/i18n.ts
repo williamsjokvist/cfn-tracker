@@ -6,31 +6,20 @@ import { initReactI18next } from 'react-i18next';
 import type { locales } from "@@/go/models";
 import { GetTranslation } from "@@/go/core/CommandHandler";
 
-type AppLanguage = {
-  code: string;
-  nativeName: string;
-}
-
 export type LocalizationKey = keyof locales.Localization
 
-export const APP_LANGUAGES: AppLanguage[] = [
-  { code: 'en-GB', nativeName: 'English' },
-  { code: 'fr-FR', nativeName: 'Français' },
-  { code: 'ja-JP', nativeName: '日本' },
-];
-
 // https://www.i18next.com/overview/configuration-options
-export const initLocalization = () => {
+export const initI18n = () => {
   return i18n
     .use(LanguageDetector)
     .use(HttpBackend)
     .use(initReactI18next)
     .init<HttpBackendOptions>({
-      fallbackLng: APP_LANGUAGES[0].code,
+      fallbackLng: "en-GB",
       load: "currentOnly",
-      lng: window.localStorage.getItem("lng") ?? APP_LANGUAGES[0].code,
+      lng: window.localStorage.getItem("lng") ?? "en-GB",
       react: {
-        useSuspense: false,
+        useSuspense: true,
       },
       backend: {
         loadPath: '{{lng}}',

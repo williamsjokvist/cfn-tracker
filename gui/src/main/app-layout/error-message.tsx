@@ -4,7 +4,7 @@ import { Icon } from "@iconify/react";
 import { useAnimate } from "framer-motion";
 import { useTranslation } from "react-i18next";
 
-import type { LocalizationKey } from "@/main/i18n-config";
+import type { LocalizationKey } from "@/main/i18n";
 import type { errorsx } from "@@/go/models";
 
 type ErrorContextType = [error: errorsx.FrontEndError | null, setError: (error: errorsx.FrontEndError | null) => void]
