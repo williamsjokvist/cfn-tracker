@@ -17,6 +17,7 @@
 		"tailwindcss": "^3.2.7"
 	},
 	"devDependencies": {
+		"@tailwindcss/typography": "^0.5.10",
 		"@types/gsap": "^3.0.0",
 		"sass": "^1.69.5"
 	}

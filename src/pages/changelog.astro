@@ -1,0 +1,30 @@
+---
+import { Content } from '../content/changelog.md';
+import Layout from '../layouts/Layout.astro';
+---
+<script>
+  import { gsap, Power2 } from "../lib/gsap";
+  gsap.from("#changelog > *", {
+    autoAlpha: 0,
+    translateY: 20,
+    duration: 1.25,
+    ease: Power2.easeInOut,
+    stagger: 0.25,
+    scrollTrigger: {
+      scroller: "main",
+      trigger: "#used-by h2",
+      start: "center bottom",
+    },
+  });
+</script>
+
+<Layout title="CFN Tracker - Changelog">
+  <div id="changelog" class="prose lg:prose-lg dark:prose-invert mx-auto mt-20">
+    <Content />
+  </div>
+</Layout>
+
+<style lang="sass">
+  body 
+    background: linear-gradient(0deg, rgb(25 16 34) 0%, #000 100%)
+</style>
