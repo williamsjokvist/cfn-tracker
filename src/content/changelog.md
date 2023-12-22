@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [Unreleased](https://github.com/williamsjokvist/cfn-tracker/tree/master)
 
 ### Added
 - Street Fighter 6 tracking.
@@ -28,7 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - No longer output tracking state to a *results.json* file.
 - Ability to track battle lounge and casual matches **(SFV)**.
 
-## [3.0.0] - 2023-02-22
+## [3.0.0](https://github.com/williamsjokvist/cfn-tracker/tree/v3.0.0) - 2023-02-22
 
 Thanks to [Sheldon](https://www.twitch.tv/SheldonTwitching) for testing this release and for the encouragement and support!
 
@@ -47,7 +47,7 @@ Expect the next major release when Street Fighter 6 comes out, until then it's p
 ### Fixed
 - Fixed an issue where the tracking could not be initialized.
 
-## [2.0.0] - 2023-01-12
+## [2.0.0](https://github.com/williamsjokvist/cfn-tracker/tree/v2.0.0) - 2023-01-12
 
 This is the rewrite of the CFN Tracker I wrote almost 4 years ago. It contains many improvements and I hope to add even more features to it in time!
 
@@ -56,3 +56,5 @@ This is the rewrite of the CFN Tracker I wrote almost 4 years ago. It contains m
 
 ### Changed
 - App is now shipped as a single binary instead of having to download PhantomJS + CasperJS.
+
+## [1.0.0](https://github.com/williamsjokvist/cfn-tracker/tree/458774bf59df5854b7ba6365a0f0b3cfc74bc52f) - 2019-09-07
