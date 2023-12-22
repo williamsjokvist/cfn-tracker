@@ -17,7 +17,7 @@ type AppErrorBoundaryProps = {
 export const AppErrorBoundary: React.FC<AppErrorBoundaryProps> = ({ outer }) => {
   const { t } = useTranslation();
   const thrownError = useRouteError();
-  const [err, setErr] = React.useState<errorsx.FrontEndError>()
+  const [err, setErr] = React.useState<errorsx.FrontEndError | null>(null)
 
   React.useEffect(() => {
     console.error(thrownError);
@@ -28,7 +28,7 @@ export const AppErrorBoundary: React.FC<AppErrorBoundaryProps> = ({ outer }) => 
     }
   }, [thrownError])
 
-  if (!err) {
+  if (!err?.code) {
     return null
   }
 

@@ -4,12 +4,12 @@ import { useTranslation } from "react-i18next";
 
 import { TrackingMachineContext } from "@/machines/tracking-machine";
 import { AuthMachineContext } from "@/machines/auth-machine";
+import { useErrorMessage } from "@/main/app-layout/error-message";
 import { PageHeader } from "@/ui/page-header";
 
 import { TrackingGamePicker } from "./tracking-game-picker";
 import { TrackingLiveUpdater } from "./tracking-live-updater";
 import { TrackingForm } from "./tracking-form";
-import { useErrorMessage } from "@/main/app-layout/error-message";
 
 export const TrackingPage: React.FC = () => {
   const { t } = useTranslation();

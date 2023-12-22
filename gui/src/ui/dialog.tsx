@@ -10,7 +10,7 @@ type DialogContentProps = {
   description?: LocalizationKey
 } & React.PropsWithChildren<DialogPrimitive.DialogContentProps>
 
-export const DialogContent = React.forwardRef((
+export const Content = React.forwardRef((
   props: DialogContentProps, 
   ref: React.MutableRefObject<HTMLDivElement>
 ) => {
@@ -29,7 +29,9 @@ export const DialogContent = React.forwardRef((
               </DialogPrimitive.Description>
             }
           </div>
-          <DialogCloseButton />
+          <DialogPrimitive.Close aria-label="Close" className="bg-[#202020] hover:bg-[#2b2a33] w-11 h-11 rounded-full">
+            <Icon icon="ci:close-big" width={28} className='mx-auto' />
+          </DialogPrimitive.Close>
         </header>
         {props.children}
       </DialogPrimitive.Content>
@@ -38,14 +40,6 @@ export const DialogContent = React.forwardRef((
   )
 });
 
-const DialogCloseButton = () => (
-  <DialogPrimitive.Close aria-label="Close" className="bg-[#202020] hover:bg-[#2b2a33] w-11 h-11 rounded-full">
-    <Icon icon="ci:close-big" width={28} className='mx-auto' />
-  </DialogPrimitive.Close>
-)
+export const Root = DialogPrimitive.Root;
+export const Trigger = DialogPrimitive.Trigger;
 
-export default {
-  Root: DialogPrimitive.Root,
-  Trigger: DialogPrimitive.Trigger,
-  Content: DialogContent
-}

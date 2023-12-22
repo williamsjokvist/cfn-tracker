@@ -1,20 +1,16 @@
 import React from "react";
-import { useLoaderData } from "react-router-dom";
 import { Trans, useTranslation } from "react-i18next";
 import { motion, useAnimate } from "framer-motion";
 import { Icon } from "@iconify/react";
 
-import Dialog from "@/ui/dialog";
-import { Checkbox } from "@/ui/checkbox";
 import { PageHeader } from "@/ui/page-header";
 import { ActionButton } from "@/ui/action-button";
 import { OpenResultsDirectory } from "@@/go/core/CommandHandler";
 
-import defaultTheme from './themes/default.png'
-import bladesTheme from './themes/blades.png'
-import jaegerTheme from './themes/jaeger.png'
-import nordTheme from './themes/nord.png'
-import pillsTheme from './themes/pills.png'
+import { ThemeDialog } from "./theme-dialog";
+import { StatsDialog } from "./stats-dialog";
+
+export type StatOptions = typeof defaultOptions;
 
 const defaultOptions = {
   theme: "default",
@@ -40,7 +36,6 @@ const defaultOptions = {
 export const OutputPage: React.FC = () => {
   const { t } = useTranslation();
   const [options, setOptions] = React.useState(defaultOptions);
-  const themes = useLoaderData() as string[];
   const [scope, animate] = useAnimate();
 
   const copyUrlToClipBoard = () => {
@@ -96,12 +91,11 @@ export const OutputPage: React.FC = () => {
               </ActionButton>
             </div>
             <div className='flex flex-col gap-4'>
-              <ThemePickModal 
-                themes={themes}
+              <ThemeDialog 
                 onSelect={theme => setOptions({ ...options, theme }) } 
                 selectedTheme={options.theme}
               />
-              <StatPickModal 
+              <StatsDialog 
                 options={options} 
                 onSelect={(key, value) => setOptions({ ...options, [key]: value })}
               />
@@ -140,70 +134,3 @@ export const OutputPage: React.FC = () => {
     </>
   );
 };
-
-const ThemePickModal = (props: { selectedTheme: string, themes: string[], onSelect: (theme: string) => void }) => {
-  const { t } = useTranslation()
-
-  const ThemeItem = ({ name, img }) => (
-    <li>
-      <button onClick={() => props.onSelect(name)}>
-        <img src={img} className='object-cover object-top overflow-hidden w-full rounded-md h-[76px]' 
-          style={{ border: props.selectedTheme == name ? '2px solid lime' : '2px solid transparent'}}
-        />
-      </button>
-    </li>
-  )
-  return (
-    <Dialog.Root>
-      <Dialog.Trigger asChild>
-        <ActionButton style={{ filter: "hue-rotate(-180deg)", justifyContent: "center" }}>
-          <Icon icon="ph:paint-bucket-fill" className="mr-3 w-6 h-6" />
-          {t("selectTheme")}
-        </ActionButton>
-      </Dialog.Trigger>
-      <Dialog.Content title="selectTheme">
-        <ul className='mt-2 h-80 w-full pr-2 overflow-y-scroll'>
-          <ThemeItem name="default" img={defaultTheme} />
-          <ThemeItem name="blades" img={bladesTheme} />
-          <ThemeItem name="pills" img={pillsTheme}  />
-          <ThemeItem name="jaeger" img={jaegerTheme}  />
-          <ThemeItem name="nord" img={nordTheme} />
-        </ul>
-      </Dialog.Content>
-  </Dialog.Root>
-  )
-}
-
-const StatPickModal = (props: { onSelect: (option: string, checked: boolean) => void, options: typeof defaultOptions }) => {
-  const { t } = useTranslation()
-  return (
-    <Dialog.Root>
-      <Dialog.Trigger asChild>
-        <ActionButton style={{ filter: "hue-rotate(-45deg)" }}>
-          <Icon icon="bx:stats" className="mr-3 w-6 h-6" />
-          {t("displayStats")}
-        </ActionButton>
-      </Dialog.Trigger>
-      <Dialog.Content title="displayStats" description="statsWillBeDisplayed">
-        <ul className="overflow-y-scroll h-72 mt-4">
-          {Object.entries(props.options).map(([key, value]) => {
-            if (key == "theme") return null;
-            return (
-              <li key={key}>
-                <button
-                  className="w-full cursor-pointer flex py-1 px-2 items-center text-lg hover:bg-[rgba(255,255,255,0.075)]"
-                  onClick={() => props.onSelect(key, !value)}
-                >
-                  <Checkbox checked={props.options[key] == true} readOnly />
-                  <span className="ml-2 text-center cursor-pointer capitalize">
-                    {key}
-                  </span>
-                </button>
-              </li>
-            );
-          })}
-        </ul>
-      </Dialog.Content>
-    </Dialog.Root>
-  )
-}

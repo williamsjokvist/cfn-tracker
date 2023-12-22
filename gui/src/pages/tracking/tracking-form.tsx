@@ -40,8 +40,10 @@ export const TrackingForm: React.FC = () => {
   };
 
   const clearInput = () => {
-    playerIdInputRef.current.value = "";
-    setPlayerIdInput("");
+    if (playerIdInputRef.current) {
+      playerIdInputRef.current.value = "";
+      setPlayerIdInput("");
+    }
   }
 
   return (
