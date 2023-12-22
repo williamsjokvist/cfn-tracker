@@ -1,14 +1,14 @@
 ---
-import { Content } from '../content/changelog.md';
+import { Content } from '../content/faq.md';
 import Layout from '../layouts/Layout.astro';
 ---
 <script>
-  import { gsap, Power2 } from "../lib/gsap";
-  gsap.from("#changelog > *", {
+  import { gsap, Power3 } from "../lib/gsap";
+  gsap.from("#faq > *", {
     autoAlpha: 0,
     translateY: 20,
     duration: .75,
-    ease: Power2.easeInOut,
+    ease: Power3.easeInOut,
     stagger: 0.125,
     scrollTrigger: {
       scroller: "main",
@@ -18,8 +18,8 @@ import Layout from '../layouts/Layout.astro';
   });
 </script>
 
-<Layout title="CFN Tracker - Changelog">
-  <div id="changelog" class="prose lg:prose-lg dark:prose-invert mx-auto mt-20">
+<Layout title="CFN Tracker - FAQ">
+  <div id="faq" class="prose lg:prose-lg dark:prose-invert mx-auto mt-20">
     <Content />
   </div>
 </Layout>

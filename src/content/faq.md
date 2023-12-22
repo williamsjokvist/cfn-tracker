@@ -1,0 +1,13 @@
+# FAQ
+
+## Can I use this for my stream?
+Yes absolutely! If you do, let us know and we'll feature you here 💪
+
+## Can I use this for my own without streaming?
+Yes! Quite a few people have also told us that peeking at their stats as they play has kept them motivated!
+
+## Why is the download link broken?
+The installer was disabled when SF6 came out to avoid confusion, since the app only supported SFV.
+
+## Is it possible to use the CFN Tracker as an API?
+It hasn't been ruled out, but it's not something we're gonna work on in the forseeable future due to the difference in scope of a service like this.
