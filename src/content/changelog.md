@@ -38,6 +38,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The match log is now available through the app, with filters for date, opponent, league and character.
 - The match log can now be exported to an Excel sheet.
 - In addition to text files, the app now also outputs the live data to a JSON file: *results.json*.
+- Translations for *French* and *Japanese*.
 
 ### Fixed
 - Fixed an issue where the tracking could not be initialized.
