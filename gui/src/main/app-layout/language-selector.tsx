@@ -62,7 +62,7 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
                   style: "narrow", 
                   fallback: "code" 
                   })
-                  .of(code).split(/[ |（]/)[0]
+                  .of(code)!.split(/[ |（]/)[0]
                 }
               </button>
             </li>

@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { Icon } from "@iconify/react";
-import { PieChart as ReactMinimalPieChart } from "react-minimal-pie-chart";
+import { PieChart } from "react-minimal-pie-chart";
 
 import { TrackingMachineContext } from "@/machines/tracking-machine";
 import { ActionButton } from "@/ui/action-button";
@@ -77,7 +77,7 @@ export const TrackingLiveUpdater: React.FC = () => {
             transition={{ delay: 0.35 }}
             className="relative h-full max-w-[220px] w-full text-center gap-5 pt-8"
           >
-            <ReactMinimalPieChart
+            <PieChart
               className="clip-circle animate-enter w-[150px] h-[150px] mx-auto"
               animate
               animationDuration={750}
@@ -109,7 +109,7 @@ export const TrackingLiveUpdater: React.FC = () => {
                   <stop offset="100%" stopColor="#EE9617" />
                 </linearGradient>
               </defs>
-            </ReactMinimalPieChart>
+            </PieChart>
             <ActionButton
               className="absolute bottom-0 right-0"
               onClick={() => trackingActor.send({ type: "cease" })}

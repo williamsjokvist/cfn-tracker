@@ -2,11 +2,12 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 
-import sfv from "./games/sfv.png";
-import sf6 from "./games/sf6.png";
 import { ActionButton } from "@/ui/action-button";
 import { GameButton } from "@/ui/game-button";
 import { PageHeader } from "@/ui/page-header";
+
+import sfv from "./games/sfv.png";
+import sf6 from "./games/sf6.png";
 
 const GAMES = [
   {

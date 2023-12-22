@@ -9,7 +9,7 @@ import type { errorsx } from "@@/go/models";
 
 type ErrorContextType = [error: errorsx.FrontEndError | null, setError: (error: errorsx.FrontEndError | null) => void]
 const ErrorContext = React.createContext<ErrorContextType | null>(null)
-export const useErrorMessage = () => React.useContext(ErrorContext)[1]
+export const useErrorMessage = () => React.useContext(ErrorContext)![1]
 
 export const LocalizedErrorMessage: Record<number, LocalizationKey> = {
   401: "errUnauthorized",
@@ -20,7 +20,7 @@ export const LocalizedErrorMessage: Record<number, LocalizationKey> = {
 export const ErrorMessageProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
   const { t } = useTranslation();
   const [scope, animate] = useAnimate();
-  const [error, setError] = React.useState<errorsx.FrontEndError>(null)
+  const [error, setError] = React.useState<errorsx.FrontEndError | null>(null)
 
   React.useEffect(() => {
     if (error === null) {
@@ -52,7 +52,7 @@ export const ErrorMessageProvider: React.FC<React.PropsWithChildren> = ({ childr
           />
           {error && (
             <span>
-              {LocalizedErrorMessage[error.code]
+              {error?.code && LocalizedErrorMessage[error.code]
                 ? t(LocalizedErrorMessage[error.code])
                 : error.message}
             </span>

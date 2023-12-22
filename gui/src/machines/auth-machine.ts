@@ -8,7 +8,7 @@ import { setup, assign } from "xstate";
 type AuthMachineContextProps = {
   progress: number
   game?: "sfv" | "sf6"
-  error?: errorsx.FrontEndError;
+  error: errorsx.FrontEndError | null;
 }
 export const AUTH_MACHINE = setup({
   types: {
@@ -16,7 +16,7 @@ export const AUTH_MACHINE = setup({
   },
   actions: {
     selectGame: ({ context, self }) => {
-      SelectGame(context.game)
+      SelectGame(context.game ?? "sf6")
       .catch(error => self.send({ type: "error", error }));
     },
     subscribeToProgressEvents: ({ self }) => {
@@ -38,7 +38,8 @@ export const AUTH_MACHINE = setup({
   id: "auth-machine",
   initial: "gameForm",
   context: {
-    progress: 0
+    progress: 0,
+    error: null
   },
   states: {
     gameForm: {
@@ -64,7 +65,8 @@ export const AUTH_MACHINE = setup({
           actions: [
             "unsubscribeToProgressEvents",
             assign({
-              progress: 0
+              progress: 0,
+              error: null
             }),
           ]
         },

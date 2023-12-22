@@ -9,11 +9,11 @@ import type { errorsx, model } from "@@/go/models";
 import { EventsOff, EventsOn } from "@@/runtime/runtime";
 
 type TrackingMachineContextProps = {
-  user?: model.User
+  user: model.User | null
   restore: boolean;
   isTracking: boolean;
   trackingState: model.TrackingState;
-  error?: errorsx.FrontEndError;
+  error: errorsx.FrontEndError | null;
 };
 
 export const TRACKING_MACHINE = setup({
@@ -25,7 +25,7 @@ export const TRACKING_MACHINE = setup({
   },
   actions: {
     startTracking: ({ context, self }) => {
-      StartTracking(context.user.code, context.restore)
+      context.user && StartTracking(context.user.code, context.restore)
         .catch(error => self.send({ type: "error", error }))
     },
     stopTracking: ({ self }) => {
@@ -45,6 +45,8 @@ export const TRACKING_MACHINE = setup({
   {
     id: "cfn-tracker",
     context: {
+      user: null,
+      error: null,
       restore: false,
       isTracking: false,
       trackingState: <model.TrackingState>{},
