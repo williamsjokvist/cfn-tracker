@@ -139,7 +139,7 @@ func main() {
 		HideWindowOnClose:  false,
 		LogLevel:           logger.WARNING,
 		LogLevelProduction: logger.ERROR,
-		ErrorFormatter:     errorsx.ConvertToFrontEndError,
+		ErrorFormatter:     errorsx.ConvertToAppError,
 		BackgroundColour:   options.NewRGBA(0, 0, 0, 1),
 		CSSDragProperty:    `--draggable`,
 		Windows: &windows.Options{

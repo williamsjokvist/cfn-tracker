@@ -13,7 +13,11 @@ type TrackingMachineContextProps = {
   restore: boolean;
   isTracking: boolean;
   trackingState: model.TrackingState;
+<<<<<<< HEAD
   error: errorsx.FrontEndError | null;
+=======
+  error?: errorsx.AppError;
+>>>>>>> 6fb0399 (Merged TrackingError and FrontEndError)
 };
 
 export const TRACKING_MACHINE = setup({

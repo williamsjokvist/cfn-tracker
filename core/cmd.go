@@ -194,6 +194,6 @@ func (ch *CommandHandler) GetTrackingStateUnused() *model.TrackingState {
 	return nil
 }
 
-func (ch *CommandHandler) GetFrontendErrorModelUnused() *errorsx.FrontEndError {
+func (ch *CommandHandler) GetAppErrorModelUnused() *errorsx.AppError {
 	return nil
 }

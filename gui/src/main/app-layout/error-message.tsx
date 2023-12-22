@@ -7,7 +7,7 @@ import { useTranslation } from "react-i18next";
 import type { LocalizationKey } from "@/main/i18n";
 import type { errorsx } from "@@/go/models";
 
-type ErrorContextType = [error: errorsx.FrontEndError | null, setError: (error: errorsx.FrontEndError | null) => void]
+type ErrorContextType = [error: errorsx.AppError | null, setError: (error: errorsx.AppError | null) => void]
 const ErrorContext = React.createContext<ErrorContextType | null>(null)
 export const useErrorMessage = () => React.useContext(ErrorContext)![1]
 

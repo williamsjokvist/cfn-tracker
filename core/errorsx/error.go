@@ -2,54 +2,41 @@ package errorsx
 
 import (
 	"errors"
-	"strconv"
 )
 
-type TrackingError struct {
-	errorCode  int
-	innerError error
+type AppError struct {
+	ErrorCode  *int  `json:"code"`
+	InnerError error `json:"message"`
 }
 
-type FrontEndError struct {
-	ErrorCode *int   `json:"code"`
-	Message   string `json:"message"`
-}
-
-func NewError(errorCode int, innerError error) *TrackingError {
-	return &TrackingError{
-		errorCode:  errorCode,
-		innerError: innerError,
+func NewError(errorCode int, innerError error) *AppError {
+	return &AppError{
+		ErrorCode:  &errorCode,
+		InnerError: innerError,
 	}
 }
 
-func (e *TrackingError) Error() string {
-	return e.innerError.Error()
+func (e *AppError) Error() string {
+	return e.InnerError.Error()
 }
 
-func (e *TrackingError) ErrorCode() string {
-	return strconv.Itoa(e.errorCode)
-}
-
-func (e *TrackingError) Unwrap() error {
-	return e.innerError
+func (e *AppError) Unwrap() error {
+	return e.InnerError
 }
 
 func ContainsTrackingError(err error) bool {
-	var trackingErr *TrackingError
+	var trackingErr *AppError
 	return errors.As(err, &trackingErr)
 }
 
-func ConvertToFrontEndError(err error) any {
-	var trackingErr *TrackingError
+func ConvertToAppError(err error) any {
+	var trackingErr *AppError
 	if errors.As(err, &trackingErr) {
-		return FrontEndError{
-			ErrorCode: &trackingErr.errorCode,
-			Message:   trackingErr.innerError.Error(),
-		}
+		return trackingErr
 	}
 
-	return FrontEndError{
-		ErrorCode: nil,
-		Message:   err.Error(),
+	return AppError{
+		ErrorCode:  nil,
+		InnerError: err,
 	}
 }
