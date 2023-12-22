@@ -54,8 +54,8 @@ func (ch *CommandHandler) GetTranslation(locale string) (*locales.Localization, 
 	lng, err := i18n.GetTranslation(locale)
 	if err != nil {
 		log.Println(err)
-		if !errorsx.ContainsTrackingError(err) {
-			err = errorsx.NewError(http.StatusNotFound, fmt.Errorf(`failed to get translation %w`, err))
+		if !errorsx.ContainsFormattedError(err) {
+			err = errorsx.NewFormattedError(http.StatusNotFound, fmt.Errorf(`failed to get translation %w`, err))
 		}
 		return nil, err
 	}
@@ -93,8 +93,8 @@ func (ch *CommandHandler) StartTracking(cfn string, restore bool) error {
 	err := ch.tracker.Start(ch.ctx, cfn, restore, 30*time.Second)
 	if err != nil {
 		log.Println(err)
-		if !errorsx.ContainsTrackingError(err) {
-			err = errorsx.NewError(http.StatusInternalServerError, fmt.Errorf(`failed to start tracking %w`, err))
+		if !errorsx.ContainsFormattedError(err) {
+			err = errorsx.NewFormattedError(http.StatusInternalServerError, fmt.Errorf(`failed to start tracking %w`, err))
 		}
 	}
 	return err
@@ -113,8 +113,8 @@ func (ch *CommandHandler) GetSessions(userId string) ([]*model.Session, error) {
 	sessions, err := ch.repo.GetSessions(ch.ctx, userId, 0, 0)
 	if err != nil {
 		log.Println(err)
-		if !errorsx.ContainsTrackingError(err) {
-			err = errorsx.NewError(http.StatusNotFound, fmt.Errorf(`failed to get sessions %w`, err))
+		if !errorsx.ContainsFormattedError(err) {
+			err = errorsx.NewFormattedError(http.StatusNotFound, fmt.Errorf(`failed to get sessions %w`, err))
 		}
 	}
 	return sessions, err
@@ -124,8 +124,8 @@ func (ch *CommandHandler) GetMatches(sessionId uint16, userId string, limit uint
 	matches, err := ch.repo.GetMatches(ch.ctx, sessionId, userId, limit, offset)
 	if err != nil {
 		log.Println(err)
-		if !errorsx.ContainsTrackingError(err) {
-			err = errorsx.NewError(http.StatusNotFound, fmt.Errorf(`failed to get matches %w`, err))
+		if !errorsx.ContainsFormattedError(err) {
+			err = errorsx.NewFormattedError(http.StatusNotFound, fmt.Errorf(`failed to get matches %w`, err))
 		}
 	}
 	return matches, err
@@ -135,8 +135,8 @@ func (ch *CommandHandler) GetUsers() ([]*model.User, error) {
 	users, err := ch.repo.GetUsers(ch.ctx)
 	if err != nil {
 		log.Println(err)
-		if !errorsx.ContainsTrackingError(err) {
-			err = errorsx.NewError(http.StatusNotFound, fmt.Errorf(`failed to get users %w`, err))
+		if !errorsx.ContainsFormattedError(err) {
+			err = errorsx.NewFormattedError(http.StatusNotFound, fmt.Errorf(`failed to get users %w`, err))
 		}
 	}
 	return users, err
@@ -146,7 +146,7 @@ func (ch *CommandHandler) GetThemeList() ([]string, error) {
 	files, err := ioutil.ReadDir(`themes`)
 	if err != nil {
 		log.Println(err)
-		return nil, errorsx.NewError(http.StatusInternalServerError, errors.New("failed to read themes directory"))
+		return nil, errorsx.NewFormattedError(http.StatusInternalServerError, errors.New("failed to read themes directory"))
 	}
 	themes := make([]string, 0, len(files))
 	for _, file := range files {
@@ -171,8 +171,8 @@ func (ch *CommandHandler) SelectGame(game string) error {
 
 	if err != nil {
 		log.Println(err)
-		if !errorsx.ContainsTrackingError(err) {
-			err = errorsx.NewError(http.StatusInternalServerError, fmt.Errorf(`failed to select game %w`, err))
+		if !errorsx.ContainsFormattedError(err) {
+			err = errorsx.NewFormattedError(http.StatusInternalServerError, fmt.Errorf(`failed to select game %w`, err))
 		}
 	}
 	return err
@@ -194,6 +194,6 @@ func (ch *CommandHandler) GetTrackingStateUnused() *model.TrackingState {
 	return nil
 }
 
-func (ch *CommandHandler) GetAppErrorModelUnused() *errorsx.AppError {
+func (ch *CommandHandler) GetAppErrorModelUnused() *errorsx.FormattedError {
 	return nil
 }

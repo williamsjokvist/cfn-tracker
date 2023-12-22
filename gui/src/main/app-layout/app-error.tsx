@@ -17,14 +17,14 @@ type AppErrorBoundaryProps = {
 export const AppErrorBoundary: React.FC<AppErrorBoundaryProps> = ({ outer }) => {
   const { t } = useTranslation();
   const thrownError = useRouteError();
-  const [err, setErr] = React.useState<errorsx.FrontEndError | null>(null)
+  const [err, setErr] = React.useState<errorsx.FormattedError>()
 
   React.useEffect(() => {
     console.error(thrownError);
     if (thrownError instanceof Error) {
       setErr({ code: 500, message: thrownError.message });
     } else if (isAppError(thrownError)) {
-      setErr({ code: 500, message: (thrownError as errorsx.AppError).message });
+      setErr({ code: 500, message: (thrownError as errorsx.FormattedError).message });
     }
   }, [thrownError])
 

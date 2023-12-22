@@ -7,7 +7,7 @@ import { useTranslation } from "react-i18next";
 import type { LocalizationKey } from "@/main/i18n";
 import type { errorsx } from "@@/go/models";
 
-type ErrorContextType = [error: errorsx.AppError | null, setError: (error: errorsx.AppError | null) => void]
+type ErrorContextType = [error: errorsx.FormattedError | null, setError: (error: errorsx.FormattedError | null) => void]
 const ErrorContext = React.createContext<ErrorContextType | null>(null)
 export const useErrorMessage = () => React.useContext(ErrorContext)![1]
 
@@ -20,7 +20,7 @@ export const LocalizedErrorMessage: Record<number, LocalizationKey> = {
 export const ErrorMessageProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
   const { t } = useTranslation();
   const [scope, animate] = useAnimate();
-  const [error, setError] = React.useState<errorsx.FrontEndError | null>(null)
+  const [error, setError] = React.useState<errorsx.FormattedError>(null)
 
   React.useEffect(() => {
     if (error === null) {

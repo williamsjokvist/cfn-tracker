@@ -8,7 +8,7 @@ import { setup, assign } from "xstate";
 type AuthMachineContextProps = {
   progress: number
   game?: "sfv" | "sf6"
-  error?: errorsx.AppError;
+  error?: errorsx.FormattedError;
 }
 export const AUTH_MACHINE = setup({
   types: {
