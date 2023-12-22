@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Output for OBS Browser Source, with customizeable CSS themes.
 - Authentication is now persisted across app starts.
 
-### Changes
+### Changed
 - Tracking errors now render an error notification, others render an error page.
 - The config for the GUI is now stored in a *json* file instead of localStorage.
 - Sessions, matches and CFN names are now stored in an *SQL* database instead of a big *json* file.
@@ -54,5 +54,5 @@ This is the rewrite of the CFN Tracker I wrote almost 4 years ago. It contains m
 ### Added
 - Rewrote the app in Go + [Rod](https://github.com/go-rod/rod), since [PhantomJS](https://github.com/ariya/phantomjs) and [CasperJS](https://github.com/casperjs/casperjs) are no longer maintained
 
-### Changes
+### Changed
 - App is now shipped as a single binary instead of having to download PhantomJS + CasperJS.

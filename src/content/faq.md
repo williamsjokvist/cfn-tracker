@@ -11,3 +11,6 @@ The installer was disabled when SF6 came out to avoid confusion, since the app o
 
 ## Is it possible to use the CFN Tracker as an API?
 It hasn't been ruled out, but it's not something we're gonna work on in the forseeable future due to the difference in scope of a service like this.
+
+## How did you make this?
+You can read about it [here](https://www.williamsjokvist.se/cases/cfn-tracker) once it's done...
