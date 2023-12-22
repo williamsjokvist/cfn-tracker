@@ -5,23 +5,56 @@ import { motion } from "framer-motion";
 import { Icon } from "@iconify/react";
 
 import { TrackingMachineContext } from "@/machines/tracking-machine";
+import { FetchPlayer, GetUsers } from "@@/go/core/CommandHandler";
+
 import { ActionButton } from "@/ui/action-button";
 import { Checkbox } from "@/ui/checkbox";
-import { model } from "@@/go/models";
+import { errorsx, model } from "@@/go/models";
 import { PageHeader } from "@/ui/page-header";
 
 export const TrackingForm: React.FC = () => {
   const { t } = useTranslation();
   const users = useLoaderData() as model.User[]
   const trackingActor = TrackingMachineContext.useActorRef()
-  
+
   const playerIdInputRef = React.useRef<HTMLInputElement>(null);
   const restoreRef = React.useRef<HTMLInputElement>(null);
   const [playerIdInput, setPlayerIdInput] = React.useState<string>("");
 
-  const onSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
+  const onSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
     if (playerIdInput == "") return;
+
+    try {
+      const player = await FetchPlayer(playerIdInput);
+      console.log(`Player found ${player.displayName}`);
+      trackingActor.send({
+        type: "submit",
+        user: {
+          displayName: player.displayName,
+          code: player.code,
+        },
+        restore: restoreRef.current && restoreRef.current.checked,
+      });
+    } catch (err) {
+      if (err.code && err.code == 404) {
+        console.error(`Player not found ${playerIdInput}`);
+
+        try {
+          const players = await SearchPlayers(playerIdInput);
+        } catch (err) {
+          console.error(err);
+        }
+
+
+        return;
+      }
+
+      console.error(err);
+    }
+
+
+    return;
     trackingActor.send({
       type: "submit",
       user: {
@@ -68,10 +101,10 @@ export const TrackingForm: React.FC = () => {
             autoSave="off"
           />
           {playerIdInput.length > 0 && (
-            <button 
-              type="button" 
+            <button
+              type="button"
               onClick={clearInput}
-              aria-label="Clear" 
+              aria-label="Clear"
               className='absolute top-0 right-0 mt-4 mr-4 text-[#bfbcff] hover:text-white hover:bg-[rgba(255,255,255,.11)] transition-colors rounded-md'
             >
               <Icon icon="ci:close-big" className='w-6 h-6' />

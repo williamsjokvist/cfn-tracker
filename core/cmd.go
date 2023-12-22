@@ -153,9 +153,21 @@ func (ch *CommandHandler) FetchPlayer(code string) (*model.Player, error) {
 	return player, err
 }
 
+func (ch *CommandHandler) SearchPlayers(query string) ([]model.Player, error) {
+	players, err := ch.tracker.SearchPlayers(ch.ctx, query)
+	if err != nil {
+		log.Println(err)
+		if !errorsx.ContainsTrackingError(err) {
+			err = errorsx.NewError(http.StatusNotFound, fmt.Errorf(`failed to search players %w`, err))
+		}
+	}
+	return players, err
+}
+
 func (ch *CommandHandler) GetThemeList() ([]string, error) {
 	files, err := ioutil.ReadDir(`themes`)
 	if err != nil {
+
 		log.Println(err)
 		return nil, errorsx.NewError(http.StatusInternalServerError, errors.New("failed to read themes directory"))
 	}
