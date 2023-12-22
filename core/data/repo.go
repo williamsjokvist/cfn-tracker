@@ -25,64 +25,44 @@ func NewCFNTrackerRepository(sqlDb *sql.Storage, nosqlDb *nosql.Storage, txtDb *
 	}
 }
 
+func (m *CFNTrackerRepository) SaveTrackingState(trackingState *model.TrackingState) error {
+	return m.txtDb.SaveTrackingState(trackingState)
+}
+
 func (m *CFNTrackerRepository) GetUserByCode(ctx context.Context, code string) (*model.User, error) {
-	user, err := m.sqlDb.GetUserByCode(ctx, code)
-	if err != nil {
-		return nil, fmt.Errorf("get user by code: %w", err)
-	}
-	return user, nil
+	return m.sqlDb.GetUserByCode(ctx, code)
 }
 
 func (m *CFNTrackerRepository) GetUsers(ctx context.Context) ([]*model.User, error) {
-	users, err := m.sqlDb.GetUsers(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("get users: %w", err)
-	}
-	return users, nil
+	return m.sqlDb.GetUsers(ctx)
 }
 
 func (m *CFNTrackerRepository) GetSessions(ctx context.Context, userId string, limit uint8, offset uint16) ([]*model.Session, error) {
-	sessions, err := m.sqlDb.GetSessions(ctx, userId, limit, offset)
-	if err != nil {
-		return nil, fmt.Errorf("get users: %w", err)
-	}
-	return sessions, nil
+	return m.sqlDb.GetSessions(ctx, userId, limit, offset)
 }
 
 func (m *CFNTrackerRepository) SaveUser(ctx context.Context, displayName, code string) error {
-	log.Println("saving user")
-	err := m.sqlDb.SaveUser(ctx, displayName, code)
-	if err != nil {
-		return fmt.Errorf("save user in storage: %w", err)
-	}
-	return nil
+	return m.sqlDb.SaveUser(ctx, displayName, code)
 }
 
-func (m *CFNTrackerRepository) SaveTrackingState(trackingState *model.TrackingState) error {
-	log.Println("saving user")
-	err := m.txtDb.SaveTrackingState(trackingState)
-	if err != nil {
-		return fmt.Errorf("save tracking state: %w", err)
-	}
-	return nil
-}
-
-// CreateSession creates a session if it does not exist
 func (m *CFNTrackerRepository) CreateSession(ctx context.Context, userId string) (*model.Session, error) {
-	log.Println("saving session")
-	sesh, err := m.sqlDb.CreateSession(ctx, userId)
-	if err != nil {
-		return nil, fmt.Errorf("create session: %w", err)
-	}
-	return sesh, nil
+	return m.sqlDb.CreateSession(ctx, userId)
 }
 
 func (m *CFNTrackerRepository) GetMatches(ctx context.Context, sessionId uint16, userId string, limit uint8, offset uint16) ([]*model.Match, error) {
-	matches, err := m.sqlDb.GetMatches(ctx, sessionId, userId, limit, offset)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get matches: %w", err)
-	}
-	return matches, nil
+	return m.sqlDb.GetMatches(ctx, sessionId, userId, limit, offset)
+}
+
+func (m *CFNTrackerRepository) SaveLocale(locale string) error {
+	return m.nosqlDb.SaveLocale(locale)
+}
+
+func (m *CFNTrackerRepository) SaveSidebarMinimized(sidebarMinified bool) error {
+	return m.nosqlDb.SaveSidebarMinimized(sidebarMinified)
+}
+
+func (m *CFNTrackerRepository) GetGuiConfig() (*model.GuiConfig, error) {
+	return m.nosqlDb.GetGuiConfig()
 }
 
 func (m *CFNTrackerRepository) GetLatestSession(ctx context.Context, userId string) (*model.Session, error) {
@@ -104,27 +84,13 @@ func (m *CFNTrackerRepository) GetLatestSession(ctx context.Context, userId stri
 }
 
 func (m *CFNTrackerRepository) UpdateSession(ctx context.Context, sesh *model.Session, match model.Match, sessionId uint16) error {
-	log.Println("updating session")
 	err := m.sqlDb.UpdateLatestSession(ctx, sesh.LP, sesh.MR, sessionId)
 	if err != nil {
 		return fmt.Errorf("update session: %w", err)
 	}
-	log.Println("saving match")
 	err = m.sqlDb.SaveMatch(ctx, match)
 	if err != nil {
 		return fmt.Errorf("save match in storage: %w", err)
 	}
 	return nil
-}
-
-func (m *CFNTrackerRepository) SaveLocale(locale string) error {
-	return m.nosqlDb.SaveLocale(locale)
-}
-
-func (m *CFNTrackerRepository) SaveSidebarMinimized(sidebarMinified bool) error {
-	return m.nosqlDb.SaveSidebarMinimized(sidebarMinified)
-}
-
-func (m *CFNTrackerRepository) GetGuiConfig() (*model.GuiConfig, error) {
-	return m.nosqlDb.GetGuiConfig()
 }
