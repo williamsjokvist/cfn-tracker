@@ -49,7 +49,7 @@ func MakeSF6Tracker(ctx context.Context, cfg *config.Config, browser *browser.Br
 	go sf6Tracker.Authenticate(ctx, cfg.CapIDEmail, cfg.CapIDPassword, authChan)
 	for status := range authChan {
 		if status.Err != nil {
-			return nil, errorsx.NewError(http.StatusUnauthorized, status.Err)
+			return nil, errorsx.NewFormattedError(http.StatusUnauthorized, status.Err)
 		}
 		runtime.EventsEmit(ctx, "auth-progress", status.Progress)
 

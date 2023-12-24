@@ -9,7 +9,7 @@ import { PageHeader } from "@/ui/page-header";
 import { useTranslation } from "react-i18next";
 import { AppTitleBar } from "./app-titlebar";
 
-const isFrontendError = (error: unknown) => error instanceof Object && 'message' in error && 'code' in error
+const isFormattedError = (error: unknown) => error instanceof Object && 'message' in error && 'code' in error
 
 type AppErrorBoundaryProps = {
   outer?: boolean
@@ -17,14 +17,14 @@ type AppErrorBoundaryProps = {
 export const AppErrorBoundary: React.FC<AppErrorBoundaryProps> = ({ outer }) => {
   const { t } = useTranslation();
   const thrownError = useRouteError();
-  const [err, setErr] = React.useState<errorsx.FrontEndError | null>(null)
+  const [err, setErr] = React.useState<errorsx.FormattedError>()
 
   React.useEffect(() => {
     console.error(thrownError);
     if (thrownError instanceof Error) {
       setErr({ code: 500, message: thrownError.message });
-    } else if (isFrontendError(thrownError)) {
-      setErr({ code: 500, message: (thrownError as errorsx.FrontEndError).message });
+    } else if (isFormattedError(thrownError)) {
+      setErr(thrownError as errorsx.FormattedError);
     }
   }, [thrownError])
 

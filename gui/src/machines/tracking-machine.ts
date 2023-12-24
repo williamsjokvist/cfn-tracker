@@ -13,7 +13,7 @@ type TrackingMachineContextProps = {
   restore: boolean;
   isTracking: boolean;
   trackingState: model.TrackingState;
-  error: errorsx.FrontEndError | null;
+  error: errorsx.FormattedError | null;
 };
 
 export const TRACKING_MACHINE = setup({
