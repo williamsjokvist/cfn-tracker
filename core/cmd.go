@@ -194,6 +194,6 @@ func (ch *CommandHandler) GetTrackingStateUnused() *model.TrackingState {
 	return nil
 }
 
-func (ch *CommandHandler) GetAppErrorModelUnused() *errorsx.FormattedError {
+func (ch *CommandHandler) GetFormattedErrorModelUnused() *errorsx.FormattedError {
 	return nil
 }
