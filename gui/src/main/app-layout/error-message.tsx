@@ -20,7 +20,7 @@ export const LocalizedErrorMessage: Record<number, LocalizationKey> = {
 export const ErrorMessageProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
   const { t } = useTranslation();
   const [scope, animate] = useAnimate();
-  const [error, setError] = React.useState<errorsx.FormattedError>(null)
+  const [error, setError] = React.useState<errorsx.FormattedError | null>(null)
 
   React.useEffect(() => {
     if (error === null) {
