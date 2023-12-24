@@ -24,7 +24,7 @@ export const AppErrorBoundary: React.FC<AppErrorBoundaryProps> = ({ outer }) => 
     if (thrownError instanceof Error) {
       setErr({ code: 500, message: thrownError.message });
     } else if (isFormattedError(thrownError)) {
-      setErr({ code: 500, message: (thrownError as errorsx.FormattedError).message });
+      setErr(thrownError as errorsx.FormattedError);
     }
   }, [thrownError])
 
