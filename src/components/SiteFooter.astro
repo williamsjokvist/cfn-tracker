@@ -1,6 +1,40 @@
 ---
 ---
 
+<script defer>
+  const fetchDownloadCount = async () => {
+    const res = await fetch(
+      `https://api.github.com/repos/williamsjokvist/cfn-tracker/releases`,
+      {
+        method: `GET`,
+      }
+    );
+
+    if (res.status == 200) {
+      const releases = await res.json();
+
+      let downloadCount = 0;
+      for (const release of releases) {
+        for (const asset of release.assets) {
+          downloadCount += asset.download_count;
+        }
+      }
+      return downloadCount;
+    } else if (res.status == 404) {
+      return 0;
+    }
+  };
+
+  const assignDownloadCount = async () => {
+    const download_count = await fetchDownloadCount();
+    const cfnTrackerEl = document.getElementById(`cfn-tracker-download-count`);
+    cfnTrackerEl.innerText = download_count;
+  }
+
+  document.addEventListener("DOMContentLoaded", assignDownloadCount);
+</script>
+
 <footer class="py-36 text-xl lowercase text-center">
-  CFN Tracker - By <a href="https://www.williamsjokvist.se/" target="_blank" class="text-gradient font-bold">William</a>
+  CFN Tracker - by <a href="https://www.williamsjokvist.se/" target="_blank" class="text-gradient font-bold">William</a><br/> downloads <b id="cfn-tracker-download-count" class="font-extrabold text-[#ff53d9]"></b>
+
 </footer>

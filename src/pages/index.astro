@@ -22,17 +22,11 @@ import DownloadButton from "../components/DownloadButton.astro";
         <span>ranked</span>
         <span>matches</span>
       </h1>
-      <p class="text-lg mt-12">
+      <p class="text-lg mt-12 mb-4">
         CFN Tracker lets you track your matches in realtime as you play them.
       </p>
 
-      {/*  Download */}
-      <div class="flex flex-wrap mt-8 justify-center 2xl:justify-start">
-        <DownloadButton />
-        <span class="text-lg text-center mt-4 ml-8">
-          <b id="cfn-tracker-download-count"></b> downloads
-        </span>
-      </div>
+      <DownloadButton />
     </header>
 
     <MockTracker title="Tracking" page="track" spin>
@@ -126,38 +120,6 @@ import DownloadButton from "../components/DownloadButton.astro";
     >
   </div>
 </Layout>
-
-<script defer>
-  const fetchCFNTrackerDownloadCount = async () => {
-    const res = await fetch(
-      `https://api.github.com/repos/williamsjokvist/cfn-tracker/releases`,
-      {
-        method: `GET`,
-      }
-    );
-
-    if (res.status == 200) {
-      const releases = await res.json();
-
-      let downloadCount = 0;
-      for (const release of releases) {
-        for (const asset of release.assets) {
-          downloadCount += asset.download_count;
-        }
-      }
-      return downloadCount;
-    } else if (res.status == 404) {
-      return 0;
-    }
-  };
-
-  document.addEventListener("DOMContentLoaded", async () => {
-    const download_count = await fetchCFNTrackerDownloadCount();
-
-    const cfnTrackerEl = document.getElementById(`cfn-tracker-download-count`);
-    cfnTrackerEl.innerText = download_count;
-  });
-</script>
 
 <style is:global>
   .intro {
