@@ -1,5 +1,5 @@
 ---
-import { Content } from '../content/guide.md';
+import { Content } from '../content/guide.mdx';
 import Layout from '../layouts/Layout.astro';
 ---
 <script>
@@ -10,11 +10,6 @@ import Layout from '../layouts/Layout.astro';
     duration: .75,
     ease: Power3.easeInOut,
     stagger: 0.125,
-    scrollTrigger: {
-      scroller: "main",
-      trigger: "#used-by h2",
-      start: "center bottom",
-    },
   });
 </script>
 

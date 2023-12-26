@@ -1,28 +1,11 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import { Icon } from "astro-icon";
 import World from "../components/World.astro";
 import MockTracker from "../components/MockTracker.astro";
 import Streamers from "../components/Streamers.astro";
 import Features from "../components/Features.astro";
+import DownloadButton from "../components/DownloadButton.astro";
 ---
-
-<script defer>
-  function removeNonUserAgentDownloads() {
-    const isWindows = window.navigator.userAgent.indexOf("Win") != -1;
-    const isMacOS = window.navigator.userAgent.indexOf("Mac") != -1;
-    const macDownload = document.getElementById("mac-download");
-    const windowsDownload = document.getElementById("windows-download");
-
-    if (!isMacOS) {
-      macDownload.remove();
-    }
-    if (!isWindows) {
-      windowsDownload.remove();
-    }
-  }
-  document.addEventListener("DOMContentLoaded", removeNonUserAgentDownloads);
-</script>
 
 <Layout title="CFN Tracker">
   <section
@@ -45,23 +28,7 @@ import Features from "../components/Features.astro";
 
       {/*  Download */}
       <div class="flex flex-wrap mt-8 justify-center 2xl:justify-start">
-        <a
-          id="windows-download"
-          href="https://github.com/GreenSoap/cfn-tracker/releases/download/v4.0.0/CFN_Tracker_Windows.zip"
-          class="link-card mac inline-flex gap-2 justify-between items-center rounded-full px-6 py-4 text-2xl"
-        >
-          <Icon name="mdi:microsoft-windows" class="w-8 h-8" />
-          <span>Download for Windows</span>
-        </a>
-        <a
-          id="mac-download"
-          href="https://github.com/GreenSoap/cfn-tracker/releases/download/v4.0.0/CFN_Tracker_macOS.zip"
-          class="link-card mac inline-flex gap-2 justify-between items-center rounded-full px-6 py-4 text-2xl"
-        >
-          <Icon name="mdi:apple" class="w-8 h-8" />
-          <span class="w-full">Download for Mac</span>
-        </a>
-
+        <DownloadButton />
         <span class="text-lg text-center mt-4 ml-8">
           <b id="cfn-tracker-download-count"></b> downloads
         </span>
@@ -269,46 +236,5 @@ import Features from "../components/Features.astro";
 
   #catchphrase span:nth-child(12) {
     animation: fade-in 1s 1.4s forwards cubic-bezier(0.11, 0, 0.5, 0);
-  }
-
-  @keyframes fade-in {
-    100% {
-      opacity: 1;
-      filter: blur(0);
-    }
-  }
-
-  .link-card {
-    backdrop-filter: blur(12px);
-    background-image: var(--accent-gradient);
-    background-size: 400%;
-    background-position: 100%;
-    transition: background-position 0.6s cubic-bezier(0.22, 1, 0.36, 1);
-  }
-
-  .link-card:is(:hover, :focus-within) {
-    background-position: 0;
-  }
-
-  .windows {
-    --accent-gradient: linear-gradient(
-      45deg,
-      rgb(124, 58, 237),
-      #627ada 30%,
-      rgba(115, 115, 115, 0.125) 60%
-    );
-  }
-
-  .mac {
-    --accent-gradient: linear-gradient(
-      45deg,
-      #eb3349,
-      #dd2476 30%,
-      rgba(115, 115, 115, 0.125) 60%
-    );
-  }
-
-  .text-shadow-sm {
-    text-shadow: 1px 1px 2px black;
   }
 </style>

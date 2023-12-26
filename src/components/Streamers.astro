@@ -50,7 +50,7 @@ const streamers = [{
   <div id="used-by-list" class="flex gap-6 justify-center mt-8">
     {
       streamers.map(s => (
-        <WithTooltip label={s.url}>
+        <WithTooltip label={s.name}>
           <a href={s.url}>
             <img src={s.img} width="50px" height="50px" />
           </a>  

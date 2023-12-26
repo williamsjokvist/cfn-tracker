@@ -45,4 +45,15 @@ const { title } = Astro.props;
     background-size: 400%;
     background-position: 0%;
   }
+
+  @keyframes fade-in {
+    100% {
+      opacity: 1;
+      filter: blur(0);
+    }
+  }
+
+  .text-shadow-sm {
+    text-shadow: 1px 1px 2px black;
+  }
 </style>
