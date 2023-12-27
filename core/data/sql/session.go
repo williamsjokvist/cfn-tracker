@@ -50,7 +50,10 @@ func (s *Storage) GetSessions(ctx context.Context, userId string, limit uint8, o
 	}
 	query, args, err := sqlx.In(fmt.Sprintf(`
 		SELECT
-			s.id, s.created_at, u.display_name as user_name,
+			s.id,
+			s.created_at,
+			u.display_name as user_name,
+			s.user_id,
 			COUNT(IIF(m.victory, 1, NULL)) as matches_won,
 			COUNT(IIF(m.victory = false, 1, NULL)) as matches_lost,
 			m.lp as starting_lp,
