@@ -2,45 +2,42 @@
 import WithTooltip from "./WithTooltip.astro";
 import Icon from "astro-icon";
 
-const currentPath = Astro.url.pathname;
-
 const NavItems = [{
   href: '/guide',
   name: 'Guide',
-  icon: currentPath === '/guide' ? "akar-icons:info-fill" : "akar-icons:info"
+  icon: Astro.url.pathname === '/guide' ? "akar-icons:info-fill" : "akar-icons:info"
 }, {
   href: '/faq',
   name: 'FAQ',
-  icon: currentPath === '/faq' ? "mdi:chat-bubble" : "mdi:chat-bubble-outline"
+  icon: Astro.url.pathname === '/faq' ? "mdi:chat-bubble" : "mdi:chat-bubble-outline"
 }, 
 {
   href: '/changelog',
   name: 'Changelog',
-  icon: currentPath === '/changelog' ? "mdi:scroll" : "mdi:scroll-outline"
+  icon: Astro.url.pathname === '/changelog' ? "mdi:scroll" : "mdi:scroll-outline"
 }]
-
 ---
 
 <header
-  class="sticky top-0 sm:top-4 flex justify-between max-w-[600px] mx-auto w-full z-50 bg-[#2e1332] shadow-[0px_0px_12px_#2e1332] sm:rounded-full p-1 pr-6"
+  class="sticky top-0 sm:top-4 flex justify-between sm:max-w-[600px] mx-auto w-full z-50 bg-[#2e1332] shadow-[0px_0px_12px_#2e1332] sm:rounded-full p-1 pr-6"
 >
   <nav class="flex items-center lowercase gap-6">
     <a href="/">
       <img
         src="https://raw.githubusercontent.com/williamsjokvist/cfn-tracker/master/build/appicon.png"
-        class="w-[6ch] mx-auto"
-        alt="CFN Tracker logotype"
+        class="w-12 sm:w-14"
+        alt="CFN Tracker logo"
       />
     </a>
     {NavItems.map(item => (
-      <a href={item.href} class="flex flex-col items-center text-lg font-bold mx-2">
+      <a href={item.href} class="flex flex-col items-center text-lg font-bold">
         <Icon name={item.icon} width="24" />
         <span class="hidden sm:block">{item.name}</span>
       </a>
     ))}
   </nav>
 
-  <div class="flex items-center gap-6">
+  <div class="flex items-center gap-3 sm:gap-6">
     <a
       class="flex gap-4 hover:underline"
       href="https://twitter.com/greensoap_"
@@ -64,7 +61,7 @@ const NavItems = [{
     <a
       class="text-lg flex gap-4 hover:underline"
       href="https://github.com/williamsjokvist/cfn-tracker/"
-      aria-label="Source code"
+      aria-label="Source"
       target="_blank"
     >
     <WithTooltip label="Source">
