@@ -2,7 +2,6 @@ package tracker
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -66,10 +65,21 @@ func MakeSF6Tracker(ctx context.Context, cfg *config.Config, browser *browser.Br
 // Make a SFVTracker and expose it as a GameTracker
 func MakeSFVTracker(ctx context.Context, cfg *config.Config, browser *browser.Browser) (GameTracker, error) {
 	sfvTracker := sfv.NewSFVTracker(browser)
-	err := sfvTracker.Authenticate(ctx, cfg.SteamUsername, cfg.SteamPassword, false)
-	if err != nil {
-		return nil, fmt.Errorf(`auth err: %v`, err)
+
+	authChan := make(chan sfv.AuthStatus)
+	go sfvTracker.Authenticate(ctx, cfg.SteamUsername, cfg.SteamPassword, authChan)
+	for status := range authChan {
+		if status.Err != nil {
+			return nil, errorsx.NewFormattedError(http.StatusUnauthorized, status.Err)
+		}
+		runtime.EventsEmit(ctx, "auth-progress", status.Progress)
+
+		if status.Progress >= 100 {
+			close(authChan)
+			break
+		}
 	}
+
 	var gt GameTracker = sfvTracker
 	return gt, nil
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 	"math"
 	"strconv"
 	"strings"
@@ -44,7 +45,7 @@ func (t *SFVTracker) Stop() {
 }
 
 func (t *SFVTracker) stopFn(ctx context.Context) {
-	fmt.Println(`Stopped tracking`)
+	log.Println(`Stopped tracking`)
 	t.isTracking = false
 	wails.EventsEmit(ctx, `stopped-tracking`)
 }
@@ -78,7 +79,7 @@ func (t *SFVTracker) Start(ctx context.Context, cfn string, restoreData bool, re
 		Date:         ``,
 	}
 
-	fmt.Println(`Loading profile`)
+	log.Println(`Loading profile`)
 	t.Page.MustNavigate(fmt.Sprintf(`https://game.capcom.com/cfn/sfv/profile/%s`, cfn)).MustWaitLoad()
 	isValidProfile := t.Page.MustHas(`.leagueInfo`)
 	if !isValidProfile {
@@ -86,14 +87,13 @@ func (t *SFVTracker) Start(ctx context.Context, cfn string, restoreData bool, re
 		return ErrInvalidCFN
 	}
 
-	fmt.Println(`Profile loaded`)
+	log.Println(`Profile loaded`)
 	t.isTracking = true
-	wails.EventsEmit(ctx, `started-tracking`)
 
 	// First fetch
 	t.refreshMatchHistory(ctx, cfn, true)
 
-	pollCtx, cancel := context.WithCancel(context.Background())
+	pollCtx, cancel := context.WithCancel(ctx)
 	t.stopTracking = cancel
 	go t.poll(pollCtx, cfn, refreshInterval)
 
@@ -126,7 +126,7 @@ func (t *SFVTracker) refreshMatchHistory(ctx context.Context, cfn string, isFirs
 	}
 
 	if !isFirstFetch {
-		fmt.Println(`Reloading page`)
+		log.Println(`Reloading page`)
 		t.Page.Reload()
 	}
 
