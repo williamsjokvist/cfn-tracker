@@ -1,21 +1,43 @@
 ---
 import WithTooltip from "./WithTooltip.astro";
+import Icon from "astro-icon";
+
+const currentPath = Astro.url.pathname;
+
+const NavItems = [{
+  href: '/guide',
+  name: 'Guide',
+  icon: currentPath === '/guide' ? "akar-icons:info-fill" : "akar-icons:info"
+}, {
+  href: '/faq',
+  name: 'FAQ',
+  icon: currentPath === '/faq' ? "mdi:chat-bubble" : "mdi:chat-bubble-outline"
+}, 
+{
+  href: '/changelog',
+  name: 'Changelog',
+  icon: currentPath === '/changelog' ? "mdi:scroll" : "mdi:scroll-outline"
+}]
+
 ---
 
 <header
-  class="sticky top-4 flex justify-between max-w-[600px] mx-auto w-full z-50 bg-[#2e1332] shadow-[0px_0px_12px_#2e1332] rounded-full p-1 pr-6"
+  class="sticky sm:top-4 flex justify-between max-w-[600px] mx-auto w-full z-50 bg-[#2e1332] shadow-[0px_0px_12px_#2e1332] sm:rounded-full p-1 pr-6"
 >
   <nav class="flex items-center lowercase gap-6">
-    <a href="/" class="">
+    <a href="/">
       <img
         src="https://raw.githubusercontent.com/williamsjokvist/cfn-tracker/master/build/appicon.png"
         class="w-[6ch] mx-auto"
         alt="CFN Tracker logotype"
       />
     </a>
-    <a href="/guide" class="text-lg font-bold mx-2">Guide</a>
-    <a href="/faq" class="text-lg font-bold mr-2">FAQ</a>
-    <a href="/changelog" class="text-lg font-bold mr-2">Changelog</a>
+    {NavItems.map(item => (
+      <a href={item.href} class="flex flex-col items-center text-lg font-bold mx-2">
+        <Icon name={item.icon} width="24" />
+        <span class="hidden sm:block">{item.name}</span>
+      </a>
+    ))}
   </nav>
 
   <div class="flex items-center gap-6">
@@ -26,7 +48,7 @@ import WithTooltip from "./WithTooltip.astro";
       aria-label="Twitter / X"
     >
       <!-- not working: <Icon name="simple-icons:x" class="w-8 h-8 ml-4" /> -->
-      <WithTooltip label="Twitter / X">
+      <WithTooltip label="Twitter">
         <svg
         xmlns="http://www.w3.org/2000/svg"
         width="20"
@@ -45,7 +67,7 @@ import WithTooltip from "./WithTooltip.astro";
       aria-label="Source code"
       target="_blank"
     >
-    <WithTooltip label="Source code">
+    <WithTooltip label="Source">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="24"

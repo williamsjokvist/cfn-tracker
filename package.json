@@ -1,25 +1,25 @@
 {
-	"name": "",
-	"type": "module",
-	"version": "0.0.1",
-	"scripts": {
-		"dev": "astro dev",
-		"start": "astro dev",
-		"build": "astro build",
-		"preview": "astro preview",
-		"astro": "astro"
-	},
-	"dependencies": {
-		"@astrojs/mdx": "^2.0.2",
-		"@astrojs/tailwind": "^5.0.4",
-		"astro": "^4.0.7",
-		"astro-icon": "^0.8.1",
-		"gsap": "^3.12.4",
-		"tailwindcss": "^3.2.7"
-	},
-	"devDependencies": {
-		"@tailwindcss/typography": "^0.5.10",
-		"@types/gsap": "^3.0.0",
-		"sass": "^1.69.5"
-	}
+  "name": "",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/mdx": "^2.0.2",
+    "@astrojs/tailwind": "^5.0.4",
+    "astro": "^4.0.7",
+    "astro-icon": "^0.8.2",
+    "gsap": "^3.12.4",
+    "tailwindcss": "^3.2.7"
+  },
+  "devDependencies": {
+    "@tailwindcss/typography": "^0.5.10",
+    "@types/gsap": "^3.0.0",
+    "sass": "^1.69.5"
+  }
 }
