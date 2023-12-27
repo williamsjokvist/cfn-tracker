@@ -23,7 +23,7 @@ tasks:
     vars:
       ldflags: -X 'main.isProduction="true"' -X 'main.appVersion=${APP_VERSION}' -X 'main.steamUsername=${STEAM_USERNAME}' -X 'main.steamPassword=${STEAM_PASSWORD}' -X 'main.capIDEmail=${CAP_ID_EMAIL}' -X 'main.capIDPassword=${CAP_ID_PASSWORD}'
     cmds:
-      - cmd: env GOOS=darwin GOARCH=amd64 wails build -ldflags="{{.ldflags}}"
+      - cmd: env GOOS=darwin GOARCH=arm64 wails build -ldflags="{{.ldflags}}"
         platforms: [darwin]
       - cmd: GOOS=windows GOARCH=amd64 wails build -ldflags="{{.ldflags}}"
         platforms: [windows]

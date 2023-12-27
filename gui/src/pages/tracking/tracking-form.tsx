@@ -12,7 +12,7 @@ import { PageHeader } from "@/ui/page-header";
 
 export const TrackingForm: React.FC = () => {
   const { t } = useTranslation();
-  const users = useLoaderData() as model.User[]
+  const users = (useLoaderData() ?? []) as model.User[]
   const trackingActor = TrackingMachineContext.useActorRef()
   
   const playerIdInputRef = React.useRef<HTMLInputElement>(null);

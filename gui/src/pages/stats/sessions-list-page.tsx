@@ -10,7 +10,7 @@ type MonthGroup = Record<number, model.Session[]>;
 type YearGroup = Record<number, MonthGroup>;
 
 export const SessionsListPage: React.FC = () => {
-  const sessions = useLoaderData() as model.Session[];
+  const sessions = (useLoaderData() ?? []) as model.Session[];
   const { i18n, t } = useTranslation();
   const navigate = useNavigate();
 
