@@ -8,6 +8,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
@@ -17,6 +18,7 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
 	"github.com/wailsapp/wails/v2/pkg/options/mac"
 	"github.com/wailsapp/wails/v2/pkg/options/windows"
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 
 	"github.com/williamsjokvist/cfn-tracker/core"
 	"github.com/williamsjokvist/cfn-tracker/core/browser"
@@ -50,7 +52,6 @@ var icon []byte
 var cfg config.Config
 
 func init() {
-	cleanUpProcess()
 	err := godotenv.Load(`.env`)
 	if err != nil {
 		log.Println(fmt.Errorf(`missing .env file: %w`, err))
@@ -125,6 +126,7 @@ func main() {
 	trackerRepo := data.NewCFNTrackerRepository(sqlDb, noSqlDb, txtDb)
 	cmdHandler := core.NewCommandHandler(appBrowser, trackerRepo, &cfg)
 
+	var wailsCtx context.Context
 	err = wails.Run(&options.App{
 		Title:              `CFN Tracker v3`,
 		Assets:             assets,
@@ -156,6 +158,7 @@ func main() {
 			},
 		},
 		OnStartup: func(ctx context.Context) {
+			wailsCtx = ctx
 			cmdHandler.SetContext(ctx)
 			go server.Start(ctx, &cfg)
 		},
@@ -165,6 +168,16 @@ func main() {
 		OnBeforeClose: func(_ context.Context) (prevent bool) {
 			appBrowser.Page.Browser().Close()
 			return false
+		},
+		SingleInstanceLock: &options.SingleInstanceLock{
+			UniqueId: "d0ef6612-49f7-437a-9ffc-2076ec9e37db",
+			OnSecondInstanceLaunch: func(secondInstanceData options.SecondInstanceData) {
+				log.Println("user opened second instance", strings.Join(secondInstanceData.Args, ","))
+				log.Println("user opened second from", secondInstanceData.WorkingDirectory)
+				runtime.WindowUnminimise(wailsCtx)
+				runtime.Show(wailsCtx)
+				go runtime.EventsEmit(wailsCtx, "launchArgs", secondInstanceData.Args)
+			},
 		},
 		Bind: []interface{}{
 			cmdHandler,
