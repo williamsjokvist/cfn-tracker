@@ -34,3 +34,4 @@ resource.syso
 .DS_Store
 
 *.db
+*.log

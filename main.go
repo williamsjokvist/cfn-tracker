@@ -8,6 +8,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/joho/godotenv"
@@ -37,7 +38,7 @@ var (
 	capIDEmail    string = ``
 	capIDPassword string = ``
 	appVersion    string = ``
-	runHeadless   string = ``
+	isProduction  string = ``
 )
 
 //go:embed all:gui/dist
@@ -51,13 +52,27 @@ var icon []byte
 
 var cfg config.Config
 
+func logToFile() {
+	logFile, err := os.OpenFile(`cfn-tracker.log`, os.O_APPEND|os.O_RDWR|os.O_CREATE, 0644)
+	if err != nil {
+		log.Panic(err)
+	}
+	defer logFile.Close()
+
+	log.SetOutput(logFile)
+	log.SetFlags(log.Ldate | log.LstdFlags | log.Lshortfile)
+}
+
 func init() {
+	if isProduction == `true` {
+		logToFile()
+	}
 	err := godotenv.Load(`.env`)
 	if err != nil {
 		log.Println(fmt.Errorf(`missing .env file: %w`, err))
 		cfg = config.Config{
 			AppVersion:        appVersion,
-			Headless:          runHeadless == `true`,
+			Headless:          isProduction == `true`,
 			SteamUsername:     steamUsername,
 			SteamPassword:     steamPassword,
 			CapIDEmail:        capIDEmail,
