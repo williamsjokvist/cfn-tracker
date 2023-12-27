@@ -12,7 +12,7 @@ tasks:
     desc: Run the dev server with codegen, reloading and go mod sync
     cmds:
       - wails dev -forcebuild
-  
+
   bind:
     desc: Generate go->ts bindings
     cmds:
@@ -21,9 +21,9 @@ tasks:
   build:
     desc: Build the app
     vars:
-      ldflags:  -X 'main.runHeadless="true"' -X 'main.appVersion=${APP_VERSION}' -X 'main.steamUsername=${STEAM_USERNAME}' -X 'main.steamPassword=${STEAM_PASSWORD}' -X 'main.capIDEmail=${CAP_ID_EMAIL}' -X 'main.capIDPassword=${CAP_ID_PASSWORD}'
+      ldflags: -X 'main.runHeadless="true"' -X 'main.appVersion=${APP_VERSION}' -X 'main.steamUsername=${STEAM_USERNAME}' -X 'main.steamPassword=${STEAM_PASSWORD}' -X 'main.capIDEmail=${CAP_ID_EMAIL}' -X 'main.capIDPassword=${CAP_ID_PASSWORD}'
     cmds:
       - cmd: env GOOS=darwin GOARCH=amd64 wails build -ldflags="{{.ldflags}}"
         platforms: [darwin]
-      - cmd: env GOOS=windows GOARCH=amd64 wails build -ldflags="{{.ldflags}}"
+      - cmd: GOOS=windows GOARCH=amd64 wails build -ldflags="{{.ldflags}}"
         platforms: [windows]
