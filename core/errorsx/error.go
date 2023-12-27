@@ -31,12 +31,18 @@ func ContainsFormattedError(err error) bool {
 
 func FormatError(err error) any {
 	var trackingErr *FormattedError
+	var errCode *int
+	var message string
 	if errors.As(err, &trackingErr) {
-		return trackingErr
+		errCode = trackingErr.ErrorCode
+		message = trackingErr.Error()
 	}
 
-	return FormattedError{
-		ErrorCode:  nil,
-		InnerError: err,
+	return struct {
+		ErrorCode *int
+		Message   string
+	}{
+		ErrorCode: errCode,
+		Message:   message,
 	}
 }
