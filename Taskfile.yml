@@ -21,7 +21,7 @@ tasks:
   build:
     desc: Build the app
     vars:
-      ldflags: -X 'main.isProduction=${IS_PRODUCTION}' -X 'main.appVersion=${APP_VERSION}' -X 'main.steamUsername=${STEAM_USERNAME}' -X 'main.steamPassword=${STEAM_PASSWORD}' -X 'main.capIDEmail=${CAP_ID_EMAIL}' -X 'main.capIDPassword=${CAP_ID_PASSWORD}'
+      ldflags: -X 'main.isProduction="true"' -X 'main.appVersion=${APP_VERSION}' -X 'main.steamUsername=${STEAM_USERNAME}' -X 'main.steamPassword=${STEAM_PASSWORD}' -X 'main.capIDEmail=${CAP_ID_EMAIL}' -X 'main.capIDPassword=${CAP_ID_PASSWORD}'
     cmds:
       - cmd: env GOOS=darwin GOARCH=amd64 wails build -ldflags="{{.ldflags}}"
         platforms: [darwin]
