@@ -24,14 +24,14 @@ export const ThemeDialog: React.FC<ThemeDialogProps> = ({ selectedTheme, onSelec
   React.useEffect(() => {
     GetCustomThemeList().then(setCustomThemes).catch(console.error)
   }, [])
-  
+
   const { t } = useTranslation()
 
   const ThemeItem = ({ name, img }) => (
     <li>
       <button onClick={() => onSelect(name)}>
-        <img src={img} className='object-cover object-top overflow-hidden rounded-md h-[76px] w-[390px]' 
-          style={{ border: selectedTheme == name ? '2px solid lime' : '2px solid transparent'}}
+        <img src={img} className='object-cover object-top overflow-hidden rounded-md h-[76px] w-[390px]'
+          style={{ border: selectedTheme == name ? '2px solid lime' : '2px solid transparent' }}
         />
       </button>
     </li>
@@ -47,7 +47,7 @@ export const ThemeDialog: React.FC<ThemeDialogProps> = ({ selectedTheme, onSelec
       </Dialog.Trigger>
       <Dialog.Content title="selectTheme">
         <ul className='mt-2 h-80 w-full pr-2 overflow-y-scroll'>
-          {customThemes && customThemes.length > 0 && 
+          {customThemes && customThemes.length > 0 &&
             customThemes.map((name) => (
               <li key={name}>
                 <button
@@ -64,11 +64,11 @@ export const ThemeDialog: React.FC<ThemeDialogProps> = ({ selectedTheme, onSelec
           }
           <ThemeItem name="default" img={defaultTheme} />
           <ThemeItem name="blades" img={bladesTheme} />
-          <ThemeItem name="pills" img={pillsTheme}  />
-          <ThemeItem name="jaeger" img={jaegerTheme}  />
+          <ThemeItem name="pills" img={pillsTheme} />
+          <ThemeItem name="jaeger" img={jaegerTheme} />
           <ThemeItem name="nord" img={nordTheme} />
         </ul>
       </Dialog.Content>
-  </Dialog.Root>
+    </Dialog.Root>
   )
 }
