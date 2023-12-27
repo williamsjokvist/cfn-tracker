@@ -9,9 +9,7 @@ require (
 	github.com/joho/godotenv v1.4.0
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/mattn/go-sqlite3 v1.14.17
-	github.com/shirou/gopsutil v3.21.11+incompatible
 	github.com/wailsapp/wails/v2 v2.7.0
-	golang.org/x/sys v0.13.0
 )
 
 require (
@@ -47,10 +45,8 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rivo/uniseg v0.4.4 // indirect
 	github.com/rogpeppe/go-internal v1.6.1 // indirect
-	github.com/tklauser/go-sysconf v0.3.11 // indirect
-	github.com/tklauser/numcpus v0.6.0 // indirect
 	github.com/wailsapp/go-webview2 v1.0.10 // indirect
-	github.com/yusufpapurcu/wmi v1.2.3 // indirect
+	golang.org/x/sys v0.13.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
