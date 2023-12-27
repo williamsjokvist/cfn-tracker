@@ -61,7 +61,7 @@ const applyTheme = async (theme) => {
 
   if (theme != 'default') {
     const cssEl = document.createElement('link')
-    cssEl.setAttribute('href', `/themes/${theme}.css`)
+    cssEl.setAttribute('href', `/${theme}.css`)
     cssEl.setAttribute('rel', 'stylesheet')
     document.head.appendChild(cssEl)
     document.getElementById('default-theme').remove()

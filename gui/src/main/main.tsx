@@ -10,7 +10,7 @@ import { SessionsListPage } from "@/pages/stats/sessions-list-page";
 import { TrackingMachineContext } from "@/machines/tracking-machine";
 import { AuthMachineContext } from "@/machines/auth-machine";
 
-import { GetMatches, GetSessions, GetThemeList, GetUsers } from "@@/go/core/CommandHandler";
+import { GetMatches, GetSessions, GetUsers } from "@@/go/core/CommandHandler";
 
 import { AppLoader } from "./app-layout/app-loader";
 import { AppWrapper } from "./app-layout/app-wrapper";
@@ -38,7 +38,6 @@ const router = createHashRouter([
           {
             element: <OutputPage />,
             path: "/output",
-            loader: GetThemeList
           },
           {
             element: <SessionsListPage />,
