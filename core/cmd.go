@@ -142,11 +142,11 @@ func (ch *CommandHandler) GetUsers() ([]*model.User, error) {
 	return users, err
 }
 
-func (ch *CommandHandler) GetThemeList() ([]string, error) {
+func (ch *CommandHandler) GetCustomThemeList() ([]string, error) {
 	files, err := ioutil.ReadDir(`themes`)
 	if err != nil {
 		log.Println(err)
-		return nil, errorsx.NewFormattedError(http.StatusInternalServerError, errors.New("failed to read themes directory"))
+		return nil, errorsx.NewFormattedError(http.StatusNotFound, errors.New("failed to read themes directory"))
 	}
 	themes := make([]string, 0, len(files))
 	for _, file := range files {

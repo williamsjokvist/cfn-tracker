@@ -21,8 +21,20 @@ var page []byte
 //go:embed static/index.js
 var js []byte
 
-//go:embed static/default.css
-var css []byte
+//go:embed static/themes/default.css
+var defaultCss []byte
+
+//go:embed static/themes/blades.css
+var bladesCss []byte
+
+//go:embed static/themes/jaeger.css
+var jaegerCss []byte
+
+//go:embed static/themes/nord.css
+var nordCss []byte
+
+//go:embed static/themes/pills.css
+var pillsCss []byte
 
 func Start(ctx context.Context, cfg *config.Config) error {
 	log.Println(`Starting browser source server`)
@@ -56,7 +68,31 @@ func Start(ctx context.Context, cfg *config.Config) error {
 	http.HandleFunc("/default.css", func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set(`Content-Type`, `text/css`)
 		w.WriteHeader(http.StatusOK)
-		w.Write(css)
+		w.Write(defaultCss)
+	})
+
+	http.HandleFunc("/blades.css", func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set(`Content-Type`, `text/css`)
+		w.WriteHeader(http.StatusOK)
+		w.Write(bladesCss)
+	})
+
+	http.HandleFunc("/jaeger.css", func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set(`Content-Type`, `text/css`)
+		w.WriteHeader(http.StatusOK)
+		w.Write(jaegerCss)
+	})
+
+	http.HandleFunc("/nord.css", func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set(`Content-Type`, `text/css`)
+		w.WriteHeader(http.StatusOK)
+		w.Write(nordCss)
+	})
+
+	http.HandleFunc("/pills.css", func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set(`Content-Type`, `text/css`)
+		w.WriteHeader(http.StatusOK)
+		w.Write(pillsCss)
 	})
 
 	http.HandleFunc(`/stream`, func(w http.ResponseWriter, _ *http.Request) {
