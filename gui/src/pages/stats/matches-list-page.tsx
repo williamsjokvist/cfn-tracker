@@ -8,7 +8,7 @@ import type { model } from "@@/go/models";
 
 export const MatchesListPage: React.FC = () => {
   const { t } = useTranslation();
-  const totalMatches = useLoaderData() as model.Match[];
+  const totalMatches = (useLoaderData() ?? []) as model.Match[];
   const [matches, setMatches] = React.useState<model.Match[]>(totalMatches);
   const [totalWinRate, setTotalWinRate] = React.useState<number | null>(null);
 
