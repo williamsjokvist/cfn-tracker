@@ -117,7 +117,7 @@ export const AppSidebar: React.FC = () => {
           onClick={() => {
             SaveSidebarMinimized(!isMinimized).then(() => 
               setCfg({ ...cfg, sidebarMinified: !isMinimized})
-            ).catch(err => setErrorMessage(err))
+            ).catch(setErrorMessage)
           }}
         >
           <Icon

@@ -23,7 +23,7 @@ export const ConfigProvider: React.FC<React.PropsWithChildren> = ({ children }) 
       i18n.changeLanguage(cfg.locale)
       setCfg(cfg)
       console.log("App config:", cfg)
-    }).catch(err => setErrorMessage(err))
+    }).catch(setErrorMessage)
   }, [])
 
   return (

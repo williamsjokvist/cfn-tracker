@@ -17,12 +17,12 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
   const setErrorMessage = useErrorMessage();
 
   React.useEffect(() => {
-    GetSupportedLanguages().then((langs) => setLangs(langs))
+    GetSupportedLanguages().then(setLangs).catch(setErrorMessage)
   }, [])
   
   const changeLanguage = (code: string) => {
     i18n.changeLanguage(code);
-    SaveLocale(code).catch(err => setErrorMessage(err))
+    SaveLocale(code).catch(setErrorMessage)
   };
 
   return (
