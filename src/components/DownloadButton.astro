@@ -1,8 +1,8 @@
 ---
-import  Icon  from "astro-icon"
+import Icon from "astro-icon"
 ---
 
-<!-- <script defer>
+<script defer>
   function removeNonUserAgentDownloads() { 
     const isWindows = window.navigator.userAgent.indexOf("Win") != -1
     const isMacOS = window.navigator.userAgent.indexOf("Mac") != -1
@@ -11,14 +11,15 @@ import  Icon  from "astro-icon"
     if (!(isMacOS || isWindows)) {
       return
     } else if (!isMacOS) {
-      document.getElementById("mac-download").remove()
+      document.getElementById("mac-download-arm").remove()
+      document.getElementById("mac-download-intel").remove()
     } else if (!isWindows) {
       document.getElementById("windows-download").remove()
     }
   }
 
   document.addEventListener("DOMContentLoaded", removeNonUserAgentDownloads)
-</script> -->
+</script>
 
 <a
   id="windows-download"
@@ -28,15 +29,28 @@ import  Icon  from "astro-icon"
   <Icon name="mdi:microsoft-windows" class="w-8 h-8" />
   <span>Download for Windows</span>
 </a>
-<!-- <a
-  id="mac-download"
-  href="https://github.com/GreenSoap/cfn-tracker/releases/download/v4.0.0/CFN_Tracker_macOS.zip"
+<a
+  id="mac-download-arm"
+  href="https://github.com/GreenSoap/cfn-tracker/releases/download/v4.0.0/cfn-tracker-windows-arm64.zip"
   class="link-card mac inline-flex gap-2 justify-between items-center rounded-full px-6 py-4 text-2xl"
 >
-  <Icon name="mdi:apple" class="w-8 h-8" />
+  <div class="grid justify-items-center h-8">
+    <Icon name="mdi:apple" class="relative bottom-2 w-8 h-8" />
+    <Icon name="simple-icons:arm" class="relative bottom-4 w-14 h-8" />
+  </div>
   <span class="w-full">Download for Mac</span>
-</a> -->
-
+</a>
+<a
+  id="mac-download-intel"
+  href="https://github.com/GreenSoap/cfn-tracker/releases/download/v4.0.0/cfn-tracker-windows-amd64.zip"
+  class="link-card mac mt-2 inline-flex gap-2 justify-between items-center rounded-full px-6 py-4 text-2xl"
+>
+  <div class="grid justify-items-center h-8">
+    <Icon name="mdi:apple" class="relative bottom-2 w-8 h-8" />
+    <Icon name="simple-icons:intel" class="relative bottom-4 w-14 h-8" />
+  </div>
+  <span class="w-full">Download for Mac</span>
+</a>
 
 <style lang="sass">
   .link-card
