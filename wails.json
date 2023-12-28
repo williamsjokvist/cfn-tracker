@@ -9,6 +9,7 @@
   "assetdir": "./gui/dist",
   "build:dir": "./build",
   "frontend:dir": "./gui",
+  "obfuscated": true,
   "author": {
     "name": "greensoap"
   }
