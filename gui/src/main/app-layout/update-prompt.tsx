@@ -10,10 +10,10 @@ import { BrowserOpenURL } from "@@/runtime/runtime";
 export const UpdatePrompt: React.FC = () => {
   const { t } = useTranslation();
   const [hasUpdate, setHasUpdate] = React.useState(false);
-  const setError = useErrorMessage();
+  const setErrorMessage = useErrorMessage();
   
   React.useEffect(() => {
-    CheckForUpdate().then((hasUpdate: boolean) => setHasUpdate(hasUpdate)).catch(err => setError(err));
+    CheckForUpdate().then(setHasUpdate).catch(setErrorMessage);
   }, [])
 
   if (hasUpdate === false) {
