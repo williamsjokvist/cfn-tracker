@@ -2,7 +2,7 @@
 import  Icon  from "astro-icon"
 ---
 
-<script defer>
+<!-- <script defer>
   function removeNonUserAgentDownloads() { 
     const isWindows = window.navigator.userAgent.indexOf("Win") != -1
     const isMacOS = window.navigator.userAgent.indexOf("Mac") != -1
@@ -18,24 +18,24 @@ import  Icon  from "astro-icon"
   }
 
   document.addEventListener("DOMContentLoaded", removeNonUserAgentDownloads)
-</script>
+</script> -->
 
 <a
   id="windows-download"
-  href="https://github.com/GreenSoap/cfn-tracker/releases/download/v4.0.0/CFN_Tracker_Windows.zip"
+  href="https://github.com/GreenSoap/cfn-tracker/releases/download/v4.0.0/cfn-tracker-windows-amd64.zip"
   class="link-card windows inline-flex gap-2 justify-between items-center rounded-full px-6 py-4 text-2xl"
 >
   <Icon name="mdi:microsoft-windows" class="w-8 h-8" />
   <span>Download for Windows</span>
 </a>
-<a
+<!-- <a
   id="mac-download"
   href="https://github.com/GreenSoap/cfn-tracker/releases/download/v4.0.0/CFN_Tracker_macOS.zip"
   class="link-card mac inline-flex gap-2 justify-between items-center rounded-full px-6 py-4 text-2xl"
 >
   <Icon name="mdi:apple" class="w-8 h-8" />
   <span class="w-full">Download for Mac</span>
-</a>
+</a> -->
 
 
 <style lang="sass">
