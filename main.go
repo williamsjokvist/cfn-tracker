@@ -143,7 +143,7 @@ func main() {
 
 	var wailsCtx context.Context
 	err = wails.Run(&options.App{
-		Title:              `CFN Tracker v3`,
+		Title:              fmt.Sprintf(`CFN Tracker v%s`, appVersion),
 		Assets:             assets,
 		Width:              920,
 		Height:             450,
