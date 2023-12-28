@@ -5,12 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://github.com/williamsjokvist/cfn-tracker/tree/master)
+## [4.0.0](https://github.com/williamsjokvist/cfn-tracker/tree/v4.0.0)
 
 ### Added
 - Street Fighter 6 tracking.
 - Concept of *Sessions* which contain all the matches played during that tracking session.
-- Output for OBS Browser Source, with customizeable CSS themes.
+- Output for OBS Browser Source, with ability to make custom themes in CSS.
 - Authentication is now persisted across app starts.
 
 ### Changed
@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - GUI State is controlled via a state machine.
 
 ### Fixed
+- LP and MR Gains are now counted by character **(SF6)**
 - In cases of app crashing on start, a Windows XP error message is displayed.
 
 ### Removed
