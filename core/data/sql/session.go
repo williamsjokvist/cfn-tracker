@@ -69,7 +69,7 @@ func (s *Storage) GetSessions(ctx context.Context, userId string, limit uint8, o
 		GROUP BY s.id
 		ORDER BY s.id DESC
 		%s
-`, where, pagination), userId)
+`, where, pagination), whereArgs...)
 	if err != nil {
 		return nil, fmt.Errorf("prepare get sessions query: %w", err)
 	}
