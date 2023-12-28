@@ -75,11 +75,13 @@ func (m *CFNTrackerRepository) GetLatestSession(ctx context.Context, userId stri
 		return nil, nil
 	}
 	sesh := sessions[0]
+	log.Println(sesh.Id)
 	matches, err := m.sqlDb.GetMatches(ctx, sesh.Id, userId, 0, 0)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get matches by session: %w", err)
 	}
 	sesh.Matches = matches
+	log.Println(sesh.Matches[0].Opponent, sesh.Matches[1].Opponent)
 	return sesh, nil
 }
 

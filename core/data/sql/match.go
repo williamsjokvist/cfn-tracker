@@ -89,10 +89,9 @@ func (s *Storage) GetMatches(ctx context.Context, sessionId uint16, userId strin
 	}
 	query, args, err := sqlx.In(fmt.Sprintf(`
 		SELECT * FROM matches %s
-		ORDER BY date DESC
+		ORDER BY date DESC, time DESC
 		%s
 `, where, pagination), whereArgs...)
-
 	if err != nil {
 		return nil, fmt.Errorf("prepare matches by session query: %w", err)
 	}

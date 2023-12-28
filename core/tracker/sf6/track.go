@@ -161,7 +161,7 @@ func (t *SF6Tracker) updateSession(ctx context.Context, userCode string, bl *Bat
 
 	t.sesh.LP = bl.GetLP()
 	t.sesh.MR = bl.GetMR()
-	t.sesh.Matches = append(t.sesh.Matches, &match)
+	t.sesh.Matches = append([]*model.Match{&match}, t.sesh.Matches...)
 	err := t.CFNTrackerRepository.UpdateSession(ctx, t.sesh, match, t.sesh.Id)
 	if err != nil {
 		return fmt.Errorf("failed to update session: %w", err)
@@ -181,7 +181,7 @@ func (t *SF6Tracker) getTrackingStateForLastMatch() *model.TrackingState {
 	if len(t.sesh.Matches) == 0 {
 		return nil
 	}
-	lastMatch := t.sesh.Matches[len(t.sesh.Matches)-1]
+	lastMatch := t.sesh.Matches[0]
 	return &model.TrackingState{
 		UserCode:          t.user.Code,
 		CFN:               t.user.DisplayName,
