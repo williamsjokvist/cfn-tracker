@@ -6,6 +6,9 @@ Yes absolutely! If you do, let us know and we'll feature you here 💪
 ## Can I use this for my own without streaming?
 Yes! Quite a few people have also told us that peeking at their stats as they play has kept them motivated!
 
+## I can't open CFN Tracker on Mac
+If the app doesn't open for you, right click the app > *Show package contents* > *Contents* > *MacOS* > double click *CFN Tracker*
+
 ## Why is the download link broken?
 The installer was disabled when SF6 came out to avoid confusion, since the app only supported SFV.
 
