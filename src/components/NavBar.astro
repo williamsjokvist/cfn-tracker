@@ -5,16 +5,16 @@ import Icon from "astro-icon";
 const NavItems = [{
   href: '/guide',
   name: 'Guide',
-  icon: Astro.url.pathname === '/guide' ? "akar-icons:info-fill" : "akar-icons:info"
+  icon: Astro.url.pathname.includes('guide') ? "akar-icons:info-fill" : "akar-icons:info"
 }, {
   href: '/faq',
   name: 'FAQ',
-  icon: Astro.url.pathname === '/faq' ? "mdi:chat-bubble" : "mdi:chat-bubble-outline"
+  icon: Astro.url.pathname.includes('faq') ? "mdi:chat-bubble" : "mdi:chat-bubble-outline"
 }, 
 {
   href: '/changelog',
   name: 'Changelog',
-  icon: Astro.url.pathname === '/changelog' ? "mdi:scroll" : "mdi:scroll-outline"
+  icon: Astro.url.pathname.includes('changelog') ? "mdi:scroll" : "mdi:scroll-outline"
 }]
 ---
 
