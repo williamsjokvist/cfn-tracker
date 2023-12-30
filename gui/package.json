@@ -4,7 +4,8 @@
   "version": "4.0.0",
   "type": "module",
   "scripts": {
-    "format": "prettier src --write"
+    "format": "prettier src --write",
+    "dev": "vite"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.0.4",
