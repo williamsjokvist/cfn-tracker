@@ -4,13 +4,16 @@ import Layout from '../layouts/Layout.astro';
 ---
 <script>
   import { gsap, Power2 } from "../lib/gsap";
-  gsap.from("#changelog > *", {
-    autoAlpha: 0,
-    translateY: 20,
-    duration: .75,
-    ease: Power2.easeInOut,
-    stagger: 0.125,
-  });
+
+  document.addEventListener("astro:page-load", () => {
+    gsap.from("#changelog > *", {
+      autoAlpha: 0,
+      translateY: 20,
+      duration: .75,
+      ease: Power2.easeInOut,
+      stagger: 0.125,
+    });
+  })
 </script>
 
 <Layout title="CFN Tracker - Changelog">

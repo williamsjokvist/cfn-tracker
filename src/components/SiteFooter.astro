@@ -1,7 +1,7 @@
 ---
 ---
 
-<script defer>
+<script>
   const fetchDownloadCount = async () => {
     const res = await fetch(
       `https://api.github.com/repos/williamsjokvist/cfn-tracker/releases`,
@@ -28,10 +28,10 @@
   const assignDownloadCount = async () => {
     const download_count = await fetchDownloadCount();
     const cfnTrackerEl = document.getElementById(`cfn-tracker-download-count`);
-    cfnTrackerEl.innerText = download_count;
+    cfnTrackerEl.innerText = download_count.toString();
   }
 
-  document.addEventListener("DOMContentLoaded", assignDownloadCount);
+  document.addEventListener("astro:page-load", assignDownloadCount);
 </script>
 
 <footer class="py-36 text-xl lowercase text-center">

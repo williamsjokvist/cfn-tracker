@@ -2,7 +2,7 @@
 import Icon from "astro-icon"
 ---
 
-<script defer>
+<script>
   function removeNonUserAgentDownloads() { 
     const isWindows = window.navigator.userAgent.indexOf("Win") != -1
     const isMacOS = window.navigator.userAgent.indexOf("Mac") != -1
@@ -18,7 +18,7 @@ import Icon from "astro-icon"
     }
   }
 
-  document.addEventListener("DOMContentLoaded", removeNonUserAgentDownloads)
+  document.addEventListener("astro:page-load", removeNonUserAgentDownloads)
 </script>
 
 <a

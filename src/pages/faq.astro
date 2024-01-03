@@ -4,13 +4,15 @@ import Layout from '../layouts/Layout.astro';
 ---
 <script>
   import { gsap, Power3 } from "../lib/gsap";
-  gsap.from("#faq > *", {
-    autoAlpha: 0,
-    translateY: 20,
-    duration: .75,
-    ease: Power3.easeInOut,
-    stagger: 0.125,
-  });
+  document.addEventListener("astro:page-load", () => {
+    gsap.from("#faq > *", {
+      autoAlpha: 0,
+      translateY: 20,
+      duration: .75,
+      ease: Power3.easeInOut,
+      stagger: 0.125,
+    });
+  })
 </script>
 
 <Layout title="CFN Tracker - FAQ">
