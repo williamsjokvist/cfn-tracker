@@ -1,4 +1,4 @@
-import clsx from "clsx";
+import { cn } from "@/helpers/cn"
 import { motion } from "framer-motion";
 
 type PageHeaderProps = {
@@ -11,7 +11,7 @@ export const PageHeader: React.FC<React.PropsWithChildren<PageHeaderProps>> = ({
   children,
 }) => (
   <header
-    className={clsx([
+    className={cn([
       "flex justify-between items-center",
       "px-8 h-[53px] select-none",
       "border-b-[1px] border-b-[rgba(255,255,255,.125)] border-solid"

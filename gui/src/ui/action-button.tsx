@@ -1,5 +1,5 @@
 import React from "react";
-import clsx from "clsx";
+import { cn } from "@/helpers/cn"
 
 export const ActionButton = React.forwardRef((
   props: React.PropsWithChildren<React.ButtonHTMLAttributes<HTMLButtonElement>>, 
@@ -8,7 +8,7 @@ export const ActionButton = React.forwardRef((
   <button
     ref={ref}
     {...props}
-    className={clsx(
+    className={cn(
       "flex items-center justify-between",
       "whitespace-nowrap  font-semibold text-md",
       "rounded-[18px] px-5 py-3 border-[1px]",

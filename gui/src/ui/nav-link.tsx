@@ -1,5 +1,5 @@
 import { Icon } from "@iconify/react";
-import clsx from "clsx";
+import { cn } from "@/helpers/cn"
 import { HideableText } from "./hideable-text";
 
 type NavigationLinkProps = {
@@ -13,7 +13,7 @@ type NavigationLinkProps = {
 export const NavigationLink: React.FC<NavigationLinkProps> = (props) => (
   <a
     href={`#/${props.href}`}
-    className={clsx(
+    className={cn(
       "flex items-center justify-between",
       "group flex items-center justify-between",
       "hover:!text-white hover:bg-slate-50 active:bg-[rgba(255,255,255,.075)] hover:bg-opacity-5 transition-colors",

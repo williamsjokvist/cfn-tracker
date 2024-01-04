@@ -1,5 +1,5 @@
 import React from "react";
-import clsx from "clsx";
+import { cn } from "@/helpers/cn"
 import { Icon } from "@iconify/react";
 import { useAnimate } from "framer-motion";
 import { useTranslation } from "react-i18next";
@@ -38,7 +38,7 @@ export const ErrorMessageProvider: React.FC<React.PropsWithChildren> = ({ childr
       <div ref={scope} className="absolute w-full flex justify-end">
         <div
           id="error-message"
-          className={clsx(
+          className={cn(
             "flex gap-6 items-center justify-around",
             "fixed mx-auto z-50",
             "px-8 py-3 rounded-bl-xl text-xl backdrop-blur-sm pointer-events-none",
