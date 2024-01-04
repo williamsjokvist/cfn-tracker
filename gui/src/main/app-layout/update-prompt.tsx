@@ -1,5 +1,5 @@
 import React from "react";
-import clsx from "clsx";
+import { cn } from "@/helpers/cn"
 import { Icon } from "@iconify/react";
 import { useTranslation } from "react-i18next";
 
@@ -22,7 +22,7 @@ export const UpdatePrompt: React.FC = () => {
 
   return (
     <a
-      className={clsx(
+      className={cn(
         "group absolute z-50 left-0 bottom-2",
         "cursor-pointer leading-5 text-base",
         "bg-[rgba(0,0,0,.625)] hover:bg-[rgba(0,0,0,.525)] text-[#bfbcff] hover:text-white transition-colors backdrop-blur",

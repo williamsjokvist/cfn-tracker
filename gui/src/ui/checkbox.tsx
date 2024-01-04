@@ -1,5 +1,5 @@
 import React from "react";
-import clsx from "clsx";
+import { cn } from "@/helpers/cn"
 
 export const Checkbox = React.forwardRef((
   props: React.InputHTMLAttributes<HTMLInputElement>,
@@ -8,7 +8,7 @@ export const Checkbox = React.forwardRef((
   <input
     ref={ref}
     type="checkbox"
-    className={clsx(
+    className={cn(
       "w-7 h-7 rounded-md cursor-pointer mr-4 bg-transparent text-transparent",
       "border-2 border-[rgba(255,255,255,.25)] focus:border-2",
       "checked:border-2 checked:border-[rgba(255,255,255,.25)] checked:focus:border-[rgba(255,255,255,.25)] checked:hover:border-[rgba(255,255,255,.25)]",
