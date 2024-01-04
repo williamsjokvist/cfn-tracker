@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "format": "prettier src --write",
+    "format:check": "prettier src --check",
+    "tsc": "tsc --project . --noEmit",
     "dev": "vite"
   },
   "dependencies": {
@@ -34,6 +36,7 @@
     "prettier": "^3.0.1",
     "sass": "^1.62.1",
     "tailwindcss": "^3.1.8",
+    "typescript": "^5.3.3",
     "vite": "^5.0.9"
   },
   "author": "greensoap"

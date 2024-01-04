@@ -1,7 +1,9 @@
-name: CFNScraper Pipeline
+name: Test Core Auth
 on:
   push:
     branches: [ master, development ]
+    paths:
+      - ~/core
 
 jobs:
   test:
@@ -11,7 +13,7 @@ jobs:
       - uses: actions/setup-go@v3
       - uses: n8maninger/action-golang-test@v1
         with:
-          package: ./core/...
+          package: ~/core/...
         env:
           STEAM_USERNAME: ${{ secrets.STEAM_USERNAME }} 
           STEAM_PASSWORD: ${{ secrets.STEAM_PASSWORD }} 
