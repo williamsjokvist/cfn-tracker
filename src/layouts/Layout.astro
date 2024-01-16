@@ -1,5 +1,5 @@
 ---
-import { ViewTransitions } from 'astro:transitions';
+import { ViewTransitions, fade } from 'astro:transitions';
 import NavBar from '../components/NavBar.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 export interface Props {
@@ -23,9 +23,9 @@ const { title } = Astro.props;
     <title>CFN Tracker</title>
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
   </head>
-  <body>
+  <body >
     <NavBar />
-    <main>
+    <main transition:animate={fade({ duration: '0.4s' })}>
       <slot />
     </main>
     <SiteFooter/>

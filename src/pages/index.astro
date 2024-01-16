@@ -9,10 +9,10 @@ import DownloadButton from "../components/DownloadButton.astro";
 
 <Layout title="CFN Tracker">
   <section
-    class="flex-wrap intro relative pt-36 pb-28 -mt-20 min-h-screen flex items-center justify-around px-4"
+    class="flex-wrap gap-8 px-8 intro relative pt-44 pb-36 -mt-20 min-h-screen flex items-center justify-around"
   >
-    <header class="mx-8 mb-8">
-      <h1 id="catchphrase" class="text-2xl md:text-4xl font-bold mb-4 md:mb-10">
+    <header class="mx-8">
+      <h1 id="catchphrase" class="text-center text-2xl md:text-4xl xl:text-6xl font-bold mb-4 md:mb-10">
         <span>Track</span>
         <span>your</span>
         <span class="text-gradient">live</span>
@@ -22,7 +22,6 @@ import DownloadButton from "../components/DownloadButton.astro";
         <span>ranked</span>
         <span>matches</span>
       </h1>
-      <DownloadButton />
     </header>
 
     <MockTracker title="Tracking" page="track" spin>
@@ -90,6 +89,9 @@ import DownloadButton from "../components/DownloadButton.astro";
         </div>
       </dl>
     </MockTracker>
+    <div class="w-full flex justify-center gap-8">
+      <DownloadButton transition:persist />
+    </div>
     <World />
   </section>
 
@@ -103,13 +105,11 @@ import DownloadButton from "../components/DownloadButton.astro";
     frameborder="0"
     allowfullscreen="true"
     scrolling="no"
-    height="378"
-  />
+    height="378"></iframe>
 
   <div class="fixed bottom-0 w-full py-4 bg-[#131c32] text-center z-50">
     <span class="text-shadow-sm"
-      >If you find the app useful, consider
-      buying me a</span
+      >If you find the app useful, consider buying me a</span
     >
     <a href="https://ko-fi.com/greensoap" class="" target="_blank"
       ><span class="text-gradient">coffee</span> ☕</a
