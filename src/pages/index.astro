@@ -12,7 +12,7 @@ import DownloadButton from "../components/DownloadButton.astro";
     class="flex-wrap gap-8 px-8 intro relative pt-44 pb-36 -mt-20 min-h-screen flex items-center justify-around"
   >
     <header class="mx-8">
-      <h1 id="catchphrase" class="text-center text-2xl md:text-4xl xl:text-6xl font-bold mb-4 md:mb-10">
+      <h1 id="catchphrase" class="text-center text-3xl md:text-5xl xl:text-6xl font-bold mb-4 md:mb-10">
         <span>Track</span>
         <span>your</span>
         <span class="text-gradient">live</span>
@@ -24,72 +24,74 @@ import DownloadButton from "../components/DownloadButton.astro";
       </h1>
     </header>
 
-    <MockTracker title="Tracking" page="track" spin>
-      <dl
-        class="flex whitespace-nowrap items-center justify-between w-full pt-3 px-6"
-      >
-        <div class="flex gap-3 text-xl">
-          <dt class="text-xl">CFN</dt>
-          <dd class="font-bold">Hjejjjej</dd>
-        </div>
-        <div class="flex justify-between gap-8">
+    <div class="overflow-y-hidden overflow-x-scroll md:overflow-x-hidden w-full md:w-auto">
+      <MockTracker title="Tracking" page="track" spin className="shadow-[0px_2px_18px_rgba(0,0,0,.25)]">
+        <dl
+          class="flex whitespace-nowrap items-center justify-between w-full pt-3 px-6"
+        >
           <div class="flex gap-3 text-xl">
-            <dt class="text-xl">LP</dt>
-            <dd class="font-bold">35652</dd>
+            <dt class="text-xl">CFN</dt>
+            <dd class="font-bold">Hjejjjej</dd>
           </div>
-          <div class="flex gap-3 text-xl">
-            <dt class="text-xl">MR</dt>
-            <dd class="font-bold">1604</dd>
+          <div class="flex justify-between gap-8">
+            <div class="flex gap-3 text-xl">
+              <dt class="text-xl">LP</dt>
+              <dd class="font-bold">35652</dd>
+            </div>
+            <div class="flex gap-3 text-xl">
+              <dt class="text-xl">MR</dt>
+              <dd class="font-bold">1604</dd>
+            </div>
           </div>
-        </div>
-      </dl>
+        </dl>
 
-      <dl class="text-lg whitespace-nowrap mt-2 px-6 w-[420px]">
-        <div class="flex justify-between gap-2">
-          <div
-            class="mb-2 flex flex-1 gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl"
-          >
-            <dt class="tracking-wider font-extralight">Wins</dt>
-            <dd class="text-4xl font-semibold">4</dd>
+        <dl class="text-lg whitespace-nowrap mt-2 px-6 w-[420px]">
+          <div class="flex justify-between gap-2">
+            <div
+              class="mb-2 flex flex-1 gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl"
+            >
+              <dt class="tracking-wider font-extralight">Wins</dt>
+              <dd class="text-4xl font-semibold">4</dd>
+            </div>
+            <div
+              class="mb-2 flex flex-1 gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl"
+            >
+              <dt class="tracking-wider font-extralight">Losses</dt>
+              <dd class="text-4xl font-semibold">2</dd>
+            </div>
           </div>
-          <div
-            class="mb-2 flex flex-1 gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl"
-          >
-            <dt class="tracking-wider font-extralight">Losses</dt>
-            <dd class="text-4xl font-semibold">2</dd>
+          <div class="flex justify-between gap-2">
+            <div
+              class="mb-2 flex flex-1 gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl"
+            >
+              <dt class="tracking-wider font-extralight">Win Rate</dt>
+              <dd class="text-4xl font-semibold">69%</dd>
+            </div>
+            <div
+              class="mb-2 flex flex-1 gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl"
+            >
+              <dt class="tracking-wider font-extralight">Win Streak</dt>
+              <dd class="text-4xl font-semibold">2</dd>
+            </div>
           </div>
-        </div>
-        <div class="flex justify-between gap-2">
-          <div
-            class="mb-2 flex flex-1 gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl"
-          >
-            <dt class="tracking-wider font-extralight">Win Rate</dt>
-            <dd class="text-4xl font-semibold">69%</dd>
+          <div class="flex justify-between gap-2">
+            <div
+              class="mb-2 flex flex-1 gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl"
+            >
+              <dt class="tracking-wider font-extralight">LP Gain</dt>
+              <dd class="text-4xl font-semibold">+125</dd>
+            </div>
+            <div
+              class="mb-2 flex flex-1 gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl"
+            >
+              <dt class="tracking-wider font-extralight">MR Gain</dt>
+              <dd class="text-4xl font-semibold">+12</dd>
+            </div>
           </div>
-          <div
-            class="mb-2 flex flex-1 gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl"
-          >
-            <dt class="tracking-wider font-extralight">Win Streak</dt>
-            <dd class="text-4xl font-semibold">2</dd>
-          </div>
-        </div>
-        <div class="flex justify-between gap-2">
-          <div
-            class="mb-2 flex flex-1 gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl"
-          >
-            <dt class="tracking-wider font-extralight">LP Gain</dt>
-            <dd class="text-4xl font-semibold">+125</dd>
-          </div>
-          <div
-            class="mb-2 flex flex-1 gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl"
-          >
-            <dt class="tracking-wider font-extralight">MR Gain</dt>
-            <dd class="text-4xl font-semibold">+12</dd>
-          </div>
-        </div>
-      </dl>
-    </MockTracker>
-    <div class="w-full flex justify-center gap-8">
+        </dl>
+      </MockTracker>
+    </div>
+    <div class="w-full flex flex-wrap justify-center gap-8">
       <DownloadButton transition:persist />
     </div>
     <World />
@@ -98,14 +100,6 @@ import DownloadButton from "../components/DownloadButton.astro";
   <Features />
 
   <Streamers />
-
-  <iframe
-    class="mx-auto w-full max-w-[620px] px-4"
-    src="https://clips.twitch.tv/embed?clip=PeppyCuriousFungusSoBayed-CdfDcX7MJOumXGYq&parent=cfn.williamsjokvist.se"
-    frameborder="0"
-    allowfullscreen="true"
-    scrolling="no"
-    height="378"></iframe>
 
   <div class="fixed bottom-0 w-full py-4 bg-[#131c32] text-center z-50">
     <span class="text-shadow-sm"
@@ -119,8 +113,47 @@ import DownloadButton from "../components/DownloadButton.astro";
 
 <style is:global>
   .intro {
-    background: linear-gradient(0deg, #000 0%, rgb(25 16 34) 100%);
     min-height: 100vh;
+  }
+
+  body {
+    position: relative;
+  }
+  body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: linear-gradient(0deg,#3a0ca3,#7209B7);
+    z-index: -1;
+  }
+
+  body::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 80vh;
+    background: linear-gradient(0deg,#4361EE,#3a0ca3);
+    z-index: -1;
+  }
+
+  html {
+    position: relative;
+  }
+  html::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url("/noise.png");
+    z-index: -1;
+    opacity: .35;
   }
   .intro > *:not(.world) {
     position: relative;

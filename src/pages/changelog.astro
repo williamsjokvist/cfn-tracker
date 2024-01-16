@@ -6,7 +6,7 @@ import Layout from '../layouts/Layout.astro';
   import { gsap, Power2 } from "../lib/gsap";
 
   document.addEventListener("astro:page-load", () => {
-    gsap.from("#changelog > *", {
+    gsap.from("#changelog-container > *", {
       autoAlpha: 0,
       translateY: 20,
       duration: .75,
@@ -17,7 +17,7 @@ import Layout from '../layouts/Layout.astro';
 </script>
 
 <Layout title="CFN Tracker - Changelog">
-  <div id="changelog" class="prose lg:prose-lg prose-invert mx-auto px-4 mt-20">
+  <div id="changelog-container" class="prose lg:prose-lg prose-invert mx-auto px-4 mt-20">
     <Content />
   </div>
 </Layout>

@@ -55,17 +55,32 @@ const streamers = [{
   })
 </script>
 
-<section id="used-by" class="my-28">
-  <h2 class="text-3xl text-center font-bold">Used by</h2>
-  <div id="used-by-list" class="flex gap-6 justify-center mt-8">
+<section id="used-by" class="relative my-48">
+  <h2 class="text-3xl md:text-5xl text-center font-bold">Used by</h2>
+  <div id="used-by-list" class="flex gap-6 justify-center mt-14">
     {
       streamers.map(s => (
         <WithTooltip label={s.name}>
           <a href={s.url}>
-            <img src={s.img} width="50px" height="50px" />
+            <img src={s.img} width="60px" height="60px" class="rounded-full" />
           </a>  
         </WithTooltip>
       ))
     }
   </div>
 </section>
+
+<style lang="sass">
+/*  #used-by::after
+    content: ''
+    top: -350px
+    position: absolute
+    left: 0
+    width: 100%
+    height: 1200px
+    display: block
+    z-index: -20
+    background: url(https://www.streetfighter.com/6/buckler/assets/images/material/character/profile_ryu.png) no-repeat
+    background-size: contain
+    */
+</style>

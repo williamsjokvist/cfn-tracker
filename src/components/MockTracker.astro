@@ -1,9 +1,9 @@
 ---
 import Icon from "astro-icon";
-const { title, page, spin } = Astro.props
+const { title, page, spin, className } = Astro.props
 ---
 
-<section class="tracker overflow-x-scroll">
+<section class={`tracker ` + (className ?? "")}>
   <div class="sidebar">
     <header>
       <div class="flex justify-start">
@@ -22,7 +22,7 @@ const { title, page, spin } = Astro.props
     <div class="mt-5 w-full flex flex-col gap-4">
       <Icon name={`ri:search-${page == "track" ? "fill" : "line"}`} class="text-[#f85961] w-10 h-7 mr-1"/>
       <Icon name={`ion:document-text${page == "log" ? "" : "-outline"}`} class="text-[#f85961] w-10 h-7 mr-1"/>
-      <Icon name={`clarity:sign-out-${page == "out" ? "fill" : "line"}`} class="text-[#f85961] w-10 h-7 mr-1"/>
+      <Icon name={`clarity:sign-out-${page == "out" ? "solid" : "line"}`} class="text-[#f85961] w-10 h-7 mr-1"/>
     </div>
   </div>
   <div class="w-full">
@@ -48,7 +48,6 @@ const { title, page, spin } = Astro.props
   .tracker
     font-family: 'League Spartan', sans-serif
     background: radial-gradient(circle at 52.1% -29.6%, rgb(144, 17, 105) 0%, rgb(51, 0, 131) 100.2%)
-    overflow: hidden
     height: 343px
     width: 700px
     z-index: 1
@@ -68,6 +67,8 @@ const { title, page, spin } = Astro.props
       color: #fff
       z-index: 50
       padding: 12px 10px
+      border-bottom-left-radius: 12px
+      border-top-left-radius: 12px
       width: 80px
       > div
         margin-top: 20px

@@ -1,4 +1,5 @@
 ---
+import Icon from "astro-icon";
 import MockTracker from "./MockTracker.astro";
 const matches = [
   {
@@ -35,6 +36,7 @@ const matches = [
   },
 ];
 ---
+
 <script>
   import { gsap, Power2 } from "../lib/gsap";
   const features = document.querySelectorAll("#features>*");
@@ -55,154 +57,179 @@ const matches = [
       });
       if (feature.firstElementChild != feature.lastElementChild) {
         gsap.from(feature.lastElementChild, {
-        autoAlpha: 0,
-        translateY: 50,
-        duration: 3,
-        ease: Power2.easeOut,
-        scrollTrigger: {
-          scroller: document.body,
-          trigger: feature,
-          start: "center bottom",
-          toggleActions: "play none none reverse",
-        },
-      });
+          autoAlpha: 0,
+          translateY: 50,
+          duration: 3,
+          ease: Power2.easeOut,
+          scrollTrigger: {
+            scroller: document.body,
+            trigger: feature,
+            start: "center bottom",
+            toggleActions: "play none none reverse",
+          },
+        });
       }
     }
   }
 </script>
-<section id="features" class="[&>*:nth-child(even)]:flex-row-reverse flex flex-col gap-24 px-4">
+<section
+  id="features"
+  class="[&>*:nth-child(even)]:flex-row-reverse flex flex-col gap-60 px-4"
+>
   <section class="flex flex-wrap items-center justify-around">
     <header class="mb-8 max-w-[700px] w-full">
-      <h2 class="font-bold text-4xl">Live match updates</h2>
+      <h2 class="font-bold text-3xl md:text-5xl">
+        <Icon
+          name="ri:search-fill"
+          class="inline text-[#f85961] w-12 h-12 mr-1"
+        />
+        Live match updates
+      </h2>
       <p class="text-lg mt-8">
         New matches are tracked instantly as soon as you press start!
       </p>
     </header>
-    <MockTracker title="Tracking" page="track" spin>
-      <dl
-        class="flex whitespace-nowrap items-center justify-between w-full pt-3 px-6"
-      >
-        <div class="flex gap-3 text-xl">
-          <dt class="text-xl">CFN</dt>
-          <dd class="font-bold">Hjejjjej</dd>
-        </div>
-        <div class="flex justify-between gap-8">
+    <div class="tracker-container w-full md:w-auto overflow-auto md:overflow-visible">
+      <MockTracker title="Tracking" page="track" spin>
+        <dl
+          class="flex whitespace-nowrap items-center justify-between w-full pt-3 px-6"
+        >
           <div class="flex gap-3 text-xl">
-            <dt class="text-xl">LP</dt>
-            <dd class="font-bold">35652</dd>
+            <dt class="text-xl">CFN</dt>
+            <dd class="font-bold">Hjejjjej</dd>
           </div>
-          <div class="flex gap-3 text-xl">
-            <dt class="text-xl">MR</dt>
-            <dd class="font-bold">1604</dd>
+          <div class="flex justify-between gap-8">
+            <div class="flex gap-3 text-xl">
+              <dt class="text-xl">LP</dt>
+              <dd class="font-bold">35652</dd>
+            </div>
+            <div class="flex gap-3 text-xl">
+              <dt class="text-xl">MR</dt>
+              <dd class="font-bold">1604</dd>
+            </div>
           </div>
-        </div>
-      </dl>
+        </dl>
 
-      <dl class="text-lg whitespace-nowrap mt-2 px-6 w-[420px]">
-        <div class="flex justify-between gap-2">
-          <div
-            class="mb-2 flex flex-1 gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl"
-          >
-            <dt class="tracking-wider font-extralight">Wins</dt>
-            <dd class="text-4xl font-semibold">4</dd>
+        <dl class="text-lg whitespace-nowrap mt-2 px-6 w-[420px]">
+          <div class="flex justify-between gap-2">
+            <div
+              class="mb-2 flex flex-1 gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl"
+            >
+              <dt class="tracking-wider font-extralight">Wins</dt>
+              <dd class="text-4xl font-semibold">4</dd>
+            </div>
+            <div
+              class="mb-2 flex flex-1 gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl"
+            >
+              <dt class="tracking-wider font-extralight">Losses</dt>
+              <dd class="text-4xl font-semibold">2</dd>
+            </div>
           </div>
-          <div
-            class="mb-2 flex flex-1 gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl"
-          >
-            <dt class="tracking-wider font-extralight">Losses</dt>
-            <dd class="text-4xl font-semibold">2</dd>
+          <div class="flex justify-between gap-2">
+            <div
+              class="mb-2 flex flex-1 gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl"
+            >
+              <dt class="tracking-wider font-extralight">Win Rate</dt>
+              <dd class="text-4xl font-semibold">69%</dd>
+            </div>
+            <div
+              class="mb-2 flex flex-1 gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl"
+            >
+              <dt class="tracking-wider font-extralight">Win Streak</dt>
+              <dd class="text-4xl font-semibold">2</dd>
+            </div>
           </div>
-        </div>
-        <div class="flex justify-between gap-2">
-          <div
-            class="mb-2 flex flex-1 gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl"
-          >
-            <dt class="tracking-wider font-extralight">Win Rate</dt>
-            <dd class="text-4xl font-semibold">69%</dd>
+          <div class="flex justify-between gap-2">
+            <div
+              class="mb-2 flex flex-1 gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl"
+            >
+              <dt class="tracking-wider font-extralight">LP Gain</dt>
+              <dd class="text-4xl font-semibold">+125</dd>
+            </div>
+            <div
+              class="mb-2 flex flex-1 gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl"
+            >
+              <dt class="tracking-wider font-extralight">MR Gain</dt>
+              <dd class="text-4xl font-semibold">+12</dd>
+            </div>
           </div>
-          <div
-            class="mb-2 flex flex-1 gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl"
-          >
-            <dt class="tracking-wider font-extralight">Win Streak</dt>
-            <dd class="text-4xl font-semibold">2</dd>
-          </div>
-        </div>
-        <div class="flex justify-between gap-2">
-          <div
-            class="mb-2 flex flex-1 gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl"
-          >
-            <dt class="tracking-wider font-extralight">LP Gain</dt>
-            <dd class="text-4xl font-semibold">+125</dd>
-          </div>
-          <div
-            class="mb-2 flex flex-1 gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl"
-          >
-            <dt class="tracking-wider font-extralight">MR Gain</dt>
-            <dd class="text-4xl font-semibold">+12</dd>
-          </div>
-        </div>
-      </dl>
-    </MockTracker>
+        </dl>
+      </MockTracker>
+    </div>
   </section>
 
   <section class="flex flex-wrap items-center justify-around">
     <header class="mb-8 max-w-[700px] w-full">
-      <h2 class="font-bold text-4xl">Statistics</h2>
+      <h2 class="font-bold text-3xl md:text-5xl">
+        <Icon
+          name="ion:document-text"
+          class="inline text-[#f85961] w-12 h-12 mr-1"
+        />
+        Statistics
+      </h2>
       <p class="text-lg mt-8">
         Matches are stored so you can keep track of your progress from session
         to session. <br /> You own your match logs, not Capcom.
       </p>
     </header>
-    <MockTracker title="Match Log" page="log">
-      <table class="mx-6 mt-2 border-spacing-y-1 border-separate">
-        <thead>
-          <tr>
-            <th class="text-left px-3 whitespace-nowrap w-[120px]"> Date</th>
-            <th class="text-left px-3 whitespace-nowrap w-[70px]"> Time</th>
-            <th class="text-left px-3 whitespace-nowrap w-[180px]">
-              Opponent
-            </th>
-            <th class="text-left px-3 whitespace-nowrap"> League</th>
-            <th class="text-center px-3 whitespace-nowrap"> Character</th>
-            <th class="text-center px-3 whitespace-nowrap"> Result</th>
-          </tr>
-        </thead>
-        <tbody>
-          {
-            matches.map((log) => (
-              <tr class="backdrop-blur group">
-                <td class="whitespace-nowrap text-left rounded-l-xl rounded-r-none bg-slate-50 bg-opacity-5 group-hover:bg-opacity-10 transition-colors px-3 py-2  ">
-                  {log.date}
-                </td>
-                <td class="whitespace-nowrap text-left bg-slate-50 bg-opacity-5 group-hover:bg-opacity-10 transition-colors px-3 py-2">
-                  {log.time}
-                </td>
-                <td class="whitespace-nowrap rounded-none bg-slate-50 bg-opacity-5 group-hover:bg-opacity-10 transition-colors px-3 py-2  ">
-                  {log.opponent}
-                </td>
-                <td class="whitespace-nowrap rounded-none bg-slate-50 bg-opacity-5 group-hover:bg-opacity-10 transition-colors px-3 py-2  ">
-                  {log.opponentLeague}
-                </td>
-                <td class="rounded-none bg-slate-50 bg-opacity-5 group-hover:bg-opacity-10 transition-colors px-3 py-2 text-center  ">
-                  {log.opponentCharacter}
-                </td>
-                <td
-                  class="rounded-r-xl rounded-l-none bg-slate-50 bg-opacity-5 group-hover:bg-opacity-10 transition-colors px-3 py-2 text-center"
-                  style={{ color: log.victory == true ? "lime" : "red" }}
-                >
-                  {log.victory == true ? "W" : "L"}
-                </td>
-              </tr>
-            ))
-          }
-        </tbody>
-      </table>
-    </MockTracker>
+    <div class="tracker-container w-full md:w-auto overflow-auto md:overflow-visible">
+      <MockTracker title="Match Log" page="log">
+        <table class="mx-6 mt-2 border-spacing-y-1 border-separate">
+          <thead>
+            <tr>
+              <th class="text-left px-3 whitespace-nowrap w-[120px]"> Date</th>
+              <th class="text-left px-3 whitespace-nowrap w-[70px]"> Time</th>
+              <th class="text-left px-3 whitespace-nowrap w-[180px]">
+                Opponent
+              </th>
+              <th class="text-left px-3 whitespace-nowrap"> League</th>
+              <th class="text-center px-3 whitespace-nowrap"> Character</th>
+              <th class="text-center px-3 whitespace-nowrap"> Result</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              matches.map((log) => (
+                <tr class="backdrop-blur group">
+                  <td class="whitespace-nowrap text-left rounded-l-xl rounded-r-none bg-slate-50 bg-opacity-5 group-hover:bg-opacity-10 transition-colors px-3 py-2  ">
+                    {log.date}
+                  </td>
+                  <td class="whitespace-nowrap text-left bg-slate-50 bg-opacity-5 group-hover:bg-opacity-10 transition-colors px-3 py-2">
+                    {log.time}
+                  </td>
+                  <td class="whitespace-nowrap rounded-none bg-slate-50 bg-opacity-5 group-hover:bg-opacity-10 transition-colors px-3 py-2  ">
+                    {log.opponent}
+                  </td>
+                  <td class="whitespace-nowrap rounded-none bg-slate-50 bg-opacity-5 group-hover:bg-opacity-10 transition-colors px-3 py-2  ">
+                    {log.opponentLeague}
+                  </td>
+                  <td class="rounded-none bg-slate-50 bg-opacity-5 group-hover:bg-opacity-10 transition-colors px-3 py-2 text-center  ">
+                    {log.opponentCharacter}
+                  </td>
+                  <td
+                    class="rounded-r-xl rounded-l-none bg-slate-50 bg-opacity-5 group-hover:bg-opacity-10 transition-colors px-3 py-2 text-center"
+                    style={{ color: log.victory == true ? "lime" : "red" }}
+                  >
+                    {log.victory == true ? "W" : "L"}
+                  </td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </MockTracker>
+    </div>
   </section>
 
   <section class="flex flex-wrap items-center justify-around">
     <header class="mb-8 max-w-[700px] w-full">
-      <h2 class="font-bold text-4xl">Made for streamers</h2>
+      <h2 class="font-bold text-3xl md:text-5xl">
+        <Icon
+          name="clarity:sign-out-solid"
+          class="inline text-[#f85961] w-12 h-12 mr-1"
+        />
+        Made for streamers
+      </h2>
       <p class="text-lg mt-8">
         Display your stats in OBS, choose from multiple themes or create your
         own with CSS!
@@ -221,3 +248,34 @@ const matches = [
     /> -->
   </section>
 </section>
+
+<style lang="sass">
+  
+  #features>*:nth-child(even)
+    .tracker-container::after
+      --dot-color: #ff938e
+      left: -28px
+
+  #features>*:nth-child(odd)
+    .tracker-container::after
+      --dot-color: #43EE46
+      left: 28px
+
+  .tracker-container
+    display: grid
+    align-items: flex-end
+    position: relative
+
+  .tracker-container::after
+    content: ''
+    background: radial-gradient(var(--dot-color) 1px,transparent 1px)
+    background-size: auto
+    background-size: 10px 10px
+    display: block
+    height: 100%
+    position: absolute
+    width: 100%
+    top: 28px
+    z-index: -1
+    border-radius: 24px
+</style>
