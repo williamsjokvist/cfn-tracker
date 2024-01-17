@@ -9,6 +9,8 @@ const NavItems = [
     icon: Astro.url.pathname.includes("guide")
       ? "akar-icons:info-fill"
       : "akar-icons:info",
+    bold: Astro.url.pathname.includes("guide"),
+    color: "#fe3958",
   },
   {
     href: "/faq",
@@ -16,6 +18,8 @@ const NavItems = [
     icon: Astro.url.pathname.includes("faq")
       ? "mdi:chat-bubble"
       : "mdi:chat-bubble-outline",
+    bold: Astro.url.pathname.includes("faq"),
+    color: "#e92bb6",
   },
   {
     href: "/changelog",
@@ -23,43 +27,59 @@ const NavItems = [
     icon: Astro.url.pathname.includes("changelog")
       ? "mdi:scroll"
       : "mdi:scroll-outline",
+    bold: Astro.url.pathname.includes("changelog"),
+    color: "#8afb3d",
   },
 ];
 ---
 
 <header
-  class="bg-[#310a65] sm:bg-transparent sticky top-0 sm:top-4 flex justify-between mx-auto w-full z-50 p-1 pr-6"
+  class="bg-[#310a65] sm:bg-transparent sticky top-0 sm:top-4 flex justify-between mx-auto w-full z-50 p-1 px-4 sm:px-8"
 >
-  <nav class="flex items-center lowercase gap-6 md:gap-12 font-bold">
+  <nav class="flex items-center lowercase gap-2 sm:gap-6 md:gap-10">
     <a href="/">
       <img
         src="https://raw.githubusercontent.com/williamsjokvist/cfn-tracker/master/build/appicon.png"
-        class="w-12 sm:w-14 md:ml-8"
+        class="w-12 sm:w-14"
         alt="CFN Tracker logo"
       />
     </a>
-    {
-      NavItems.map((item) => (
-        <a
-          href={item.href}
-          class="flex flex-col items-center text-lg"
-        >
-          <Icon name={item.icon} width="24" class="sm:hidden" />
-          <span class="hidden sm:block bg-[#310a65] rounded-3xl px-3">{item.name}</span>
-        </a>
-      ))
-    }
+    <ul
+      class="flex items-center justify-around w-full md:gap-10 text-lg font-semibold text-gray-800 dark:text-gray-300"
+    >
+      {
+        NavItems.map(({ href, icon, name, bold, color }) => (
+          <li class="hover:text-gray-600 dark:hover:text-white">
+            <a
+              href={href}
+              class={`grid bg-[#310a65] hover:bg-[#601099] transition-colors rounded-md md:rounded-2xl py-1 px-3 sm:flex items-center sm:gap-2 text-lg ${
+                bold ? "text-bold" : "font-normal"
+              }`}
+            >
+              <Icon
+                name={icon}
+                width="24"
+                class="justify-self-center"
+                style={{ color }}
+              />
+              <span class="">
+                {name}
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
   </nav>
 
-  <div class="flex items-center gap-3 md:gap-6 md:mr-8">
+  <div class="flex items-center gap-1 sm:gap-3 md:gap-6">
     <WithTooltip label="Twitter">
       <a
-        class="flex gap-4 bg-[rgba(115,115,115,.125)] p-3 rounded-full"
+        class="flex gap-4 bg-[#310a65] hover:bg-[#601099] transition-colors p-3 rounded-full"
         href="https://twitter.com/greensoap_"
         target="_blank"
         aria-label="Twitter / X"
       >
-        <!-- not working: <Icon name="simple-icons:x" class="w-8 h-8 ml-4" /> -->
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="20"
@@ -76,7 +96,7 @@ const NavItems = [
 
     <WithTooltip label="Source">
       <a
-        class="flex gap-4 bg-[rgba(115,115,115,.125)] p-3 rounded-full"
+        class="flex gap-4 bg-[#310a65] hover:bg-[#601099] transition-colors p-[.625rem] md:p-3 rounded-full"
         href="https://github.com/williamsjokvist/cfn-tracker/"
         aria-label="Source"
         target="_blank"
