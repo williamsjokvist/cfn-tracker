@@ -1,9 +1,9 @@
 ---
 import Icon from "astro-icon";
-const { title, page, spin, className } = Astro.props
+const { title, page, spin, className, ...props } = Astro.props
 ---
 
-<section class={`tracker ` + (className ?? "")}>
+<section class={`tracker ` + (className ?? "")} {...props} >
   <div class="sidebar">
     <header>
       <div class="flex justify-start">

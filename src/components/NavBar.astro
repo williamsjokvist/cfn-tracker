@@ -33,6 +33,29 @@ const NavItems = [
 ];
 ---
 
+<script>
+  import { gsap, Power3 } from "../lib/gsap";
+
+  document.addEventListener("astro:page-load", () => {
+
+    const opts = {
+      autoAlpha: 0,
+      translateY: -20,
+      duration: 2.75,
+      ease: Power3.easeOut,
+      stagger: .75
+    }
+
+    gsap.from("#nav-item-container > *", opts)
+
+    gsap.from("#socials-container > *", {
+      ...opts,
+      delay: 2
+    });
+
+  }, { once: true })
+</script>
+
 <header
   class="bg-[#310a65] sm:bg-transparent sticky top-0 sm:top-4 flex justify-between mx-auto w-full z-50 p-1 px-4 sm:px-8"
 >
@@ -45,6 +68,7 @@ const NavItems = [
       />
     </a>
     <ul
+      id="nav-item-container"
       class="flex items-center justify-around w-full md:gap-10 text-lg font-semibold text-gray-800 dark:text-gray-300"
     >
       {
@@ -72,7 +96,7 @@ const NavItems = [
     </ul>
   </nav>
 
-  <div class="flex items-center gap-1 sm:gap-3 md:gap-6">
+  <div id="socials-container" class="flex items-center gap-1 sm:gap-3 md:gap-6">
     <WithTooltip label="Twitter">
       <a
         class="flex gap-4 bg-[#310a65] hover:bg-[#601099] transition-colors p-3 rounded-full"

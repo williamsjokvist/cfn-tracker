@@ -7,6 +7,27 @@ import Features from "../components/Features.astro";
 import DownloadButton from "../components/DownloadButton.astro";
 ---
 
+<script>
+  import { gsap, Power3 } from "../lib/gsap";
+
+  document.addEventListener("astro:page-load", () => {
+    gsap.from("#tracker-container", {
+      autoAlpha: 0,
+      top: 80,
+      duration: 2.75,
+      ease: Power3.easeOut,
+    });
+
+    gsap.from("#download-container > *", {
+      autoAlpha: 0,
+      translateY: -20,
+      duration: .75,
+      ease: Power3.easeOut,
+      stagger: .75,
+    });
+  })
+</script>
+
 <Layout title="CFN Tracker">
   <section
     class="flex-wrap gap-8 px-8 intro relative pt-44 pb-36 -mt-20 min-h-screen flex items-center justify-around"
@@ -24,8 +45,8 @@ import DownloadButton from "../components/DownloadButton.astro";
       </h1>
     </header>
 
-    <div class="overflow-y-hidden overflow-x-scroll md:overflow-x-hidden w-full md:w-auto">
-      <MockTracker title="Tracking" page="track" spin className="shadow-[0px_2px_18px_rgba(0,0,0,.25)]">
+    <div id="tracker-container" class="overflow-y-hidden overflow-x-scroll md:overflow-x-hidden w-full md:w-auto">
+      <MockTracker  title="Tracking" page="track" spin className="shadow-[0px_2px_18px_rgba(0,0,0,.25)]">
         <dl
           class="flex whitespace-nowrap items-center justify-between w-full pt-3 px-6"
         >
@@ -91,7 +112,7 @@ import DownloadButton from "../components/DownloadButton.astro";
         </dl>
       </MockTracker>
     </div>
-    <div class="w-full flex flex-wrap justify-center gap-8">
+    <div id="download-container" class="w-full flex flex-wrap justify-center gap-8">
       <DownloadButton transition:persist />
     </div>
     <World />
