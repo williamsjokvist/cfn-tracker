@@ -1,42 +1,6 @@
 ---
 ---
 
-<script>
-  const fetchDownloadCount = async () => {
-    const res = await fetch(
-      `https://api.github.com/repos/williamsjokvist/cfn-tracker/releases`,
-      {
-        method: `GET`,
-      }
-    );
-
-    if (res.status == 200) {
-      const releases = await res.json();
-
-      let downloadCount = 0;
-      for (const release of releases) {
-        for (const asset of release.assets) {
-          downloadCount += asset.download_count;
-        }
-      }
-      return downloadCount;
-    } else if (res.status == 404) {
-      return 0;
-    }
-  };
-
-  const assignDownloadCount = async () => {
-    const download_count = await fetchDownloadCount();
-    const cfnTrackerEl = document.getElementById(`cfn-tracker-download-count`);
-    cfnTrackerEl.innerText = download_count.toString();
-  }
-
-  document.addEventListener("astro:page-load", assignDownloadCount);
-</script>
-
 <footer class="pb-80 pt-48 text-2xl lowercase flex justify-center">
-  <div class="border-solid border-[#2d29b9] border-4 text-center p-8 rounded-3xl">
-    <p class="text-2xl">CFN Tracker // <a href="https://www.williamsjokvist.se/" target="_blank" class="text-gradient font-bold">William</a></p>
-    <p class="text-xl mt-2"><b id="cfn-tracker-download-count" class="font-extrabold text-[#ff53d9]"></b> downloads</p>
-  </div>
+  <p class="text-2xl"><b class="font-extrabold text-[#ff53d9]">CFN</b> Tracker // <a href="https://www.williamsjokvist.se/" target="_blank" class="text-gradient">William</a></p>
 </footer>

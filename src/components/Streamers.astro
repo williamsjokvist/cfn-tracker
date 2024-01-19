@@ -2,6 +2,7 @@
 import osl from "../../public/streamer-icons/osl.png"
 import sheldon from "../../public/streamer-icons/sheldon.png"
 import espadah from "../../public/streamer-icons/espadah.png"
+import crash_sight from "../../public/streamer-icons/crash_sight.jpg"
 
 import WithTooltip from "./WithTooltip.astro";
 
@@ -13,12 +14,18 @@ const streamers = [{
   url: "https://twitch.tv/sheldontwitching",
   img: sheldon.src,
   name: "SheldonTwitching"
-},
+},/*
 {
   url: "https://twitch.tv/Espadah",
   img: espadah.src,
   name: "Espadah"
+},*/
+{
+  url: "https://www.twitch.tv/crash_sight",
+  img: crash_sight.src,
+  name: "くらっしゅ"
 }]
+
 ---
 
 <script>
@@ -61,7 +68,7 @@ const streamers = [{
     {
       streamers.map(s => (
         <WithTooltip label={s.name}>
-          <a href={s.url}>
+          <a href={s.url} target="_blank">
             <img src={s.img} width="60px" height="60px" class="rounded-full" />
           </a>  
         </WithTooltip>
