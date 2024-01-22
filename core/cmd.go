@@ -4,9 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"os/exec"
 	"runtime"
 	"strings"
@@ -21,6 +21,7 @@ import (
 	"github.com/williamsjokvist/cfn-tracker/core/i18n"
 	"github.com/williamsjokvist/cfn-tracker/core/i18n/locales"
 	"github.com/williamsjokvist/cfn-tracker/core/model"
+	"github.com/williamsjokvist/cfn-tracker/core/server"
 	"github.com/williamsjokvist/cfn-tracker/core/tracker"
 )
 
@@ -142,22 +143,37 @@ func (ch *CommandHandler) GetUsers() ([]*model.User, error) {
 	return users, err
 }
 
-func (ch *CommandHandler) GetCustomThemeList() ([]string, error) {
-	files, err := ioutil.ReadDir(`themes`)
+func (ch *CommandHandler) GetThemes() ([]model.Theme, error) {
+	// get internal themes
+	internalThemes := server.GetInternalThemes()
+
+	// get custom themes
+	files, err := os.ReadDir(`themes`)
 	if err != nil {
-		log.Println(err)
-		return nil, errorsx.NewFormattedError(http.StatusNotFound, errors.New("failed to read themes directory"))
+		return internalThemes, nil
 	}
-	themes := make([]string, 0, len(files))
+	customThemes := make([]model.Theme, 0, len(files))
 	for _, file := range files {
 		fileName := file.Name()
+
 		if !strings.Contains(fileName, `.css`) {
 			continue
 		}
-		theme := strings.Split(fileName, `.css`)[0]
-		themes = append(themes, theme)
+		css, err := os.ReadFile(fmt.Sprintf(`themes/%s`, fileName))
+		if err != nil {
+			log.Println(err)
+			return nil, errorsx.NewFormattedError(http.StatusInternalServerError, errors.New("failed to read theme css"))
+		}
+		name := strings.Split(fileName, `.css`)[0]
+
+		customThemes = append(customThemes, model.Theme{
+			Name: name,
+			CSS:  string(css),
+		})
 	}
-	return themes, nil
+
+	combinedThemes := append(customThemes, internalThemes...)
+	return combinedThemes, nil
 }
 
 func (ch *CommandHandler) SelectGame(game string) error {

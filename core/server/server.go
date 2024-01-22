@@ -33,6 +33,31 @@ var nordCss []byte
 //go:embed static/themes/pills.css
 var pillsCss []byte
 
+func GetInternalThemes() []model.Theme {
+	return []model.Theme{
+		{
+			Name: "default",
+			CSS:  string(defaultCss),
+		},
+		{
+			Name: "jaeger",
+			CSS:  string(jaegerCss),
+		},
+		{
+			Name: "nord",
+			CSS:  string(nordCss),
+		},
+		{
+			Name: "pills",
+			CSS:  string(pillsCss),
+		},
+		{
+			Name: "blades",
+			CSS:  string(bladesCss),
+		},
+	}
+}
+
 func Start(ctx context.Context, cfg *config.Config) error {
 	log.Println(`Starting browser source server`)
 
