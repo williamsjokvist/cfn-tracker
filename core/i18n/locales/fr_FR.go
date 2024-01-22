@@ -43,7 +43,7 @@ var FR_FR = Localization{
 	PickTheme:                "Choisir un thème",
 	CopyBrowserSourceLink:    "Copier le lien",
 	BrowserSourceDescription: "Le moyen le plus simple d'afficher les statistiques dans OBS est d'utiliser <1>Source du navigateur</1>. Après avoir modifié les options, copiez l'URL",
-	UsingBrowserSource:       "Pick a theme to display in the browser source",
+	UsingBrowserSource:       "Choisissez un thème à afficher dans la source du navigateur",
 	DisplayStats:             "Choisissez des valeurs",
 	ImportFiles:              "Importer des fichiers",
 	OBSCustomize:             "Si vous souhaitez personnaliser via OBS, vous pouvez utiliser des <1>Étiquettes de texte</1> et ajouter les fichiers texte dans le dossier de résultats en tant que sources.",
