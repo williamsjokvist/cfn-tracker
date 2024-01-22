@@ -2,6 +2,8 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import { Icon } from "@iconify/react";
 
+import { useErrorMessage } from "@/main/app-layout/error-message";
+
 import * as Dialog from "@/ui/dialog";
 import { Checkbox } from "@/ui/checkbox";
 import { ActionButton } from "@/ui/action-button";
@@ -18,9 +20,10 @@ export const ThemeDialog: React.FC<ThemeDialogProps> = ({ selectedTheme, onSelec
   const containerRef = React.useRef<HTMLDivElement>(null)
   const [themes, setThemes] = React.useState<model.Theme[]>([])
   const [isOpen, setOpen] = React.useState(false)
+  const setError = useErrorMessage()
 
   React.useEffect(() => {
-    GetThemes().then(setThemes).catch(console.error)
+    GetThemes().then(setThemes).catch(setError)
   }, [])
 
   React.useEffect(() => {
