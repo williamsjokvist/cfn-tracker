@@ -4,16 +4,12 @@ body {
   background: #2e3440;
 }
 
-stat-list {
+.stat-list {
   max-width: 690px;
   font-family: "Cherry Bomb One", Helvetica, cursive;
-
-  --stat-title-color: #63c2e8;
-  --stat-value-color: #fff;
-  --stat-bg-color: transparent;
 }
 
-stat-list::part(list-item) {
+.stat-item {
   display: flex;
   justify-content: space-between;
   font-size: 2rem;
@@ -24,18 +20,20 @@ stat-list::part(list-item) {
   border-radius: 25px;
 }
 
-stat-list::part(list-title),
-stat-list::part(list-value) {
+.stat-title,
+.stat-value {
   padding: 15px 25px;
   width: 100%;
 }
 
-stat-list::part(list-title) {
+.stat-title {
+  color: #63c2e8;
   background: #42404d;
   text-align: right;
 }
 
-stat-list::part(list-value) {
+.stat-value {
+  color: white;
   background: #2e242e;
   text-align: left;
 }

@@ -4,7 +4,7 @@ body {
   background: black;
 }
 
-stat-list {
+.stat-list {
   display: block;
   max-width: 500px;
 
@@ -17,7 +17,7 @@ stat-list {
   --stat-bg-color: transparent;
 }
 
-stat-list::part(list-item) {
+.stat-item {
   display: flex;
   line-height: 18px;
   white-space: nowrap;
@@ -33,20 +33,21 @@ stat-list::part(list-item) {
   );
 }
 
-stat-list::part(list-title),
-stat-list::part(list-value) {
+.stat-title, .stat-value {
   padding: 15px 25px;
   max-width: 250px;
   width: 100%;
 }
 
-stat-list::part(list-title) {
+.stat-title {
+  color: #ff47a3;
   font-family: "Pirata One", Helvetica, cursive;
   text-transform: uppercase;
   background: rgba(0, 0, 0, 0.25);
 }
 
-stat-list::part(list-value) {
+.stat-value {
+  color: white;
   font-family: "Nova Cut", Helvetica, cursive;
   font-size: 26px;
 }

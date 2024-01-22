@@ -5,7 +5,7 @@ body {
 }
 
 /* Stat list container */
-stat-list {
+.stat-list {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
@@ -13,25 +13,24 @@ stat-list {
 
   font-family: "Caesar Dressing", "Trebuchet MS"; /* Any font installed on the system works */
   font-size: 2rem;
-
-  --stat-title-color: #eceff4; /* Stat title color */
-  --stat-value-color: #88c0d0; /* Stat value color */
-  --stat-bg-color: #4c566a; /* Stat box background color */
 }
 
 /* Stat box container */
-stat-list::part(list-item) {
+.stat-item {
   display: flex;
   justify-content: space-between;
   gap: 12px;
   padding: 0.75rem;
   white-space: nowrap;
+  background: #4c566a;
 }
 
 /* Stat title (Wins, Losses, Win Rate, LP Gain etc.) */
-stat-list::part(list-title) {
+.stat-title {
+  color: #eceff4;
 }
 
 /* Stat value */
-stat-list::part(list-value) {
+.stat-value {
+  color: #88c0d0;
 }
