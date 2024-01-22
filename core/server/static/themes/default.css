@@ -10,7 +10,7 @@ body {
 }
 
 /* Stat list container */
-stat-list {
+.stat-list {
   display: grid;
   gap: 8px;
   max-width: 400px;
@@ -18,33 +18,29 @@ stat-list {
 
   font-family: "League Spartan", Verdana, sans-serif;
   white-space: nowrap;
-
-  --stat-title-color: rgb(255, 255, 255);
-  --stat-value-color: rgb(255, 255, 255);
-  --stat-bg-color: rgb(248 250 252 / 0.05);
 }
 
 /* Stat container */
-stat-list::part(list-item) {
+.stat-item {
   display: flex;
   justify-content: space-between;
-  background: var(--stat-bg-color);
+  background: rgb(248 250 252 / 0.05);
   padding: 0.75rem;
   padding-bottom: 0.25rem;
   border-radius: 0.75rem;
 }
 
 /* Stat title (Wins, Losses, Win Rate, LP Gain etc.) */
-stat-list::part(list-title) {
-  color: var(--stat-title-color);
+.stat-title {
+  color: white;
   font-weight: 200;
   letter-spacing: 0.05em;
   font-size: 24px;
 }
 
 /* Stat value */
-stat-list::part(list-value) {
-  color: var(--stat-value-color);
+.stat-value {
+  color: white;
   font-weight: 600;
   font-size: 2.5rem;
   line-height: 2.5rem;

@@ -18,9 +18,6 @@ import (
 //go:embed static/index.html
 var page []byte
 
-//go:embed static/index.js
-var js []byte
-
 //go:embed static/themes/default.css
 var defaultCss []byte
 
@@ -57,12 +54,6 @@ func Start(ctx context.Context, cfg *config.Config) error {
 		w.Header().Set(`Content-Type`, `text/html`)
 		w.WriteHeader(http.StatusOK)
 		w.Write(page)
-	})
-
-	http.HandleFunc("/index.js", func(w http.ResponseWriter, _ *http.Request) {
-		w.Header().Set(`Content-Type`, `text/javascript`)
-		w.WriteHeader(http.StatusOK)
-		w.Write(js)
 	})
 
 	http.HandleFunc("/default.css", func(w http.ResponseWriter, _ *http.Request) {

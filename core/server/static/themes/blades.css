@@ -4,16 +4,12 @@ body {
   background: #1e283c;
 }
 
-stat-list {
+.stat-list {
   font-family: "Bebas Neue", Helvetica;
   font-size: 2rem;
-
-  --stat-title-color: #66e6ff;
-  --stat-value-color: #fff;
-  --stat-bg-color: transparent;
 }
 
-stat-list::part(list-item) {
+.stat-item {
   display: flex;
   justify-content: space-between;
   line-height: 18px;
@@ -22,18 +18,20 @@ stat-list::part(list-item) {
   clip-path: polygon(5% 5%, 100% 0%, 95% 95%, 0% 100%);
 }
 
-stat-list::part(list-title),
-stat-list::part(list-value) {
+.stat-title, .stat-value {
   padding: 20px 25px;
   width: 100%;
 }
 
-stat-list::part(list-title) {
+.stat-title {
+  color: #66e6ff;
   background: #25394b;
   text-align: right;
 }
 
-stat-list::part(list-value) {
+.stat-value {
+  color: #fff;
   background: #161e2d;
+  text-transform: capitalize;
   text-align: left;
 }
