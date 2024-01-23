@@ -7,7 +7,7 @@
     <style>
       * { margin: 0 }
     </style>
-    <link id="theme-css" href="/default.css" rel="stylesheet" />
+    <link id="theme-css" href="/themes/default.css" rel="stylesheet" />
     <script defer>
       const statDictionaryEN = {
         "cfn": "CFN",
@@ -60,7 +60,7 @@
 
         // apply theme
         const cssEl = document.getElementById("theme-css")
-        cssEl.setAttribute("href", `/${searchParams.get("theme") ?? "default"}.css`)
+        cssEl.setAttribute("href", `/themes/${searchParams.get("theme") ?? "default"}.css`)
 
         // create elements for stats
         const statContainer = document.getElementsByClassName("stat-list")[0]
