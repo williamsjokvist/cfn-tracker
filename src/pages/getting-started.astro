@@ -1,11 +1,11 @@
 ---
-import { Content } from '../content/guide.mdx';
+import { Content } from '../content/gettingstarted.mdx';
 import Layout from '../layouts/Layout.astro';
 ---
 <script>
   import { gsap, Power3 } from "../lib/gsap";
   document.addEventListener("astro:page-load", () => {
-    gsap.from("#guide > *", {
+    gsap.from("#getting-started > *", {
       autoAlpha: 0,
       translateY: 20,
       duration: .75,
@@ -15,8 +15,8 @@ import Layout from '../layouts/Layout.astro';
   })
 </script>
 
-<Layout title="CFN Tracker - Guide">
-  <div id="guide" class="prose lg:prose-lg prose-invert mx-auto px-4 mt-20">
+<Layout title="CFN Tracker - Getting Started">
+  <div id="getting-started" class="prose lg:prose-lg prose-invert mx-auto px-4 mt-20">
     <Content />
   </div>
 </Layout>
