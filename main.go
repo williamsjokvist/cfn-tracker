@@ -92,7 +92,6 @@ func init() {
 func main() {
 	defer func() {
 		if logFile != nil {
-			log.Printf("closing log file")
 			logFile.Close()
 		}
 	}()
