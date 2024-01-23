@@ -51,15 +51,16 @@ var errorTmpl []byte
 var icon []byte
 
 var cfg config.Config
+var logFile *os.File
 
 func logToFile() {
-	logFile, err := os.OpenFile(`cfn-tracker.log`, os.O_APPEND|os.O_RDWR|os.O_CREATE, 0644)
+	file, err := os.OpenFile(`cfn-tracker.log`, os.O_APPEND|os.O_RDWR|os.O_CREATE, 0644)
 	if err != nil {
 		log.Panic(err)
 	}
-	defer logFile.Close()
 
-	log.SetOutput(logFile)
+	logFile = file
+	log.SetOutput(file)
 	log.SetFlags(log.Ldate | log.LstdFlags | log.Lshortfile)
 }
 
@@ -67,6 +68,7 @@ func init() {
 	if isProduction == `true` {
 		logToFile()
 	}
+
 	err := godotenv.Load(`.env`)
 	if err != nil {
 		log.Println(fmt.Errorf(`missing .env file: %w`, err))
@@ -88,6 +90,13 @@ func init() {
 }
 
 func main() {
+	defer func() {
+		if logFile != nil {
+			log.Printf("closing log file")
+			logFile.Close()
+		}
+	}()
+
 	var appBrowser *browser.Browser
 	closeWithError := func(err error) {
 		if appBrowser != nil {
