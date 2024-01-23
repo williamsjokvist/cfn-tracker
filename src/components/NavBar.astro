@@ -4,12 +4,12 @@ import Icon from "astro-icon";
 
 const NavItems = [
   {
-    href: "/guide",
-    name: "Guide",
-    icon: Astro.url.pathname.includes("guide")
+    href: "/getting-started",
+    name: "Getting Started",
+    icon: Astro.url.pathname.includes("getting-started")
       ? "akar-icons:info-fill"
       : "akar-icons:info",
-    bold: Astro.url.pathname.includes("guide"),
+    bold: Astro.url.pathname.includes("getting-started"),
     color: "#fe3958",
   },
   {
@@ -20,6 +20,15 @@ const NavItems = [
       : "mdi:chat-bubble-outline",
     bold: Astro.url.pathname.includes("faq"),
     color: "#e92bb6",
+  },
+  {
+    href: "/theme-guide",
+    name: "Theme Guide",
+    icon: Astro.url.pathname.includes("theme-guide")
+      ? "fluent:paint-brush-16-filled"
+      : "fluent:paint-brush-16-regular",
+    bold: Astro.url.pathname.includes("theme-guide"),
+    color: "#fbb03d",
   },
   {
     href: "/changelog",
@@ -57,9 +66,9 @@ const NavItems = [
 </script>
 
 <header
-  class="bg-[#310a65] sm:bg-transparent sticky top-0 sm:top-4 flex justify-between mx-auto w-full z-50 p-1 px-4 sm:px-8"
+  class="bg-[#310a65] sm:bg-transparent sticky top-0 sm:top-4 flex justify-between mx-auto w-full z-50 p-1 px-4 lg:px-8"
 >
-  <nav class="flex items-center lowercase gap-2 sm:gap-6 md:gap-10">
+  <nav class="flex items-center lowercase gap-2 lg:gap-6 xl:gap-10">
     <a href="/">
       <img
         src="https://raw.githubusercontent.com/williamsjokvist/cfn-tracker/master/build/appicon.png"
@@ -69,14 +78,14 @@ const NavItems = [
     </a>
     <ul
       id="nav-item-container"
-      class="flex items-center justify-around w-full md:gap-10 text-lg font-semibold text-gray-800 dark:text-gray-300"
+      class="flex items-start justify-around w-full lg:gap-10 text-sm sm:text-xs md:text-lg font-semibold text-gray-800 dark:text-gray-300"
     >
       {
         NavItems.map(({ href, icon, name, bold, color }) => (
           <li class="hover:text-gray-600 dark:hover:text-white">
             <a
               href={href}
-              class={`grid bg-[#310a65] hover:bg-[#601099] transition-colors rounded-md md:rounded-2xl py-1 px-3 sm:flex items-center sm:gap-2 text-lg ${
+              class={`text-center flex flex-col sm:flex-row  bg-[#310a65] hover:bg-[#601099] transition-colors rounded-md lg:rounded-2xl py-1 px-3 items-center justify-between sm:gap-2 ${
                 bold ? "text-bold" : "font-normal"
               }`}
             >
@@ -96,7 +105,7 @@ const NavItems = [
     </ul>
   </nav>
 
-  <div id="socials-container" class="flex items-center gap-1 sm:gap-3 md:gap-6">
+  <div id="socials-container" class="flex right-0 top-full absolute sm:relative mt-2 mr-2 sm:mt-0 sm:mr-0 items-center gap-1 sm:gap-1 md:gap-2 lg:gap-6">
     <WithTooltip label="Twitter">
       <a
         class="flex gap-4 bg-[#310a65] hover:bg-[#601099] transition-colors p-3 rounded-full"

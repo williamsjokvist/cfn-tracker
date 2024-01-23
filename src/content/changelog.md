@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.1.0](https://github.com/williamsjokvist/cfn-tracker/tree/v4.1.0)
+
+### Fixed
+- Browser source now instantly renders stats instead of waiting until a match has been played
+- Fixed issue where custom themes weren't being applied
+- Improved theme selection in output settings
+- Adjusted theme CSS structure
+
 ## [4.0.1](https://github.com/williamsjokvist/cfn-tracker/tree/v4.0.1)
 
 ### Fixed

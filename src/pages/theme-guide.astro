@@ -1,0 +1,78 @@
+---
+import { Content } from "../content/theme-guide.mdx";
+import Layout from "../layouts/Layout.astro";
+---
+
+<script>
+  import { gsap, Power3 } from "../lib/gsap";
+  document.addEventListener("astro:page-load", () => {
+    gsap.from("#theme-guide > *", {
+      autoAlpha: 0,
+      translateY: 20,
+      duration: 0.75,
+      ease: Power3.easeInOut,
+      stagger: 0.125,
+    });
+  });
+</script>
+
+<Layout title="CFN Tracker - Theme Guide">
+  <div id="theme-guide" class="mx-auto px-4 mt-20 max-w-3xl">
+    <div class="prose lg:prose-lg prose-invert">
+      <h1>Theme Guide</h1>
+      <h2>Creating a Browser Source theme</h2>
+      <p>
+        <b>Requirements:</b> Basic CSS
+        <br><br>
+        Create a <i>themes</i> folder in the same directory as the app. CSS files in the <i>themes</i> folder are read from the app and can be selected in the output settings.
+      </p>
+      <h2>Structure</h2>
+    </div>
+
+    <div class="text-lg my-14 max-w-lg mx-auto w-full">
+      <b>.stat-list</b>
+      <div class="border-2 border-green-400 p-6">
+        <b>.stat-item</b>
+        <div class="border-2 border-red-400 p-4">
+          <div
+            class="mb-2 flex gap-4 justify-between bg-slate-50 bg-opacity-20 p-3 pb-1 rounded-xl"
+          >
+            <div class="relative">
+              <b class="absolute -top-6 whitespace-nowrap">.stat-title</b>
+              <div class="block border-2 border-blue-400 ">
+                <span class="tracking-wider font-extralight">Wins</span>
+              </div>
+            </div>
+            <div class="relative">
+              <b class="absolute -top-6 right-0 whitespace-nowrap">.stat-value</b>
+              <div class="block border-2 border-pink-400 ">
+                <span class="relative -top-2 text-4xl font-semibold">4</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="prose lg:prose-lg prose-invert">
+      <ul>
+        <li>
+          <b>.stat-list</b> - the container for all of the stats
+        </li>
+        <li><b>.stat-item</b> - container for each individual stat</li>
+        <li><b>.stat-title</b> - the text that says "Wins", "Losses", Win Rate", "LP Gain" etc</li>
+        <li><b>.stat-value</b> - the value of the stat</li>
+      </ul>
+
+      <div class="mt-20">
+        <Content />
+      </div>
+    </div>
+
+  </div>
+</Layout>
+
+<style lang="sass">
+  body
+    background: linear-gradient(0deg, rgb(25 16 34) 0%, #000 100%)
+</style>
