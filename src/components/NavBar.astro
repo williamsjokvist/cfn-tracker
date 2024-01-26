@@ -50,16 +50,16 @@ const NavItems = [
     const opts = {
       autoAlpha: 0,
       translateY: -20,
-      duration: 2.75,
+      duration: 2.25,
       ease: Power3.easeOut,
-      stagger: .75
+      stagger: .2
     }
 
     gsap.from("#nav-item-container > *", opts)
 
     gsap.from("#socials-container > *", {
       ...opts,
-      delay: 2
+      delay: 1.2
     });
 
   }, { once: true })
