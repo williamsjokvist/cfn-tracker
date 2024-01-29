@@ -61,7 +61,7 @@ func (s *Storage) SaveUser(ctx context.Context, displayName, code string) error 
 
 func (s *Storage) RemoveUser(ctx context.Context, code string) error {
 	query, args, err := sqlx.In(`
-		DELETE * FROM users 
+		DELETE * FROM users
 		WHERE code = (?)
 	`, code)
 	if err != nil {
@@ -70,19 +70,6 @@ func (s *Storage) RemoveUser(ctx context.Context, code string) error {
 	_, err = s.db.NamedExecContext(ctx, query, args)
 	if err != nil {
 		return fmt.Errorf("create user: %w", err)
-	}
-	return nil
-}
-
-func (s *Storage) createUsersTable() error {
-	_, err := s.db.Exec(`
-	CREATE TABLE IF NOT EXISTS users (
-		code TEXT NOT NULL,
-		display_name TEXT NOT NULL,
-		PRIMARY KEY (code)
-	)`)
-	if err != nil {
-		return fmt.Errorf("create users table: %w", err)
 	}
 	return nil
 }

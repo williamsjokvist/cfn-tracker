@@ -273,6 +273,24 @@ type Replay struct {
 	ReplayBattleTypeName    string     `json:"replay_battle_type_name"`
 	ReplayBattleSubTypeName string     `json:"replay_battle_sub_type_name"`
 }
+
+func (r *Replay) ReplayTypeToString(replayType int) string {
+	switch (replayType) {
+		case 1:
+		return "rank"
+		case 2:
+		return "casual"
+		case 3:
+		return "hub"
+		case 4:
+		return "custom"
+		case 0:
+		default:
+		return ""
+	}
+	return ""
+}
+
 type SearchResult struct {
 	AssetPrefix   string   `json:"assetPrefix"`
 	BuildID       string   `json:"buildId"`

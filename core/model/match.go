@@ -20,4 +20,5 @@ type Match struct {
 	Wins              int    `db:"wins" json:"wins"`
 	Losses            int    `db:"losses" json:"losses"`
 	WinRate           int    `db:"win_rate" json:"winRate"`
+	Type              int    `db:"type" json:"type"`
 }

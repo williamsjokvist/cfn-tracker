@@ -145,36 +145,26 @@ func (t *SF6Tracker) poll(ctx context.Context, userCode string, pollRate time.Du
 			break
 		}
 
-		err = t.updateSession(ctx, userCode, bl)
+		if t.sesh.LP == bl.GetLP() {
+			continue
+		}
+		t.sesh.LP = bl.GetLP()
+		t.sesh.MR = bl.GetMR()
+		match := getNewestMatch(t.sesh, bl)
+		t.sesh.Matches = append([]*model.Match{&match}, t.sesh.Matches...)
+		err = t.CFNTrackerRepository.UpdateSession(ctx, t.sesh, match, t.sesh.Id)
 		if err != nil {
 			log.Println(`failed to update session: `, err)
+			continue
+		}
+
+		trackingState := t.getTrackingStateForLastMatch()
+		if trackingState != nil {
+			trackingState.Log()
+			t.CFNTrackerRepository.SaveTrackingState(trackingState)
+			wails.EventsEmit(ctx, `cfn-data`, trackingState)
 		}
 	}
-}
-
-func (t *SF6Tracker) updateSession(ctx context.Context, userCode string, bl *BattleLog) error {
-	// no new match played
-	if t.sesh.LP == bl.GetLP() {
-		return nil
-	}
-	match := getNewestMatch(t.sesh, bl)
-
-	t.sesh.LP = bl.GetLP()
-	t.sesh.MR = bl.GetMR()
-	t.sesh.Matches = append([]*model.Match{&match}, t.sesh.Matches...)
-	err := t.CFNTrackerRepository.UpdateSession(ctx, t.sesh, match, t.sesh.Id)
-	if err != nil {
-		return fmt.Errorf("failed to update session: %w", err)
-	}
-
-	trackingState := t.getTrackingStateForLastMatch()
-	if trackingState != nil {
-		trackingState.Log()
-		t.CFNTrackerRepository.SaveTrackingState(trackingState)
-		wails.EventsEmit(ctx, `cfn-data`, trackingState)
-	}
-
-	return nil
 }
 
 func (t *SF6Tracker) getTrackingStateForLastMatch() *model.TrackingState {
@@ -205,7 +195,7 @@ func (t *SF6Tracker) getTrackingStateForLastMatch() *model.TrackingState {
 }
 
 func (t *SF6Tracker) fetchBattleLog(userCode string) (*BattleLog, error) {
-	err := t.Page.Navigate(fmt.Sprintf(`https://www.streetfighter.com/6/buckler/profile/%s/battlelog/rank`, userCode))
+	err := t.Page.Navigate(fmt.Sprintf(`https://www.streetfighter.com/6/buckler/profile/%s/battlelog`, userCode))
 	if err != nil {
 		return nil, fmt.Errorf(`navigate to cfn: %w`, err)
 	}
@@ -244,7 +234,8 @@ func getOpponentInfo(myCfn string, replay *Replay) PlayerInfo {
 }
 
 func getNewestMatch(sesh *model.Session, bl *BattleLog) model.Match {
-	opponent := getOpponentInfo(bl.GetCFN(), &bl.ReplayList[0])
+	match := bl.ReplayList[0]
+	opponent := getOpponentInfo(bl.GetCFN(), &match)
 	victory := !isVictory(opponent.RoundResults)
 	biota := utils.Biota(victory)
 	wins := biota
@@ -264,6 +255,7 @@ func getNewestMatch(sesh *model.Session, bl *BattleLog) model.Match {
 		Character:         bl.GetCharacter(),
 		LP:                bl.GetLP(),
 		MR:                bl.GetMR(),
+		Type:              match.ReplayBattleType,
 		Opponent:          opponent.Player.FighterID,
 		OpponentCharacter: opponent.CharacterName,
 		OpponentLP:        opponent.LeaguePoint,
