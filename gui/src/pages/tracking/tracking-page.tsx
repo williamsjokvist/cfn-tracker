@@ -11,7 +11,7 @@ import { TrackingGamePicker } from "./tracking-game-picker";
 import { TrackingLiveUpdater } from "./tracking-live-updater";
 import { TrackingForm } from "./tracking-form";
 
-export const TrackingPage: React.FC = () => {
+export function TrackingPage() {
   const { t } = useTranslation();
 
   const trackingActor = TrackingMachineContext.useActorRef()

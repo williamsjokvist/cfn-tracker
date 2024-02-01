@@ -7,8 +7,8 @@ import { PageHeader } from "@/ui/page-header";
 import { ActionButton } from "@/ui/action-button";
 import { OpenResultsDirectory } from "@@/go/core/CommandHandler";
 
-import { ThemeDialog } from "./theme-dialog";
-import { StatsDialog } from "./stats-dialog";
+import { ThemeSelect } from "./theme-select";
+import { StatSelect } from "./stat-select";
 
 export type StatOptions = typeof defaultOptions;
 
@@ -33,12 +33,12 @@ const defaultOptions = {
   date: false,
 };
 
-export const OutputPage: React.FC = () => {
+export function OutputPage() {
   const { t } = useTranslation();
   const [options, setOptions] = React.useState(defaultOptions);
   const [scope, animate] = useAnimate();
 
-  const copyUrlToClipBoard = () => {
+  function copyUrlToClipBoard() {
     let url = `http://localhost:4242?theme=${options.theme}`;
     for (const [key, value] of Object.entries(options)) {
       if (key == "theme") continue;
@@ -91,11 +91,11 @@ export const OutputPage: React.FC = () => {
               </ActionButton>
             </div>
             <div className='flex flex-col gap-4'>
-              <ThemeDialog 
+              <ThemeSelect 
                 onSelect={theme => setOptions({ ...options, theme }) } 
                 selectedTheme={options.theme}
               />
-              <StatsDialog 
+              <StatSelect 
                 options={options} 
                 onSelect={(key, value) => setOptions({ ...options, [key]: value })}
               />

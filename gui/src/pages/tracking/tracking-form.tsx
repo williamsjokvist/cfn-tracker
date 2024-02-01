@@ -10,7 +10,7 @@ import { Checkbox } from "@/ui/checkbox";
 import { model } from "@@/go/models";
 import { PageHeader } from "@/ui/page-header";
 
-export const TrackingForm: React.FC = () => {
+export function TrackingForm() {
   const { t } = useTranslation();
   const users = (useLoaderData() ?? []) as model.User[]
   const trackingActor = TrackingMachineContext.useActorRef()

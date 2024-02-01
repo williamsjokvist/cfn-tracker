@@ -11,12 +11,12 @@ import { ActionButton } from "@/ui/action-button";
 import { GetThemes } from "@@/go/core/CommandHandler";
 import type { model } from "@@/go/models";
 
-type ThemeDialogProps = {
+type ThemeSelectProps = {
   selectedTheme: string
   onSelect: (theme: string) => void
 }
 
-export const ThemeDialog: React.FC<ThemeDialogProps> = ({ selectedTheme, onSelect }) => {
+export const ThemeSelect: React.FC<ThemeSelectProps> = ({ selectedTheme, onSelect }) => {
   const containerRef = React.useRef<HTMLDivElement>(null)
   const [themes, setThemes] = React.useState<model.Theme[]>([])
   const [isOpen, setOpen] = React.useState(false)

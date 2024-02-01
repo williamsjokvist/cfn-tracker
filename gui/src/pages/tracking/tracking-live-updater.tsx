@@ -8,7 +8,7 @@ import { ActionButton } from "@/ui/action-button";
 import { PageHeader } from "@/ui/page-header";
 import { useSelector } from "@xstate/react";
 
-export const TrackingLiveUpdater: React.FC = () => {
+export function TrackingLiveUpdater() {
   const { t } = useTranslation();
   const trackingActor = TrackingMachineContext.useActorRef()
 

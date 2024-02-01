@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import { PageHeader } from "@/ui/page-header";
 import type { model } from "@@/go/models";
 
-export const MatchesListPage: React.FC = () => {
+export function MatchesListPage() {
   const { t } = useTranslation();
   const totalMatches = (useLoaderData() ?? []) as model.Match[];
   const [matches, setMatches] = React.useState<model.Match[]>(totalMatches);

@@ -1,16 +1,16 @@
 import i18n from "i18next";
-import LanguageDetector from 'i18next-browser-languagedetector';
+import LanguageDetector from "i18next-browser-languagedetector";
 import HttpBackend, { type HttpBackendOptions } from "i18next-http-backend";
-import { initReactI18next } from 'react-i18next';
+import { I18nextProvider, initReactI18next } from "react-i18next";
 
 import type { locales } from "@@/go/models";
 import { GetTranslation } from "@@/go/core/CommandHandler";
 
-export type LocalizationKey = keyof locales.Localization
+export type LocalizationKey = keyof locales.Localization;
 
 // https://www.i18next.com/overview/configuration-options
-export const initI18n = () => {
-  return i18n
+export function I18nProvider({ children }: React.PropsWithChildren) {
+  i18n
     .use(LanguageDetector)
     .use(HttpBackend)
     .use(initReactI18next)
@@ -22,15 +22,17 @@ export const initI18n = () => {
         useSuspense: true,
       },
       backend: {
-        loadPath: '{{lng}}',
+        loadPath: "{{lng}}",
         request: (options, url, payload, callback) => {
           GetTranslation(url).then((data) => {
             callback(null, {
               status: 200,
-              data
-            })
-          })
-        }
-      }
+              data,
+            });
+          });
+        },
+      },
     });
+
+  return <I18nextProvider i18n={i18n}>{children}</I18nextProvider>;
 }

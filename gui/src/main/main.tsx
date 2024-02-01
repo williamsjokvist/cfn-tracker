@@ -18,7 +18,7 @@ import { AppErrorBoundary } from "./app-layout/app-error";
 import { ErrorMessageProvider } from "./app-layout/error-message";
 import { ConfigProvider } from "./config";
 
-import { initI18n } from "./i18n";
+import { I18nProvider } from "./i18n";
 
 import "./style.sass";
 
@@ -55,9 +55,8 @@ const router = createHashRouter([
   },
 ]);
 
-const App: React.FC = () => {
-  initI18n();
-  return (
+createRoot(document.getElementById("root")!).render(
+  <I18nProvider>
     <AuthMachineContext.Provider>
       <TrackingMachineContext.Provider>
         <React.Suspense fallback={<AppLoader/>}>
@@ -69,7 +68,5 @@ const App: React.FC = () => {
         </React.Suspense>
       </TrackingMachineContext.Provider>
     </AuthMachineContext.Provider>
-  );
-}
-
-createRoot(document.getElementById("root")!).render(<App />);
+  </I18nProvider>
+);

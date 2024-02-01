@@ -6,12 +6,12 @@ import { Checkbox } from "@/ui/checkbox";
 import { ActionButton } from "@/ui/action-button";
 import type { StatOptions } from "./output-page";
 
-type StatsDialogProps = {
+type StatSelectProps = {
   options: StatOptions
   onSelect: (option: string, checked: boolean) => void
 }
 
-export const StatsDialog: React.FC<StatsDialogProps> = ({ onSelect, options }) => {
+export const StatSelect: React.FC<StatSelectProps> = ({ onSelect, options }) => {
   const { t } = useTranslation()
   return (
     <Dialog.Root>
