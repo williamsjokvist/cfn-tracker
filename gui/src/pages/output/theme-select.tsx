@@ -1,26 +1,21 @@
-import React from "react";
-import { createRoot } from "react-dom/client";
-import { Icon } from "@iconify/react";
+import React from 'react'
+import { createRoot } from 'react-dom/client'
+import { Icon } from '@iconify/react'
 
-import { useErrorMessage } from "@/main/app-layout/error-message";
+import { useErrorPopup } from '@/main/error-popup'
 
-import * as Dialog from "@/ui/dialog";
-import { Checkbox } from "@/ui/checkbox";
-import { ActionButton } from "@/ui/action-button";
+import * as Dialog from '@/ui/dialog'
+import { Checkbox } from '@/ui/checkbox'
+import { Button } from '@/ui/button'
 
-import { GetThemes } from "@@/go/core/CommandHandler";
-import type { model } from "@@/go/models";
+import { GetThemes } from '@@/go/core/CommandHandler'
+import type { model } from '@@/go/models'
 
-type ThemeSelectProps = {
-  selectedTheme: string
-  onSelect: (theme: string) => void
-}
-
-export const ThemeSelect: React.FC<ThemeSelectProps> = ({ selectedTheme, onSelect }) => {
+export function ThemeSelect(props: { selectedTheme: string; onSelect: (theme: string) => void }) {
   const containerRef = React.useRef<HTMLDivElement>(null)
   const [themes, setThemes] = React.useState<model.Theme[]>([])
   const [isOpen, setOpen] = React.useState(false)
-  const setError = useErrorMessage()
+  const setError = useErrorPopup()
 
   React.useEffect(() => {
     GetThemes().then(setThemes).catch(setError)
@@ -30,18 +25,21 @@ export const ThemeSelect: React.FC<ThemeSelectProps> = ({ selectedTheme, onSelec
     if (!isOpen || !containerRef.current) return
 
     for (const theme of themes) {
-      const container = document.createElement("div");
-      containerRef.current.appendChild(container);
-      const shadowRoot = container.attachShadow({ mode: "open" });
+      const container = document.createElement('div')
+      containerRef.current.appendChild(container)
+      const shadowRoot = container.attachShadow({ mode: 'open' })
 
       createRoot(container).render(
-        <div className="mb-4">
+        <div className='mb-4'>
           <style>{theme.css.match(/@import.*;/g)}</style>
-          <Checkbox id={`${theme.name}-checkbox`} checked={theme.name === selectedTheme} onChange={(e) => onSelect(theme.name)} />
+          <Checkbox
+            id={`${theme.name}-checkbox`}
+            checked={theme.name === props.selectedTheme}
+            onChange={e => props.onSelect(theme.name)}
+          />
           <label
             htmlFor={`${theme.name}-checkbox`}
-            style={{ fontFamily: "League Spartan" }}
-            className="capitalize text-lg font-bold cursor-pointer"
+            className='cursor-pointer font-spartan text-lg font-bold capitalize'
           >
             {theme.name}
           </label>
@@ -51,11 +49,11 @@ export const ThemeSelect: React.FC<ThemeSelectProps> = ({ selectedTheme, onSelec
       createRoot(shadowRoot).render(
         <>
           <slot />
-          <div className="stat-list">
+          <div className='stat-list'>
             <style>{theme.css}</style>
-            <div className="stat-item">
-              <span className="stat-title">MR</span>
-              <span className="stat-value">444</span>
+            <div className='stat-item'>
+              <span className='stat-title'>MR</span>
+              <span className='stat-value'>444</span>
             </div>
           </div>
         </>
@@ -63,21 +61,25 @@ export const ThemeSelect: React.FC<ThemeSelectProps> = ({ selectedTheme, onSelec
     }
 
     return () => {
-      if (containerRef.current)
-        containerRef.current.innerHTML = ""
+      if (containerRef.current) {
+        containerRef.current.innerHTML = ''
+      }
     }
-  }, [isOpen, themes, selectedTheme])
+  }, [isOpen, themes, props.selectedTheme])
 
   return (
     <Dialog.Root onOpenChange={setOpen}>
       <Dialog.Trigger asChild>
-        <ActionButton className="capitalize" style={{ filter: "hue-rotate(-180deg)", justifyContent: "center" }}>
-          <Icon icon="ph:paint-bucket-fill" className="mr-3 w-6 h-6" />
-          {selectedTheme}
-        </ActionButton>
+        <Button
+          className='capitalize'
+          style={{ filter: 'hue-rotate(-180deg)', justifyContent: 'center' }}
+        >
+          <Icon icon='ph:paint-bucket-fill' className='mr-3 h-6 w-6' />
+          {props.selectedTheme}
+        </Button>
       </Dialog.Trigger>
-      <Dialog.Content title="selectTheme">
-        <div ref={containerRef} className='grid gap-4 mt-2 h-80 w-full pr-2 overflow-y-scroll'></div>
+      <Dialog.Content title='selectTheme'>
+        <div ref={containerRef} className='mt-2 grid h-80 w-full gap-4 overflow-y-scroll pr-2' />
       </Dialog.Content>
     </Dialog.Root>
   )

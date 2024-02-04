@@ -1,15 +1,15 @@
-import { motion } from "framer-motion";
-import { useTranslation } from "react-i18next";
-import { Icon } from "@iconify/react";
-import { PieChart } from "react-minimal-pie-chart";
+import { motion } from 'framer-motion'
+import { Icon } from '@iconify/react'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from '@xstate/react'
+import { PieChart } from 'react-minimal-pie-chart'
 
-import { TrackingMachineContext } from "@/machines/tracking-machine";
-import { ActionButton } from "@/ui/action-button";
-import { PageHeader } from "@/ui/page-header";
-import { useSelector } from "@xstate/react";
+import { TrackingMachineContext } from '@/state/tracking-machine'
+import { Button } from '@/ui/button'
+import * as Page from '@/ui/page'
 
 export function TrackingLiveUpdater() {
-  const { t } = useTranslation();
+  const { t } = useTranslation()
   const trackingActor = TrackingMachineContext.useActorRef()
 
   const {
@@ -26,47 +26,54 @@ export function TrackingLiveUpdater() {
     opponentCharacter,
     character,
     opponentLeague,
-    result,
-  } = useSelector(trackingActor, (snapshot) => snapshot.context.trackingState)
+    result
+  } = useSelector(trackingActor, ({ context }) => context.trackingState)
 
   return (
-    <>
-      <PageHeader text={t("tracking")} showSpinner/>
-      <motion.section           
+    <Page.Root>
+      <Page.Header>
+        <Page.Title>{t('tracking')}</Page.Title>
+        <Page.LoadingIcon />
+      </Page.Header>
+      <motion.section
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 0.125 }} 
-        className="px-6 pt-4 h-full"
+        transition={{ delay: 0.125 }}
+        className='h-full px-6 pt-4'
       >
-        <dl className="flex whitespace-nowrap items-center justify-between w-full">
-          <SmallStat text="CFN" value={cfn} />
-          <div className="flex justify-between gap-8">
-            <SmallStat text="LP" value={`${lp == -1 ? t("placement") : lp}`} />
-            <SmallStat text="MR" value={`${mr == -1 ? t("placement") : mr}`} />
+        <dl className='flex w-full items-center justify-between whitespace-nowrap'>
+          <SmallStat text='CFN' value={cfn} />
+          <div className='flex justify-between gap-8'>
+            <SmallStat text='LP' value={`${lp == -1 ? t('placement') : lp}`} />
+            <SmallStat text='MR' value={`${mr == -1 ? t('placement') : mr}`} />
           </div>
         </dl>
-        <div className="flex gap-12 pt-3 pb-5 h-[calc(100%-32px)]">
-          <div className="w-full">
-            <dl className="text-lg whitespace-nowrap">
-              <div className="flex justify-between gap-2">
-                <BigStat text={t("wins")} value={wins} />
-                <BigStat text={t("losses")} value={losses} />
+        <div className='flex h-[calc(100%-32px)] gap-12 pb-5 pt-3'>
+          <div className='w-full'>
+            <dl className='whitespace-nowrap text-lg'>
+              <div className='flex justify-between gap-2'>
+                <BigStat text={t('wins')} value={wins} />
+                <BigStat text={t('losses')} value={losses} />
               </div>
-              <div className="flex justify-between gap-2">
-                <BigStat text={t("winRate")} value={`${winRate}%`} />
-                <BigStat text={t("winStreak")} value={winStreak} />
+              <div className='flex justify-between gap-2'>
+                <BigStat text={t('winRate')} value={`${winRate}%`} />
+                <BigStat text={t('winStreak')} value={winStreak} />
               </div>
-              <div className="flex justify-between gap-2">
-                <BigStat text={t("lpGain")} value={`${lpGain > 0 ? `+` : ``}${lpGain}`} />
-                <BigStat text={t("mrGain")} value={`${mrGain > 0 ? `+` : ``}${mrGain}`} />
+              <div className='flex justify-between gap-2'>
+                <BigStat text={t('lpGain')} value={`${lpGain > 0 ? `+` : ``}${lpGain}`} />
+                <BigStat text={t('mrGain')} value={`${mrGain > 0 ? `+` : ``}${mrGain}`} />
               </div>
             </dl>
-            {opponent != "" && (
-              <div className="text-lg group leading-none flex items-center justify-between bg-slate-50 bg-opacity-5 p-3 pb-2 rounded-xl">
+            {opponent != '' && (
+              <div className='group flex items-center justify-between rounded-xl bg-slate-50 bg-opacity-5 p-3 pb-2 text-lg leading-none'>
                 <span>{t('lastMatch')}</span>
-                <div className="relative flex items-center gap-2">
-                  <Icon icon={result ? "twemoji:victory-hand" : "twemoji:pensive-face"} width={25} /> vs
-                  <b>{opponent}</b> - {opponentCharacter} ({ opponentLeague })
+                <div className='relative flex items-center gap-2'>
+                  <Icon
+                    icon={result ? 'twemoji:victory-hand' : 'twemoji:pensive-face'}
+                    width={25}
+                  />{' '}
+                  vs
+                  <b>{opponent}</b> - {opponentCharacter} ({opponentLeague})
                 </div>
               </div>
             )}
@@ -75,67 +82,74 @@ export function TrackingLiveUpdater() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.35 }}
-            className="relative h-full max-w-[220px] w-full text-center gap-5 pt-8"
+            className='relative h-full w-full max-w-[220px] gap-5 pt-8 text-center'
           >
             <PieChart
-              className="clip-circle animate-enter w-[150px] h-[150px] mx-auto"
+              className='clip-circle animate-enter mx-auto h-[150px] w-[150px]'
               animate
               animationDuration={750}
               lineWidth={85}
               paddingAngle={0}
               viewBoxSize={[60, 60]}
               center={[30, 30]}
-              animationEasing="ease-in-out"
+              animationEasing='ease-in-out'
               data={[
                 {
-                  title: t("wins"),
+                  title: t('wins'),
                   value: wins,
-                  color: "rgba(0, 255, 77, .65)",
+                  color: 'rgba(0, 255, 77, .65)'
                 },
                 {
-                  title: t("losses"),
+                  title: t('losses'),
                   value: wins == 0 && losses == 0 ? 1 : losses,
-                  color: "rgba(251, 73, 73, 0.25)",
-                },
+                  color: 'rgba(251, 73, 73, 0.25)'
+                }
               ]}
             >
               <defs>
-                <linearGradient id="blue-gradient" direction={-65}>
-                  <stop offset="0%" stopColor="#20BF55" />
-                  <stop offset="100%" stopColor="#347fd0" />
+                <linearGradient id='blue-gradient' direction={-65}>
+                  <stop offset='0%' stopColor='#20BF55' />
+                  <stop offset='100%' stopColor='#347fd0' />
                 </linearGradient>
-                <linearGradient id="red-gradient" direction={120}>
-                  <stop offset="0%" stopColor="#EC9F05" />
-                  <stop offset="100%" stopColor="#EE9617" />
+                <linearGradient id='red-gradient' direction={120}>
+                  <stop offset='0%' stopColor='#EC9F05' />
+                  <stop offset='100%' stopColor='#EE9617' />
                 </linearGradient>
               </defs>
             </PieChart>
-            <ActionButton
-              className="absolute bottom-0 right-0"
-              onClick={() => trackingActor.send({ type: "cease" })}
+            <Button
+              className='absolute bottom-0 right-0'
+              onClick={() => trackingActor.send({ type: 'cease' })}
             >
-              <Icon icon="fa6-solid:stop" className="mr-3 w-5 h-5" />
-              {t("stop")}
-            </ActionButton>
+              <Icon icon='fa6-solid:stop' className='mr-3 h-5 w-5' />
+              {t('stop')}
+            </Button>
           </motion.div>
         </div>
-        <img className="grayscale h-full absolute top-0 -right-20 z-[-1] opacity-10 pointer-events-none" src={`https://www.streetfighter.com/6/buckler/assets/images/material/character/character_${character.toLowerCase().replace(/\s/g, "").replace(".", "")}_r.png`} alt={character} />
+        <img
+          className='pointer-events-none absolute -right-20 top-0 z-[-1] h-full opacity-10 grayscale'
+          src={`https://www.streetfighter.com/6/buckler/assets/images/material/character/character_${character
+            .toLowerCase()
+            .replace(/\s/g, '')
+            .replace('.', '')}_r.png`}
+          alt={character}
+        />
       </motion.section>
-    </>
-  );
-};
+    </Page.Root>
+  )
+}
 
-type StatProps = { text: string; value: string | number; };
-const BigStat: React.FC<StatProps> = ({ text, value }) => (
-  <div className="mb-2 flex flex-1 gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl">
-    <dt className="tracking-wider font-extralight">{text}</dt>
-    <dd className="text-4xl font-semibold">{value}</dd>
+type StatProps = { text: string; value: string | number }
+const BigStat = ({ text, value }: StatProps) => (
+  <div className='mb-2 flex flex-1 justify-between gap-4 rounded-xl bg-slate-50 bg-opacity-5 p-3 pb-1'>
+    <dt className='font-extralight tracking-wider'>{text}</dt>
+    <dd className='text-4xl font-semibold'>{value}</dd>
   </div>
-);
+)
 
-const SmallStat: React.FC<StatProps> = ({ text, value }) => (
-  <div className="flex gap-3 text-2xl">
+const SmallStat = ({ text, value }: StatProps) => (
+  <div className='flex gap-3 text-2xl'>
     <dt className='text-xl leading-8'>{text}</dt>
-    <dd className="font-bold">{value}</dd>
+    <dd className='font-bold'>{value}</dd>
   </div>
 )

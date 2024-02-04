@@ -1,29 +1,29 @@
-import React from "react";
-import { useSelector } from "@xstate/react";
-import { useTranslation } from "react-i18next";
+import React from 'react'
+import { useSelector } from '@xstate/react'
+import { useTranslation } from 'react-i18next'
 
-import { TrackingMachineContext } from "@/machines/tracking-machine";
-import { AuthMachineContext } from "@/machines/auth-machine";
-import { useErrorMessage } from "@/main/app-layout/error-message";
-import { PageHeader } from "@/ui/page-header";
+import { TrackingMachineContext } from '@/state/tracking-machine'
+import { AuthMachineContext } from '@/state/auth-machine'
+import { useErrorPopup } from '@/main/error-popup'
+import * as Page from '@/ui/page'
 
-import { TrackingGamePicker } from "./tracking-game-picker";
-import { TrackingLiveUpdater } from "./tracking-live-updater";
-import { TrackingForm } from "./tracking-form";
+import { TrackingForm } from './tracking-form'
+import { TrackingGamePicker } from './tracking-game-picker'
+import { TrackingLiveUpdater } from './tracking-live-updater'
 
 export function TrackingPage() {
-  const { t } = useTranslation();
+  const { t } = useTranslation()
 
   const trackingActor = TrackingMachineContext.useActorRef()
   const authActor = AuthMachineContext.useActorRef()
 
-  const authState = useSelector(authActor, (snapshot) => snapshot.value)
-  const trackingState = useSelector(trackingActor, (snapshot) => snapshot.value)
+  const authState = useSelector(authActor, ({ value }) => value)
+  const trackingState = useSelector(trackingActor, ({ value }) => value)
 
   const authError = useSelector(authActor, ({ context }) => context.error)
   const trackingError = useSelector(trackingActor, ({ context }) => context.error)
 
-  const setError = useErrorMessage()
+  const setError = useErrorPopup()
 
   React.useEffect(() => {
     authError && setError(authError)
@@ -34,19 +34,29 @@ export function TrackingPage() {
   }, [trackingError])
 
   switch (authState) {
-    case "gameForm":
-      return <TrackingGamePicker onSubmit={(game: string) => authActor.send({ type: "submit", game })} />
-    case "loading":
-      return <PageHeader text={t("loading")} showSpinner />      
+    case 'gameForm':
+      return <TrackingGamePicker onSubmit={game => authActor.send({ type: 'submit', game })} />
+    case 'loading':
+      return (
+        <Page.Header>
+          <Page.Title>{t('loading')}</Page.Title>
+          <Page.LoadingIcon />
+        </Page.Header>
+      )
   }
 
   switch (trackingState) {
-    case "cfnForm":
+    case 'cfnForm':
       return <TrackingForm />
-    case "tracking":
+    case 'tracking':
       return <TrackingLiveUpdater />
-    case "loading":
+    case 'loading':
     default:
-      return <PageHeader text={t("loading")} showSpinner />
+      return (
+        <Page.Header>
+          <Page.Title>{t('loading')}</Page.Title>
+          <Page.LoadingIcon />
+        </Page.Header>
+      )
   }
-};
+}

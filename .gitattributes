@@ -1,4 +1,1 @@
-*.html linguist-detectable=false  
-*.json linguist-detectable=false
-.gitignore linguist-detectable=false
 *.plist linguist-detectable=false

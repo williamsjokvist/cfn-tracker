@@ -1,34 +1,34 @@
-import React from "react"
-import { useTranslation } from "react-i18next"
+import React from 'react'
+import { useTranslation } from 'react-i18next'
 
-import type { model } from "@@/go/models"
-import { GetGuiConfig } from "@@/go/core/CommandHandler"
+import type { model } from '@@/go/models'
+import { GetGuiConfig } from '@@/go/core/CommandHandler'
 
-import { useErrorMessage } from "./app-layout/error-message"
+const initialConfig: model.GuiConfig = {
+  locale: 'en-GB',
+  sidebarMinified: false
+}
 
-type ConfigContextType = [cfg: model.GuiConfig | null, setCfg: (cfg: model.GuiConfig | null) => void]
+export const ConfigContext = React.createContext<
+  [cfg: model.GuiConfig, setCfg: React.Dispatch<model.GuiConfig>]
+>([
+  initialConfig,
+  () => {
+    return
+  }
+])
 
-const ConfigContext = React.createContext<ConfigContextType | null>(null)
+export function ConfigProvider({ children }: React.PropsWithChildren) {
+  const { i18n } = useTranslation()
+  const [cfg, setCfg] = React.useState(initialConfig)
 
-export const useConfig = () => React.useContext(ConfigContext)
-
-export const ConfigProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
-  const { i18n } = useTranslation();
-  const setErrorMessage = useErrorMessage();
-  const configState = React.useState<model.GuiConfig | null>(null)
-  const [_, setCfg] = configState;
-
-  React.useEffect(()=> {
-    GetGuiConfig().then(cfg => {
-      i18n.changeLanguage(cfg.locale)
+  React.useEffect(() => {
+    ;(async function () {
+      const cfg = await GetGuiConfig()
       setCfg(cfg)
-      console.log("App config:", cfg)
-    }).catch(setErrorMessage)
+      i18n.changeLanguage(cfg.locale)
+    })()
   }, [])
 
-  return (
-    <ConfigContext.Provider value={configState}>
-      {children}
-    </ConfigContext.Provider>
-  )
+  return <ConfigContext.Provider value={[cfg, setCfg]}>{children}</ConfigContext.Provider>
 }

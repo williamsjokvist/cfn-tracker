@@ -1,53 +1,77 @@
-import React from "react";
-import { useRouteError } from "react-router-dom";
-import { motion } from "framer-motion";
-import { Icon } from "@iconify/react";
+import React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useRouteError } from 'react-router-dom'
+import { motion } from 'framer-motion'
+import { Icon } from '@iconify/react'
 
-import { LocalizedErrorMessage } from "./error-message";
-import { errorsx } from "@@/go/models";
-import { PageHeader } from "@/ui/page-header";
-import { useTranslation } from "react-i18next";
-import { AppTitleBar } from "./app-titlebar";
+import * as Page from '@/ui/page'
+import { errorsx } from '@@/go/models'
 
-const isFormattedError = (error: unknown) => error instanceof Object && 'message' in error && 'code' in error
+import { LocalizedErrorMessage } from '../error-popup'
+import { AppTitleBar } from './app-titlebar'
 
-type AppErrorBoundaryProps = {
-  outer?: boolean
+export function AppErrorBoundary() {
+  const err = useFormattedError()
+  return (
+    <ErrorWrapper err={err}>
+      <AppTitleBar />
+    </ErrorWrapper>
+  )
 }
-export const AppErrorBoundary: React.FC<AppErrorBoundaryProps> = ({ outer }) => {
-  const { t } = useTranslation();
-  const thrownError = useRouteError();
-  const [err, setErr] = React.useState<errorsx.FormattedError>()
 
-  React.useEffect(() => {
-    console.error(thrownError);
-    if (thrownError instanceof Error) {
-      setErr({ code: 500, message: thrownError.message });
-    } else if (isFormattedError(thrownError)) {
-      setErr(thrownError as errorsx.FormattedError);
-    }
-  }, [thrownError])
-
+export function PageErrorBoundary() {
+  const { t } = useTranslation()
+  const err = useFormattedError()
   if (!err?.code) {
     return null
   }
+  return (
+    <ErrorWrapper err={err}>
+      <Page.Header>
+        <Page.Title>{t(LocalizedErrorMessage[err!.code!])}</Page.Title>
+      </Page.Header>
+    </ErrorWrapper>
+  )
+}
 
+const isFormattedError = (error: unknown) =>
+  error instanceof Object && 'message' in error && 'code' in error
+
+function useFormattedError() {
+  const thrownError = useRouteError()
+  const [err, setErr] = React.useState<errorsx.FormattedError>()
+
+  React.useEffect(() => {
+    console.error(thrownError)
+    if (thrownError instanceof Error) {
+      setErr({ code: 500, message: thrownError.message })
+    } else if (isFormattedError(thrownError)) {
+      setErr(thrownError as errorsx.FormattedError)
+    }
+  }, [thrownError])
+
+  return err
+}
+
+function ErrorWrapper(props: React.PropsWithChildren & { err?: errorsx.FormattedError }) {
+  const { t } = useTranslation()
+  if (!props.err?.code) {
+    return null
+  }
   return (
     <motion.section
-      className="text-white h-screen w-full"
+      className='h-screen w-full text-white'
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ delay: 0.125 }}
     >
-      {outer && <AppTitleBar />}
-      {!outer && <PageHeader text={t(LocalizedErrorMessage[err.code])} />}
-      <div className="mt-8 w-full text-center flex flex-col items-center justify-center pb-16 rounded-md">
-        <Icon
-          icon="material-symbols:warning-outline"
-          className="text-[#ff6388] w-40 h-40"
-        />
-        <h1 className="text-2xl text-center font-bold">{t(LocalizedErrorMessage[err.code])}</h1>
-        <p className="text-xl">{err.message}</p>
+      {props.children}
+      <div className='mt-8 flex w-full flex-col items-center justify-center rounded-md pb-16 text-center'>
+        <Icon icon='material-symbols:warning-outline' className='h-40 w-40 text-[#ff6388]' />
+        <h1 className='text-center text-2xl font-bold'>
+          {t(LocalizedErrorMessage[props.err.code])}
+        </h1>
+        <p className='text-xl'>{props.err.message}</p>
       </div>
     </motion.section>
   )

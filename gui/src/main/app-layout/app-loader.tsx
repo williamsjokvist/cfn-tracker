@@ -1,9 +1,11 @@
-export const AppLoader = () => (
-  <main className="grid justify-center items-center h-screen w-full text-white">
-    <i
-      aria-label="loading"
-      className="animate-spin inline-block w-12 h-12 border-[4px] border-current border-t-transparent text-white rounded-full"
-      role="status"
-    />
-  </main>
-)
+export function AppLoader() {
+  return (
+    <main className='grid h-screen w-full items-center justify-center text-white'>
+      <i
+        aria-label='loading'
+        className='inline-block h-12 w-12 animate-spin rounded-full border-[4px] border-current border-t-transparent text-white'
+        role='status'
+      />
+    </main>
+  )
+}

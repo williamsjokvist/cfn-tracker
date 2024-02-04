@@ -1,13 +1,13 @@
-import "i18next";
-import type { locales } from "@@/go/models";
+import 'i18next'
+import type { locales } from '@@/go/models'
 
-declare module "i18next" {
+declare module 'i18next' {
   interface CustomTypeOptions {
     // We don't have any namespaces
-    defaultNS: "",
-    nsSeparator: "",
+    defaultNS: ''
+    nsSeparator: ''
     resources: {
-      '': locales.Localization,
-    };
+      '': locales.Localization
+    }
   }
 }

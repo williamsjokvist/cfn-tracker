@@ -1,14 +1,16 @@
-import { TRACKING_MACHINE } from "@/machines/tracking-machine";
-import { SelectGame } from "@@/go/core/CommandHandler";
-import { errorsx } from "@@/go/models";
-import { EventsOff, EventsOn } from "@@/runtime/runtime";
-import { createActorContext } from "@xstate/react";
-import { setup, assign } from "xstate";
+import { setup, assign } from 'xstate'
+import { createActorContext } from '@xstate/react'
+
+import { SelectGame } from '@@/go/core/CommandHandler'
+import type { errorsx } from '@@/go/models'
+import { EventsOff, EventsOn } from '@@/runtime/runtime'
+
+import { TRACKING_MACHINE } from './tracking-machine'
 
 type AuthMachineContextProps = {
   progress: number
-  game?: "sfv" | "sf6"
-  error: errorsx.FormattedError | null;
+  game?: 'sfv' | 'sf6'
+  error: errorsx.FormattedError | null
 }
 export const AUTH_MACHINE = setup({
   types: {
@@ -16,27 +18,26 @@ export const AUTH_MACHINE = setup({
   },
   actions: {
     selectGame: ({ context, self }) => {
-      SelectGame(context.game ?? "sf6")
-        .catch(error => self.send({ type: "error", error }));
+      SelectGame(context.game ?? 'sf6').catch(error => self.send({ type: 'error', error }))
     },
     subscribeToProgressEvents: ({ self }) => {
-      EventsOn("auth-progress", (progress) => {
-        self.send({ type: "loaded", progress })
+      EventsOn('auth-progress', progress => {
+        self.send({ type: 'loaded', progress })
         if (progress >= 100) {
-          self.send({ type: "finished" })
+          self.send({ type: 'finished' })
         }
-      });
+      })
     },
     unsubscribeToProgressEvents: () => {
-      EventsOff("auth-progress");
+      EventsOff('auth-progress')
     }
   },
   guards: {
     isLoaded: ({ context }) => context.progress >= 100
   }
 }).createMachine({
-  id: "auth-machine",
-  initial: "gameForm",
+  id: 'auth-machine',
+  initial: 'gameForm',
   context: {
     progress: 0,
     error: null
@@ -48,54 +49,54 @@ export const AUTH_MACHINE = setup({
           actions: [
             assign({
               game: ({ event }) => event.game,
-              error: null,
+              error: null
             }),
-            "selectGame",
-            "subscribeToProgressEvents"
+            'selectGame',
+            'subscribeToProgressEvents'
           ],
-          target: "loading",
-        },
-      },
+          target: 'loading'
+        }
+      }
     },
     loading: {
       on: {
         finished: {
-          target: "connected",
-          guard: "isLoaded",
+          target: 'connected',
+          guard: 'isLoaded',
           actions: [
-            "unsubscribeToProgressEvents",
+            'unsubscribeToProgressEvents',
             assign({
               progress: 0,
               error: null
-            }),
+            })
           ]
         },
         loaded: {
           actions: [
             assign({
               progress: ({ event }) => event.progress
-            }),
+            })
           ]
         },
         error: {
           actions: [
             assign({
               error: ({ event }) => event.error,
-              progress: 0,
+              progress: 0
             }),
-            "unsubscribeToProgressEvents"
+            'unsubscribeToProgressEvents'
           ],
-          target: "gameForm"
+          target: 'gameForm'
         }
-      },
+      }
     },
     connected: {
       invoke: {
-        id: "cfn-tracker",
+        id: 'cfn-tracker',
         src: TRACKING_MACHINE
       }
     }
-  },
+  }
 })
 
-export const AuthMachineContext = createActorContext(AUTH_MACHINE);
+export const AuthMachineContext = createActorContext(AUTH_MACHINE)

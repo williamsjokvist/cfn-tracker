@@ -1,43 +1,39 @@
-import { useTranslation } from "react-i18next";
-import { Icon } from "@iconify/react";
+import { useTranslation } from 'react-i18next'
+import { Icon } from '@iconify/react'
 
-import * as Dialog from "@/ui/dialog";
-import { Checkbox } from "@/ui/checkbox";
-import { ActionButton } from "@/ui/action-button";
-import type { StatOptions } from "./output-page";
+import * as Dialog from '@/ui/dialog'
+import { Checkbox } from '@/ui/checkbox'
+import { Button } from '@/ui/button'
 
-type StatSelectProps = {
-  options: StatOptions
+import type { StatOptions } from './output-page'
+
+export function StatSelect(props: {
+  options: Omit<StatOptions, 'theme'>
   onSelect: (option: string, checked: boolean) => void
-}
-
-export const StatSelect: React.FC<StatSelectProps> = ({ onSelect, options }) => {
+}) {
   const { t } = useTranslation()
   return (
     <Dialog.Root>
       <Dialog.Trigger asChild>
-        <ActionButton style={{ filter: "hue-rotate(-45deg)" }}>
-          <Icon icon="bx:stats" className="mr-3 w-6 h-6" />
-          {t("displayStats")}
-        </ActionButton>
+        <Button style={{ filter: 'hue-rotate(-45deg)' }}>
+          <Icon icon='bx:stats' className='mr-3 h-6 w-6' />
+          {t('displayStats')}
+        </Button>
       </Dialog.Trigger>
-      <Dialog.Content title="displayStats" description="statsWillBeDisplayed">
-        <ul className="overflow-y-scroll h-72 mt-4">
-          {Object.entries(options).map(([key, value]) => {
-            if (key == "theme") return null;
+      <Dialog.Content title='displayStats' description='statsWillBeDisplayed'>
+        <ul className='mt-4 h-72 overflow-y-scroll'>
+          {Object.entries(props.options).map(([opt, checked]) => {
             return (
-              <li key={key}>
+              <li key={opt}>
                 <button
-                  className="w-full cursor-pointer flex py-1 px-2 items-center text-lg hover:bg-[rgba(255,255,255,0.075)]"
-                  onClick={() => onSelect(key, !value)}
+                  className='flex w-full cursor-pointer items-center px-2 py-1 text-lg hover:bg-[rgba(255,255,255,0.075)]'
+                  onClick={() => props.onSelect(opt, !checked)}
                 >
-                  <Checkbox checked={options[key] == true} readOnly />
-                  <span className="ml-2 text-center cursor-pointer capitalize">
-                    {key}
-                  </span>
+                  <Checkbox checked={props.options[opt] === true} readOnly />
+                  <span className='ml-2 cursor-pointer text-center capitalize'>{opt}</span>
                 </button>
               </li>
-            );
+            )
           })}
         </ul>
       </Dialog.Content>
