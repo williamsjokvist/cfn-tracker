@@ -20,7 +20,7 @@ export function SessionsListPage() {
     const date = new Date(sesh.createdAt)
     const year = date.getFullYear()
     const month = date.getMonth() + 1
-    
+
     group[year] = group[year] ?? {}
     group[year][month] = group[year][month] ?? []
     group[year][month].push(sesh)
@@ -71,15 +71,12 @@ export function SessionsListPage() {
                         >
                           <Table.Td>
                             <time dateTime={sesh.createdAt}>
-                              {new Date(sesh.createdAt).toLocaleDateString(
-                                i18n.resolvedLanguage,
-                                {
-                                  day: 'numeric',
-                                  weekday: 'short',
-                                  hour: '2-digit',
-                                  minute: '2-digit'
-                                }
-                              )}
+                              {new Date(sesh.createdAt).toLocaleDateString(i18n.resolvedLanguage, {
+                                day: 'numeric',
+                                weekday: 'short',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })}
                             </time>
                           </Table.Td>
                           <Table.Td>{sesh.userName}</Table.Td>
@@ -90,9 +87,7 @@ export function SessionsListPage() {
                             {`${sesh.lpGain > 0 ? `+` : ``}${sesh.lpGain}`}
                           </Table.Td>
                           <Table.Td className='text-center'>{sesh.matchesWon}</Table.Td>
-                          <Table.Td className='text-center'>
-                            {sesh.matchesLost}
-                          </Table.Td>
+                          <Table.Td className='text-center'>{sesh.matchesLost}</Table.Td>
                         </Table.Tr>
                       ))}
                     </tbody>

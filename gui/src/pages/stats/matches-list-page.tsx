@@ -67,10 +67,17 @@ export function MatchesListPage() {
                   <Table.Td interactive onClick={() => filterLog('opponent', log.opponent)}>
                     {log.opponent}
                   </Table.Td>
-                  <Table.Td interactive onClick={() => filterLog('opponentLeague', log.opponentLeague)}>
+                  <Table.Td
+                    interactive
+                    onClick={() => filterLog('opponentLeague', log.opponentLeague)}
+                  >
                     {log.opponentLeague}
                   </Table.Td>
-                  <Table.Td interactive className='text-center' onClick={() => filterLog('opponentCharacter', log.opponentCharacter)}>
+                  <Table.Td
+                    interactive
+                    className='text-center'
+                    onClick={() => filterLog('opponentCharacter', log.opponentCharacter)}
+                  >
                     {log.opponentCharacter}
                   </Table.Td>
                   <Table.Td

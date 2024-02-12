@@ -22,7 +22,13 @@ export function Content(props: React.PropsWithChildren) {
 export function Tr(props: React.PropsWithChildren<React.TdHTMLAttributes<HTMLTableRowElement>>) {
   const { className, ...restProps } = props
   return (
-    <tr className={cn('group [&>*:first-child]:rounded-l-xl [&>*:last-child]:rounded-r-xl', className)} {...restProps}>
+    <tr
+      className={cn(
+        'group [&>*:first-child]:rounded-l-xl [&>*:last-child]:rounded-r-xl',
+        className
+      )}
+      {...restProps}
+    >
       {props.children}
     </tr>
   )
@@ -31,13 +37,17 @@ export function Tr(props: React.PropsWithChildren<React.TdHTMLAttributes<HTMLTab
 export function Th(props: React.PropsWithChildren<React.ThHTMLAttributes<HTMLTableCellElement>>) {
   const { className, ...restProps } = props
   return (
-    <th className={cn('text-left whitespace-nowrap px-3', className)} {...restProps}>
+    <th className={cn('whitespace-nowrap px-3 text-left', className)} {...restProps}>
       {props.children}
     </th>
   )
 }
 
-export function Td(props: React.PropsWithChildren<React.TdHTMLAttributes<HTMLTableCellElement>> & { interactive?: boolean }) {
+export function Td(
+  props: React.PropsWithChildren<React.TdHTMLAttributes<HTMLTableCellElement>> & {
+    interactive?: boolean
+  }
+) {
   const { className, interactive, ...restProps } = props
   return (
     <td
@@ -46,7 +56,7 @@ export function Td(props: React.PropsWithChildren<React.TdHTMLAttributes<HTMLTab
         'bg-slate-50 bg-opacity-5 group-hover:bg-opacity-10',
         'transition-colors',
         interactive && 'cursor-pointer hover:!bg-opacity-25',
-        className,
+        className
       )}
       {...restProps}
     >

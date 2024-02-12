@@ -91,7 +91,7 @@ function LanguageSelector(props: React.PropsWithChildren) {
     <div className='group flex w-full'>
       <button
         type='button'
-        className='left-0 relative flex h-[28px] w-full cursor-default items-center font-thin lowercase text-[#d6d4ff] transition-colors group-hover:text-white'
+        className='relative left-0 flex h-[28px] w-full cursor-default items-center font-thin lowercase text-[#d6d4ff] transition-colors group-hover:text-white'
       >
         <Icon
           icon='fa6-solid:globe'
