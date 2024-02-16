@@ -38,10 +38,12 @@ export function TrackingPage() {
       return <TrackingGamePicker onSubmit={game => authActor.send({ type: 'submit', game })} />
     case 'loading':
       return (
-        <Page.Header>
-          <Page.Title>{t('loading')}</Page.Title>
-          <Page.LoadingIcon />
-        </Page.Header>
+        <Page.Root>
+          <Page.Header>
+            <Page.Title>{t('loading')}</Page.Title>
+            <Page.LoadingIcon />
+          </Page.Header>
+        </Page.Root>
       )
   }
 
@@ -53,10 +55,12 @@ export function TrackingPage() {
     case 'loading':
     default:
       return (
-        <Page.Header>
-          <Page.Title>{t('loading')}</Page.Title>
-          <Page.LoadingIcon />
-        </Page.Header>
+        <Page.Root>
+          <Page.Header>
+            <Page.Title>{t('loading')}</Page.Title>
+            <Page.LoadingIcon />
+          </Page.Header>
+        </Page.Root>
       )
   }
 }
