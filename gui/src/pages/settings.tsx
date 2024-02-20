@@ -61,7 +61,7 @@ function AppVersion() {
   const { t } = useTranslation()
   const [appVersion, setAppVersion] = React.useState('')
   React.useEffect(() => {
-    !appVersion && GetAppVersion().then(v => setAppVersion(v))
+    !appVersion && GetAppVersion().then(v => setAppVersion(v)).catch(setError)
   }, [appVersion])
   return <span>{t('appVersion', { appVersion: `v${appVersion}` })}</span>
 }
