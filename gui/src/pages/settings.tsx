@@ -60,6 +60,7 @@ export function SettingsPage() {
 function AppVersion() {
   const { t } = useTranslation()
   const [appVersion, setAppVersion] = React.useState('')
+  const setError = useErrorPopup()
   React.useEffect(() => {
     !appVersion && GetAppVersion().then(v => setAppVersion(v)).catch(setError)
   }, [appVersion])
