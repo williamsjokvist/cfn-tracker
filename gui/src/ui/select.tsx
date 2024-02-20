@@ -66,7 +66,7 @@ export const Item = React.forwardRef<HTMLDivElement, SelectPrimitive.SelectItemP
     return (
       <SelectPrimitive.Item
         className={cn(
-          'text-lg flex w-48 cursor-pointer justify-between px-4 py-3',
+          'flex w-48 cursor-pointer justify-between px-4 py-3 text-lg',
           'hover:bg-[rgba(255,255,255,0.075)] data-[state=checked]:bg-[rgba(255,255,255,0.075)]'
         )}
         ref={forwardedRef}

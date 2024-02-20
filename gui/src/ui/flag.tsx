@@ -1,8 +1,10 @@
-import { FR, JP, GB, type FlagComponent } from "country-flag-icons/react/3x2"
+import { FR, JP, GB, type FlagComponent, Props } from 'country-flag-icons/react/3x2'
 
-export function Flag(props: {code: string, className?: string}){
+export function Flag(props: { code: string } & Props) {
+  const { code, ...restProps } = props
+
   let Flag: FlagComponent
-  switch(props.code) {
+  switch (props.code) {
     case 'fr-FR':
       Flag = FR
       break
@@ -14,7 +16,5 @@ export function Flag(props: {code: string, className?: string}){
       Flag = GB
   }
 
-  return (
-    <Flag className={props.className} />
-  )
+  return <Flag {...restProps} />
 }

@@ -7,11 +7,7 @@ export function EnthEye(props: React.ImgHTMLAttributes<HTMLImageElement>) {
     <img
       src={eye}
       alt='Enth'
-      className={cn(
-        'opacity-enth transition-opacity',
-        'pointer-events-none -z-10',
-        className
-      )}
+      className={cn('opacity-enth transition-opacity', 'pointer-events-none -z-10', className)}
       {...restProps}
     />
   )

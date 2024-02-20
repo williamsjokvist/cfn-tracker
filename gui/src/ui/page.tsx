@@ -24,10 +24,7 @@ export function Header(props: React.PropsWithChildren) {
     >
       {props.children}
       <EnthLogo
-        className={cn(
-          'opacity-enth transition-opacity',
-          'absolute right-4 -z-10',
-        )}
+        className={cn('opacity-enth transition-opacity', 'absolute right-4 -z-10')}
         width={100}
         fill='rgba(149, 243, 246, 0.075)'
         strokeWidth='50'

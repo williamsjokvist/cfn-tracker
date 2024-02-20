@@ -6,7 +6,11 @@ export function Switch(props: SwitchPrimitive.SwitchProps) {
   const { className, ...restProps } = props
   return (
     <SwitchPrimitive.Root
-      className={cn('relative h-7 w-12 cursor-pointer', 'rounded-full bg-white bg-opacity-25 backdrop-blur-xl', className)}
+      className={cn(
+        'relative h-7 w-12 cursor-pointer',
+        'rounded-full bg-white bg-opacity-25 backdrop-blur-xl',
+        className
+      )}
       {...restProps}
     >
       <SwitchPrimitive.Thumb

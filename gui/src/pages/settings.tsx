@@ -176,7 +176,7 @@ function LanguageSelect(props: React.PropsWithChildren) {
   )
 }
 
-function TwitterLink(props: { url: string; text: React.ReactNode, className?: string }) {
+function TwitterLink(props: { url: string; text: React.ReactNode; className?: string }) {
   return (
     <button
       onClick={() => BrowserOpenURL(props.url)}
