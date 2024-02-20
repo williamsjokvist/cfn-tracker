@@ -1,6 +1,10 @@
 package locales
 
 type Localization struct {
+	AppVersion               string `json:"appVersion"`
+	Source                   string `json:"source"`
+	About                    string `json:"about"`
+	Settings                 string `json:"settings"`
 	Tracking                 string `json:"tracking"`
 	History                  string `json:"history"`
 	Language                 string `json:"language"`

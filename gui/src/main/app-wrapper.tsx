@@ -9,7 +9,7 @@ import { AuthMachineContext } from '@/state/auth-machine'
 import { CheckForUpdate } from '@@/go/core/CommandHandler'
 import { BrowserOpenURL } from '@@/runtime/runtime'
 
-import { useErrorPopup } from '../error-popup'
+import { useErrorPopup } from './error-popup'
 import { AppSidebar } from './app-sidebar'
 
 export function AppWrapper() {

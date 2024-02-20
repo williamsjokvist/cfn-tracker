@@ -7,8 +7,6 @@ import { I18nextProvider, initReactI18next } from 'react-i18next'
 import type { locales } from '@@/go/models'
 import { GetTranslation } from '@@/go/core/CommandHandler'
 
-import { AppLoader } from './app-layout/app-loader'
-
 export type LocalizationKey = keyof locales.Localization
 
 // https://www.i18next.com/overview/configuration-options
@@ -37,9 +35,5 @@ export function I18nProvider(props: React.PropsWithChildren) {
       }
     })
 
-  return (
-    <React.Suspense fallback={<AppLoader />}>
-      <I18nextProvider i18n={i18n}>{props.children}</I18nextProvider>
-    </React.Suspense>
-  )
+  return <I18nextProvider i18n={i18n}>{props.children}</I18nextProvider>
 }

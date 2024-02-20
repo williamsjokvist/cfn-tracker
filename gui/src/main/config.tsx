@@ -6,6 +6,7 @@ import { GetGuiConfig } from '@@/go/core/CommandHandler'
 
 const initialConfig: model.GuiConfig = {
   locale: 'en-GB',
+  theme: 'default',
   sidebarMinified: false
 }
 
@@ -27,6 +28,7 @@ export function ConfigProvider({ children }: React.PropsWithChildren) {
       const cfg = await GetGuiConfig()
       setCfg(cfg)
       i18n.changeLanguage(cfg.locale)
+      document.body.setAttribute('data-theme', cfg.theme)
     })()
   }, [])
 

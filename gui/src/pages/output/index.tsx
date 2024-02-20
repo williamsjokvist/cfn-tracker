@@ -76,7 +76,7 @@ export function OutputPage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.125 }}
-          className='grid w-full gap-4 border-b-[1px] border-solid border-b-[rgba(255,255,255,.125)] px-8 py-6'
+          className='grid w-full gap-4 border-b-[1px] border-solid border-b-divider px-8 py-6'
         >
           <div className='flex items-center justify-between gap-8'>
             <div>

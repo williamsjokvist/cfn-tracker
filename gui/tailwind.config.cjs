@@ -5,14 +5,21 @@ module.exports = {
   ],
   theme: {
     extend: {
+      colors: {
+        'highlight': 'var(--color-highlight)',
+        'divider': 'var(--color-divider)'
+      },
+      opacity: {
+        'enth': 'var(--enth-only)'
+      },
       fontFamily: {
-        'spartan': ['"League Spartan"', 'sans-serif']
+        'app': 'var(--app-font)',
       },
       backgroundImage: {
-        'radial-purple': 'radial-gradient(circle at 52.1% -29.6%, rgb(144, 17, 105) 0%, rgb(51, 0, 131) 100.2%)'
+        'main': 'var(--bg-main)'
       },
       animation: {
-        'blink-pulse': 'blink 1s linear infinite',
+        'blink': 'blink 1s linear infinite',
       },
       keyframes: {
         blink: {

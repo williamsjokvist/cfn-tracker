@@ -1,6 +1,10 @@
 package locales
 
 var FR_FR = Localization{
+	About:                    "Environ",
+	AppVersion:               "Version {{appVersion}} de l'application",
+	Source:                   "Code source",
+	Settings:                 "Paramètres",
 	Tracking:                 "Suivie",
 	History:                  "Histoire",
 	Language:                 "Langue",
@@ -28,7 +32,7 @@ var FR_FR = Localization{
 	Unpause:                  "Reprendre",
 	Statistics:               "Statistiques",
 	Date:                     "Date",
-	Minimize:                 "réduire",
+	Minimize:                 "Barre latérale",
 	RestoreSession:           "Restaurer la dernière session",
 	ExportLog:                "Exporter CSV",
 	League:                   "Ligue",

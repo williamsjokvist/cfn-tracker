@@ -1,6 +1,10 @@
 package locales
 
 var EN_GB = Localization{
+	About:                    "About",
+	AppVersion:               "App version {{appVersion}}",
+	Source:                   "Source code",
+	Settings:                 "Settings",
 	Tracking:                 "Tracking",
 	History:                  "Match Log",
 	Language:                 "Language",
@@ -28,7 +32,7 @@ var EN_GB = Localization{
 	Unpause:                  "Unpause",
 	Statistics:               "Statistics",
 	Date:                     "Date",
-	Minimize:                 "shrink",
+	Minimize:                 "Sidebar",
 	RestoreSession:           "Restore last session",
 	ExportLog:                "Export CSV",
 	League:                   "League",

@@ -1,6 +1,10 @@
 package locales
 
 var JA_JP = Localization{
+	About:                    "約",
+	AppVersion:               "アプリバージョン {{appVersion}}",
+	Source:                   "ソースコード",
+	Settings:                 "設定",
 	Tracking:                 "追跡",
 	History:                  "ログ",
 	Language:                 "言語",
