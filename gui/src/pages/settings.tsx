@@ -18,7 +18,6 @@ import { BrowserOpenURL } from '@@/runtime/runtime'
 import * as Page from '@/ui/page'
 import * as Select from '@/ui/select'
 import { Switch } from '@/ui/switch'
-import { EnthEye } from '@/ui/enth-eye'
 import { Flag } from '@/ui/flag'
 import { cn } from '@/helpers/cn'
 
@@ -52,7 +51,6 @@ export function SettingsPage() {
             <TwitterLink url='https://x.com/greensoap_' text={t('follow')} />
             <TwitterLink url='https://x.com/enthcreations' text={'enth'} className='opacity-enth' />
           </div>
-          <EnthEye className='absolute bottom-0 right-0 w-40 origin-[bottom_left] translate-x-40  -rotate-90' />
         </div>
       </motion.section>
     </Page.Root>
