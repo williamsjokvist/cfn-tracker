@@ -61,6 +61,10 @@ func (m *CFNTrackerRepository) SaveSidebarMinimized(sidebarMinified bool) error 
 	return m.nosqlDb.SaveSidebarMinimized(sidebarMinified)
 }
 
+func (m *CFNTrackerRepository) SaveTheme(theme model.ThemeName) error {
+	return m.nosqlDb.SaveTheme(theme)
+}
+
 func (m *CFNTrackerRepository) GetGuiConfig() (*model.GuiConfig, error) {
 	return m.nosqlDb.GetGuiConfig()
 }

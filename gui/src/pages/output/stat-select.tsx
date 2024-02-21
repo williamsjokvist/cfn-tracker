@@ -5,7 +5,7 @@ import * as Dialog from '@/ui/dialog'
 import { Checkbox } from '@/ui/checkbox'
 import { Button } from '@/ui/button'
 
-import type { StatOptions } from './output-page'
+import type { StatOptions } from '.'
 
 export function StatSelect(props: {
   options: Omit<StatOptions, 'theme'>

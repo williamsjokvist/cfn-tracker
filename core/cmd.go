@@ -206,6 +206,10 @@ func (ch *CommandHandler) SaveSidebarMinimized(sidebarMinified bool) error {
 	return ch.repo.SaveSidebarMinimized(sidebarMinified)
 }
 
+func (ch *CommandHandler) SaveTheme(theme model.ThemeName) error {
+	return ch.repo.SaveTheme(theme)
+}
+
 func (ch *CommandHandler) GetTrackingStateUnused() *model.TrackingState {
 	return nil
 }

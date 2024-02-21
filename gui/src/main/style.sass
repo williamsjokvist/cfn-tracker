@@ -3,10 +3,22 @@
 @tailwind utilities
 
 @layer base
+  :root
+    --bg-main: radial-gradient(circle at 52.1% -29.6%, #901169 0%, #330083 100%)
+    --color-highlight: #F85961
+    --color-divider: rgba(255,255,255,.125)
+    --enth-only: 0
+    --app-font: "League Spartan", sans serif
+  body[data-theme="enth"]
+    --bg-main: radial-gradient(circle at 52.1% -29.6%, #0E254D 0%, #010814 100%)
+    --color-highlight: #95F3F6
+    --color-divider: rgba(149, 243, 246, 0.075)
+    --enth-only: 1
+    --app-font: "League Spartan", sans serif
   body
-    @apply overflow-hidden bg-radial-purple font-spartan
+    @apply overflow-hidden bg-main font-app
   #root
-    @apply flex 
+    @apply flex
 
 @layer utilities
   .clip-circle
@@ -17,9 +29,6 @@
 
 p, h1, h2, h3, h4
   cursor: default
-
-body[style="pointer-events: none;"] > #root
-  filter: brightness(.75)
 
 ::-webkit-scrollbar-track
   border-radius: 10px

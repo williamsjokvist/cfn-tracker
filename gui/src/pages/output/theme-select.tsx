@@ -39,7 +39,7 @@ export function ThemeSelect(props: { selectedTheme: string; onSelect: (theme: st
           />
           <label
             htmlFor={`${theme.name}-checkbox`}
-            className='cursor-pointer font-spartan text-lg font-bold capitalize'
+            className='font-spartan cursor-pointer text-lg font-bold capitalize'
           >
             {theme.name}
           </label>

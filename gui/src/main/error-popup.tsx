@@ -50,7 +50,7 @@ export function ErrorPopupProvider(props: React.PropsWithChildren) {
         >
           <Icon
             icon='material-symbols:warning-outline'
-            className='h-8 w-8 animate-blink-pulse text-[#ff6388]'
+            className='h-8 w-8 animate-blink text-[#ff6388]'
           />
           {error && (
             <span>

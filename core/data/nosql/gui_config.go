@@ -1,6 +1,10 @@
 package nosql
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/williamsjokvist/cfn-tracker/core/model"
+)
 
 func (s *Storage) SaveLocale(locale string) error {
 	cfg, err := s.GetGuiConfig()
@@ -8,6 +12,22 @@ func (s *Storage) SaveLocale(locale string) error {
 		return fmt.Errorf(`failed to read config: %w`, err)
 	}
 	cfg.Locale = locale
+	err = s.writeConfig(cfg)
+	if err != nil {
+		return fmt.Errorf(`failed to save locale: %w`, err)
+	}
+	return nil
+}
+
+func (s *Storage) SaveTheme(theme model.ThemeName) error {
+	if theme != model.ThemeDefault && theme != model.ThemeEnth {
+		return fmt.Errorf(`invalid theme`)
+	}
+	cfg, err := s.GetGuiConfig()
+	if err != nil {
+		return fmt.Errorf(`failed to read config: %w`, err)
+	}
+	cfg.Theme = theme
 	err = s.writeConfig(cfg)
 	if err != nil {
 		return fmt.Errorf(`failed to save locale: %w`, err)

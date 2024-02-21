@@ -1,12 +1,13 @@
 import { Navigate, RouterProvider as ReactRouterProvider, createHashRouter } from 'react-router-dom'
 
-import { OutputPage } from '@/pages/output/output-page'
-import { MatchesListPage } from '@/pages/stats/matches-list-page'
-import { SessionsListPage } from '@/pages/stats/sessions-list-page'
-import { TrackingPage } from '@/pages/tracking/tracking-page'
+import { SettingsPage } from '@/pages/settings'
+import { OutputPage } from '@/pages/output'
+import { MatchesListPage } from '@/pages/matches'
+import { SessionsListPage } from '@/pages/sessions'
+import { TrackingPage } from '@/pages/tracking'
 
-import { AppWrapper } from './app-layout/app-wrapper'
-import { AppErrorBoundary, PageErrorBoundary } from './app-layout/app-error'
+import { AppWrapper } from './app-wrapper'
+import { AppErrorBoundary, PageErrorBoundary } from './app-error'
 
 import { GetUsers, GetSessions, GetMatches } from '@@/go/core/CommandHandler'
 
@@ -30,6 +31,10 @@ const router = createHashRouter([
           {
             element: <OutputPage />,
             path: '/output'
+          },
+          {
+            element: <SettingsPage />,
+            path: '/settings'
           },
           {
             element: <SessionsListPage />,

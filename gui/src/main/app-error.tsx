@@ -7,7 +7,7 @@ import { Icon } from '@iconify/react'
 import * as Page from '@/ui/page'
 import { errorsx } from '@@/go/models'
 
-import { LocalizedErrorMessage } from '../error-popup'
+import { LocalizedErrorMessage } from './error-popup'
 import { AppTitleBar } from './app-titlebar'
 
 export function AppErrorBoundary() {
