@@ -98,19 +98,3 @@ func (s *Storage) UpdateLatestSession(ctx context.Context, lp, mr int, sessionId
 	}
 	return nil
 }
-
-func (s *Storage) createSessionsTable() error {
-	_, err := s.db.Exec(`
-	CREATE TABLE IF NOT EXISTS sessions (
-		id INTEGER PRIMARY KEY AUTOINCREMENT,
-		user_id TEXT NOT NULL,
-		lp INTEGER DEFAULT 0 NOT NULL,
-		mr INTEGER DEFAULT 0 NOT NULL,
-		created_at TEXT DEFAULT (DATETIME('NOW')) NOT NULL,
-		FOREIGN KEY (user_id) REFERENCES users(code)
-	)`)
-	if err != nil {
-		return fmt.Errorf("create users table: %w", err)
-	}
-	return nil
-}
