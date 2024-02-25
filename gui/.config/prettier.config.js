@@ -1,5 +1,5 @@
 /** @type {import('prettier').Config} */
-module.exports = {
+export default {
   printWidth: 100,
   arrowParens: 'avoid',
   jsxSingleQuote: true,
@@ -9,5 +9,5 @@ module.exports = {
   trailingComma: 'none',
   plugins: ['prettier-plugin-tailwindcss'],
   tailwindFunctions: ['cn'],
-  tailwindConfig: 'tailwind.config.cjs'
+  tailwindConfig: './.config/tailwind.config.js'
 }

@@ -1,13 +1,13 @@
 {
   "name": "cfn-tracker",
   "private": true,
-  "version": "4.0.0",
   "type": "module",
   "scripts": {
-    "format": "prettier src --write",
-    "format:check": "prettier src --check",
-    "tsc": "tsc --project . --noEmit",
-    "dev": "vite"
+    "build": "vite build --config .config/vite.config.js",
+    "format": "prettier src --config .config/prettier.config.js --write",
+    "format:check": "prettier --config .config/prettier.config.js src --check",
+    "tsc": "tsc --project .config/tsconfig.json --noEmit",
+    "dev": "vite --config .config/vite.config.js"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.0.4",

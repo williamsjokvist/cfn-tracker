@@ -24,7 +24,7 @@ export function EnthEye(props: React.ImgHTMLAttributes<HTMLImageElement>) {
             WebkitMaskSize: 'cover'
           }}
           className={cn(
-            'opacity-enth rounded-full transition-opacity',
+            'rounded-full opacity-enth transition-opacity',
             'pointer-events-none -z-10'
           )}
           {...restProps}

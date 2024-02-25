@@ -62,7 +62,10 @@ function AppVersion() {
   const [appVersion, setAppVersion] = React.useState('')
   const setError = useErrorPopup()
   React.useEffect(() => {
-    !appVersion && GetAppVersion().then(v => setAppVersion(v)).catch(setError)
+    !appVersion &&
+      GetAppVersion()
+        .then(v => setAppVersion(v))
+        .catch(setError)
   }, [appVersion])
   return <span>{t('appVersion', { appVersion: `v${appVersion}` })}</span>
 }

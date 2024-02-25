@@ -2,7 +2,6 @@
 # https://github.com/github/gitignore/blob/main/community/Golang/Go.AllowList.gitignore
 #
 # Binaries for programs and plugins
-.astro
 *.exe
 *.exe~
 *.dll
@@ -10,7 +9,6 @@
 *.dylib
 
 build/bin
-gui/wailsjs
 
 # Test binary, built with `go test -c`
 *.test
@@ -18,16 +16,14 @@ gui/wailsjs
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
 
-# Dependency directories (remove the comment below to include it)
-# vendor/
-
-# Go workspace file
 go.work
 
 .env
 
 results
 
+wailsjs
+dist
 node_modules
 
 resource.syso
@@ -36,3 +32,5 @@ resource.syso
 
 *.db
 *.log
+
+.astro
