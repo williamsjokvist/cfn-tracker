@@ -1,6 +1,6 @@
 # FAQ
 
-## The app shows up as a virus on Windows Defender.
+## The app shows up as a virus in Windows Defender.
 This is a false positive, caused by the app being compressed and not signed by a certificate authority. App certificates are expensive - [around $500/yr](https://order.digicert.com/step1/code_signing) - and no way am I paying that. The [source code](https://github.com/williamsjokvist/cfn-tracker) is public, so you or a programming friend can check it out and make sure no tomfoolery is going on 😌
 
 ## Can I use this for my stream?
