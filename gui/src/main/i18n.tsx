@@ -4,8 +4,8 @@ import LanguageDetector from 'i18next-browser-languagedetector'
 import HttpBackend, { type HttpBackendOptions } from 'i18next-http-backend'
 import { I18nextProvider, initReactI18next } from 'react-i18next'
 
-import type { locales } from '@@/go/models'
-import { GetTranslation } from '@@/go/core/CommandHandler'
+import type { locales } from '@model'
+import { GetTranslation } from '@cmd'
 
 export type LocalizationKey = keyof locales.Localization
 

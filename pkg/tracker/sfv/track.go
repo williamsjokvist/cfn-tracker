@@ -12,9 +12,9 @@ import (
 
 	wails "github.com/wailsapp/wails/v2/pkg/runtime"
 
-	"github.com/williamsjokvist/cfn-tracker/core/browser"
-	"github.com/williamsjokvist/cfn-tracker/core/model"
-	"github.com/williamsjokvist/cfn-tracker/core/utils"
+	"github.com/williamsjokvist/cfn-tracker/pkg/browser"
+	"github.com/williamsjokvist/cfn-tracker/pkg/model"
+	"github.com/williamsjokvist/cfn-tracker/pkg/utils"
 )
 
 type SFVTracker struct {

@@ -1,8 +1,8 @@
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 
-import type { model } from '@@/go/models'
-import { GetGuiConfig } from '@@/go/core/CommandHandler'
+import type { model } from '@model'
+import { GetGuiConfig } from '@cmd'
 
 const initialConfig: model.GuiConfig = {
   locale: 'en-GB',

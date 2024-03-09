@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 import * as Page from '@/ui/page'
 import * as Table from '@/ui/table'
 
-import type { model } from '@@/go/models'
+import type { model } from '@model'
 
 export function MatchesListPage() {
   const { t } = useTranslation()

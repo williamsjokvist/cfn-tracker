@@ -21,15 +21,15 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/options/windows"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 
-	"github.com/williamsjokvist/cfn-tracker/core"
-	"github.com/williamsjokvist/cfn-tracker/core/browser"
-	"github.com/williamsjokvist/cfn-tracker/core/config"
-	"github.com/williamsjokvist/cfn-tracker/core/data"
-	"github.com/williamsjokvist/cfn-tracker/core/data/nosql"
-	"github.com/williamsjokvist/cfn-tracker/core/data/sql"
-	"github.com/williamsjokvist/cfn-tracker/core/data/txt"
-	"github.com/williamsjokvist/cfn-tracker/core/errorsx"
-	"github.com/williamsjokvist/cfn-tracker/core/server"
+	"github.com/williamsjokvist/cfn-tracker/cmd"
+	"github.com/williamsjokvist/cfn-tracker/pkg/browser"
+	"github.com/williamsjokvist/cfn-tracker/pkg/config"
+	"github.com/williamsjokvist/cfn-tracker/pkg/data"
+	"github.com/williamsjokvist/cfn-tracker/pkg/data/nosql"
+	"github.com/williamsjokvist/cfn-tracker/pkg/data/sql"
+	"github.com/williamsjokvist/cfn-tracker/pkg/data/txt"
+	"github.com/williamsjokvist/cfn-tracker/pkg/errorsx"
+	"github.com/williamsjokvist/cfn-tracker/pkg/server"
 )
 
 var (
@@ -46,9 +46,6 @@ var assets embed.FS
 
 //go:embed gui/error/error.html
 var errorTmpl []byte
-
-//go:embed build/appicon.png
-var icon []byte
 
 var cfg config.Config
 var logFile *os.File
@@ -147,7 +144,7 @@ func main() {
 		return
 	}
 	trackerRepo := data.NewCFNTrackerRepository(sqlDb, noSqlDb, txtDb)
-	cmdHandler := core.NewCommandHandler(appBrowser, trackerRepo, &cfg)
+	cmdHandler := cmd.NewCommandHandler(appBrowser, trackerRepo, &cfg)
 
 	var wailsCtx context.Context
 	err = wails.Run(&options.App{

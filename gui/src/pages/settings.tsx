@@ -12,8 +12,8 @@ import {
   SaveLocale,
   SaveSidebarMinimized,
   SaveTheme
-} from '@@/go/core/CommandHandler'
-import { BrowserOpenURL } from '@@/runtime/runtime'
+} from '@cmd'
+import { BrowserOpenURL } from '@runtime'
 
 import * as Page from '@/ui/page'
 import * as Select from '@/ui/select'

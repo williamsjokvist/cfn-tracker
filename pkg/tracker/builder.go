@@ -7,12 +7,12 @@ import (
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 
-	"github.com/williamsjokvist/cfn-tracker/core/browser"
-	"github.com/williamsjokvist/cfn-tracker/core/config"
-	"github.com/williamsjokvist/cfn-tracker/core/data"
-	"github.com/williamsjokvist/cfn-tracker/core/errorsx"
-	"github.com/williamsjokvist/cfn-tracker/core/tracker/sf6"
-	"github.com/williamsjokvist/cfn-tracker/core/tracker/sfv"
+	"github.com/williamsjokvist/cfn-tracker/pkg/browser"
+	"github.com/williamsjokvist/cfn-tracker/pkg/config"
+	"github.com/williamsjokvist/cfn-tracker/pkg/data"
+	"github.com/williamsjokvist/cfn-tracker/pkg/errorsx"
+	"github.com/williamsjokvist/cfn-tracker/pkg/tracker/sf6"
+	"github.com/williamsjokvist/cfn-tracker/pkg/tracker/sfv"
 )
 
 type GameTracker interface {

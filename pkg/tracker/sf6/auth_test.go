@@ -1,4 +1,4 @@
-package sfv
+package sf6
 
 import (
 	"context"
@@ -7,11 +7,11 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/williamsjokvist/cfn-tracker/core/browser"
+	"github.com/williamsjokvist/cfn-tracker/pkg/browser"
 )
 
 // The most crucial test, to make sure authentication is always working.
-func TestSFVAuthentication(t *testing.T) {
+func TestSF6Authentication(t *testing.T) {
 	assert := assert.New(t)
 
 	ctx := context.Background()
@@ -21,7 +21,7 @@ func TestSFVAuthentication(t *testing.T) {
 		t.Fatalf("failed to create browser: %v", err)
 	}
 
-	sf5Tracker := NewSFVTracker(browser)
+	sf6Tracker := NewSF6Tracker(browser, nil)
 	authChan := make(chan AuthStatus, 1)
 
 	t.Cleanup(func() {
@@ -29,7 +29,7 @@ func TestSFVAuthentication(t *testing.T) {
 		close(authChan)
 	})
 
-	go sf5Tracker.Authenticate(ctx, os.Getenv(`STEAM_USERNAME`), os.Getenv(`STEAM_PASSWORD`), authChan)
+	go sf6Tracker.Authenticate(ctx, os.Getenv("CAP_ID_EMAIL"), os.Getenv("CAP_ID_PASSWORD"), authChan)
 	for status := range authChan {
 		if !assert.Nil(status.Err) {
 			t.Fatalf("failed to authenticate: %v", status.Err)

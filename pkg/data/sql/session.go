@@ -7,7 +7,7 @@ import (
 
 	"github.com/jmoiron/sqlx"
 
-	"github.com/williamsjokvist/cfn-tracker/core/model"
+	"github.com/williamsjokvist/cfn-tracker/pkg/model"
 )
 
 type SessionStorage interface {

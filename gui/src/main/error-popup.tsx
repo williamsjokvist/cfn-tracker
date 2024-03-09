@@ -4,7 +4,7 @@ import { useAnimate } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 
 import { cn } from '@/helpers/cn'
-import type { errorsx } from '@@/go/models'
+import type { errorsx } from '@model'
 
 import type { LocalizationKey } from './i18n'
 

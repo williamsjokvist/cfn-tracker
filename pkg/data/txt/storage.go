@@ -5,7 +5,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/williamsjokvist/cfn-tracker/core/model"
+	"github.com/williamsjokvist/cfn-tracker/pkg/model"
 )
 
 type Storage struct {

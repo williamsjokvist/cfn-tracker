@@ -7,7 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/williamsjokvist/cfn-tracker/core/model"
+	"github.com/williamsjokvist/cfn-tracker/pkg/model"
 )
 
 type Storage struct {

@@ -3,7 +3,7 @@ package i18n
 import (
 	"errors"
 
-	"github.com/williamsjokvist/cfn-tracker/core/i18n/locales"
+	"github.com/williamsjokvist/cfn-tracker/pkg/i18n/locales"
 )
 
 var languages = map[string]locales.Localization{

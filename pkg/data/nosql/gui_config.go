@@ -3,7 +3,7 @@ package nosql
 import (
 	"fmt"
 
-	"github.com/williamsjokvist/cfn-tracker/core/model"
+	"github.com/williamsjokvist/cfn-tracker/pkg/model"
 )
 
 func (s *Storage) SaveLocale(locale string) error {

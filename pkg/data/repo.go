@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/williamsjokvist/cfn-tracker/core/data/nosql"
-	"github.com/williamsjokvist/cfn-tracker/core/data/sql"
-	"github.com/williamsjokvist/cfn-tracker/core/data/txt"
-	"github.com/williamsjokvist/cfn-tracker/core/model"
+	"github.com/williamsjokvist/cfn-tracker/pkg/data/nosql"
+	"github.com/williamsjokvist/cfn-tracker/pkg/data/sql"
+	"github.com/williamsjokvist/cfn-tracker/pkg/data/txt"
+	"github.com/williamsjokvist/cfn-tracker/pkg/model"
 )
 
 type CFNTrackerRepository struct {

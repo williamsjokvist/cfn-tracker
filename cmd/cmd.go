@@ -1,4 +1,4 @@
-package core
+package cmd
 
 import (
 	"context"
@@ -14,15 +14,15 @@ import (
 
 	"github.com/hashicorp/go-version"
 
-	"github.com/williamsjokvist/cfn-tracker/core/browser"
-	"github.com/williamsjokvist/cfn-tracker/core/config"
-	"github.com/williamsjokvist/cfn-tracker/core/data"
-	"github.com/williamsjokvist/cfn-tracker/core/errorsx"
-	"github.com/williamsjokvist/cfn-tracker/core/i18n"
-	"github.com/williamsjokvist/cfn-tracker/core/i18n/locales"
-	"github.com/williamsjokvist/cfn-tracker/core/model"
-	"github.com/williamsjokvist/cfn-tracker/core/server"
-	"github.com/williamsjokvist/cfn-tracker/core/tracker"
+	"github.com/williamsjokvist/cfn-tracker/pkg/browser"
+	"github.com/williamsjokvist/cfn-tracker/pkg/config"
+	"github.com/williamsjokvist/cfn-tracker/pkg/data"
+	"github.com/williamsjokvist/cfn-tracker/pkg/errorsx"
+	"github.com/williamsjokvist/cfn-tracker/pkg/i18n"
+	"github.com/williamsjokvist/cfn-tracker/pkg/i18n/locales"
+	"github.com/williamsjokvist/cfn-tracker/pkg/model"
+	"github.com/williamsjokvist/cfn-tracker/pkg/server"
+	"github.com/williamsjokvist/cfn-tracker/pkg/tracker"
 )
 
 // The CommandHandler is the interface between the GUI and the core

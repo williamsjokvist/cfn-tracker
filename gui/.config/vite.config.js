@@ -12,7 +12,10 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(dirname, "src"),
-      '@@': path.resolve(dirname, "wailsjs")
+      '@@': path.resolve(dirname, "wailsjs"),
+      "@runtime": path.resolve(dirname, "wailsjs", "runtime", "runtime.js"),
+      "@model": path.resolve(dirname, "wailsjs", "go", "models.ts"),
+      "@cmd": path.resolve(dirname, "wailsjs", "go", "cmd", "CommandHandler.js"),
     },
   },
   css: {

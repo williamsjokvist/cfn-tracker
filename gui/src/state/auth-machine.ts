@@ -1,9 +1,9 @@
 import { setup, assign } from 'xstate'
 import { createActorContext } from '@xstate/react'
 
-import { SelectGame } from '@@/go/core/CommandHandler'
-import type { errorsx } from '@@/go/models'
-import { EventsOff, EventsOn } from '@@/runtime/runtime'
+import { SelectGame } from '@cmd'
+import type { errorsx } from '@model'
+import { EventsOff, EventsOn } from '@runtime'
 
 import { TRACKING_MACHINE } from './tracking-machine'
 

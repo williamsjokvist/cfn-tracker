@@ -6,8 +6,8 @@ import { Icon } from '@iconify/react'
 
 import { cn } from '@/helpers/cn'
 import { AuthMachineContext } from '@/state/auth-machine'
-import { CheckForUpdate } from '@@/go/core/CommandHandler'
-import { BrowserOpenURL } from '@@/runtime/runtime'
+import { CheckForUpdate } from '@cmd'
+import { BrowserOpenURL } from '@runtime'
 
 import { useErrorPopup } from './error-popup'
 import { AppSidebar } from './app-sidebar'

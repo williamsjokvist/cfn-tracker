@@ -1,9 +1,9 @@
 import { assign, setup } from 'xstate'
 import { createActorContext } from '@xstate/react'
 
-import { StartTracking, StopTracking } from '@@/go/core/CommandHandler'
-import type { errorsx, model } from '@@/go/models'
-import { EventsOff, EventsOn } from '@@/runtime/runtime'
+import { StartTracking, StopTracking } from '@cmd'
+import type { errorsx, model } from '@model'
+import { EventsOff, EventsOn } from '@runtime'
 
 type TrackingMachineContextProps = {
   user: model.User | null

@@ -6,7 +6,7 @@ import { motion } from 'framer-motion'
 import * as Page from '@/ui/page'
 import * as Table from '@/ui/table'
 
-import type { model } from '@@/go/models'
+import type { model } from '@model'
 
 type MonthGroup = Record<string, model.Session[]>
 type YearGroup = Record<string, MonthGroup>

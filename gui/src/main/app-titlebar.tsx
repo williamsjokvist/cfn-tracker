@@ -1,5 +1,5 @@
 import { Icon } from '@iconify/react'
-import { Quit, WindowMinimise } from '@@/runtime/runtime'
+import { Quit, WindowMinimise } from '@runtime'
 
 export function AppTitleBar() {
   return (

@@ -11,8 +11,8 @@ import (
 
 	wails "github.com/wailsapp/wails/v2/pkg/runtime"
 
-	"github.com/williamsjokvist/cfn-tracker/core/config"
-	"github.com/williamsjokvist/cfn-tracker/core/model"
+	"github.com/williamsjokvist/cfn-tracker/pkg/config"
+	"github.com/williamsjokvist/cfn-tracker/pkg/model"
 )
 
 //go:embed static/index.html

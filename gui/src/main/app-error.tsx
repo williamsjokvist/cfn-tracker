@@ -5,7 +5,7 @@ import { motion } from 'framer-motion'
 import { Icon } from '@iconify/react'
 
 import * as Page from '@/ui/page'
-import { errorsx } from '@@/go/models'
+import { errorsx } from '@model'
 
 import { LocalizedErrorMessage } from './error-popup'
 import { AppTitleBar } from './app-titlebar'

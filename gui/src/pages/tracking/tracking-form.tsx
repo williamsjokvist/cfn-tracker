@@ -10,7 +10,7 @@ import { Button } from '@/ui/button'
 import { Checkbox } from '@/ui/checkbox'
 import * as Page from '@/ui/page'
 
-import { model } from '@@/go/models'
+import { model } from '@model'
 
 export function TrackingForm() {
   const { t } = useTranslation()

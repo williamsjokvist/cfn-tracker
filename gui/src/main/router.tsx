@@ -9,7 +9,7 @@ import { TrackingPage } from '@/pages/tracking'
 import { AppWrapper } from './app-wrapper'
 import { AppErrorBoundary, PageErrorBoundary } from './app-error'
 
-import { GetUsers, GetSessions, GetMatches } from '@@/go/core/CommandHandler'
+import { GetUsers, GetSessions, GetMatches } from '@cmd'
 
 const router = createHashRouter([
   {

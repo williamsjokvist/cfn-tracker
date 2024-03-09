@@ -8,8 +8,8 @@ import * as Dialog from '@/ui/dialog'
 import { Checkbox } from '@/ui/checkbox'
 import { Button } from '@/ui/button'
 
-import { GetThemes } from '@@/go/core/CommandHandler'
-import type { model } from '@@/go/models'
+import { GetThemes } from '@cmd'
+import type { model } from '@model'
 
 export function ThemeSelect(props: { selectedTheme: string; onSelect: (theme: string) => void }) {
   const containerRef = React.useRef<HTMLDivElement>(null)

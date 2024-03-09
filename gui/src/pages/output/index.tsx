@@ -6,8 +6,8 @@ import { motion, useAnimate } from 'framer-motion'
 import * as Page from '@/ui/page'
 import { Button } from '@/ui/button'
 
-import { model } from '@@/go/models'
-import { OpenResultsDirectory } from '@@/go/core/CommandHandler'
+import { model } from '@model'
+import { OpenResultsDirectory } from '@cmd'
 
 import { ThemeSelect } from './theme-select'
 import { StatSelect } from './stat-select'
