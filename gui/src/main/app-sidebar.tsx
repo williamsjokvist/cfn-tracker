@@ -74,6 +74,7 @@ function Nav() {
         const selected = location.pathname.includes(href)
         return (
           <Link
+            key={href}
             to={href}
             className={cn(
               'flex items-center justify-between',

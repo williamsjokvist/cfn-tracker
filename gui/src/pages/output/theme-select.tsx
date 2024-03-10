@@ -12,7 +12,6 @@ import { GetThemes } from '@cmd'
 import type { model } from '@model'
 
 export function ThemeSelect(props: { selectedTheme: string; onSelect: (theme: string) => void }) {
-  const containerRef = React.useRef<HTMLUListElement>(null)
   const [themes, setThemes] = React.useState<model.Theme[]>([])
   const [isOpen, setOpen] = React.useState(false)
   const setError = useErrorPopup()
@@ -22,10 +21,9 @@ export function ThemeSelect(props: { selectedTheme: string; onSelect: (theme: st
   }, [])
 
   React.useEffect(() => {
-    if (!isOpen || !containerRef.current) {
+    if (!isOpen) {
       return
     }
-
     for (const theme of themes) {
       const container = document.querySelector(`.${theme.name}-preview`)
       if (!container) {
@@ -33,16 +31,13 @@ export function ThemeSelect(props: { selectedTheme: string; onSelect: (theme: st
       }
       const shadowRoot = container.attachShadow({ mode: 'open' })
       createRoot(shadowRoot).render(
-        <>
-          <slot />
-          <div className='stat-list'>
-            <style>{theme.css}</style>
-            <div className='stat-item'>
-              <span className='stat-title'>MR</span>
-              <span className='stat-value'>444</span>
-            </div>
+        <div className='stat-list'>
+          <style>{theme.css}</style>
+          <div className='stat-item'>
+            <span className='stat-title'>MR</span>
+            <span className='stat-value'>444</span>
           </div>
-        </>
+        </div>
       )
     }
   }, [isOpen, themes])
@@ -59,18 +54,19 @@ export function ThemeSelect(props: { selectedTheme: string; onSelect: (theme: st
         </Button>
       </Dialog.Trigger>
       <Dialog.Content title='selectTheme'>
-        <ul ref={containerRef} className='mt-2 grid h-80 w-full gap-4 overflow-y-scroll pr-2'>
+        <ul className='mt-2 grid h-80 w-full gap-4 overflow-y-scroll pr-2'>
           {themes.map(theme => (
             <li key={theme.name}>
-              <div className='mb-4 flex px-2 py-1 hover:bg-white hover:bg-opacity-[.075]'>
+              <div className='mb-4 flex px-2 hover:bg-white hover:bg-opacity-[.075]'>
                 <Checkbox
                   id={`${theme.name}-checkbox`}
                   checked={theme.name === props.selectedTheme}
                   onChange={e => props.onSelect(theme.name)}
+                  className="my-2"
                 />
                 <label
                   htmlFor={`${theme.name}-checkbox`}
-                  className='font-spartan w-full cursor-pointer text-lg font-bold capitalize'
+                  className='font-spartan w-full cursor-pointer py-2 text-lg font-bold capitalize'
                 >
                   {theme.name}
                 </label>

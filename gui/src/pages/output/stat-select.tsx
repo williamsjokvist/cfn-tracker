@@ -22,19 +22,17 @@ export function StatSelect(props: {
       </Dialog.Trigger>
       <Dialog.Content title='displayStats' description='statsWillBeDisplayed'>
         <ul className='mt-4 h-72 overflow-y-scroll'>
-          {Object.entries(props.options).map(([opt, checked]) => {
-            return (
-              <li key={opt}>
-                <button
-                  className='flex w-full cursor-pointer items-center px-2 py-1 text-lg hover:bg-white hover:bg-opacity-[.075]'
-                  onClick={() => props.onSelect(opt, !checked)}
-                >
-                  <Checkbox checked={props.options[opt] === true} readOnly />
-                  <span className='ml-2 cursor-pointer text-center capitalize'>{opt}</span>
-                </button>
-              </li>
-            )
-          })}
+          {Object.entries(props.options).map(([opt, checked]) => (
+            <li key={opt}>
+              <button
+                className='flex w-full cursor-pointer items-center px-2 py-1 text-lg hover:bg-white hover:bg-opacity-[.075]'
+                onClick={() => props.onSelect(opt, !checked)}
+              >
+                <Checkbox checked={props.options[opt] === true} readOnly />
+                <span className='ml-2 cursor-pointer text-center capitalize'>{opt}</span>
+              </button>
+            </li>
+          ))}
         </ul>
       </Dialog.Content>
     </Dialog.Root>

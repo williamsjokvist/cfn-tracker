@@ -115,7 +115,7 @@ function ThemeSelect() {
       >
         {Object.keys(Themes).map(theme => {
           return (
-            <Select.Item value={theme} className='flex items-center justify-between gap-2'>
+            <Select.Item key={theme} value={theme} className='flex items-center justify-between gap-2'>
               <i style={{ background: Themes[theme][0] }} className={`h-4 w-3 rounded-md`} />
               <i style={{ background: Themes[theme][1] }} className={`h-4 w-3 rounded-md`} />
               <span className='first-letter:uppercase'>{theme}</span>
@@ -160,6 +160,7 @@ function LanguageSelect(props: React.PropsWithChildren) {
 
           return (
             <Select.Item
+              key={code}
               value={code}
               className='flex items-center justify-between gap-2'
               {...(i18n.resolvedLanguage === code && {
