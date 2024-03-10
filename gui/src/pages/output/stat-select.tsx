@@ -26,7 +26,7 @@ export function StatSelect(props: {
             return (
               <li key={opt}>
                 <button
-                  className='flex w-full cursor-pointer items-center px-2 py-1 text-lg hover:bg-[rgba(255,255,255,0.075)]'
+                  className='flex w-full cursor-pointer items-center px-2 py-1 text-lg hover:bg-white hover:bg-opacity-[.075]'
                   onClick={() => props.onSelect(opt, !checked)}
                 >
                   <Checkbox checked={props.options[opt] === true} readOnly />

@@ -12,7 +12,7 @@ import { GetThemes } from '@cmd'
 import type { model } from '@model'
 
 export function ThemeSelect(props: { selectedTheme: string; onSelect: (theme: string) => void }) {
-  const containerRef = React.useRef<HTMLDivElement>(null)
+  const containerRef = React.useRef<HTMLUListElement>(null)
   const [themes, setThemes] = React.useState<model.Theme[]>([])
   const [isOpen, setOpen] = React.useState(false)
   const setError = useErrorPopup()
@@ -22,30 +22,16 @@ export function ThemeSelect(props: { selectedTheme: string; onSelect: (theme: st
   }, [])
 
   React.useEffect(() => {
-    if (!isOpen || !containerRef.current) return
+    if (!isOpen || !containerRef.current) {
+      return
+    }
 
     for (const theme of themes) {
-      const container = document.createElement('div')
-      containerRef.current.appendChild(container)
+      const container = document.querySelector(`.${theme.name}-preview`)
+      if (!container) {
+        continue
+      }
       const shadowRoot = container.attachShadow({ mode: 'open' })
-
-      createRoot(container).render(
-        <div className='mb-4'>
-          <style>{theme.css.match(/@import.*;/g)}</style>
-          <Checkbox
-            id={`${theme.name}-checkbox`}
-            checked={theme.name === props.selectedTheme}
-            onChange={e => props.onSelect(theme.name)}
-          />
-          <label
-            htmlFor={`${theme.name}-checkbox`}
-            className='font-spartan cursor-pointer text-lg font-bold capitalize'
-          >
-            {theme.name}
-          </label>
-        </div>
-      )
-
       createRoot(shadowRoot).render(
         <>
           <slot />
@@ -59,13 +45,7 @@ export function ThemeSelect(props: { selectedTheme: string; onSelect: (theme: st
         </>
       )
     }
-
-    return () => {
-      if (containerRef.current) {
-        containerRef.current.innerHTML = ''
-      }
-    }
-  }, [isOpen, themes, props.selectedTheme])
+  }, [isOpen, themes])
 
   return (
     <Dialog.Root onOpenChange={setOpen}>
@@ -79,7 +59,28 @@ export function ThemeSelect(props: { selectedTheme: string; onSelect: (theme: st
         </Button>
       </Dialog.Trigger>
       <Dialog.Content title='selectTheme'>
-        <div ref={containerRef} className='mt-2 grid h-80 w-full gap-4 overflow-y-scroll pr-2' />
+        <ul ref={containerRef} className='mt-2 grid h-80 w-full gap-4 overflow-y-scroll pr-2'>
+          {themes.map(theme => (
+            <li key={theme.name}>
+              <div className='mb-4 flex px-2 py-1 hover:bg-white hover:bg-opacity-[.075]'>
+                <Checkbox
+                  id={`${theme.name}-checkbox`}
+                  checked={theme.name === props.selectedTheme}
+                  onChange={e => props.onSelect(theme.name)}
+                />
+                <label
+                  htmlFor={`${theme.name}-checkbox`}
+                  className='font-spartan w-full cursor-pointer text-lg font-bold capitalize'
+                >
+                  {theme.name}
+                </label>
+              </div>
+              <div className={`${theme.name}-preview`}>
+                <style>{theme.css.match(/@import.*;/g)}</style>
+              </div>
+            </li>
+          ))}
+        </ul>
       </Dialog.Content>
     </Dialog.Root>
   )
