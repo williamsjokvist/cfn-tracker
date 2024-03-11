@@ -1,18 +1,20 @@
 import React from 'react'
+import { createRoot } from 'react-dom/client'
 import { Icon } from '@iconify/react'
 import { Trans, useTranslation } from 'react-i18next'
 import { motion, useAnimate } from 'framer-motion'
 
 import * as Page from '@/ui/page'
+import * as Dialog from '@/ui/dialog'
 import { Button } from '@/ui/button'
+import { Checkbox } from '@/ui/checkbox'
 
 import { model } from '@model'
-import { OpenResultsDirectory } from '@cmd'
+import { GetThemes, OpenResultsDirectory } from '@cmd'
 
-import { ThemeSelect } from './theme-select'
-import { StatSelect } from './stat-select'
+import { useErrorPopup } from '@/main/error-popup'
 
-export type StatOptions = Omit<
+type StatOptions = Omit<
   Record<keyof model.TrackingState, boolean>,
   'totalLosses' | 'totalWins'
 > & {
@@ -103,7 +105,7 @@ export function OutputPage() {
             </div>
             <div className='flex flex-col gap-4'>
               <ThemeSelect
-                selectedTheme={options.theme}
+                value={options.theme}
                 onSelect={theme => setOptions({ ...options, theme })}
               />
               <StatSelect
@@ -139,5 +141,108 @@ export function OutputPage() {
         </motion.section>
       </div>
     </Page.Root>
+  )
+}
+
+function StatSelect(props: {
+  options: Omit<StatOptions, 'theme'>
+  onSelect: (option: string, checked: boolean) => void
+}) {
+  const { t } = useTranslation()
+  return (
+    <Dialog.Root>
+      <Dialog.Trigger asChild>
+        <Button style={{ filter: 'hue-rotate(-45deg)' }}>
+          <Icon icon='bx:stats' className='mr-3 h-6 w-6' />
+          {t('displayStats')}
+        </Button>
+      </Dialog.Trigger>
+      <Dialog.Content title='displayStats' description='statsWillBeDisplayed'>
+        <ul className='mt-4 h-72 overflow-y-scroll'>
+          {Object.entries(props.options).map(([opt, checked]) => (
+            <li key={opt}>
+              <button
+                className='flex w-full cursor-pointer items-center px-2 py-1 text-lg hover:bg-white hover:bg-opacity-[.075]'
+                onClick={() => props.onSelect(opt, !checked)}
+              >
+                <Checkbox checked={props.options[opt] === true} readOnly />
+                <span className='ml-2 cursor-pointer text-center capitalize'>{opt}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      </Dialog.Content>
+    </Dialog.Root>
+  )
+}
+
+function ThemeSelect(props: { value: string; onSelect: (theme: string) => void }) {
+  const [themes, setThemes] = React.useState<model.Theme[]>([])
+  const [isOpen, setOpen] = React.useState(false)
+  const setError = useErrorPopup()
+
+  React.useEffect(() => {
+    GetThemes().then(setThemes).catch(setError)
+  }, [])
+
+  React.useEffect(() => {
+    if (!isOpen) {
+      return
+    }
+    for (const theme of themes) {
+      const container = document.querySelector(`.${theme.name}-preview`)
+      if (!container) {
+        continue
+      }
+      const shadowRoot = container.attachShadow({ mode: 'open' })
+      createRoot(shadowRoot).render(
+        <div className='stat-list'>
+          <style>{theme.css}</style>
+          <div className='stat-item'>
+            <span className='stat-title'>MR</span>
+            <span className='stat-value'>444</span>
+          </div>
+        </div>
+      )
+    }
+  }, [isOpen, themes])
+
+  return (
+    <Dialog.Root onOpenChange={setOpen}>
+      <Dialog.Trigger asChild>
+        <Button
+          className='capitalize'
+          style={{ filter: 'hue-rotate(-180deg)', justifyContent: 'center' }}
+        >
+          <Icon icon='ph:paint-bucket-fill' className='mr-3 h-6 w-6' />
+          {props.value}
+        </Button>
+      </Dialog.Trigger>
+      <Dialog.Content title='selectTheme'>
+        <ul className='mt-2 grid h-80 w-full gap-4 overflow-y-scroll pr-2'>
+          {themes.map(theme => (
+            <li key={theme.name}>
+              <div className='mb-4 flex px-2 hover:bg-white hover:bg-opacity-[.075]'>
+                <Checkbox
+                  id={`${theme.name}-checkbox`}
+                  checked={theme.name === props.value}
+                  onChange={e => props.onSelect(theme.name)}
+                  className="my-2"
+                />
+                <label
+                  htmlFor={`${theme.name}-checkbox`}
+                  className='font-spartan w-full cursor-pointer py-2 text-lg font-bold capitalize'
+                >
+                  {theme.name}
+                </label>
+              </div>
+              <div className={`${theme.name}-preview`}>
+                <style>{theme.css.match(/@import.*;/g)}</style>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </Dialog.Content>
+    </Dialog.Root>
   )
 }

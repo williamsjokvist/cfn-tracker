@@ -49,7 +49,7 @@ export function SettingsPage() {
           <div className='flex gap-8'>
             <GithubLink />
             <TwitterLink url='https://x.com/greensoap_' text={t('follow')} />
-            <TwitterLink url='https://x.com/enthcreations' text={'enth'} className='opacity-enth' />
+            <TwitterLink url='https://x.com/enthcreations' text='enth' />
           </div>
         </div>
       </motion.section>
@@ -113,15 +113,13 @@ function ThemeSelect() {
             .catch(setError)
         }}
       >
-        {Object.keys(Themes).map(theme => {
-          return (
-            <Select.Item key={theme} value={theme} className='flex items-center justify-between gap-2'>
-              <i style={{ background: Themes[theme][0] }} className={`h-4 w-3 rounded-md`} />
-              <i style={{ background: Themes[theme][1] }} className={`h-4 w-3 rounded-md`} />
-              <span className='first-letter:uppercase'>{theme}</span>
-            </Select.Item>
-          )
-        })}
+        {Object.keys(Themes).map(theme => (
+          <Select.Item key={theme} value={theme} className='flex items-center justify-between gap-2'>
+            <i style={{ background: Themes[theme][0] }} className={`h-4 w-3 rounded-md`} />
+            <i style={{ background: Themes[theme][1] }} className={`h-4 w-3 rounded-md`} />
+            <span className='first-letter:uppercase'>{theme}</span>
+          </Select.Item>
+        ))}
       </Select.Root>
     </div>
   )
