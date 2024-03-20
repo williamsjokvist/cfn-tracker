@@ -2,7 +2,7 @@ package server
 
 import (
 	"context"
-	_ "embed"
+	"embed"
 	"encoding/json"
 	"fmt"
 	"io/fs"
@@ -23,30 +23,17 @@ var staticFs embed.FS
 func GetInternalThemes() []model.Theme {
 	var themes = make([]model.Theme, 0, 10)
 
-	err := fs.WalkDir(staticFs, "static/themes", func(path string, d fs.DirEntry, err error) error {
-		if err != nil {
-			return err
-		}
+	fs.WalkDir(staticFs, "static/themes", func(path string, d fs.DirEntry, err error) error {
 		if d.IsDir() {
 			return nil
 		}
-
-		b, err := fs.ReadFile(staticFs, path)
-		if err != nil {
-			return err
-		}
-
+		b, _ := fs.ReadFile(staticFs, path)
 		themes = append(themes, model.Theme{
 			Name: strings.Split(d.Name(), ".css")[0],
 			CSS:  string(b),
 		})
 		return nil
 	})
-
-	if err != nil {
-		return []model.Theme{}
-	}
-
 	return themes
 }
 
@@ -113,7 +100,7 @@ func Start(ctx context.Context, cfg *config.Config) error {
 		}
 	})
 
-	// custom themes
+	// serve custom themes through "themes" directory in the same directory as the user's executable
 	fs := http.FileServer(http.Dir("./themes"))
 	http.Handle("/themes/", http.StripPrefix("/themes/", fs))
 
