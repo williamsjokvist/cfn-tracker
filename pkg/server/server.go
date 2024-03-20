@@ -45,7 +45,6 @@ func GetInternalThemes() []model.Theme {
 	})
 
 	if err != nil {
-		fmt.Println("error", err.Error())
 		return []model.Theme{}
 	}
 
