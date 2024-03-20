@@ -20,6 +20,8 @@ import (
 //go:embed static
 var staticFs embed.FS
 
+var mhJson *[]byte
+
 func GetInternalThemes() []model.Theme {
 	var themes = make([]model.Theme, 0, 10)
 
@@ -40,8 +42,6 @@ func GetInternalThemes() []model.Theme {
 func Start(ctx context.Context, cfg *config.Config) error {
 	log.Println(`Starting browser source server`)
 
-	var mhJson *[]byte
-
 	wails.EventsOn(ctx, `cfn-data`, func(incomingData ...interface{}) {
 		mh, ok := incomingData[0].(*model.TrackingState)
 		if !ok {
@@ -50,55 +50,9 @@ func Start(ctx context.Context, cfg *config.Config) error {
 		js, _ := json.Marshal(mh)
 		mhJson = &js
 	})
-
-	http.HandleFunc("GET /themes/{theme}", func(w http.ResponseWriter, req *http.Request) {
-		fileName := req.PathValue("theme")
-		css, err := staticFs.ReadFile(fmt.Sprintf("static/themes/%s", fileName))
-
-		if err != nil {
-			w.WriteHeader(http.StatusNotFound)
-		} else {
-			w.Header().Set(`Content-Type`, `text/css`)
-			w.WriteHeader(http.StatusOK)
-			w.Write(css)
-		}
-	})
-
-	http.HandleFunc("GET /", func(w http.ResponseWriter, _ *http.Request) {
-		html, err := staticFs.ReadFile("static/index.html")
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-		} else {
-			w.Header().Set(`Content-Type`, `text/html`)
-			w.WriteHeader(http.StatusOK)
-			w.Write(html)
-		}
-	})
-
-	http.HandleFunc(`GET /stream`, func(w http.ResponseWriter, _ *http.Request) {
-		flusher, ok := w.(http.Flusher)
-		var lastJson *[]byte = nil
-		if !ok {
-			http.Error(w, `SSE not supported`, http.StatusInternalServerError)
-			return
-		}
-
-		w.Header().Set(`Content-Type`, `text/event-stream`)
-		w.Header().Set(`Cache-Control`, `no-cache`)
-		w.Header().Set(`Connection`, `keep-alive`)
-
-		ticker := time.NewTicker(time.Second * 5)
-		for range ticker.C {
-			if mhJson == lastJson {
-				continue
-			}
-
-			fmt.Fprint(w, "event: message\n\n")
-			fmt.Fprintf(w, "data: %s\n\n", *mhJson)
-			lastJson = mhJson
-			flusher.Flush()
-		}
-	})
+	http.HandleFunc("/", handleRoot)
+	http.HandleFunc(`GET /stream`, handleStream)
+	http.HandleFunc("GET /themes/{theme}", handleTheme)
 
 	// serve custom themes through "themes" directory in the same directory as the user's executable
 	fs := http.FileServer(http.Dir("./themes"))
@@ -108,4 +62,53 @@ func Start(ctx context.Context, cfg *config.Config) error {
 		return fmt.Errorf(`failed to launch browser source server: %v`, err)
 	}
 	return nil
+}
+
+func handleStream(w http.ResponseWriter, _ *http.Request) {
+	flusher, ok := w.(http.Flusher)
+	var lastJson *[]byte = nil
+	if !ok {
+		http.Error(w, `SSE not supported`, http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set(`Content-Type`, `text/event-stream`)
+	w.Header().Set(`Cache-Control`, `no-cache`)
+	w.Header().Set(`Connection`, `keep-alive`)
+
+	ticker := time.NewTicker(time.Second * 5)
+	for range ticker.C {
+		if mhJson == lastJson {
+			continue
+		}
+
+		fmt.Fprint(w, "event: message\n\n")
+		fmt.Fprintf(w, "data: %s\n\n", *mhJson)
+		lastJson = mhJson
+		flusher.Flush()
+	}
+}
+
+func handleTheme(w http.ResponseWriter, req *http.Request) {
+	fileName := req.PathValue("theme")
+	css, err := staticFs.ReadFile(fmt.Sprintf("static/themes/%s", fileName))
+
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+	} else {
+		w.Header().Set(`Content-Type`, `text/css`)
+		w.WriteHeader(http.StatusOK)
+		w.Write(css)
+	}
+}
+
+func handleRoot(w http.ResponseWriter, _ *http.Request) {
+	html, err := staticFs.ReadFile("static/index.html")
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+	} else {
+		w.Header().Set(`Content-Type`, `text/html`)
+		w.WriteHeader(http.StatusOK)
+		w.Write(html)
+	}
 }
