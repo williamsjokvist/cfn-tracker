@@ -2,11 +2,14 @@ package server
 
 import (
 	"context"
+	"embed"
 	_ "embed"
 	"encoding/json"
 	"fmt"
+	"io/fs"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	wails "github.com/wailsapp/wails/v2/pkg/runtime"
@@ -15,47 +18,38 @@ import (
 	"github.com/williamsjokvist/cfn-tracker/pkg/model"
 )
 
-//go:embed static/index.html
-var page []byte
-
-//go:embed static/themes/default.css
-var defaultCss []byte
-
-//go:embed static/themes/blades.css
-var bladesCss []byte
-
-//go:embed static/themes/jaeger.css
-var jaegerCss []byte
-
-//go:embed static/themes/nord.css
-var nordCss []byte
-
-//go:embed static/themes/pills.css
-var pillsCss []byte
+//go:embed static
+var staticFs embed.FS
 
 func GetInternalThemes() []model.Theme {
-	return []model.Theme{
-		{
-			Name: "default",
-			CSS:  string(defaultCss),
-		},
-		{
-			Name: "jaeger",
-			CSS:  string(jaegerCss),
-		},
-		{
-			Name: "nord",
-			CSS:  string(nordCss),
-		},
-		{
-			Name: "pills",
-			CSS:  string(pillsCss),
-		},
-		{
-			Name: "blades",
-			CSS:  string(bladesCss),
-		},
+	var themes = make([]model.Theme, 0, 10)
+
+	err := fs.WalkDir(staticFs, "static/themes", func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if d.IsDir() {
+			return nil
+		}
+
+		b, err := fs.ReadFile(staticFs, path)
+		if err != nil {
+			return err
+		}
+
+		themes = append(themes, model.Theme{
+			Name: strings.Split(d.Name(), ".css")[0],
+			CSS:  string(b),
+		})
+		return nil
+	})
+
+	if err != nil {
+		fmt.Println("error", err.Error())
+		return []model.Theme{}
 	}
+
+	return themes
 }
 
 func Start(ctx context.Context, cfg *config.Config) error {
@@ -72,46 +66,31 @@ func Start(ctx context.Context, cfg *config.Config) error {
 		mhJson = &js
 	})
 
-	fs := http.FileServer(http.Dir("./themes"))
-	http.Handle("/themes/", http.StripPrefix("/themes/", fs))
+	http.HandleFunc("GET /themes/{theme}", func(w http.ResponseWriter, req *http.Request) {
+		fileName := req.PathValue("theme")
+		css, err := staticFs.ReadFile(fmt.Sprintf("static/themes/%s", fileName))
+
+		if err != nil {
+			w.WriteHeader(http.StatusNotFound)
+		} else {
+			w.Header().Set(`Content-Type`, `text/css`)
+			w.WriteHeader(http.StatusOK)
+			w.Write(css)
+		}
+	})
 
 	http.HandleFunc("/", func(w http.ResponseWriter, _ *http.Request) {
-		w.Header().Set(`Content-Type`, `text/html`)
-		w.WriteHeader(http.StatusOK)
-		w.Write(page)
+		html, err := staticFs.ReadFile("static/index.html")
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+		} else {
+			w.Header().Set(`Content-Type`, `text/html`)
+			w.WriteHeader(http.StatusOK)
+			w.Write(html)
+		}
 	})
 
-	http.HandleFunc("/themes/default.css", func(w http.ResponseWriter, _ *http.Request) {
-		w.Header().Set(`Content-Type`, `text/css`)
-		w.WriteHeader(http.StatusOK)
-		w.Write(defaultCss)
-	})
-
-	http.HandleFunc("/themes/blades.css", func(w http.ResponseWriter, _ *http.Request) {
-		w.Header().Set(`Content-Type`, `text/css`)
-		w.WriteHeader(http.StatusOK)
-		w.Write(bladesCss)
-	})
-
-	http.HandleFunc("/themes/jaeger.css", func(w http.ResponseWriter, _ *http.Request) {
-		w.Header().Set(`Content-Type`, `text/css`)
-		w.WriteHeader(http.StatusOK)
-		w.Write(jaegerCss)
-	})
-
-	http.HandleFunc("/themes/nord.css", func(w http.ResponseWriter, _ *http.Request) {
-		w.Header().Set(`Content-Type`, `text/css`)
-		w.WriteHeader(http.StatusOK)
-		w.Write(nordCss)
-	})
-
-	http.HandleFunc("/themes/pills.css", func(w http.ResponseWriter, _ *http.Request) {
-		w.Header().Set(`Content-Type`, `text/css`)
-		w.WriteHeader(http.StatusOK)
-		w.Write(pillsCss)
-	})
-
-	http.HandleFunc(`/stream`, func(w http.ResponseWriter, _ *http.Request) {
+	http.HandleFunc(`GET /stream`, func(w http.ResponseWriter, _ *http.Request) {
 		flusher, ok := w.(http.Flusher)
 		var lastJson *[]byte = nil
 		if !ok {
@@ -135,6 +114,10 @@ func Start(ctx context.Context, cfg *config.Config) error {
 			flusher.Flush()
 		}
 	})
+
+	// custom themes
+	fs := http.FileServer(http.Dir("./themes"))
+	http.Handle("/themes/", http.StripPrefix("/themes/", fs))
 
 	if err := http.ListenAndServe(fmt.Sprintf(`:%d`, cfg.BrowserSourcePort), nil); err != nil {
 		return fmt.Errorf(`failed to launch browser source server: %v`, err)
