@@ -2,7 +2,6 @@ package server
 
 import (
 	"context"
-	"embed"
 	_ "embed"
 	"encoding/json"
 	"fmt"
