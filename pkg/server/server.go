@@ -78,7 +78,7 @@ func Start(ctx context.Context, cfg *config.Config) error {
 		}
 	})
 
-	http.HandleFunc("/", func(w http.ResponseWriter, _ *http.Request) {
+	http.HandleFunc("GET /", func(w http.ResponseWriter, _ *http.Request) {
 		html, err := staticFs.ReadFile("static/index.html")
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
