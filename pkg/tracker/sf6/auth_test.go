@@ -21,7 +21,7 @@ func TestSF6Authentication(t *testing.T) {
 		t.Fatalf("failed to create browser: %v", err)
 	}
 
-	sf6Tracker := NewSF6Tracker(browser, nil)
+	sf6Tracker := NewSF6Tracker(browser, nil, nil)
 	authChan := make(chan AuthStatus, 1)
 
 	t.Cleanup(func() {

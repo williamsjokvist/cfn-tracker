@@ -81,7 +81,7 @@ func (s *Storage) GetSessions(ctx context.Context, userId string, limit uint8, o
 	return sessions, nil
 }
 
-func (s *Storage) UpdateLatestSession(ctx context.Context, lp, mr int, sessionId uint16) error {
+func (s *Storage) updateLatestSession(ctx context.Context, lp, mr int, sessionId uint16) error {
 	query, args, err := sqlx.In(`
 		UPDATE sessions
 		SET
@@ -97,6 +97,35 @@ func (s *Storage) UpdateLatestSession(ctx context.Context, lp, mr int, sessionId
 		return fmt.Errorf("excute update last session query: %w", err)
 	}
 	return nil
+}
+
+func (s *Storage) UpdateSession(ctx context.Context, sesh *model.Session, match model.Match, sessionId uint16) error {
+	err := s.updateLatestSession(ctx, sesh.LP, sesh.MR, sessionId)
+	if err != nil {
+		return fmt.Errorf("update session: %w", err)
+	}
+	err = s.SaveMatch(ctx, match)
+	if err != nil {
+		return fmt.Errorf("save match in storage: %w", err)
+	}
+	return nil
+}
+
+func (s *Storage) GetLatestSession(ctx context.Context, userId string) (*model.Session, error) {
+	sessions, err := s.GetSessions(ctx, userId, 1, 0)
+	if err != nil {
+		return nil, fmt.Errorf("get session: %w", err)
+	}
+	if len(sessions) == 0 {
+		return nil, nil
+	}
+	sesh := sessions[0]
+	matches, err := s.GetMatches(ctx, sesh.Id, userId, 0, 0)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get matches by session: %w", err)
+	}
+	sesh.Matches = matches
+	return sesh, nil
 }
 
 func (s *Storage) createSessionsTable() error {

@@ -12,9 +12,10 @@ import (
 	wails "github.com/wailsapp/wails/v2/pkg/runtime"
 
 	"github.com/williamsjokvist/cfn-tracker/pkg/browser"
-	"github.com/williamsjokvist/cfn-tracker/pkg/data"
 	"github.com/williamsjokvist/cfn-tracker/pkg/errorsx"
 	"github.com/williamsjokvist/cfn-tracker/pkg/model"
+	"github.com/williamsjokvist/cfn-tracker/pkg/storage/sql"
+	"github.com/williamsjokvist/cfn-tracker/pkg/storage/txt"
 	"github.com/williamsjokvist/cfn-tracker/pkg/utils"
 )
 
@@ -25,15 +26,18 @@ type SF6Tracker struct {
 	sesh            *model.Session
 	user            *model.User
 	*browser.Browser
-	*data.CFNTrackerRepository
+
+	sqlDb *sql.Storage
+	txtDb *txt.Storage
 }
 
-func NewSF6Tracker(browser *browser.Browser, trackerRepo *data.CFNTrackerRepository) *SF6Tracker {
+func NewSF6Tracker(browser *browser.Browser, sqlDb *sql.Storage, txtDb *txt.Storage) *SF6Tracker {
 	return &SF6Tracker{
-		Browser:              browser,
-		stopPolling:          func() {},
-		CFNTrackerRepository: trackerRepo,
-		state:                make(map[string]*model.TrackingState, 4),
+		Browser:     browser,
+		stopPolling: func() {},
+		sqlDb:       sqlDb,
+		txtDb:       txtDb,
+		state:       make(map[string]*model.TrackingState, 4),
 	}
 }
 
@@ -51,12 +55,12 @@ func (t *SF6Tracker) Start(ctx context.Context, userCode string, restore bool, p
 	}
 
 	if restore {
-		sesh, err := t.CFNTrackerRepository.GetLatestSession(ctx, userCode)
+		sesh, err := t.sqlDb.GetLatestSession(ctx, userCode)
 		if err != nil {
 			return errorsx.NewFormattedError(http.StatusNotFound, fmt.Errorf(`failed to get last session: %w`, err))
 		}
 		t.sesh = sesh
-		t.user, err = t.CFNTrackerRepository.GetUserByCode(ctx, userCode)
+		t.user, err = t.sqlDb.GetUserByCode(ctx, userCode)
 		if err != nil {
 			return errorsx.NewFormattedError(http.StatusNotFound, fmt.Errorf(`failed to get user: %w`, err))
 		}
@@ -82,7 +86,7 @@ func (t *SF6Tracker) Start(ctx context.Context, userCode string, restore bool, p
 	if err != nil {
 		return errorsx.NewFormattedError(http.StatusInternalServerError, fmt.Errorf(`failed to fetch battle log: %w`, err))
 	}
-	err = t.CFNTrackerRepository.SaveUser(ctx, bl.GetCFN(), userCode)
+	err = t.sqlDb.SaveUser(ctx, bl.GetCFN(), userCode)
 	if err != nil {
 		return errorsx.NewFormattedError(http.StatusInternalServerError, fmt.Errorf(`failed to save user: %w`, err))
 	}
@@ -90,7 +94,7 @@ func (t *SF6Tracker) Start(ctx context.Context, userCode string, restore bool, p
 		DisplayName: bl.GetCFN(),
 		Code:        userCode,
 	}
-	sesh, err := t.CFNTrackerRepository.CreateSession(ctx, userCode)
+	sesh, err := t.sqlDb.CreateSession(ctx, userCode)
 	if err != nil {
 		return errorsx.NewFormattedError(http.StatusInternalServerError, fmt.Errorf(`failed to create session: %w`, err))
 	}
@@ -162,7 +166,7 @@ func (t *SF6Tracker) updateSession(ctx context.Context, userCode string, bl *Bat
 	t.sesh.LP = bl.GetLP()
 	t.sesh.MR = bl.GetMR()
 	t.sesh.Matches = append([]*model.Match{&match}, t.sesh.Matches...)
-	err := t.CFNTrackerRepository.UpdateSession(ctx, t.sesh, match, t.sesh.Id)
+	err := t.sqlDb.UpdateSession(ctx, t.sesh, match, t.sesh.Id)
 	if err != nil {
 		return fmt.Errorf("failed to update session: %w", err)
 	}
@@ -170,7 +174,7 @@ func (t *SF6Tracker) updateSession(ctx context.Context, userCode string, bl *Bat
 	trackingState := t.getTrackingStateForLastMatch()
 	if trackingState != nil {
 		trackingState.Log()
-		t.CFNTrackerRepository.SaveTrackingState(trackingState)
+		t.txtDb.SaveTrackingState(trackingState)
 		wails.EventsEmit(ctx, `cfn-data`, trackingState)
 	}
 

@@ -24,12 +24,11 @@ import (
 	"github.com/williamsjokvist/cfn-tracker/cmd"
 	"github.com/williamsjokvist/cfn-tracker/pkg/browser"
 	"github.com/williamsjokvist/cfn-tracker/pkg/config"
-	"github.com/williamsjokvist/cfn-tracker/pkg/data"
-	"github.com/williamsjokvist/cfn-tracker/pkg/data/nosql"
-	"github.com/williamsjokvist/cfn-tracker/pkg/data/sql"
-	"github.com/williamsjokvist/cfn-tracker/pkg/data/txt"
 	"github.com/williamsjokvist/cfn-tracker/pkg/errorsx"
 	"github.com/williamsjokvist/cfn-tracker/pkg/server"
+	"github.com/williamsjokvist/cfn-tracker/pkg/storage/nosql"
+	"github.com/williamsjokvist/cfn-tracker/pkg/storage/sql"
+	"github.com/williamsjokvist/cfn-tracker/pkg/storage/txt"
 )
 
 var (
@@ -143,8 +142,7 @@ func main() {
 		closeWithError(fmt.Errorf(`failed to initalize text store: %w`, err))
 		return
 	}
-	trackerRepo := data.NewCFNTrackerRepository(sqlDb, noSqlDb, txtDb)
-	cmdHandler := cmd.NewCommandHandler(appBrowser, trackerRepo, &cfg)
+	cmdHandler := cmd.NewCommandHandler(appBrowser, sqlDb, noSqlDb, txtDb, &cfg)
 
 	var wailsCtx context.Context
 	err = wails.Run(&options.App{
