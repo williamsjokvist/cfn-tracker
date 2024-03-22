@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/hashicorp/go-version"
+	wailsRuntime "github.com/wailsapp/wails/v2/pkg/runtime"
 
 	"github.com/williamsjokvist/cfn-tracker/pkg/browser"
 	"github.com/williamsjokvist/cfn-tracker/pkg/config"
@@ -25,6 +26,8 @@ import (
 	"github.com/williamsjokvist/cfn-tracker/pkg/storage/sql"
 	"github.com/williamsjokvist/cfn-tracker/pkg/storage/txt"
 	"github.com/williamsjokvist/cfn-tracker/pkg/tracker"
+	"github.com/williamsjokvist/cfn-tracker/pkg/tracker/sf6"
+	"github.com/williamsjokvist/cfn-tracker/pkg/tracker/sfv"
 )
 
 // The CommandHandler is the interface between the GUI and the core
@@ -186,11 +189,15 @@ func (ch *CommandHandler) GetThemes() ([]model.Theme, error) {
 
 func (ch *CommandHandler) SelectGame(game string) error {
 	var err error
+	onAuth := func(progress int) {
+		wailsRuntime.EventsEmit(ch.ctx, "auth-progress", progress)
+	}
+
 	switch game {
 	case tracker.GameTypeSF6.String():
-		ch.tracker, err = tracker.MakeSF6Tracker(ch.ctx, ch.cfg, ch.browser, ch.sqlDb, ch.txtDb)
+		ch.tracker, err = sf6.NewSF6Tracker(ch.browser, ch.sqlDb, ch.txtDb, ch.cfg, onAuth)
 	case tracker.GameTypeSFV.String():
-		ch.tracker, err = tracker.MakeSFVTracker(ch.ctx, ch.cfg, ch.browser)
+		ch.tracker, err = sfv.NewSFVTracker(ch.browser, ch.cfg, onAuth)
 	}
 
 	if err != nil {

@@ -12,10 +12,12 @@ import (
 	wails "github.com/wailsapp/wails/v2/pkg/runtime"
 
 	"github.com/williamsjokvist/cfn-tracker/pkg/browser"
+	"github.com/williamsjokvist/cfn-tracker/pkg/config"
 	"github.com/williamsjokvist/cfn-tracker/pkg/errorsx"
 	"github.com/williamsjokvist/cfn-tracker/pkg/model"
 	"github.com/williamsjokvist/cfn-tracker/pkg/storage/sql"
 	"github.com/williamsjokvist/cfn-tracker/pkg/storage/txt"
+	"github.com/williamsjokvist/cfn-tracker/pkg/tracker"
 	"github.com/williamsjokvist/cfn-tracker/pkg/utils"
 )
 
@@ -31,14 +33,34 @@ type SF6Tracker struct {
 	txtDb *txt.Storage
 }
 
-func NewSF6Tracker(browser *browser.Browser, sqlDb *sql.Storage, txtDb *txt.Storage) *SF6Tracker {
-	return &SF6Tracker{
+var _ tracker.GameTracker = (*SF6Tracker)(nil)
+
+func NewSF6Tracker(browser *browser.Browser, sqlDb *sql.Storage, txtDb *txt.Storage, cfg *config.Config, authCallback func(progress int)) (*SF6Tracker, error) {
+	sf6Tracker := &SF6Tracker{
 		Browser:     browser,
 		stopPolling: func() {},
 		sqlDb:       sqlDb,
 		txtDb:       txtDb,
 		state:       make(map[string]*model.TrackingState, 4),
 	}
+
+	authChan := make(chan tracker.AuthStatus)
+	go sf6Tracker.authenticate(cfg.CapIDEmail, cfg.CapIDPassword, authChan)
+	for status := range authChan {
+		if status.Err != nil {
+			return nil, status.Err
+		}
+		if authCallback != nil {
+			authCallback(status.Progress)
+		}
+
+		if status.Progress >= 100 {
+			close(authChan)
+			break
+		}
+	}
+
+	return sf6Tracker, nil
 }
 
 // Start will update the tracking state when new matches are played.

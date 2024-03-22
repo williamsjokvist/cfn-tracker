@@ -9,26 +9,11 @@ import (
 	"strings"
 	"time"
 
-	"golang.org/x/net/context"
+	"github.com/williamsjokvist/cfn-tracker/pkg/tracker"
 )
 
-type AuthStatus struct {
-	Progress int
-	Err      error
-}
-
-func (s *AuthStatus) WithProgress(progress int) *AuthStatus {
-	s.Progress = progress
-	return s
-}
-
-func (s *AuthStatus) WithError(err error) *AuthStatus {
-	s.Err = err
-	return s
-}
-
-func (t *SF6Tracker) Authenticate(ctx context.Context, email string, password string, statChan chan AuthStatus) {
-	status := &AuthStatus{Progress: 0, Err: nil}
+func (t *SF6Tracker) authenticate(email string, password string, statChan chan tracker.AuthStatus) {
+	status := &tracker.AuthStatus{Progress: 0, Err: nil}
 	defer func() {
 		if r := recover(); r != nil {
 			log.Println(`Recovered from panic: `, r)
