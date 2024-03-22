@@ -143,8 +143,7 @@ func main() {
 		return
 	}
 	cmdHandler := cmd.NewCommandHandler(appBrowser, sqlDb, noSqlDb, txtDb, &cfg)
-	settingsHandler := cmd.SettingHandler{}
-
+	settingsHandler := cmd.NewSettingHandler(sqlDb)
 	var wailsCtx context.Context
 	err = wails.Run(&options.App{
 		Title:              fmt.Sprintf(`CFN Tracker v%s`, appVersion),
@@ -182,9 +181,9 @@ func main() {
 
 			// FIXME:
 			settingsHandler.WithContext(ctx)
-			err := settingsHandler.CreateBackup()
+			err := settingsHandler.RestoreBackup()
 			if err != nil {
-				log.Println(fmt.Errorf(`failed to create backup: %w`, err))
+				log.Println(fmt.Errorf(`failed to restore backup: %w`, err))
 			}
 
 			go server.Start(ctx, &cfg)
@@ -208,7 +207,7 @@ func main() {
 		},
 		Bind: []interface{}{
 			cmdHandler,
-			&settingsHandler,
+			settingsHandler,
 		},
 	})
 	if err != nil {
