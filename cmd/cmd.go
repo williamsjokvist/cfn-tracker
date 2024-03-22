@@ -188,25 +188,35 @@ func (ch *CommandHandler) GetThemes() ([]model.Theme, error) {
 }
 
 func (ch *CommandHandler) SelectGame(game string) error {
-	var err error
-	onAuth := func(progress int) {
-		wailsRuntime.EventsEmit(ch.ctx, "auth-progress", progress)
-	}
+	var username, password string
 
 	switch game {
 	case tracker.GameTypeSF6.String():
-		ch.tracker, err = sf6.NewSF6Tracker(ch.browser, ch.sqlDb, ch.txtDb, ch.cfg, onAuth)
+		ch.tracker = sf6.NewSF6Tracker(ch.browser, ch.sqlDb, ch.txtDb)
+		username = ch.cfg.CapIDEmail
+		password = ch.cfg.CapIDPassword
 	case tracker.GameTypeSFV.String():
-		ch.tracker, err = sfv.NewSFVTracker(ch.browser, ch.cfg, onAuth)
+		ch.tracker = sfv.NewSFVTracker(ch.browser)
+		username = ch.cfg.SteamUsername
+		password = ch.cfg.SteamPassword
+	default:
+		return errorsx.NewFormattedError(http.StatusInternalServerError, fmt.Errorf(`failed to select game`))
 	}
 
-	if err != nil {
-		log.Println(err)
-		if !errorsx.ContainsFormattedError(err) {
-			err = errorsx.NewFormattedError(http.StatusInternalServerError, fmt.Errorf(`failed to select game %w`, err))
+	authChan := make(chan tracker.AuthStatus)
+	go ch.tracker.Authenticate(username, password, authChan)
+	for status := range authChan {
+		if status.Err != nil {
+			return errorsx.NewFormattedError(http.StatusUnauthorized, status.Err)
+		}
+		wailsRuntime.EventsEmit(ch.ctx, "auth-progress", status.Progress)
+
+		if status.Progress >= 100 {
+			close(authChan)
+			break
 		}
 	}
-	return err
+	return nil
 }
 
 func (ch *CommandHandler) SaveLocale(locale string) error {

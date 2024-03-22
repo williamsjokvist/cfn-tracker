@@ -7,6 +7,7 @@ import (
 
 type GameTracker interface {
 	Start(ctx context.Context, cfn string, restore bool, refreshInterval time.Duration) error
+	Authenticate(email string, password string, statusChan chan AuthStatus)
 	Stop()
 }
 

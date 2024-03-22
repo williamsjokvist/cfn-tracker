@@ -12,7 +12,7 @@ import (
 	"github.com/williamsjokvist/cfn-tracker/pkg/tracker"
 )
 
-func (t *SF6Tracker) authenticate(email string, password string, statChan chan tracker.AuthStatus) {
+func (t *SF6Tracker) Authenticate(email string, password string, statChan chan tracker.AuthStatus) {
 	status := &tracker.AuthStatus{Progress: 0, Err: nil}
 	defer func() {
 		if r := recover(); r != nil {

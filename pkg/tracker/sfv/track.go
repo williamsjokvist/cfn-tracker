@@ -13,9 +13,7 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 
 	"github.com/williamsjokvist/cfn-tracker/pkg/browser"
-	"github.com/williamsjokvist/cfn-tracker/pkg/config"
 	"github.com/williamsjokvist/cfn-tracker/pkg/model"
-	"github.com/williamsjokvist/cfn-tracker/pkg/tracker"
 	"github.com/williamsjokvist/cfn-tracker/pkg/utils"
 )
 
@@ -33,29 +31,12 @@ var (
 	ErrInvalidCFN      = errors.New(`invalid cfn provided`)
 )
 
-func NewSFVTracker(browser *browser.Browser, cfg *config.Config, authCallback func(progress int)) (*SFVTracker, error) {
-	sfvTracker := &SFVTracker{
+func NewSFVTracker(browser *browser.Browser) *SFVTracker {
+	return &SFVTracker{
 		isTracking:   false,
 		Browser:      browser,
 		stopTracking: func() {},
 	}
-
-	authChan := make(chan tracker.AuthStatus)
-	go sfvTracker.authenticate(cfg.SteamUsername, cfg.SteamPassword, authChan)
-	for status := range authChan {
-		if status.Err != nil {
-			return nil, status.Err
-		}
-		if authCallback != nil {
-			authCallback(status.Progress)
-		}
-
-		if status.Progress >= 100 {
-			close(authChan)
-			break
-		}
-	}
-	return sfvTracker, nil
 }
 
 // Stop will stop any current tracking

@@ -12,7 +12,7 @@ import (
 	"github.com/williamsjokvist/cfn-tracker/pkg/tracker"
 )
 
-func (t *SFVTracker) authenticate(username string, password string, statChan chan tracker.AuthStatus) {
+func (t *SFVTracker) Authenticate(username string, password string, statChan chan tracker.AuthStatus) {
 	status := &tracker.AuthStatus{Progress: 0, Err: nil}
 
 	if t.isAuthenticated || t.Page.MustInfo().URL == `https://game.capcom.com/cfn/sfv/` {
