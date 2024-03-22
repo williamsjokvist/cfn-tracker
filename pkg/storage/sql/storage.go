@@ -44,6 +44,10 @@ func NewStorage() (*Storage, error) {
 	return storage, nil
 }
 
+/*
+Documentation for sqlite3 backup API:
+https://www.sqlite.org/c3ref/backup_finish.html#sqlite3backupinit
+*/
 func (s *Storage) CreateBackup(ctx context.Context) error {
 
 	conns := make([]*sqlite3.SQLiteConn, 0, 1)
@@ -78,6 +82,8 @@ func (s *Storage) CreateBackup(ctx context.Context) error {
 	// so we need to ping the connection to ensure it is established
 	backupDb.Ping()
 
+	// Even though we are using the same db file, we need to open a new connection to it
+	// "The source database connection may be used by the application for other purposes while a backup operation is underway or being initialized."
 	sourceDb, err := sqlx.Open("sqlite3-backup", getDataSource())
 	if err != nil {
 		return fmt.Errorf("open sqlite3 connection: %w", err)
@@ -95,7 +101,6 @@ func (s *Storage) CreateBackup(ctx context.Context) error {
 
 	backupConn := conns[0]
 	sourceConn := conns[1]
-	// TODO: Check error type
 	// The database name is "main" as per sqlite3 documentation
 	backup, err := backupConn.Backup("main", sourceConn, "main")
 	if err != nil {
@@ -108,6 +113,7 @@ func (s *Storage) CreateBackup(ctx context.Context) error {
 		}
 	}()
 
+	// -1 means to copy all data
 	didComplete, err := backup.Step(-1)
 	if err != nil {
 		return fmt.Errorf("backup step: %w", err)
