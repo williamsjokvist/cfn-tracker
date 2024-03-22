@@ -9,8 +9,9 @@ import (
 
 	"github.com/williamsjokvist/cfn-tracker/pkg/browser"
 	"github.com/williamsjokvist/cfn-tracker/pkg/config"
-	"github.com/williamsjokvist/cfn-tracker/pkg/data"
 	"github.com/williamsjokvist/cfn-tracker/pkg/errorsx"
+	"github.com/williamsjokvist/cfn-tracker/pkg/storage/sql"
+	"github.com/williamsjokvist/cfn-tracker/pkg/storage/txt"
 	"github.com/williamsjokvist/cfn-tracker/pkg/tracker/sf6"
 	"github.com/williamsjokvist/cfn-tracker/pkg/tracker/sfv"
 )
@@ -41,8 +42,8 @@ func (s GameType) String() string {
 }
 
 // Make a SF6Tracker and expose it as a GameTracker
-func MakeSF6Tracker(ctx context.Context, cfg *config.Config, browser *browser.Browser, trackerRepository *data.CFNTrackerRepository) (GameTracker, error) {
-	sf6Tracker := sf6.NewSF6Tracker(browser, trackerRepository)
+func MakeSF6Tracker(ctx context.Context, cfg *config.Config, browser *browser.Browser, sqlDb *sql.Storage, txtDb *txt.Storage) (GameTracker, error) {
+	sf6Tracker := sf6.NewSF6Tracker(browser, sqlDb, txtDb)
 
 	authChan := make(chan sf6.AuthStatus)
 	go sf6Tracker.Authenticate(ctx, cfg.CapIDEmail, cfg.CapIDPassword, authChan)

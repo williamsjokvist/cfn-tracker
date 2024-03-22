@@ -16,12 +16,14 @@ import (
 
 	"github.com/williamsjokvist/cfn-tracker/pkg/browser"
 	"github.com/williamsjokvist/cfn-tracker/pkg/config"
-	"github.com/williamsjokvist/cfn-tracker/pkg/data"
 	"github.com/williamsjokvist/cfn-tracker/pkg/errorsx"
 	"github.com/williamsjokvist/cfn-tracker/pkg/i18n"
 	"github.com/williamsjokvist/cfn-tracker/pkg/i18n/locales"
 	"github.com/williamsjokvist/cfn-tracker/pkg/model"
 	"github.com/williamsjokvist/cfn-tracker/pkg/server"
+	"github.com/williamsjokvist/cfn-tracker/pkg/storage/nosql"
+	"github.com/williamsjokvist/cfn-tracker/pkg/storage/sql"
+	"github.com/williamsjokvist/cfn-tracker/pkg/storage/txt"
 	"github.com/williamsjokvist/cfn-tracker/pkg/tracker"
 )
 
@@ -30,13 +32,19 @@ type CommandHandler struct {
 	ctx     context.Context
 	tracker tracker.GameTracker
 	browser *browser.Browser
-	repo    *data.CFNTrackerRepository
-	cfg     *config.Config
+
+	sqlDb   *sql.Storage
+	nosqlDb *nosql.Storage
+	txtDb   *txt.Storage
+
+	cfg *config.Config
 }
 
-func NewCommandHandler(browser *browser.Browser, trackerRepo *data.CFNTrackerRepository, cfg *config.Config) *CommandHandler {
+func NewCommandHandler(browser *browser.Browser, sqlDb *sql.Storage, nosqlDb *nosql.Storage, txtDb *txt.Storage, cfg *config.Config) *CommandHandler {
 	return &CommandHandler{
-		repo:    trackerRepo,
+		sqlDb:   sqlDb,
+		nosqlDb: nosqlDb,
+		txtDb:   txtDb,
 		browser: browser,
 		cfg:     cfg,
 	}
@@ -111,7 +119,7 @@ func (ch *CommandHandler) OpenResultsDirectory() {
 }
 
 func (ch *CommandHandler) GetSessions(userId string) ([]*model.Session, error) {
-	sessions, err := ch.repo.GetSessions(ch.ctx, userId, 0, 0)
+	sessions, err := ch.sqlDb.GetSessions(ch.ctx, userId, 0, 0)
 	if err != nil {
 		log.Println(err)
 		if !errorsx.ContainsFormattedError(err) {
@@ -122,7 +130,7 @@ func (ch *CommandHandler) GetSessions(userId string) ([]*model.Session, error) {
 }
 
 func (ch *CommandHandler) GetMatches(sessionId uint16, userId string, limit uint8, offset uint16) ([]*model.Match, error) {
-	matches, err := ch.repo.GetMatches(ch.ctx, sessionId, userId, limit, offset)
+	matches, err := ch.sqlDb.GetMatches(ch.ctx, sessionId, userId, limit, offset)
 	if err != nil {
 		log.Println(err)
 		if !errorsx.ContainsFormattedError(err) {
@@ -133,7 +141,7 @@ func (ch *CommandHandler) GetMatches(sessionId uint16, userId string, limit uint
 }
 
 func (ch *CommandHandler) GetUsers() ([]*model.User, error) {
-	users, err := ch.repo.GetUsers(ch.ctx)
+	users, err := ch.sqlDb.GetUsers(ch.ctx)
 	if err != nil {
 		log.Println(err)
 		if !errorsx.ContainsFormattedError(err) {
@@ -180,7 +188,7 @@ func (ch *CommandHandler) SelectGame(game string) error {
 	var err error
 	switch game {
 	case tracker.GameTypeSF6.String():
-		ch.tracker, err = tracker.MakeSF6Tracker(ch.ctx, ch.cfg, ch.browser, ch.repo)
+		ch.tracker, err = tracker.MakeSF6Tracker(ch.ctx, ch.cfg, ch.browser, ch.sqlDb, ch.txtDb)
 	case tracker.GameTypeSFV.String():
 		ch.tracker, err = tracker.MakeSFVTracker(ch.ctx, ch.cfg, ch.browser)
 	}
@@ -195,19 +203,19 @@ func (ch *CommandHandler) SelectGame(game string) error {
 }
 
 func (ch *CommandHandler) SaveLocale(locale string) error {
-	return ch.repo.SaveLocale(locale)
+	return ch.nosqlDb.SaveLocale(locale)
 }
 
 func (ch *CommandHandler) GetGuiConfig() (*model.GuiConfig, error) {
-	return ch.repo.GetGuiConfig()
+	return ch.nosqlDb.GetGuiConfig()
 }
 
 func (ch *CommandHandler) SaveSidebarMinimized(sidebarMinified bool) error {
-	return ch.repo.SaveSidebarMinimized(sidebarMinified)
+	return ch.nosqlDb.SaveSidebarMinimized(sidebarMinified)
 }
 
 func (ch *CommandHandler) SaveTheme(theme model.ThemeName) error {
-	return ch.repo.SaveTheme(theme)
+	return ch.nosqlDb.SaveTheme(theme)
 }
 
 func (ch *CommandHandler) GetTrackingStateUnused() *model.TrackingState {
