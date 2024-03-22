@@ -143,6 +143,7 @@ func main() {
 		return
 	}
 	cmdHandler := cmd.NewCommandHandler(appBrowser, sqlDb, noSqlDb, txtDb, &cfg)
+	settingsHandler := cmd.SettingHandler{}
 
 	var wailsCtx context.Context
 	err = wails.Run(&options.App{
@@ -178,6 +179,14 @@ func main() {
 		OnStartup: func(ctx context.Context) {
 			wailsCtx = ctx
 			cmdHandler.SetContext(ctx)
+
+			// FIXME:
+			settingsHandler.WithContext(ctx)
+			err := settingsHandler.CreateBackup()
+			if err != nil {
+				log.Println(fmt.Errorf(`failed to create backup: %w`, err))
+			}
+
 			go server.Start(ctx, &cfg)
 		},
 		OnShutdown: func(_ context.Context) {
@@ -199,6 +208,7 @@ func main() {
 		},
 		Bind: []interface{}{
 			cmdHandler,
+			&settingsHandler,
 		},
 	})
 	if err != nil {
