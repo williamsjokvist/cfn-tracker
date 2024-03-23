@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"math"
+	"net/http"
 	"strconv"
 	"strings"
 	"time"
@@ -13,7 +14,9 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 
 	"github.com/williamsjokvist/cfn-tracker/pkg/browser"
+	"github.com/williamsjokvist/cfn-tracker/pkg/errorsx"
 	"github.com/williamsjokvist/cfn-tracker/pkg/model"
+	"github.com/williamsjokvist/cfn-tracker/pkg/tracker"
 	"github.com/williamsjokvist/cfn-tracker/pkg/utils"
 )
 
@@ -26,10 +29,7 @@ type SFVTracker struct {
 	*browser.Browser
 }
 
-var (
-	ErrUnauthenticated = errors.New(`sfv authentication invalid or missing`)
-	ErrInvalidCFN      = errors.New(`invalid cfn provided`)
-)
+var _ tracker.GameTracker = (*SFVTracker)(nil)
 
 func NewSFVTracker(browser *browser.Browser) *SFVTracker {
 	return &SFVTracker{
@@ -58,7 +58,7 @@ func (t *SFVTracker) Start(ctx context.Context, cfn string, restoreData bool, re
 	}
 
 	if !t.isAuthenticated {
-		return ErrUnauthenticated
+		return errorsx.NewFormattedError(http.StatusUnauthorized, errors.New(`tracker not authenticated`))
 	}
 
 	t.mh = &model.TrackingState{
@@ -84,7 +84,7 @@ func (t *SFVTracker) Start(ctx context.Context, cfn string, restoreData bool, re
 	isValidProfile := t.Page.MustHas(`.leagueInfo`)
 	if !isValidProfile {
 		t.stopFn(ctx)
-		return ErrInvalidCFN
+		return errorsx.NewFormattedError(http.StatusNotFound, fmt.Errorf(`failed to get user`))
 	}
 
 	log.Println(`Profile loaded`)
