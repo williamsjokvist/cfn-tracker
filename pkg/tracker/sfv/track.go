@@ -6,14 +6,17 @@ import (
 	"fmt"
 	"log"
 	"math"
+	"net/http"
 	"strconv"
 	"strings"
 	"time"
 
-	wails "github.com/wailsapp/wails/v2/pkg/runtime"
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 
 	"github.com/williamsjokvist/cfn-tracker/pkg/browser"
+	"github.com/williamsjokvist/cfn-tracker/pkg/errorsx"
 	"github.com/williamsjokvist/cfn-tracker/pkg/model"
+	"github.com/williamsjokvist/cfn-tracker/pkg/tracker"
 	"github.com/williamsjokvist/cfn-tracker/pkg/utils"
 )
 
@@ -26,10 +29,7 @@ type SFVTracker struct {
 	*browser.Browser
 }
 
-var (
-	ErrUnauthenticated = errors.New(`sfv authentication invalid or missing`)
-	ErrInvalidCFN      = errors.New(`invalid cfn provided`)
-)
+var _ tracker.GameTracker = (*SFVTracker)(nil)
 
 func NewSFVTracker(browser *browser.Browser) *SFVTracker {
 	return &SFVTracker{
@@ -47,7 +47,7 @@ func (t *SFVTracker) Stop() {
 func (t *SFVTracker) stopFn(ctx context.Context) {
 	log.Println(`Stopped tracking`)
 	t.isTracking = false
-	wails.EventsEmit(ctx, `stopped-tracking`)
+	runtime.EventsEmit(ctx, `stopped-tracking`)
 }
 
 // Start will update the MatchHistory when new matches are played.
@@ -58,7 +58,7 @@ func (t *SFVTracker) Start(ctx context.Context, cfn string, restoreData bool, re
 	}
 
 	if !t.isAuthenticated {
-		return ErrUnauthenticated
+		return errorsx.NewFormattedError(http.StatusUnauthorized, errors.New(`tracker not authenticated`))
 	}
 
 	t.mh = &model.TrackingState{
@@ -84,7 +84,7 @@ func (t *SFVTracker) Start(ctx context.Context, cfn string, restoreData bool, re
 	isValidProfile := t.Page.MustHas(`.leagueInfo`)
 	if !isValidProfile {
 		t.stopFn(ctx)
-		return ErrInvalidCFN
+		return errorsx.NewFormattedError(http.StatusNotFound, fmt.Errorf(`failed to get user`))
 	}
 
 	log.Println(`Profile loaded`)
@@ -191,7 +191,7 @@ func (t *SFVTracker) refreshMatchHistory(ctx context.Context, cfn string, isFirs
 	t.mh.TimeStamp = time.Now().Format(`15:04`)
 	t.mh.Date = time.Now().Format(`2006-01-02`)
 
-	wails.EventsEmit(ctx, `cfn-data`, t.mh)
+	runtime.EventsEmit(ctx, `cfn-data`, t.mh)
 	t.mh.Log()
 }
 

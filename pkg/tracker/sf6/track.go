@@ -16,6 +16,7 @@ import (
 	"github.com/williamsjokvist/cfn-tracker/pkg/model"
 	"github.com/williamsjokvist/cfn-tracker/pkg/storage/sql"
 	"github.com/williamsjokvist/cfn-tracker/pkg/storage/txt"
+	"github.com/williamsjokvist/cfn-tracker/pkg/tracker"
 	"github.com/williamsjokvist/cfn-tracker/pkg/utils"
 )
 
@@ -30,6 +31,8 @@ type SF6Tracker struct {
 	sqlDb *sql.Storage
 	txtDb *txt.Storage
 }
+
+var _ tracker.GameTracker = (*SF6Tracker)(nil)
 
 func NewSF6Tracker(browser *browser.Browser, sqlDb *sql.Storage, txtDb *txt.Storage) *SF6Tracker {
 	return &SF6Tracker{

@@ -1,7 +1,6 @@
 package sfv
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"log"
@@ -9,25 +8,12 @@ import (
 	"time"
 
 	"github.com/go-rod/rod/lib/proto"
+
+	"github.com/williamsjokvist/cfn-tracker/pkg/tracker"
 )
 
-type AuthStatus struct {
-	Progress int
-	Err      error
-}
-
-func (s *AuthStatus) WithProgress(progress int) *AuthStatus {
-	s.Progress = progress
-	return s
-}
-
-func (s *AuthStatus) WithError(err error) *AuthStatus {
-	s.Err = err
-	return s
-}
-
-func (t *SFVTracker) Authenticate(ctx context.Context, username string, password string, statChan chan AuthStatus) {
-	status := &AuthStatus{Progress: 0, Err: nil}
+func (t *SFVTracker) Authenticate(username string, password string, statChan chan tracker.AuthStatus) {
+	status := &tracker.AuthStatus{Progress: 0, Err: nil}
 
 	if t.isAuthenticated || t.Page.MustInfo().URL == `https://game.capcom.com/cfn/sfv/` {
 		statChan <- *status.WithProgress(100)

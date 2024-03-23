@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/hashicorp/go-version"
+	wailsRuntime "github.com/wailsapp/wails/v2/pkg/runtime"
 
 	"github.com/williamsjokvist/cfn-tracker/pkg/browser"
 	"github.com/williamsjokvist/cfn-tracker/pkg/config"
@@ -25,6 +26,8 @@ import (
 	"github.com/williamsjokvist/cfn-tracker/pkg/storage/sql"
 	"github.com/williamsjokvist/cfn-tracker/pkg/storage/txt"
 	"github.com/williamsjokvist/cfn-tracker/pkg/tracker"
+	"github.com/williamsjokvist/cfn-tracker/pkg/tracker/sf6"
+	"github.com/williamsjokvist/cfn-tracker/pkg/tracker/sfv"
 )
 
 // The CommandHandler is the interface between the GUI and the core
@@ -185,21 +188,35 @@ func (ch *CommandHandler) GetThemes() ([]model.Theme, error) {
 }
 
 func (ch *CommandHandler) SelectGame(game string) error {
-	var err error
+	var username, password string
+
 	switch game {
 	case tracker.GameTypeSF6.String():
-		ch.tracker, err = tracker.MakeSF6Tracker(ch.ctx, ch.cfg, ch.browser, ch.sqlDb, ch.txtDb)
+		ch.tracker = sf6.NewSF6Tracker(ch.browser, ch.sqlDb, ch.txtDb)
+		username = ch.cfg.CapIDEmail
+		password = ch.cfg.CapIDPassword
 	case tracker.GameTypeSFV.String():
-		ch.tracker, err = tracker.MakeSFVTracker(ch.ctx, ch.cfg, ch.browser)
+		ch.tracker = sfv.NewSFVTracker(ch.browser)
+		username = ch.cfg.SteamUsername
+		password = ch.cfg.SteamPassword
+	default:
+		return errorsx.NewFormattedError(http.StatusInternalServerError, fmt.Errorf(`failed to select game`))
 	}
 
-	if err != nil {
-		log.Println(err)
-		if !errorsx.ContainsFormattedError(err) {
-			err = errorsx.NewFormattedError(http.StatusInternalServerError, fmt.Errorf(`failed to select game %w`, err))
+	authChan := make(chan tracker.AuthStatus)
+	go ch.tracker.Authenticate(username, password, authChan)
+	for status := range authChan {
+		if status.Err != nil {
+			return errorsx.NewFormattedError(http.StatusUnauthorized, status.Err)
+		}
+		wailsRuntime.EventsEmit(ch.ctx, "auth-progress", status.Progress)
+
+		if status.Progress >= 100 {
+			close(authChan)
+			break
 		}
 	}
-	return err
+	return nil
 }
 
 func (ch *CommandHandler) SaveLocale(locale string) error {
