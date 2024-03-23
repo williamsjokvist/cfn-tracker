@@ -199,9 +199,6 @@ func main() {
 		},
 		Bind: []interface{}{
 			cmdHandler,
-			sqlDb,
-			noSqlDb,
-			txtDb,
 		},
 	})
 	if err != nil {
