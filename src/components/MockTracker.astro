@@ -38,7 +38,9 @@ const { title, page, spin, className, ...props } = Astro.props
       />
       )}
     </header>
-    <slot />
+    <div class="overflow-y-scroll h-[290px]">
+      <slot />
+    </div>
 
 
   </div>

@@ -13,9 +13,9 @@ const matches = [
   {
     date: "2023-04-23",
     time: "12:38",
-    opponent: "bboylong",
+    opponent: "dierto",
     opponentLeague: "Diamond",
-    opponentCharacter: "Akuma",
+    opponentCharacter: "Chun-Li",
     victory: false,
   },
   {
@@ -29,10 +29,50 @@ const matches = [
   {
     date: "2023-04-23",
     time: "12:23",
-    opponent: "indigoinconnu",
+    opponent: "UchihaStrider",
     opponentLeague: "Diamond",
-    opponentCharacter: "Zangief",
+    opponentCharacter: "Akuma",
     victory: true,
+  },
+  {
+    date: "2023-04-23",
+    time: "12:08",
+    opponent: "ferret_ja",
+    opponentLeague: "S. Diamond",
+    opponentCharacter: "Rashid",
+    victory: false,
+  },
+  {
+    date: "2023-04-23",
+    time: "12:00",
+    opponent: "Dooradoyle",
+    opponentLeague: "S. Diamond",
+    opponentCharacter: "Akuma",
+    victory: false,
+  },
+  {
+    date: "2023-04-23",
+    time: "11:48",
+    opponent: "Abelievable",
+    opponentLeague: "Diamond",
+    opponentCharacter: "Ken",
+    victory: false,
+  },
+  {
+    date: "2023-04-23",
+    time: "11:40",
+    opponent: "Ryu_Knight",
+    opponentLeague: "Diamond",
+    opponentCharacter: "Ryu",
+    victory: true,
+  },
+  {
+    date: "2023-04-23",
+    time: "11:35",
+    opponent: "AlexLeder",
+    opponentLeague: "Diamond",
+    opponentCharacter: "Abigail",
+    victory: false,
   },
 ];
 ---
@@ -186,12 +226,12 @@ const matches = [
               <th class="text-left px-3 whitespace-nowrap w-[180px]">
                 Opponent
               </th>
-              <th class="text-left px-3 whitespace-nowrap"> League</th>
-              <th class="text-center px-3 whitespace-nowrap"> Character</th>
+              <th class="text-left px-3 whitespace-nowrap"> Character</th>
+              <th class="text-center px-3 whitespace-nowrap"> League</th>
               <th class="text-center px-3 whitespace-nowrap"> Result</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody class="">
             {
               matches.map((log) => (
                 <tr class="backdrop-blur group">
@@ -204,11 +244,11 @@ const matches = [
                   <td class="whitespace-nowrap rounded-none bg-slate-50 bg-opacity-5 group-hover:bg-opacity-10 transition-colors px-3 py-2  ">
                     {log.opponent}
                   </td>
-                  <td class="whitespace-nowrap rounded-none bg-slate-50 bg-opacity-5 group-hover:bg-opacity-10 transition-colors px-3 py-2  ">
-                    {log.opponentLeague}
-                  </td>
-                  <td class="rounded-none bg-slate-50 bg-opacity-5 group-hover:bg-opacity-10 transition-colors px-3 py-2 text-center  ">
+                  <td class="rounded-none bg-slate-50 bg-opacity-5 group-hover:bg-opacity-10 transition-colors px-3 py-2 text-center">
                     {log.opponentCharacter}
+                  </td>
+                  <td class="text-center whitespace-nowrap rounded-none bg-slate-50 bg-opacity-5 group-hover:bg-opacity-10 transition-colors px-3 py-2  ">
+                    {log.opponentLeague}
                   </td>
                   <td
                     class="rounded-r-xl rounded-l-none bg-slate-50 bg-opacity-5 group-hover:bg-opacity-10 transition-colors px-3 py-2 text-center"
