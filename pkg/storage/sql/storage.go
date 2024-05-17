@@ -25,6 +25,8 @@ type Storage struct {
 	db *sqlx.DB
 }
 
+const backupDriverName string = "sqlite3-backup-db-driver"
+
 func NewStorage() (*Storage, error) {
 	if err := migrateSchema(nil); err != nil {
 		return nil, fmt.Errorf("failed to perform migrations: %w", err)
@@ -93,10 +95,15 @@ func migrateSchema(nSteps *int) error {
 Documentation for sqlite3 backup API:
 https://www.sqlite.org/c3ref/backup_finish.html#sqlite3backupinit
 */
+<<<<<<< HEAD
 func (s *Storage) CreateBackup(ctx context.Context) error {
+=======
+func (s *Storage) CreateBackup() error {
+	// Require handle to the sqlite3 connections to perform backup
+>>>>>>> 0b2c83a (cleaned up code structure)
 	conns := make([]*sqlite3.SQLiteConn, 0, 1)
 	sql.Register(
-		"sqlite3-backup",
+		backupDriverName,
 		&sqlite3.SQLiteDriver{
 			ConnectHook: func(conn *sqlite3.SQLiteConn) error {
 				conns = append(conns, conn)
@@ -111,8 +118,9 @@ func (s *Storage) CreateBackup(ctx context.Context) error {
 	}
 	dataDir := filepath.Join(cacheDir, "cfn-tracker")
 	os.MkdirAll(dataDir, os.FileMode(0755))
+
 	backupFilepath := filepath.Join(dataDir, "cfn-tracker.backup.db")
-	backupDb, err := sqlx.Open("sqlite3-backup", backupFilepath)
+	backupDb, err := sqlx.Open(backupDriverName, backupFilepath)
 	if err != nil {
 		return fmt.Errorf("open sqlite3 connection: %w", err)
 	}
@@ -121,14 +129,13 @@ func (s *Storage) CreateBackup(ctx context.Context) error {
 			log.Printf("failed to close backup: %v", closeErr)
 		}
 	}()
-	// sql package offers no guarantee that a connection is established when Open() returns
-	// sqlite driver lazily opens a connection when it is needed
-	// so we need to ping the connection to ensure it is established
+	// sql.Open may not immediatly open a connection
+	// call Ping to ensure the connection is established
 	backupDb.Ping()
 
-	// Even though we are using the same db file, we need to open a new connection to it
-	// "The source database connection may be used by the application for other purposes while a backup operation is underway or being initialized."
-	sourceDb, err := sqlx.Open("sqlite3-backup", getDataSource())
+	// Need new connection to perform backup
+	// The source connection may still be used by the application during backup
+	sourceDb, err := sqlx.Open(backupDriverName, getDataSource())
 	if err != nil {
 		return fmt.Errorf("open sqlite3 connection: %w", err)
 	}
@@ -145,7 +152,8 @@ func (s *Storage) CreateBackup(ctx context.Context) error {
 
 	backupConn := conns[0]
 	sourceConn := conns[1]
-	// The database name is "main" as per sqlite3 documentation
+	// The database name is "main"
+	// https://www.sqlite.org/c3ref/backup_finish.html#sqlite3backupinit
 	backup, err := backupConn.Backup("main", sourceConn, "main")
 	if err != nil {
 		return fmt.Errorf("backup db: %w", err)
@@ -158,12 +166,14 @@ func (s *Storage) CreateBackup(ctx context.Context) error {
 	}()
 
 	// -1 means to copy all data
+	// https://www.sqlite.org/c3ref/backup_finish.html#sqlite3backupstep
 	didComplete, err := backup.Step(-1)
 	if err != nil {
 		return fmt.Errorf("backup step: %w", err)
 	}
 	if !didComplete {
-		return fmt.Errorf("backup did not complete") // Should never happen when using -1 step and error is nil
+		// Should never happen when using -1 step and error is nil
+		return fmt.Errorf("backup did not complete")
 	}
 
 	return nil
