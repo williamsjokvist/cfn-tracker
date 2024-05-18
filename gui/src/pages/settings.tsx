@@ -11,8 +11,9 @@ import {
   GetSupportedLanguages,
   SaveLocale,
   SaveSidebarMinimized,
-  SaveTheme
+  SaveTheme,
 } from '@cmd'
+import { CreateBackup } from '@settings'
 import { BrowserOpenURL } from '@runtime'
 
 import * as Page from '@/ui/page'
@@ -133,7 +134,7 @@ function BackupOptions() {
   const { i18n } = useTranslation()
 
   function backupData() {
-    console.log('backup data')
+    CreateBackup()
   }
 
   function restoreData() {

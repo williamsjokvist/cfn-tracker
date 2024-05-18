@@ -190,14 +190,7 @@ func main() {
 		OnStartup: func(ctx context.Context) {
 			wailsCtx = ctx
 			cmdHandler.SetContext(ctx)
-
-			// FIXME:
 			settingsHandler.WithContext(ctx)
-			err := settingsHandler.RestoreBackup()
-			if err != nil {
-				log.Println(fmt.Errorf(`failed to restore backup: %w`, err))
-			}
-
 			go server.Start(ctx, &cfg)
 		},
 		OnShutdown: func(_ context.Context) {

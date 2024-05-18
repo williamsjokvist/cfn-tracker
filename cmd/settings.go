@@ -23,9 +23,7 @@ func (sh *SettingHandler) WithContext(ctx context.Context) {
 }
 
 func (sh *SettingHandler) CreateBackup() error {
-	fmt.Println("Creating backup")
-	//return sh.sqlDb.CreateBackup()
-	return sh.RestoreBackup()
+	return sh.sqlDb.CreateBackup()
 }
 
 func (sh *SettingHandler) RestoreBackup() error {
