@@ -94,41 +94,17 @@ func main() {
 		}
 	}()
 
-	var appBrowser *browser.Browser
-	closeWithError := func(err error) {
-		if appBrowser != nil {
-			appBrowser.Page.Browser().Close()
-		}
-		log.Println("close with error", err)
-		wails.Run(&options.App{
-			Title:                    `CFN Tracker - Error`,
-			Width:                    400,
-			Height:                   148,
-			DisableResize:            true,
-			Frameless:                true,
-			EnableDefaultContextMenu: false,
-			AssetServer: &assetserver.Options{
-				Middleware: assetserver.ChainMiddleware(func(next http.Handler) http.Handler {
-					return http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
-						var b bytes.Buffer
-						tmpl := template.Must(template.New("errorPage").Parse(string(errorTmpl)))
-						params := struct {
-							Error string
-						}{
-							Error: err.Error(),
-						}
-						tmpl.Execute(&b, params)
-						w.Write(b.Bytes())
-					})
-				}),
-			},
-		})
-	}
 	appBrowser, err := browser.NewBrowser(cfg.Headless)
 	if err != nil {
 		closeWithError(fmt.Errorf(`failed to launch browser: %v`, err))
 		return
 	}
+	defer func() {
+		if err := appBrowser.Page.Browser().Close(); err != nil {
+			log.Printf("failed to close browser: %v", err)
+		}
+	}()
+
 	sqlDb, err := sql.NewStorage()
 	if err != nil {
 		closeWithError(fmt.Errorf(`failed to initalize database: %w`, err))
@@ -146,7 +122,6 @@ func main() {
 	}
 	cmdHandler := cmd.NewCommandHandler(appBrowser, sqlDb, noSqlDb, txtDb, &cfg)
 	settingsHandler := cmd.NewSettingHandler(sqlDb)
-	var wailsCtx context.Context
 
 	pprofServer := &http.Server{
 		Addr: ":6060",
@@ -156,8 +131,33 @@ func main() {
 			log.Printf("HTTP pprof server error %v", err)
 		}
 	}()
+	defer func() {
+		if err := pprofServer.Close(); err != nil {
+			log.Printf("error closing pprof server: %v", err)
+		}
+	}()
 
-	err = wails.Run(&options.App{
+	err = wails.Run(newApp(
+		cfg.AppVersion,
+		assets,
+		appBrowser,
+		cmdHandler,
+		settingsHandler,
+	))
+	if err != nil {
+		closeWithError(fmt.Errorf(`failed to launch app: %w`, err))
+	}
+}
+
+func newApp(
+	appVersion string,
+	assets embed.FS,
+	appBrowser *browser.Browser,
+	cmdHandler *cmd.CommandHandler,
+	settingsHandler *cmd.SettingHandler,
+) *options.App {
+	var wailsCtx context.Context
+	return &options.App{
 		Title:              fmt.Sprintf(`CFN Tracker v%s`, appVersion),
 		Assets:             assets,
 		Width:              920,
@@ -214,15 +214,32 @@ func main() {
 			cmdHandler,
 			settingsHandler,
 		},
+	}
+}
+
+func closeWithError(err error) {
+	log.Println("close with error", err)
+	wails.Run(&options.App{
+		Title:                    `CFN Tracker - Error`,
+		Width:                    400,
+		Height:                   148,
+		DisableResize:            true,
+		Frameless:                true,
+		EnableDefaultContextMenu: false,
+		AssetServer: &assetserver.Options{
+			Middleware: assetserver.ChainMiddleware(func(next http.Handler) http.Handler {
+				return http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+					var b bytes.Buffer
+					tmpl := template.Must(template.New("errorPage").Parse(string(errorTmpl)))
+					params := struct {
+						Error string
+					}{
+						Error: err.Error(),
+					}
+					tmpl.Execute(&b, params)
+					w.Write(b.Bytes())
+				})
+			}),
+		},
 	})
-
-	if closeErr := pprofServer.Close(); closeErr != nil {
-		log.Printf("error closing pprof server: %v", err)
-	}
-
-	if err == nil {
-		return
-	}
-
-	closeWithError(fmt.Errorf(`failed to launch app: %w`, err))
 }
