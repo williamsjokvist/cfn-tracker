@@ -132,9 +132,15 @@ function ThemeSelect() {
 
 function BackupOptions() {
   const { i18n } = useTranslation()
+  const setError = useErrorPopup()
 
-  function backupData() {
-    CreateBackup()
+  async function backupData() {
+    try {
+      await CreateBackup()
+    } catch (error) {
+      console.error(error)
+      setError(error)
+    }
   }
 
   function restoreData() {

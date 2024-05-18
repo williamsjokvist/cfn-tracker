@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"time"
 
 	migrate "github.com/golang-migrate/migrate/v4"
 	sqlitex "github.com/golang-migrate/migrate/v4/database/sqlite"
@@ -22,7 +23,8 @@ import (
 var migrationsFs embed.FS
 
 type Storage struct {
-	db *sqlx.DB
+	db       *sqlx.DB
+	connChan chan *sqlite3.SQLiteConn
 }
 
 const backupDriverName string = "sqlite3-backup-db-driver"
@@ -35,6 +37,7 @@ func NewStorage() (*Storage, error) {
 	if err != nil {
 		return nil, fmt.Errorf("open sqlite3 connection: %w", err)
 	}
+<<<<<<< HEAD
 	return &Storage{
 		db,
 	}, nil
@@ -46,6 +49,12 @@ func getDataSource() string {
 	os.MkdirAll(dataDir, os.FileMode(0755))
 	return filepath.Join(dataDir, "cfn-tracker.db")
 }
+=======
+	storage := &Storage{
+		db:       db,
+		connChan: make(chan *sqlite3.SQLiteConn, 1),
+	}
+>>>>>>> 6592a76 (frontend create backup error handling)
 
 func migrateSchema(nSteps *int) error {
 	db, err := sqlx.Open("sqlite3", getDataSource())
@@ -83,6 +92,7 @@ func migrateSchema(nSteps *int) error {
 		err = preparedMigrations.Up()
 	}
 
+<<<<<<< HEAD
 	if err != nil && !errors.Is(err, migrate.ErrNoChange) {
 		return fmt.Errorf("failed to apply migrations: %w", err)
 	}
@@ -102,22 +112,44 @@ func (s *Storage) CreateBackup() error {
 	// Require handle to the sqlite3 connections to perform backup
 >>>>>>> 0b2c83a (cleaned up code structure)
 	conns := make([]*sqlite3.SQLiteConn, 0, 1)
+=======
+>>>>>>> 6592a76 (frontend create backup error handling)
 	sql.Register(
 		backupDriverName,
 		&sqlite3.SQLiteDriver{
 			ConnectHook: func(conn *sqlite3.SQLiteConn) error {
-				conns = append(conns, conn)
+				ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+				defer cancel()
+
+				select {
+				case <-ctx.Done():
+					return fmt.Errorf("connect hook: %w", ctx.Err())
+				case storage.connChan <- conn:
+				}
 				return nil
 			},
 		},
 	)
 
+	return storage, nil
+}
+
+/*
+Documentation for sqlite3 backup API:
+https://www.sqlite.org/c3ref/backup_finish.html#sqlite3backupinit
+*/
+// TODO: Two calls to this function will result in a panic
+// because the backup driver is registered twice
+func (s *Storage) CreateBackup(ctx context.Context) error {
 	cacheDir, err := os.UserCacheDir()
 	if err != nil {
 		return fmt.Errorf("get user cache dir: %w", err)
 	}
 	dataDir := filepath.Join(cacheDir, "cfn-tracker")
-	os.MkdirAll(dataDir, os.FileMode(0755))
+	err = os.MkdirAll(dataDir, os.FileMode(0755))
+	if err != nil {
+		return fmt.Errorf("create data dir: %w", err)
+	}
 
 	backupFilepath := filepath.Join(dataDir, "cfn-tracker.backup.db")
 	backupDb, err := sqlx.Open(backupDriverName, backupFilepath)
@@ -132,6 +164,17 @@ func (s *Storage) CreateBackup() error {
 	// sql.Open may not immediatly open a connection
 	// call Ping to ensure the connection is established
 	backupDb.Ping()
+	var backupConn *sqlite3.SQLiteConn
+	select {
+	case backupConn = <-s.connChan:
+	case <-ctx.Done():
+		return fmt.Errorf("backup connection: %w", ctx.Err())
+	}
+	defer func() {
+		if closeErr := backupConn.Close(); closeErr != nil {
+			log.Printf("failed to close backup connection: %v", closeErr)
+		}
+	}()
 
 	// Need new connection to perform backup
 	// The source connection may still be used by the application during backup
@@ -145,20 +188,24 @@ func (s *Storage) CreateBackup() error {
 		}
 	}()
 	sourceDb.Ping()
-
-	if len(conns) != 2 {
-		return fmt.Errorf("expected 2 connections, got %d", len(conns))
+	var sourceConn *sqlite3.SQLiteConn
+	select {
+	case sourceConn = <-s.connChan:
+	case <-ctx.Done():
+		return fmt.Errorf("source connection: %w", ctx.Err())
 	}
+	defer func() {
+		if closeErr := sourceConn.Close(); closeErr != nil {
+			log.Printf("failed to close source connection: %v", closeErr)
+		}
+	}()
 
-	backupConn := conns[0]
-	sourceConn := conns[1]
 	// The database name is "main"
 	// https://www.sqlite.org/c3ref/backup_finish.html#sqlite3backupinit
 	backup, err := backupConn.Backup("main", sourceConn, "main")
 	if err != nil {
 		return fmt.Errorf("backup db: %w", err)
 	}
-	// backup.Finish() just forwards to backup.Close()
 	defer func() {
 		if closeErr := backup.Close(); closeErr != nil {
 			log.Printf("failed to close backup: %v", closeErr)
