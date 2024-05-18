@@ -4,10 +4,12 @@ import (
 	"bytes"
 	"context"
 	"embed"
+	"errors"
 	"fmt"
 	"html/template"
 	"log"
 	"net/http"
+	_ "net/http/pprof"
 	"os"
 	"strings"
 
@@ -145,6 +147,16 @@ func main() {
 	cmdHandler := cmd.NewCommandHandler(appBrowser, sqlDb, noSqlDb, txtDb, &cfg)
 	settingsHandler := cmd.NewSettingHandler(sqlDb)
 	var wailsCtx context.Context
+
+	pprofServer := &http.Server{
+		Addr: ":6060",
+	}
+	go func() {
+		if err := pprofServer.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
+			log.Printf("HTTP pprof server error %v", err)
+		}
+	}()
+
 	err = wails.Run(&options.App{
 		Title:              fmt.Sprintf(`CFN Tracker v%s`, appVersion),
 		Assets:             assets,
@@ -210,7 +222,14 @@ func main() {
 			settingsHandler,
 		},
 	})
-	if err != nil {
-		closeWithError(fmt.Errorf(`failed to launch app: %w`, err))
+
+	if closeErr := pprofServer.Close(); closeErr != nil {
+		log.Printf("error closing pprof server: %v", err)
 	}
+
+	if err == nil {
+		return
+	}
+
+	closeWithError(fmt.Errorf(`failed to launch app: %w`, err))
 }
