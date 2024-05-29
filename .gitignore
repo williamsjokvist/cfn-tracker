@@ -38,4 +38,4 @@ resource.syso
 .vite/
 
 CFN Tracker*
-cfn-tracker-*
+cfn-tracker*
