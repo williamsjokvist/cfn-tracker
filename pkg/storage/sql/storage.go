@@ -1,44 +1,39 @@
 package sql
 
 import (
+	"embed"
+	"errors"
 	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 
+	migrate "github.com/golang-migrate/migrate/v4"
+	sqlitex "github.com/golang-migrate/migrate/v4/database/sqlite"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
+	"github.com/golang-migrate/migrate/v4/source/iofs"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3"
 )
+
+//go:embed migrations
+var migrationsFs embed.FS
 
 type Storage struct {
 	db *sqlx.DB
 }
 
 func NewStorage() (*Storage, error) {
-	dataSource := getDataSource()
-	db, err := sqlx.Open("sqlite3", dataSource)
+	if err := migrateSchema(nil); err != nil {
+		return nil, fmt.Errorf("failed to perform migrations: %w", err)
+	}
+	db, err := sqlx.Open("sqlite3", getDataSource())
 	if err != nil {
 		return nil, fmt.Errorf("open sqlite3 connection: %w", err)
 	}
-	storage := &Storage{
-		db: db,
-	}
-
-	err = storage.createUsersTable()
-	if err != nil {
-		return nil, err
-	}
-
-	err = storage.createSessionsTable()
-	if err != nil {
-		return nil, err
-	}
-
-	err = storage.createMatchesTable()
-	if err != nil {
-		return nil, err
-	}
-
-	return storage, nil
+	return &Storage{
+		db,
+	}, nil
 }
 
 func getDataSource() string {
@@ -46,4 +41,48 @@ func getDataSource() string {
 	dataDir := filepath.Join(cacheDir, "cfn-tracker")
 	os.MkdirAll(dataDir, os.FileMode(0755))
 	return filepath.Join(dataDir, "cfn-tracker.db")
+}
+
+func migrateSchema(nSteps *int) error {
+	db, err := sqlx.Open("sqlite3", getDataSource())
+	if err != nil {
+		return fmt.Errorf("open sqlite3 connection: %w", err)
+	}
+
+	migrateDriver, err := sqlitex.WithInstance(db.DB, &sqlitex.Config{
+		MigrationsTable: "migrations",
+	})
+	if err != nil {
+		return fmt.Errorf("failed to create migration driver: %w", err)
+	}
+	srcDriver, err := iofs.New(migrationsFs, "migrations")
+	if err != nil {
+		return fmt.Errorf("failed to create migration source driver: %w", err)
+	}
+	preparedMigrations, err := migrate.NewWithInstance(
+		"iofs",
+		srcDriver,
+		"",
+		migrateDriver,
+	)
+	if err != nil {
+		return fmt.Errorf("failed to create migration tooling instance: %w", err)
+	}
+	defer func() {
+		preparedMigrations.Close()
+		db.Close()
+	}()
+	if nSteps != nil {
+		fmt.Printf("stepping migrations %d...\n", *nSteps)
+		err = preparedMigrations.Steps(*nSteps)
+	} else {
+		err = preparedMigrations.Up()
+	}
+
+	if err != nil && !errors.Is(err, migrate.ErrNoChange) {
+		return fmt.Errorf("failed to apply migrations: %w", err)
+	}
+
+	log.Println("Successfully applied db migrations")
+	return nil
 }
