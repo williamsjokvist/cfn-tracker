@@ -5,14 +5,9 @@ import (
 	"context"
 	"embed"
 	"fmt"
-	"html/template"
-	"log"
-	"net/http"
-	"os"
-	"strings"
-
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
+	"github.com/samber/lo"
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/logger"
 	"github.com/wailsapp/wails/v2/pkg/options"
@@ -20,6 +15,16 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/options/mac"
 	"github.com/wailsapp/wails/v2/pkg/options/windows"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
+	"github.com/williamsjokvist/cfn-tracker/pkg/update"
+	"html/template"
+	"log"
+	"log/slog"
+	"net/http"
+	"os"
+	"strconv"
+	"strings"
+	"syscall"
+	"time"
 
 	"github.com/williamsjokvist/cfn-tracker/cmd"
 	"github.com/williamsjokvist/cfn-tracker/pkg/browser"
@@ -127,6 +132,9 @@ func main() {
 		closeWithError(fmt.Errorf(`failed to launch browser: %v`, err))
 		return
 	}
+
+	handleAutoUpdate(appBrowser)
+
 	sqlDb, err := sql.NewStorage()
 	if err != nil {
 		closeWithError(fmt.Errorf(`failed to initalize database: %w`, err))
@@ -204,4 +212,72 @@ func main() {
 	if err != nil {
 		closeWithError(fmt.Errorf(`failed to launch app: %w`, err))
 	}
+}
+
+func handleAutoUpdate(appBrowser *browser.Browser) {
+
+	deleteOldExe := func() {
+
+		slog.Info("Deleting old exe...")
+		currentExePath, err := os.Executable()
+		if err != nil {
+			slog.Error(fmt.Sprintf(`Failed to get current exe path: %v`, err))
+		}
+
+		err = os.Remove(currentExePath + `.old`)
+		if err != nil {
+			slog.Error(fmt.Sprintf(`Failed to remove current %s.old: %v`, currentExePath, err))
+		}
+
+	}
+
+	// If we have a previous instance running, wait for it to close before proceeding
+	if i := lo.IndexOf(os.Args, "--auto-update"); i != -1 {
+		if len(os.Args) < i+2 {
+			panic(`missing pid argument for --auto-update`)
+		}
+		prevInstancePidStr := os.Args[i+1]
+		prevInstancePid, err := strconv.Atoi(prevInstancePidStr)
+		if err != nil {
+			panic(fmt.Sprintf(`failed to convert pid to int: %v`, err))
+		}
+
+		for i := 0; i < 10; i++ {
+
+			// On Unix systems, FindProcess always succeeds and returns a Process
+			// for the given pid, regardless of whether the process exists. To test whether
+			// the process actually exists, see whether p.Signal(syscall.Signal(0)) reports
+			// an error.
+			p, err := os.FindProcess(prevInstancePid)
+			if err != nil {
+				slog.Warn(fmt.Sprintf(`failed (err received) to find previous instance process, it's probably shut down...: %v'`, err))
+				deleteOldExe()
+				break
+			}
+			if p == nil {
+				slog.Info(`failed to find previous instance process, it's probably shut down...'`)
+				deleteOldExe()
+				break
+			}
+
+			err = p.Signal(syscall.Signal(0))
+			if err != nil {
+				// The process is not running
+				deleteOldExe()
+				break
+			}
+
+			slog.Info(`waiting for previous instance to close...`)
+			time.Sleep(1 * time.Second)
+
+		}
+	} else {
+
+		slog.Info(`checking for updates...`)
+		err := update.HandleAutoUpdate(cfg.AppVersion, appBrowser)
+		if err != nil {
+			slog.Error(fmt.Sprintf(`failed to update to latest version: %v`, err))
+		}
+	}
+
 }
