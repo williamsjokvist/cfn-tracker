@@ -73,16 +73,3 @@ func (s *Storage) RemoveUser(ctx context.Context, code string) error {
 	}
 	return nil
 }
-
-func (s *Storage) createUsersTable() error {
-	_, err := s.db.Exec(`
-	CREATE TABLE IF NOT EXISTS users (
-		code TEXT NOT NULL,
-		display_name TEXT NOT NULL,
-		PRIMARY KEY (code)
-	)`)
-	if err != nil {
-		return fmt.Errorf("create users table: %w", err)
-	}
-	return nil
-}

@@ -103,35 +103,3 @@ func (s *Storage) GetMatches(ctx context.Context, sessionId uint16, userId strin
 
 	return matches, nil
 }
-
-func (s *Storage) createMatchesTable() error {
-	_, err := s.db.Exec(`
-	CREATE TABLE IF NOT EXISTS matches (
-		user_id TEXT,
-		session_id INTEGER,
-		character TEXT NOT NULL,
-		lp INTEGER,
-		lp_gain INTEGER,
-		mr INTEGER,
-		mr_gain INTEGER,
-		opponent TEXT,
-		opponent_character TEXT,
-		opponent_lp TEXT,
-		opponent_mr INTEGER,
-		opponent_league TEXT,
-		victory BOOLEAN,
-		wins INTEGER,
-		losses INTEGER,
-		win_streak INTEGER,
-		win_rate INTEGER,
-		date TEXT,
-		time TEXT,
-		PRIMARY KEY (session_id, date, time),
-		FOREIGN KEY (session_id) REFERENCES sessions(id)
-		FOREIGN KEY (user_id) REFERENCES users(code)
-	)`)
-	if err != nil {
-		return fmt.Errorf("create users table: %w", err)
-	}
-	return nil
-}

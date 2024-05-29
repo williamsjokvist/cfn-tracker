@@ -1,0 +1,5 @@
+DROP TABLE IF EXISTS sessions;
+
+DROP TABLE IF EXISTS matches;
+
+DROP TABLE IF EXISTS users;
