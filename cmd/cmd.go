@@ -14,7 +14,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/hashicorp/go-version"
 	wailsRuntime "github.com/wailsapp/wails/v2/pkg/runtime"
 
 	"github.com/williamsjokvist/cfn-tracker/pkg/browser"
@@ -80,58 +79,14 @@ func (ch *CommandHandler) GetSupportedLanguages() []string {
 	return i18n.GetSupportedLanguages()
 }
 
-// GetVersions returns the current version of the app and the latest version
-func (ch *CommandHandler) GetVersions() (*version.Version, *version.Version, error) {
-	currentVersion, err := version.NewVersion(ch.cfg.AppVersion)
-	if err != nil {
-		log.Println(err)
-		return nil, nil, fmt.Errorf(`failed to parse current app version: %w`, err)
-	}
-	latestVersion, err := ch.browser.GetLatestAppVersion()
-	if err != nil {
-		log.Println(err)
-		return nil, nil, fmt.Errorf(`failed to check for update: %w`, err)
-	}
-
-	return currentVersion, latestVersion, nil
-}
-
 func (ch *CommandHandler) CheckForUpdate() (bool, error) {
-	//currentVersion, latestVersion, err := ch.GetVersions()
-	//if err != nil {
-	//	return false, err
-	//}
-	//
-	//hasUpdate := currentVersion.LessThan(latestVersion)
-	//log.Println(`CheckForUpdate: Has update: `, hasUpdate, `. Current: `, currentVersion.String(), ` Latest: `, latestVersion.String())
-	//return hasUpdate, nil
-
-	return ch.UpdateToLatestVersion()
-}
-
-// UpdateToLatestVersion checks for updates and updates the app if there is a new version
-// returns true if the app is being updated
-func (ch *CommandHandler) UpdateToLatestVersion() (bool, error) {
-
-	currentVersion, latestVersion, err := ch.GetVersions()
+	currentVersion, latestVersion, err := update.GetVersions(ch.cfg.AppVersion, ch.browser)
 	if err != nil {
 		return false, err
 	}
 
 	hasUpdate := currentVersion.LessThan(latestVersion)
-	slog.Info("UpdateToLatestVersion", "Has update", hasUpdate, "Current", currentVersion.String(), "Latest", latestVersion.String())
-
-	if !hasUpdate {
-		return false, nil
-	}
-
-	err = update.HandleAutoUpdate(latestVersion.String())
-	if err != nil {
-		// TODO: Forward something to the frontend
-		slog.Error(fmt.Sprintf(`UpdateToLatestVersion: Failed to update: %v`, err))
-		return false, err
-	}
-
+	log.Println(`CheckForUpdate: Has update: `, hasUpdate, `. Current: `, currentVersion.String(), ` Latest: `, latestVersion.String())
 	return hasUpdate, nil
 }
 
