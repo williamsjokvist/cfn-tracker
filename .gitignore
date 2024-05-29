@@ -34,3 +34,5 @@ resource.syso
 *.log
 
 .astro
+
+.vite/

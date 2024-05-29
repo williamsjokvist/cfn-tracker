@@ -4,10 +4,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/go-resty/resty/v2"
+	"github.com/williamsjokvist/cfn-tracker/pkg/utils"
 	"log"
+	"log/slog"
 	"net/http"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"runtime"
 	"strings"
 	"time"
@@ -53,7 +57,7 @@ func NewCommandHandler(browser *browser.Browser, sqlDb *sql.Storage, nosqlDb *no
 	}
 }
 
-// The CommandHandler needs the wails runtime context in order to emit events
+// SetContext The CommandHandler needs the wails runtime context in order to emit events
 func (ch *CommandHandler) SetContext(ctx context.Context) {
 	ch.ctx = ctx
 }
@@ -78,21 +82,133 @@ func (ch *CommandHandler) GetSupportedLanguages() []string {
 	return i18n.GetSupportedLanguages()
 }
 
-func (ch *CommandHandler) CheckForUpdate() (bool, error) {
+// GetVersions returns the current version of the app and the latest version
+func (ch *CommandHandler) GetVersions() (*version.Version, *version.Version, error) {
 	currentVersion, err := version.NewVersion(ch.cfg.AppVersion)
 	if err != nil {
 		log.Println(err)
-		return false, fmt.Errorf(`failed to parse current app version: %w`, err)
+		return nil, nil, fmt.Errorf(`failed to parse current app version: %w`, err)
 	}
 	latestVersion, err := ch.browser.GetLatestAppVersion()
 	if err != nil {
 		log.Println(err)
-		return false, fmt.Errorf(`failed to check for update: %w`, err)
+		return nil, nil, fmt.Errorf(`failed to check for update: %w`, err)
+	}
+
+	return currentVersion, latestVersion, nil
+}
+
+func (ch *CommandHandler) CheckForUpdate() (bool, error) {
+	currentVersion, latestVersion, err := ch.GetVersions()
+	if err != nil {
+		return false, err
 	}
 
 	hasUpdate := currentVersion.LessThan(latestVersion)
-	log.Println(`Has update: `, hasUpdate, `. Current: `, currentVersion.String(), ` Latest: `, latestVersion.String())
+	log.Println(`CheckForUpdate: Has update: `, hasUpdate, `. Current: `, currentVersion.String(), ` Latest: `, latestVersion.String())
 	return hasUpdate, nil
+}
+
+// UpdateToLatestVersion checks for updates and updates the app if there is a new version
+// returns true if the app is being updated
+func (ch *CommandHandler) UpdateToLatestVersion() (bool, error) {
+
+	currentVersion, latestVersion, err := ch.GetVersions()
+	if err != nil {
+		return false, err
+	}
+
+	hasUpdate := currentVersion.LessThan(latestVersion)
+	slog.Info(`UpdateToLatestVersion", "Has update`, hasUpdate, `Current`, currentVersion.String(), ` Latest: `, latestVersion.String())
+
+	if !hasUpdate {
+		return false, nil
+	}
+
+	switch runtime.GOOS {
+	case `windows`:
+		handleUpdateWindows(currentVersion.String(), latestVersion.String())
+	case `linux`:
+		handleUpdateLinux(currentVersion.String(), latestVersion.String())
+	case `darwin`:
+		handleUpdateMacOS(currentVersion.String(), latestVersion.String())
+	default:
+		slog.Error(`UpdateToLatestVersion: Unsupported/Unknown OS. Skipping auto update`)
+	}
+
+	return hasUpdate, nil
+}
+
+// Prob inject this
+var restyClient = resty.New()
+
+func handleUpdateWindows(_ string, latestVersion string) {
+	downloadLink := fmt.Sprintf("https://github.com/williamsjokvist/cfn-tracker/releases/download/%s/cfn-tracker-windows-amd64.zip", latestVersion)
+
+	request := restyClient.R()
+
+	res, err := request.Get(downloadLink)
+	if err != nil {
+		slog.Error(fmt.Sprintf(`UpdateToLatestVersion: Failed to download latest version: %v`, err))
+		return
+	}
+
+	if res.StatusCode() != 200 {
+		slog.Error(fmt.Sprintf(`UpdateToLatestVersion: Failed to download latest version, unexpected status code: %v`, res.Status()))
+		return
+	}
+
+	// read the whole body
+	unzippedFiles, err := utils.UnzipZipFile(res.Body())
+	if err != nil {
+		slog.Error(fmt.Sprintf(`UpdateToLatestVersion: Failed to unzip downloaded file: %v`, err))
+		return
+	}
+
+	exeFileBytes := unzippedFiles["CFN Tracker.exe"]
+	if exeFileBytes == nil {
+		slog.Error(`UpdateToLatestVersion: Failed to find exe file in downloaded zip`)
+		return
+	}
+
+	currentExePath, err := os.Executable()
+	if err != nil {
+		slog.Error(fmt.Sprintf(`UpdateToLatestVersion: Failed to get current exe path: %v`, err))
+		return
+	}
+
+	currentExeName := filepath.Base(currentExePath)
+	if currentExeName != `CFN Tracker.exe` {
+		// This is important to avoid deleting/moving a parent process, like go run, during development/testing
+		slog.Error(`UpdateToLatestVersion: Current exe name does not match expected name`)
+		return
+	}
+
+	// Move the current exe to "CFN Tracker.exe.old"
+	err = os.Rename(currentExePath, currentExePath+`.old`)
+	if err != nil {
+		slog.Error(fmt.Sprintf(`UpdateToLatestVersion: Failed to rename current exe: %v`, err))
+		return
+	}
+
+	// Write the new exe to the current exe path
+	err = os.WriteFile(currentExePath, exeFileBytes, 0755)
+	if err != nil {
+		slog.Error(fmt.Sprintf(`UpdateToLatestVersion: Failed to write new exe: %v`, err))
+		return
+	}
+
+	// Now we need to kill the current application process and ask windows to start a new one
+
+	slog.Warn(`UpdateToLatestVersion: Auto restarting the app not yet implemented`)
+}
+
+func handleUpdateLinux(currentVersion string, latestVersion string) {
+	slog.Warn(`UpdateToLatestVersion: Updating to latest version not implemented yet`)
+}
+
+func handleUpdateMacOS(currentVersion string, latestVersion string) {
+	slog.Warn(`UpdateToLatestVersion: Updating to latest version not implemented yet`)
 }
 
 func (ch *CommandHandler) StopTracking() {
@@ -115,9 +231,15 @@ func (ch *CommandHandler) StartTracking(cfn string, restore bool) error {
 func (ch *CommandHandler) OpenResultsDirectory() {
 	switch runtime.GOOS {
 	case `darwin`:
-		exec.Command(`Open`, `./results`).Run()
+		err := exec.Command(`Open`, `./results`).Run()
+		if err != nil {
+			slog.Error(fmt.Sprintf(`OpenResultsDirectory: Failed to open results directory: %v`, err))
+		}
 	case `windows`:
-		exec.Command(`explorer.exe`, `.\results`).Run()
+		err := exec.Command(`explorer.exe`, `.\results`).Run()
+		if err != nil {
+			slog.Error(fmt.Sprintf(`OpenResultsDirectory: Failed to open results directory: %v`, err))
+		}
 	}
 }
 
