@@ -123,7 +123,7 @@ func (ch *CommandHandler) UpdateToLatestVersion() (bool, error) {
 		return false, nil
 	}
 
-	err = update.HandleAutoUpdate(currentVersion.String())
+	err = update.HandleAutoUpdate(latestVersion.String())
 	if err != nil {
 		// TODO: Forward something to the frontend
 		slog.Error(fmt.Sprintf(`UpdateToLatestVersion: Failed to update: %v`, err))

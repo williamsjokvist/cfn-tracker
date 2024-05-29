@@ -27,3 +27,5 @@ tasks:
         platforms: [darwin]
       - cmd: GOOS=windows GOARCH=amd64 wails build -ldflags="{{.ldflags}}"
         platforms: [windows]
+      - cmd: GOOS=linux GOARCH=amd64 wails build -ldflags="{{.ldflags}}"
+        platforms: [linux]
