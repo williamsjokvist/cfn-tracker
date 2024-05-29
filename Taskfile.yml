@@ -29,3 +29,45 @@ tasks:
         platforms: [windows]
       - cmd: GOOS=linux GOARCH=amd64 wails build -ldflags="{{.ldflags}}"
         platforms: [linux]
+
+  build-windows-amd64:
+    desc: Build the app
+    vars:
+      ldflags: -X 'main.isProduction="true"' -X 'main.appVersion=${APP_VERSION}' -X 'main.steamUsername=${STEAM_USERNAME}' -X 'main.steamPassword=${STEAM_PASSWORD}' -X 'main.capIDEmail=${CAP_ID_EMAIL}' -X 'main.capIDPassword=${CAP_ID_PASSWORD}'
+    cmds:
+      - cmd: GOOS=windows GOARCH=amd64 wails build -ldflags="{{.ldflags}}"
+
+  build-windows-arm64:
+    desc: Build the app
+    vars:
+      ldflags: -X 'main.isProduction="true"' -X 'main.appVersion=${APP_VERSION}' -X 'main.steamUsername=${STEAM_USERNAME}' -X 'main.steamPassword=${STEAM_PASSWORD}' -X 'main.capIDEmail=${CAP_ID_EMAIL}' -X 'main.capIDPassword=${CAP_ID_PASSWORD}'
+    cmds:
+      - cmd: GOOS=windows GOARCH=arm64 wails build -ldflags="{{.ldflags}}"
+
+  build-linux-amd64:
+    desc: Build the app
+    vars:
+      ldflags: -X 'main.isProduction="true"' -X 'main.appVersion=${APP_VERSION}' -X 'main.steamUsername=${STEAM_USERNAME}' -X 'main.steamPassword=${STEAM_PASSWORD}' -X 'main.capIDEmail=${CAP_ID_EMAIL}' -X 'main.capIDPassword=${CAP_ID_PASSWORD}'
+    cmds:
+      - cmd: GOOS=linux GOARCH=amd64 wails build -ldflags="{{.ldflags}}"
+
+  build-linux-arm64:
+    desc: Build the app
+    vars:
+      ldflags: -X 'main.isProduction="true"' -X 'main.appVersion=${APP_VERSION}' -X 'main.steamUsername=${STEAM_USERNAME}' -X 'main.steamPassword=${STEAM_PASSWORD}' -X 'main.capIDEmail=${CAP_ID_EMAIL}' -X 'main.capIDPassword=${CAP_ID_PASSWORD}'
+    cmds:
+      - cmd: GOOS=linux GOARCH=arm64 wails build -ldflags="{{.ldflags}}"
+
+  build-mac-amd64:
+    desc: Build the app
+    vars:
+      ldflags: -X 'main.isProduction="true"' -X 'main.appVersion=${APP_VERSION}' -X 'main.steamUsername=${STEAM_USERNAME}' -X 'main.steamPassword=${STEAM_PASSWORD}' -X 'main.capIDEmail=${CAP_ID_EMAIL}' -X 'main.capIDPassword=${CAP_ID_PASSWORD}'
+    cmds:
+      - cmd: env GOOS=darwin GOARCH=amd64 wails build -ldflags="{{.ldflags}}"
+
+  build-mac-arm64:
+    desc: Build the app
+    vars:
+      ldflags: -X 'main.isProduction="true"' -X 'main.appVersion=${APP_VERSION}' -X 'main.steamUsername=${STEAM_USERNAME}' -X 'main.steamPassword=${STEAM_PASSWORD}' -X 'main.capIDEmail=${CAP_ID_EMAIL}' -X 'main.capIDPassword=${CAP_ID_PASSWORD}'
+    cmds:
+      - cmd: env GOOS=darwin GOARCH=arm64 wails build -ldflags="{{.ldflags}}"
