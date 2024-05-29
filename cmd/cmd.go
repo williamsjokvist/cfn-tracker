@@ -119,7 +119,7 @@ func (ch *CommandHandler) UpdateToLatestVersion() (bool, error) {
 	}
 
 	hasUpdate := currentVersion.LessThan(latestVersion)
-	slog.Info(`UpdateToLatestVersion", "Has update`, hasUpdate, `Current`, currentVersion.String(), ` Latest: `, latestVersion.String())
+	slog.Info("UpdateToLatestVersion", "Has update", hasUpdate, "Current", currentVersion.String(), "Latest", latestVersion.String())
 
 	if !hasUpdate {
 		return false, nil
