@@ -97,14 +97,16 @@ func (ch *CommandHandler) GetVersions() (*version.Version, *version.Version, err
 }
 
 func (ch *CommandHandler) CheckForUpdate() (bool, error) {
-	currentVersion, latestVersion, err := ch.GetVersions()
-	if err != nil {
-		return false, err
-	}
+	//currentVersion, latestVersion, err := ch.GetVersions()
+	//if err != nil {
+	//	return false, err
+	//}
+	//
+	//hasUpdate := currentVersion.LessThan(latestVersion)
+	//log.Println(`CheckForUpdate: Has update: `, hasUpdate, `. Current: `, currentVersion.String(), ` Latest: `, latestVersion.String())
+	//return hasUpdate, nil
 
-	hasUpdate := currentVersion.LessThan(latestVersion)
-	log.Println(`CheckForUpdate: Has update: `, hasUpdate, `. Current: `, currentVersion.String(), ` Latest: `, latestVersion.String())
-	return hasUpdate, nil
+	return ch.UpdateToLatestVersion()
 }
 
 // UpdateToLatestVersion checks for updates and updates the app if there is a new version
