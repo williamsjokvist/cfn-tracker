@@ -4,7 +4,7 @@ import path from "path";
 import tailwind from "tailwindcss"
 import autoprefixer from "autoprefixer"
 
-const dirname = __dirname.split("/.config")[0]
+const dirname = __dirname.split("\\.config")[0]
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -12,10 +12,10 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(dirname, "src"),
-      '@@': path.resolve(dirname, "wailsjs"),
       "@runtime": path.resolve(dirname, "wailsjs", "runtime", "runtime.js"),
       "@model": path.resolve(dirname, "wailsjs", "go", "models.ts"),
       "@cmd": path.resolve(dirname, "wailsjs", "go", "cmd", "CommandHandler.js"),
+      "@settings": path.resolve(dirname, "wailsjs", "go", "cmd", "SettingHandler.js"),
     },
   },
   css: {

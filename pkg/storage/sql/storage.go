@@ -138,8 +138,6 @@ func (s *Storage) CreateBackup() error {
 Documentation for sqlite3 backup API:
 https://www.sqlite.org/c3ref/backup_finish.html#sqlite3backupinit
 */
-// TODO: Two calls to this function will result in a panic
-// because the backup driver is registered twice
 func (s *Storage) CreateBackup(ctx context.Context) error {
 	cacheDir, err := os.UserCacheDir()
 	if err != nil {

@@ -13,7 +13,7 @@ import {
   SaveSidebarMinimized,
   SaveTheme,
 } from '@cmd'
-import { CreateBackup } from '@settings'
+import { CreateBackup, RestoreBackup } from '@settings'
 import { BrowserOpenURL } from '@runtime'
 
 import * as Page from '@/ui/page'
@@ -138,13 +138,16 @@ function BackupOptions() {
     try {
       await CreateBackup()
     } catch (error) {
-      console.error(error)
       setError(error)
     }
   }
 
-  function restoreData() {
-    console.log('restore data')
+  async function restoreData() {
+    try {
+      await RestoreBackup()
+    } catch (error) {
+      setError(error)
+    }
   }
 
   return (

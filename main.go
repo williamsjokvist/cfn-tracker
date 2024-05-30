@@ -5,13 +5,17 @@ import (
 	"context"
 	"embed"
 	"errors"
+	"flag"
 	"fmt"
 	"html/template"
 	"log"
 	"net/http"
 	_ "net/http/pprof"
 	"os"
+	"path/filepath"
 	"strings"
+	"syscall"
+	"time"
 
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
@@ -41,6 +45,11 @@ var (
 	appVersion    string = ``
 	isProduction  string = ``
 )
+
+type args struct {
+	restoreBackup bool
+	previousPID   int
+}
 
 //go:embed all:gui/dist
 var assets embed.FS
@@ -93,6 +102,18 @@ func main() {
 			logFile.Close()
 		}
 	}()
+
+	args := args{}
+	flag.BoolVar(&args.restoreBackup, "restore", false, "Trigger backup restore on app start")
+	flag.IntVar(&args.previousPID, "previous-pid", -1, "PID of previous instance")
+	flag.Parse()
+
+	if args.restoreBackup && args.previousPID > 0 {
+		err := handleRestoreBackup(context.TODO(), args.previousPID)
+		if err != nil {
+			log.Printf("failed to restore backup: %s", err.Error())
+		}
+	}
 
 	appBrowser, err := browser.NewBrowser(cfg.Headless)
 	if err != nil {
@@ -242,4 +263,70 @@ func closeWithError(err error) {
 			}),
 		},
 	})
+}
+
+func handleRestoreBackup(ctx context.Context, prevPID int) error {
+	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
+	defer cancel()
+
+	err := waitForProcessClosure(ctx, prevPID)
+	if err != nil {
+		return fmt.Errorf("err waiting for process to close: %w", err)
+	}
+
+	cacheDir, err := os.UserCacheDir()
+	if err != nil {
+		return fmt.Errorf("get user cache dir: %w", err)
+	}
+
+	dataDir := filepath.Join(cacheDir, "cfn-tracker")
+	os.MkdirAll(dataDir, os.FileMode(0755))
+	backupDbFilepath := filepath.Join(dataDir, "cfn-tracker.backup.db")
+	currentDbFilepath := filepath.Join(dataDir, "cfn-tracker.db")
+
+	err = os.Rename(currentDbFilepath, fmt.Sprintf("%s.restored.%d", currentDbFilepath, time.Now().Unix()))
+	if err != nil {
+		return fmt.Errorf("rename current db: %w", err)
+	}
+	err = os.Rename(backupDbFilepath, currentDbFilepath)
+	if err != nil {
+		return fmt.Errorf("rename backup db: %w", err)
+	}
+
+	return nil
+}
+
+func waitForProcessClosure(ctx context.Context, pid int) error {
+	errChan := make(chan error)
+	go func() {
+		ticker := time.NewTicker(time.Second)
+		defer ticker.Stop()
+		for {
+			p, err := os.FindProcess(pid)
+			if err != nil {
+				errChan <- err
+				return
+			}
+			if p == nil {
+				errChan <- nil
+				return
+			}
+
+			err = p.Signal(syscall.Signal(0))
+			if err != nil {
+				errChan <- nil
+				return
+			}
+
+			select {
+			case <-ctx.Done():
+				errChan <- ctx.Err()
+				return
+			case <-ticker.C:
+				log.Println("ticking")
+			}
+		}
+	}()
+
+	return <-errChan
 }
