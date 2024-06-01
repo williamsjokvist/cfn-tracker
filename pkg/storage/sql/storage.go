@@ -2,14 +2,12 @@ package sql
 
 import (
 	"context"
-	"database/sql"
 	"embed"
 	"errors"
 	"fmt"
 	"log"
 	"os"
 	"path/filepath"
-	"time"
 
 	migrate "github.com/golang-migrate/migrate/v4"
 	sqlitex "github.com/golang-migrate/migrate/v4/database/sqlite"
@@ -37,9 +35,9 @@ func NewStorage() (*Storage, error) {
 	if err != nil {
 		return nil, fmt.Errorf("open sqlite3 connection: %w", err)
 	}
-<<<<<<< HEAD
 	return &Storage{
 		db,
+		make(chan *sqlite3.SQLiteConn, 1),
 	}, nil
 }
 
@@ -49,12 +47,6 @@ func getDataSource() string {
 	os.MkdirAll(dataDir, os.FileMode(0755))
 	return filepath.Join(dataDir, "cfn-tracker.db")
 }
-=======
-	storage := &Storage{
-		db:       db,
-		connChan: make(chan *sqlite3.SQLiteConn, 1),
-	}
->>>>>>> 6592a76 (frontend create backup error handling)
 
 func migrateSchema(nSteps *int) error {
 	db, err := sqlx.Open("sqlite3", getDataSource())
@@ -92,46 +84,12 @@ func migrateSchema(nSteps *int) error {
 		err = preparedMigrations.Up()
 	}
 
-<<<<<<< HEAD
 	if err != nil && !errors.Is(err, migrate.ErrNoChange) {
 		return fmt.Errorf("failed to apply migrations: %w", err)
 	}
 
 	log.Println("Successfully applied db migrations")
 	return nil
-}
-
-/*
-Documentation for sqlite3 backup API:
-https://www.sqlite.org/c3ref/backup_finish.html#sqlite3backupinit
-*/
-<<<<<<< HEAD
-func (s *Storage) CreateBackup(ctx context.Context) error {
-=======
-func (s *Storage) CreateBackup() error {
-	// Require handle to the sqlite3 connections to perform backup
->>>>>>> 0b2c83a (cleaned up code structure)
-	conns := make([]*sqlite3.SQLiteConn, 0, 1)
-=======
->>>>>>> 6592a76 (frontend create backup error handling)
-	sql.Register(
-		backupDriverName,
-		&sqlite3.SQLiteDriver{
-			ConnectHook: func(conn *sqlite3.SQLiteConn) error {
-				ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-				defer cancel()
-
-				select {
-				case <-ctx.Done():
-					return fmt.Errorf("connect hook: %w", ctx.Err())
-				case storage.connChan <- conn:
-				}
-				return nil
-			},
-		},
-	)
-
-	return storage, nil
 }
 
 /*
