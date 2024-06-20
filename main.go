@@ -4,12 +4,18 @@ import (
 	"bytes"
 	"context"
 	"embed"
+	"errors"
+	"flag"
 	"fmt"
 	"html/template"
 	"log"
 	"net/http"
+	_ "net/http/pprof"
 	"os"
+	"path/filepath"
 	"strings"
+	"syscall"
+	"time"
 
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
@@ -39,6 +45,11 @@ var (
 	appVersion    string = ``
 	isProduction  string = ``
 )
+
+type args struct {
+	restoreBackup bool
+	previousPID   int
+}
 
 //go:embed all:gui/dist
 var assets embed.FS
@@ -92,41 +103,29 @@ func main() {
 		}
 	}()
 
-	var appBrowser *browser.Browser
-	closeWithError := func(err error) {
-		if appBrowser != nil {
-			appBrowser.Page.Browser().Close()
+	args := args{}
+	flag.BoolVar(&args.restoreBackup, "restore", false, "Trigger backup restore on app start")
+	flag.IntVar(&args.previousPID, "previous-pid", -1, "PID of previous instance")
+	flag.Parse()
+
+	if args.restoreBackup && args.previousPID > 0 {
+		err := handleRestoreBackup(context.TODO(), args.previousPID)
+		if err != nil {
+			log.Printf("failed to restore backup: %s", err.Error())
 		}
-		log.Println("close with error", err)
-		wails.Run(&options.App{
-			Title:                    `CFN Tracker - Error`,
-			Width:                    400,
-			Height:                   148,
-			DisableResize:            true,
-			Frameless:                true,
-			EnableDefaultContextMenu: false,
-			AssetServer: &assetserver.Options{
-				Middleware: assetserver.ChainMiddleware(func(next http.Handler) http.Handler {
-					return http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
-						var b bytes.Buffer
-						tmpl := template.Must(template.New("errorPage").Parse(string(errorTmpl)))
-						params := struct {
-							Error string
-						}{
-							Error: err.Error(),
-						}
-						tmpl.Execute(&b, params)
-						w.Write(b.Bytes())
-					})
-				}),
-			},
-		})
 	}
+
 	appBrowser, err := browser.NewBrowser(cfg.Headless)
 	if err != nil {
 		closeWithError(fmt.Errorf(`failed to launch browser: %v`, err))
 		return
 	}
+	defer func() {
+		if err := appBrowser.Page.Browser().Close(); err != nil {
+			log.Printf("failed to close browser: %v", err)
+		}
+	}()
+
 	sqlDb, err := sql.NewStorage()
 	if err != nil {
 		closeWithError(fmt.Errorf(`failed to initalize database: %w`, err))
@@ -143,9 +142,43 @@ func main() {
 		return
 	}
 	cmdHandler := cmd.NewCommandHandler(appBrowser, sqlDb, noSqlDb, txtDb, &cfg)
+	settingsHandler := cmd.NewSettingHandler(sqlDb)
 
+	pprofServer := &http.Server{
+		Addr: ":6060",
+	}
+	go func() {
+		if err := pprofServer.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
+			log.Printf("HTTP pprof server error %v", err)
+		}
+	}()
+	defer func() {
+		if err := pprofServer.Close(); err != nil {
+			log.Printf("error closing pprof server: %v", err)
+		}
+	}()
+
+	err = wails.Run(newApp(
+		cfg.AppVersion,
+		assets,
+		appBrowser,
+		cmdHandler,
+		settingsHandler,
+	))
+	if err != nil {
+		closeWithError(fmt.Errorf(`failed to launch app: %w`, err))
+	}
+}
+
+func newApp(
+	appVersion string,
+	assets embed.FS,
+	appBrowser *browser.Browser,
+	cmdHandler *cmd.CommandHandler,
+	settingsHandler *cmd.SettingHandler,
+) *options.App {
 	var wailsCtx context.Context
-	err = wails.Run(&options.App{
+	return &options.App{
 		Title:              fmt.Sprintf(`CFN Tracker v%s`, appVersion),
 		Assets:             assets,
 		Width:              920,
@@ -178,6 +211,7 @@ func main() {
 		OnStartup: func(ctx context.Context) {
 			wailsCtx = ctx
 			cmdHandler.SetContext(ctx)
+			settingsHandler.WithContext(ctx)
 			go server.Start(ctx, &cfg)
 		},
 		OnShutdown: func(_ context.Context) {
@@ -199,9 +233,100 @@ func main() {
 		},
 		Bind: []interface{}{
 			cmdHandler,
+			settingsHandler,
+		},
+	}
+}
+
+func closeWithError(err error) {
+	log.Println("close with error", err)
+	wails.Run(&options.App{
+		Title:                    `CFN Tracker - Error`,
+		Width:                    400,
+		Height:                   148,
+		DisableResize:            true,
+		Frameless:                true,
+		EnableDefaultContextMenu: false,
+		AssetServer: &assetserver.Options{
+			Middleware: assetserver.ChainMiddleware(func(next http.Handler) http.Handler {
+				return http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+					var b bytes.Buffer
+					tmpl := template.Must(template.New("errorPage").Parse(string(errorTmpl)))
+					params := struct {
+						Error string
+					}{
+						Error: err.Error(),
+					}
+					tmpl.Execute(&b, params)
+					w.Write(b.Bytes())
+				})
+			}),
 		},
 	})
+}
+
+func handleRestoreBackup(ctx context.Context, prevPID int) error {
+	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
+	defer cancel()
+
+	err := waitForProcessClosure(ctx, prevPID)
 	if err != nil {
-		closeWithError(fmt.Errorf(`failed to launch app: %w`, err))
+		return fmt.Errorf("err waiting for process to close: %w", err)
 	}
+
+	cacheDir, err := os.UserCacheDir()
+	if err != nil {
+		return fmt.Errorf("get user cache dir: %w", err)
+	}
+
+	dataDir := filepath.Join(cacheDir, "cfn-tracker")
+	os.MkdirAll(dataDir, os.FileMode(0755))
+	backupDbFilepath := filepath.Join(dataDir, "cfn-tracker.backup.db")
+	currentDbFilepath := filepath.Join(dataDir, "cfn-tracker.db")
+
+	err = os.Rename(currentDbFilepath, fmt.Sprintf("%s.restored.%d", currentDbFilepath, time.Now().Unix()))
+	if err != nil {
+		return fmt.Errorf("rename current db: %w", err)
+	}
+	err = os.Rename(backupDbFilepath, currentDbFilepath)
+	if err != nil {
+		return fmt.Errorf("rename backup db: %w", err)
+	}
+
+	return nil
+}
+
+func waitForProcessClosure(ctx context.Context, pid int) error {
+	errChan := make(chan error)
+	go func() {
+		ticker := time.NewTicker(time.Second)
+		defer ticker.Stop()
+		for {
+			p, err := os.FindProcess(pid)
+			if err != nil {
+				errChan <- err
+				return
+			}
+			if p == nil {
+				errChan <- nil
+				return
+			}
+
+			err = p.Signal(syscall.Signal(0))
+			if err != nil {
+				errChan <- nil
+				return
+			}
+
+			select {
+			case <-ctx.Done():
+				errChan <- ctx.Err()
+				return
+			case <-ticker.C:
+				log.Println("ticking")
+			}
+		}
+	}()
+
+	return <-errChan
 }

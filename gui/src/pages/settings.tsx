@@ -11,8 +11,9 @@ import {
   GetSupportedLanguages,
   SaveLocale,
   SaveSidebarMinimized,
-  SaveTheme
+  SaveTheme,
 } from '@cmd'
+import { CreateBackup, RestoreBackup } from '@settings'
 import { BrowserOpenURL } from '@runtime'
 
 import * as Page from '@/ui/page'
@@ -20,6 +21,7 @@ import * as Select from '@/ui/select'
 import { Switch } from '@/ui/switch'
 import { Flag } from '@/ui/flag'
 import { cn } from '@/helpers/cn'
+import { Button } from '@/ui/button'
 
 export function SettingsPage() {
   const { t } = useTranslation()
@@ -34,7 +36,7 @@ export function SettingsPage() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.125 }}
-        className='text-xl'
+        className='text-xl overflow-auto'
       >
         <div className='border-b-[1px] border-solid border-b-divider px-8 py-6'>
           <div className='mx-auto grid max-w-xl gap-4'>
@@ -42,6 +44,9 @@ export function SettingsPage() {
             <LanguageSelect />
             <SideBarToggle />
           </div>
+        </div>
+        <div className='border-b-[1px] border-solid border-b-divider px-8 py-6'>
+          <BackupOptions />
         </div>
         <div className='relative mx-auto grid max-w-xl gap-4 py-6'>
           <h3 className='font-bold'>{t('about')}</h3>
@@ -122,6 +127,56 @@ function ThemeSelect() {
         ))}
       </Select.Root>
     </div>
+  )
+}
+
+function BackupOptions() {
+  const { i18n } = useTranslation()
+  const setError = useErrorPopup()
+
+  async function backupData() {
+    try {
+      await CreateBackup()
+    } catch (error) {
+      setError(error)
+    }
+  }
+
+  async function restoreData() {
+    try {
+      await RestoreBackup()
+    } catch (error) {
+      setError(error)
+    }
+  }
+
+  return (
+    <div className='mx-auto grid max-w-xl gap-4'>
+      <div className="flex items-center justify-between gap-4">
+        <h3 className='font-bold grow'>Backup</h3>
+        <Button onClick={backupData}
+          style={{ filter: 'hue-rotate(-180deg)', justifyContent: 'center' }}>
+          Backup
+        </Button>
+        <Button onClick={restoreData}
+          className='justify-self-end'
+          style={{ filter: 'hue-rotate(-80deg)', justifyContent: 'center' }}>
+          Restore
+        </Button>
+      </div>
+      <p className='text-end w-full'>Last backed up at &nbsp;
+        <span className="font-bold">
+          {new Date().toLocaleDateString(
+            i18n.resolvedLanguage,
+            {
+              day: 'numeric',
+              weekday: 'short',
+              hour: '2-digit',
+              minute: '2-digit'
+            })}
+        </span>
+      </p>
+    </div >
   )
 }
 

@@ -36,6 +36,9 @@ func FormatError(err error) any {
 	if errors.As(err, &trackingErr) {
 		errCode = trackingErr.ErrorCode
 		message = trackingErr.InnerError.Error()
+	} else {
+		errCode = nil
+		message = err.Error()
 	}
 
 	return struct {
