@@ -13,7 +13,7 @@ import (
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/golang-migrate/migrate/v4/source/iofs"
 	"github.com/jmoiron/sqlx"
-	_ "github.com/mattn/go-sqlite3"
+	_ "modernc.org/sqlite"
 )
 
 //go:embed migrations
@@ -27,9 +27,9 @@ func NewStorage() (*Storage, error) {
 	if err := migrateSchema(nil); err != nil {
 		return nil, fmt.Errorf("failed to perform migrations: %w", err)
 	}
-	db, err := sqlx.Open("sqlite3", getDataSource())
+	db, err := sqlx.Open("sqlite", getDataSource())
 	if err != nil {
-		return nil, fmt.Errorf("open sqlite3 connection: %w", err)
+		return nil, fmt.Errorf("open sqlite connection: %w", err)
 	}
 	return &Storage{
 		db,
@@ -44,9 +44,9 @@ func getDataSource() string {
 }
 
 func migrateSchema(nSteps *int) error {
-	db, err := sqlx.Open("sqlite3", getDataSource())
+	db, err := sqlx.Open("sqlite", getDataSource())
 	if err != nil {
-		return fmt.Errorf("open sqlite3 connection: %w", err)
+		return fmt.Errorf("open sqlite connection: %w", err)
 	}
 
 	migrateDriver, err := sqlitex.WithInstance(db.DB, &sqlitex.Config{
