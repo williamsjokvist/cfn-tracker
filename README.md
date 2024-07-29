@@ -27,7 +27,7 @@ Contributions are welcome, take a look at the [issues](https://github.com/willia
 1. Install dependencies
     - [Wails](https://wails.io/docs/gettingstarted/installation)
     - [Task](https://taskfile.dev/) - optional, but recommended
-    - [Bun](https://bun.sh/) - mac/linux only, optional
+    - [Bun](https://bun.sh/)
 
 2. Create a `.env` in the project's root based on [example.env](https://github.com/williamsjokvist/cfn-tracker/blob/master/example.env)
 
