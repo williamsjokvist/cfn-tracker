@@ -34,3 +34,8 @@ resource.syso
 *.log
 
 .astro
+
+.vite/
+
+CFN Tracker*
+cfn-tracker*
