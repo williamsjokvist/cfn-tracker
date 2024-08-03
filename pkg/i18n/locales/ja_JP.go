@@ -25,6 +25,8 @@ var JA_JP = Localization{
 	Files:                    "ファイル",
 	EnterCfnName:             "CFN名を入力してください",
 	Result:                   "結果",
+	ReplayId:                 "リプレイ",
+	Copy:                     "コピー",
 	Time:                     "時間",
 	WinStreak:                "連勝",
 	UpdateAvailable:          "アップデートが入手可能!",

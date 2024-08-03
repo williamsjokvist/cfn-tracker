@@ -152,14 +152,14 @@ func (t *SF6Tracker) poll(ctx context.Context, userCode string, pollRate time.Du
 			break
 		}
 
-		err = t.updateSession(ctx, userCode, bl)
+		err = t.updateSession(ctx, bl)
 		if err != nil {
 			log.Println(`failed to update session: `, err)
 		}
 	}
 }
 
-func (t *SF6Tracker) updateSession(ctx context.Context, userCode string, bl *BattleLog) error {
+func (t *SF6Tracker) updateSession(ctx context.Context, bl *BattleLog) error {
 	// no new match played
 	if t.sesh.LP == bl.GetLP() {
 		return nil
@@ -251,7 +251,8 @@ func getOpponentInfo(myCfn string, replay *Replay) PlayerInfo {
 }
 
 func getNewestMatch(sesh *model.Session, bl *BattleLog) model.Match {
-	opponent := getOpponentInfo(bl.GetCFN(), &bl.ReplayList[0])
+	latestReplay := bl.ReplayList[0]
+	opponent := getOpponentInfo(bl.GetCFN(), &latestReplay)
 	victory := !isVictory(opponent.RoundResults)
 	biota := utils.Biota(victory)
 	wins := biota
@@ -287,6 +288,7 @@ func getNewestMatch(sesh *model.Session, bl *BattleLog) model.Match {
 		WinRate:           int((float64(wins) / float64(wins+losses)) * 100),
 		UserId:            sesh.UserId,
 		SessionId:         sesh.Id,
+		ReplayID:          latestReplay.ReplayID,
 	}
 }
 

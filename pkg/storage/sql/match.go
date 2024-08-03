@@ -36,7 +36,8 @@ func (s *Storage) SaveMatch(ctx context.Context, match model.Match) error {
 			win_streak,
 			victory,
 			date,
-			time
+			time,
+			replay_id
 		)
 		VALUES (
 			:user_id,
@@ -57,7 +58,8 @@ func (s *Storage) SaveMatch(ctx context.Context, match model.Match) error {
 			:win_streak,
 			:victory,
 			:date,
-			:time
+			:time,
+			:replay_id
 		)
 	`
 	_, err := s.db.NamedExecContext(ctx, query, match)

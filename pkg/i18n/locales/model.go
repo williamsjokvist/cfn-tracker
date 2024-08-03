@@ -25,6 +25,8 @@ type Localization struct {
 	Files                    string `json:"files"`
 	EnterCfnName             string `json:"enterCfnName"`
 	Result                   string `json:"result"`
+	ReplayId                 string `json:"replayId"`
+	Copy                     string `json:"copy"`
 	Time                     string `json:"time"`
 	WinStreak                string `json:"winStreak"`
 	UpdateAvailable          string `json:"newVersionAvailable"`

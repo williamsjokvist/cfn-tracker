@@ -25,6 +25,8 @@ var EN_GB = Localization{
 	Files:                    "Files",
 	EnterCfnName:             "Enter your CFN user code",
 	Result:                   "Result",
+	ReplayId:                 "Replay ID",
+	Copy:                     "Copy",
 	Time:                     "Time",
 	WinStreak:                "Win Streak",
 	UpdateAvailable:          "Update available!",

@@ -25,6 +25,8 @@ var FR_FR = Localization{
 	Files:                    "Des dossiers",
 	EnterCfnName:             "Entrez votre nom CFN",
 	Result:                   "Dossier",
+	ReplayId:                 "Rejouer ID",
+	Copy:                     "Copie",
 	Time:                     "Temps",
 	WinStreak:                "Série de victoires",
 	UpdateAvailable:          "Nouvelle version disponible!",
