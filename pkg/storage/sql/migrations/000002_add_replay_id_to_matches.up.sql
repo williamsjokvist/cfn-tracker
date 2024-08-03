@@ -1,1 +1,1 @@
-ALTER TABLE matches ADD COLUMN "replay_id" TEXT;
+ALTER TABLE matches ADD COLUMN "replay_id" TEXT NOT NULL;
