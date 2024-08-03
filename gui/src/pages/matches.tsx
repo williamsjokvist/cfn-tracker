@@ -1,5 +1,5 @@
 import React from "react";
-import { useLoaderData } from "react-router-dom";
+import { useLoaderData, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Icon } from '@iconify/react'
 
@@ -11,6 +11,7 @@ import { Button } from "@/ui/button";
 
 export function MatchesListPage() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const totalMatches = (useLoaderData() ?? []) as model.Match[];
   const [matches, setMatches] = React.useState(totalMatches);
   const [totalWinRate, setTotalWinRate] = React.useState(0);
@@ -45,15 +46,19 @@ export function MatchesListPage() {
 
       <div className="relative w-full">
         <div className="mb-2 flex h-10 justify-between items-center border-b border-slate-50 border-opacity-10 px-8 pt-1 ">
+          <Button className="py-[2px] px-1 flex gap-1 items-center" style={{ filter: 'hue-rotate(-65deg)' }} onClick={() => {
+            if (matches.length != totalMatches.length) {
+              setMatches(totalMatches)
+            } else {
+              navigate('/sessions')
+            }
+          }}>
+            <Icon width={20} height={20} icon="material-symbols:chevron-left" />
+            <span className="relative top-[2px]">{t('goBack')}</span>
+          </Button>
           <span>
             {t("winRate")}: <b>{totalWinRate}</b>%
           </span>
-          {matches.length != totalMatches.length && (
-            <Button className="py-[2px] px-1 flex gap-1 items-center" style={{ filter: 'hue-rotate(-65deg)' }} onClick={() => setMatches(totalMatches)}>
-              <Icon width={20} height={20} icon="material-symbols:chevron-left" />
-              <span className="relative top-[2px]">{t('goBack')}</span>
-            </Button>
-          )}
         </div>
         <Table.Page>
           <Table.Content>
