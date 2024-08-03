@@ -152,14 +152,14 @@ func (t *SF6Tracker) poll(ctx context.Context, userCode string, pollRate time.Du
 			break
 		}
 
-		err = t.updateSession(ctx, userCode, bl)
+		err = t.updateSession(ctx, bl)
 		if err != nil {
 			log.Println(`failed to update session: `, err)
 		}
 	}
 }
 
-func (t *SF6Tracker) updateSession(ctx context.Context, userCode string, bl *BattleLog) error {
+func (t *SF6Tracker) updateSession(ctx context.Context, bl *BattleLog) error {
 	// no new match played
 	if t.sesh.LP == bl.GetLP() {
 		return nil
