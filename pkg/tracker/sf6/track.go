@@ -251,7 +251,8 @@ func getOpponentInfo(myCfn string, replay *Replay) PlayerInfo {
 }
 
 func getNewestMatch(sesh *model.Session, bl *BattleLog) model.Match {
-	opponent := getOpponentInfo(bl.GetCFN(), &bl.ReplayList[0])
+	latestReplay := bl.ReplayList[0]
+	opponent := getOpponentInfo(bl.GetCFN(), latestReplay)
 	victory := !isVictory(opponent.RoundResults)
 	biota := utils.Biota(victory)
 	wins := biota
@@ -287,6 +288,7 @@ func getNewestMatch(sesh *model.Session, bl *BattleLog) model.Match {
 		WinRate:           int((float64(wins) / float64(wins+losses)) * 100),
 		UserId:            sesh.UserId,
 		SessionId:         sesh.Id,
+		ReplayID: 		   latestReplay.ReplayID,
 	}
 }
 

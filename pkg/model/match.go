@@ -3,6 +3,7 @@ package model
 type Match struct {
 	UserId            string `db:"user_id" json:"userId"`
 	SessionId         uint16 `db:"session_id" json:"sessionId"`
+	RelayID 		  string `db:"replay_id" json:"replayId"mi`
 	Character         string `db:"character" json:"character"`
 	LP                int    `db:"lp" json:"lp"`
 	LPGain            int    `db:"lp_gain" json:"lpGain"`
