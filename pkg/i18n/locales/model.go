@@ -8,6 +8,7 @@ type Localization struct {
 	Tracking                 string `json:"tracking"`
 	History                  string `json:"history"`
 	Language                 string `json:"language"`
+	Changelog                string `json:"changelog"`
 	StartTracking            string `json:"startTracking"`
 	CFNName                  string `json:"cfnName"`
 	Start                    string `json:"start"`

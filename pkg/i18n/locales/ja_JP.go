@@ -8,6 +8,7 @@ var JA_JP = Localization{
 	Tracking:                 "追跡",
 	History:                  "ログ",
 	Language:                 "言語",
+	Changelog:                "更新ノート",
 	StartTracking:            "追跡を開始",
 	CFNName:                  "CFN名",
 	Start:                    "始める",

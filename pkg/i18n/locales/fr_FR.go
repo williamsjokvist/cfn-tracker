@@ -3,11 +3,12 @@ package locales
 var FR_FR = Localization{
 	About:                    "Environ",
 	AppVersion:               "Version {{appVersion}} de l'application",
-	Source:                   "Code source",
+	Source:                   "Code",
 	Settings:                 "Paramètres",
 	Tracking:                 "Suivie",
 	History:                  "Histoire",
 	Language:                 "Langue",
+	Changelog:                "Mise à jour du défilement",
 	StartTracking:            "Démarrer le suivi",
 	CFNName:                  "Nom CFN",
 	Start:                    "Début",

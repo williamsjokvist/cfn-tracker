@@ -47,9 +47,46 @@ export function SettingsPage() {
           <h3 className='font-bold'>{t('about')}</h3>
           <AppVersion />
           <div className='flex gap-8'>
-            <GithubLink />
-            <TwitterLink url='https://x.com/greensoap_' text={t('follow')} />
-            <TwitterLink url='https://x.com/enthcreations' text='enth' />
+            <Link 
+              icon={
+                <Icon
+                  icon='mdi:scroll'
+                  className='mr-2 h-6 w-6 text-stone-300 transition-colors group-hover:text-white'
+                />
+              }
+              text={t('changelog')}
+              url='https://cfn.williamsjokvist.se/changelog'
+            />
+            <Link 
+              icon={
+                <Icon
+                  icon='fa6-brands:github'
+                  className='mr-2 h-6 w-6 text-orange-300 transition-colors group-hover:text-white'
+                />
+              }
+              text={t('source')}
+              url='https://github.com/williamsjokvist/cfn-tracker'
+            />
+            <Link
+              icon={
+                <Icon
+                icon='fa6-brands:twitter'
+                className='mr-2 h-6 w-6 text-[#49b3f5] transition-colors group-hover:text-white'
+                />
+              }
+              text={t('follow')}
+              url='https://x.com/greensoap_'
+            />
+            <Link
+              icon={
+                <Icon
+                icon='fa6-brands:twitter'
+                className='mr-2 h-6 w-6 text-[#49b3f5] transition-colors group-hover:text-white'
+                />
+              }
+              text='enth'
+              url='https://x.com/enthcreations'
+            />
           </div>
         </div>
       </motion.section>
@@ -177,50 +214,19 @@ function LanguageSelect(props: React.PropsWithChildren) {
   )
 }
 
-function TwitterLink(props: { url: string; text: React.ReactNode; className?: string }) {
+function Link(props: { url: string; icon: React.ReactNode; text: React.ReactNode; className?: string }) {
   return (
     <button
       onClick={() => BrowserOpenURL(props.url)}
       className={cn(
         'group mt-1 flex h-[28px] items-center justify-between',
         'font-extralight text-[#d6d4ff] transition-colors',
-        'hover:text-white',
-        props.className
-      )}
-    >
-      <div className='flex items-center justify-between lowercase'>
-        <Icon
-          icon='fa6-brands:twitter'
-          className='mr-2 h-6 w-6 text-[#49b3f5] transition-colors group-hover:text-white'
-        />
-        <span>{props.text}</span>
-      </div>
-      <Icon
-        icon='fa6-solid:arrow-up'
-        className='relative right-[-8px] h-3 w-3 opacity-0 transition-opacity group-hover:opacity-100'
-        style={{ transform: 'rotate(45deg)' }}
-      />
-    </button>
-  )
-}
-
-function GithubLink() {
-  const { t } = useTranslation()
-  return (
-    <button
-      onClick={() => BrowserOpenURL('https://github.com/williamsjokvist/cfn-tracker')}
-      className={cn(
-        'group mt-1 flex h-[28px] items-center justify-between',
-        'font-extralight text-[#d6d4ff] transition-colors',
         'hover:text-white'
       )}
     >
-      <div className='flex items-center justify-between lowercase'>
-        <Icon
-          icon='fa6-brands:github'
-          className='mr-2 h-6 w-6 text-stone-600 transition-colors group-hover:text-white'
-        />
-        <span>{t('source')}</span>
+      <div className='flex items-center justify-between lowercase whitespace-nowrap'>
+        {props.icon}
+        <span>{props.text}</span>
       </div>
       <Icon
         icon='fa6-solid:arrow-up'

@@ -53,7 +53,7 @@ export function Td(
     <td
       className={cn(
         'whitespace-nowrap px-3 py-2 backdrop-blur-sm',
-        'bg-white bg-opacity-5',
+        'bg-white bg-opacity-5 group-hover:bg-opacity-10',
         'transition-colors',
         interactive && 'cursor-pointer hover:bg-opacity-20 active:bg-opacity-30',
         className
