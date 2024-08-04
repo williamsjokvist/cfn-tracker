@@ -4,7 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/williamsjokvist/cfn-tracker/pkg/update"
 	"log"
+	"log/slog"
 	"net/http"
 	"os"
 	"os/exec"
@@ -12,7 +14,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/hashicorp/go-version"
 	wailsRuntime "github.com/wailsapp/wails/v2/pkg/runtime"
 
 	"github.com/williamsjokvist/cfn-tracker/pkg/browser"
@@ -53,7 +54,7 @@ func NewCommandHandler(browser *browser.Browser, sqlDb *sql.Storage, nosqlDb *no
 	}
 }
 
-// The CommandHandler needs the wails runtime context in order to emit events
+// SetContext The CommandHandler needs the wails runtime context in order to emit events
 func (ch *CommandHandler) SetContext(ctx context.Context) {
 	ch.ctx = ctx
 }
@@ -79,19 +80,13 @@ func (ch *CommandHandler) GetSupportedLanguages() []string {
 }
 
 func (ch *CommandHandler) CheckForUpdate() (bool, error) {
-	currentVersion, err := version.NewVersion(ch.cfg.AppVersion)
+	currentVersion, latestVersion, err := update.GetVersions(ch.cfg.AppVersion, ch.browser)
 	if err != nil {
-		log.Println(err)
-		return false, fmt.Errorf(`failed to parse current app version: %w`, err)
-	}
-	latestVersion, err := ch.browser.GetLatestAppVersion()
-	if err != nil {
-		log.Println(err)
-		return false, fmt.Errorf(`failed to check for update: %w`, err)
+		return false, err
 	}
 
 	hasUpdate := currentVersion.LessThan(latestVersion)
-	log.Println(`Has update: `, hasUpdate, `. Current: `, currentVersion.String(), ` Latest: `, latestVersion.String())
+	log.Println(`CheckForUpdate: Has update: `, hasUpdate, `. Current: `, currentVersion.String(), ` Latest: `, latestVersion.String())
 	return hasUpdate, nil
 }
 
@@ -115,9 +110,15 @@ func (ch *CommandHandler) StartTracking(cfn string, restore bool) error {
 func (ch *CommandHandler) OpenResultsDirectory() {
 	switch runtime.GOOS {
 	case `darwin`:
-		exec.Command(`Open`, `./results`).Run()
+		err := exec.Command(`Open`, `./results`).Run()
+		if err != nil {
+			slog.Error(fmt.Sprintf(`OpenResultsDirectory: Failed to open results directory: %v`, err))
+		}
 	case `windows`:
-		exec.Command(`explorer.exe`, `.\results`).Run()
+		err := exec.Command(`explorer.exe`, `.\results`).Run()
+		if err != nil {
+			slog.Error(fmt.Sprintf(`OpenResultsDirectory: Failed to open results directory: %v`, err))
+		}
 	}
 }
 
