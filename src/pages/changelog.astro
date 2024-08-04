@@ -12,6 +12,7 @@ import Layout from '../layouts/Layout.astro';
       duration: .75,
       ease: Power2.easeInOut,
       stagger: 0.125,
+      delay: 0.5
     });
   })
 </script>
@@ -25,4 +26,9 @@ import Layout from '../layouts/Layout.astro';
 <style lang="sass">
   body 
     background: linear-gradient(0deg, rgb(25 16 34) 0%, #000 100%)
+  
+  #changelog-container
+    opacity: 0
+    animation: fadeIn 1s forwards ease-out
+    animation-delay: 500ms
 </style>

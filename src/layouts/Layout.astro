@@ -32,6 +32,15 @@ const { title } = Astro.props;
   </body>
 </html>
 <style is:global>
+  @keyframes fadeIn {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+
   body {
     font-family: "Raleway", system-ui, sans-serif;
     min-height: 100%;
