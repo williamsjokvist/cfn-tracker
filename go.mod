@@ -7,7 +7,7 @@ require (
 	github.com/golang-migrate/migrate/v4 v4.17.1
 	github.com/hashicorp/go-version v1.6.0
 	github.com/jmoiron/sqlx v1.3.5
-	github.com/joho/godotenv v1.4.0
+	github.com/joho/godotenv v1.5.1
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/stretchr/testify v1.8.4
 	github.com/wailsapp/wails/v2 v2.9.1
