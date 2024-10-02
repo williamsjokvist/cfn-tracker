@@ -9,7 +9,14 @@ updates:
       day: "thursday"
     target-branch: "master"
     commit-message:
-      prefix: "chore(go-deps)"
+      prefix: "chore(deps)"
+    groups:
+      go:
+        dependency-type: production
+        applies-to: version-updates
+      go-sec:
+        dependency-type: production
+        applies-to: security-updates
 
   - package-ecosystem: "npm"
     directory: "/gui"
@@ -20,5 +27,12 @@ updates:
       day: "thursday"
     target-branch: "master"
     commit-message:
-      prefix: "chore(bun-deps)"
+      prefix: "chore(deps)"
     versioning-strategy: "increase-if-necessary"
+    groups:
+      bun:
+        dependency-type: production
+        applies-to: version-updates
+      bun-sec:
+        dependency-type: production
+        applies-to: security-updates
