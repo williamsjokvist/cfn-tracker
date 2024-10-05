@@ -1,22 +1,19 @@
-name: Test GUI PR
-on: 
-  pull_request: 
-    paths:  
-      - ~/gui
+name: Lint typescript
+on:
+  pull_request:
+    paths:
+      - gui
 
 jobs:
-  test-pr:
+  ts-lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      
       - uses: oven-sh/setup-bun@v1
-
       - uses: actions/cache@v3
         with:
           path: ~/gui/node_modules
           key: ${{ runner.os }}-${{ hashFiles('./gui/bun.lockb') }}
-
         if: steps.cache-deps.outputs.cache-hit != 'true'
       - run: bun install
         if: steps.cache-deps.outputs.cache-hit != 'true'
