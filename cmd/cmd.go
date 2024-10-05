@@ -28,6 +28,7 @@ import (
 	"github.com/williamsjokvist/cfn-tracker/pkg/tracker"
 	"github.com/williamsjokvist/cfn-tracker/pkg/tracker/sf6"
 	"github.com/williamsjokvist/cfn-tracker/pkg/tracker/sfv"
+	"github.com/williamsjokvist/cfn-tracker/pkg/tracker/t8"
 )
 
 // The CommandHandler is the interface between the GUI and the core
@@ -191,6 +192,8 @@ func (ch *CommandHandler) SelectGame(game string) error {
 	var username, password string
 
 	switch game {
+	case tracker.GameTypeT8.String():
+		ch.tracker = t8.NewT8Tracker(ch.sqlDb, ch.txtDb)
 	case tracker.GameTypeSF6.String():
 		ch.tracker = sf6.NewSF6Tracker(ch.browser, ch.sqlDb, ch.txtDb)
 		username = ch.cfg.CapIDEmail

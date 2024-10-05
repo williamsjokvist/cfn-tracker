@@ -23,6 +23,6 @@ type Replay struct {
 	P2RatingChange *int   `json:"p2_rating_change"`
 	P2Rounds       uint8  `json:"p2_rounds"`
 	P2UserId       uint64 `json:"p2_user_id"`
-	StageId        uint8  `json:"stage_id"`
+	StageId        uint16  `json:"stage_id"`
 	Winner         uint8  `json:"winner"`
 }

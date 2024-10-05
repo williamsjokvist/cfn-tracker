@@ -41,19 +41,27 @@ func NewT8Tracker(sqlDb *sql.Storage, txtDb *txt.Storage) *T8Tracker {
 	}
 }
 
-func (t *T8Tracker) Start(ctx context.Context, userCode string, restore bool, pollRate time.Duration) error {
-	sesh, err := t.sqlDb.CreateSession(ctx, userCode)
+func (t *T8Tracker) Start(ctx context.Context, polarisId string, restore bool, pollRate time.Duration) error {
+	sesh, err := t.sqlDb.CreateSession(ctx, polarisId)
 	if err != nil {
 		return errorsx.NewFormattedError(http.StatusInternalServerError, fmt.Errorf("failed to create session: %w", err))
 	}
 	t.sesh = sesh
+	t.user = &model.User{
+		DisplayName: "Kazuya",
+		Code:        polarisId,
+	}
 	pollCtx, cancelFn := context.WithCancel(ctx)
 	t.stopPolling = cancelFn
-	go t.poll(pollCtx, 0, pollRate)
+	go t.poll(pollCtx, polarisId, pollRate)
+	wails.EventsEmit(ctx, "cfn-data", model.TrackingState{
+		CFN:       polarisId,
+		Character: "Kazuya",
+	})
 	return nil
 }
 
-func (t *T8Tracker) poll(ctx context.Context, userCode uint64, pollRate time.Duration) {
+func (t *T8Tracker) poll(ctx context.Context, polarisId string, pollRate time.Duration) {
 	i := 0
 	didStop := func() bool {
 		return utils.SleepOrBreak(pollRate, func() bool {
@@ -73,7 +81,7 @@ func (t *T8Tracker) poll(ctx context.Context, userCode uint64, pollRate time.Dur
 			break
 		}
 
-		replays, err := t.wavuClient.GetReplays(userCode)
+		replays, err := t.wavuClient.GetReplays(polarisId)
 		if err != nil {
 			wails.EventsEmit(ctx, `stopped-tracking`)
 			t.stopPolling()
@@ -82,11 +90,17 @@ func (t *T8Tracker) poll(ctx context.Context, userCode uint64, pollRate time.Dur
 		if len(replays) == 0 {
 			continue
 		}
+		log.Println("replays", replays)
 
 		latestReplay := replays[0]
-		latestMatch := wavu.ConvWavuReplayToModelMatch(latestReplay, latestReplay.P2PolarisId == t.user.Code)
+		latestMatch := wavu.ConvWavuReplayToModelMatch(&latestReplay, latestReplay.P2PolarisId == polarisId)
 		if len(t.sesh.Matches) > 0 && t.sesh.Matches[0].ReplayID == latestMatch.ReplayID {
 			continue
+		}
+		if latestMatch.Victory {
+			latestMatch.Wins = t.sesh.MatchesWon + 1
+		} else {
+			latestMatch.Losses = t.sesh.MatchesLost + 1
 		}
 
 		t.sesh.Matches = append([]*model.Match{&latestMatch}, t.sesh.Matches...)

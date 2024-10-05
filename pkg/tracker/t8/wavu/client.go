@@ -10,7 +10,7 @@ import (
 )
 
 type WavuClient interface {
-	GetReplays(userId uint64) ([]*Replay, error)
+	GetReplays(polarisId string) ([]Replay, error)
 }
 
 type Client struct {
@@ -27,7 +27,7 @@ func NewClient() Client {
 	}
 }
 
-func (c *Client) GetReplays(userId uint64) ([]*Replay, error) {
+func (c *Client) GetReplays(polarisId string) ([]Replay, error) {
 	req, err := http.NewRequest(http.MethodGet, "https://wank.wavu.wiki/api/replays", nil)
 	if err != nil {
 		return nil, fmt.Errorf("make http request: %w", err)
@@ -49,12 +49,12 @@ func (c *Client) GetReplays(userId uint64) ([]*Replay, error) {
 		return nil, fmt.Errorf("read response body: %w", err)
 	}
 
-	var replays []*Replay
+	var replays []Replay
 	if err = json.Unmarshal(data, &replays); err != nil {
 		return nil, fmt.Errorf("unmarshal replays: %w", err)
 	}
-
-	return slices.DeleteFunc(replays, func(r *Replay) bool {
-		return !(r.P1UserId == userId && r.P2UserId == userId)
-	}), nil
+	parsedReplays := slices.DeleteFunc(replays, func(r Replay) bool {
+		return !(r.P1PolarisId == polarisId || r.P2PolarisId == polarisId)
+	})
+	return parsedReplays, nil
 }
