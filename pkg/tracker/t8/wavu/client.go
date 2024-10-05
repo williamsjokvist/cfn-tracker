@@ -28,9 +28,19 @@ func NewClient() Client {
 }
 
 func (c *Client) GetReplays(userId uint64) ([]*Replay, error) {
-	resp, err := c.httpClient.Get("https://wank.wavu.wiki/api/replays")
+	req, err := http.NewRequest(http.MethodGet, "https://wank.wavu.wiki/api/replays", nil)
 	if err != nil {
 		return nil, fmt.Errorf("make http request: %w", err)
+	}
+
+	req.Header.Set("Accept-Encoding", "compress")
+	req.Header.Set("Cache-Control", "no-cache")
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json")
+
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("call wavu: %w", err)
 	}
 	defer resp.Body.Close()
 

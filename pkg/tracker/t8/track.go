@@ -4,7 +4,8 @@ import (
 	"context"
 	"time"
 	"log"
-
+	"fmt"
+	"net/http"
 	wails "github.com/wailsapp/wails/v2/pkg/runtime"
 
 	"github.com/williamsjokvist/cfn-tracker/pkg/model"
@@ -12,6 +13,7 @@ import (
 	"github.com/williamsjokvist/cfn-tracker/pkg/storage/txt"
 	"github.com/williamsjokvist/cfn-tracker/pkg/tracker"
 	"github.com/williamsjokvist/cfn-tracker/pkg/utils"
+	"github.com/williamsjokvist/cfn-tracker/pkg/errorsx"
 	"github.com/williamsjokvist/cfn-tracker/pkg/tracker/t8/wavu"
 )
 
@@ -39,18 +41,15 @@ func NewT8Tracker(sqlDb *sql.Storage, txtDb *txt.Storage) *T8Tracker {
 	}
 }
 
-func (t *T8Tracker) Authenticate(email string, password string, statChan chan tracker.AuthStatus) {
-	statChan <- tracker.AuthStatus{Progress: 100, Err: nil}
-}
-
 func (t *T8Tracker) Start(ctx context.Context, userCode string, restore bool, pollRate time.Duration) error {
-	beginPolling := func() {
-		pollCtx, cancelFn := context.WithCancel(ctx)
-		t.stopPolling = cancelFn
-		go t.poll(pollCtx, 0, pollRate)
+	sesh, err := t.sqlDb.CreateSession(ctx, userCode)
+	if err != nil {
+		return errorsx.NewFormattedError(http.StatusInternalServerError, fmt.Errorf("failed to create session: %w", err))
 	}
-
-	beginPolling()
+	t.sesh = sesh
+	pollCtx, cancelFn := context.WithCancel(ctx)
+	t.stopPolling = cancelFn
+	go t.poll(pollCtx, 0, pollRate)
 	return nil
 }
 
@@ -74,16 +73,41 @@ func (t *T8Tracker) poll(ctx context.Context, userCode uint64, pollRate time.Dur
 			break
 		}
 
-		_, err := t.wavuClient.GetReplays(userCode)
+		replays, err := t.wavuClient.GetReplays(userCode)
 		if err != nil {
 			wails.EventsEmit(ctx, `stopped-tracking`)
 			t.stopPolling()
 			return
 		}
+		if len(replays) == 0 {
+			continue
+		}
 
+		latestReplay := replays[0]
+		latestMatch := wavu.ConvWavuReplayToModelMatch(latestReplay, latestReplay.P2PolarisId == t.user.Code)
+		if len(t.sesh.Matches) > 0 && t.sesh.Matches[0].ReplayID == latestMatch.ReplayID {
+			continue
+		}
+
+		t.sesh.Matches = append([]*model.Match{&latestMatch}, t.sesh.Matches...)
+		err = t.sqlDb.UpdateSession(ctx, t.sesh, latestMatch, t.sesh.Id)
+		if err != nil {
+			wails.EventsEmit(ctx, "stopped-tracking")
+			t.stopPolling()
+			return
+		}
+
+		trackingState := model.ConvMatchToTrackingState(latestMatch, t.user.Code, t.user.DisplayName)
+		trackingState.Log()
+		t.txtDb.SaveTrackingState(&trackingState)
+		wails.EventsEmit(ctx, "cfn-data", trackingState)
 	}
 }
 
 func (t *T8Tracker) Stop() {
 	t.stopPolling()
+}
+
+func (t *T8Tracker) Authenticate(email string, password string, statChan chan tracker.AuthStatus) {
+	statChan <- tracker.AuthStatus{Progress: 100, Err: nil}
 }
