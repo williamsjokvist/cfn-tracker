@@ -89,14 +89,15 @@ func (t *SF6Tracker) Start(ctx context.Context, userCode string, restore bool, p
 	if err != nil {
 		return errorsx.NewFormattedError(http.StatusInternalServerError, fmt.Errorf(`failed to fetch battle log: %w`, err))
 	}
-	err = t.sqlDb.SaveUser(ctx, bl.GetCFN(), userCode)
-	if err != nil {
-		return errorsx.NewFormattedError(http.StatusInternalServerError, fmt.Errorf(`failed to save user: %w`, err))
-	}
-	t.user = &model.User{
+	user := model.User{
 		DisplayName: bl.GetCFN(),
 		Code:        userCode,
 	}
+	err = t.sqlDb.SaveUser(ctx, user)
+	if err != nil {
+		return errorsx.NewFormattedError(http.StatusInternalServerError, fmt.Errorf(`failed to save user: %w`, err))
+	}
+	t.user = &user
 	sesh, err := t.sqlDb.CreateSession(ctx, userCode)
 	if err != nil {
 		return errorsx.NewFormattedError(http.StatusInternalServerError, fmt.Errorf(`failed to create session: %w`, err))
@@ -287,6 +288,7 @@ func getNewestMatch(sesh *model.Session, bl *BattleLog) model.Match {
 		MRGain:            mrGain,
 		WinRate:           int((float64(wins) / float64(wins+losses)) * 100),
 		UserId:            sesh.UserId,
+		UserName:          sesh.UserName,
 		SessionId:         sesh.Id,
 		ReplayID:          latestReplay.ReplayID,
 	}

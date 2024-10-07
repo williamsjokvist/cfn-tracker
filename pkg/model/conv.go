@@ -1,9 +1,9 @@
 package model
 
-func ConvMatchToTrackingState(m Match, userCode, cfn string) TrackingState {
+func ConvMatchToTrackingState(m Match) TrackingState {
 	return TrackingState{
-		UserCode:          userCode,
-		CFN:               cfn,
+		CFN:               m.UserName,
+		UserCode:          m.UserId,
 		Wins:              m.Wins,
 		Losses:            m.Losses,
 		WinRate:           m.WinRate,

@@ -62,6 +62,36 @@ type Localization struct {
 	MatchesWon               string `json:"matchesWon"`
 	MatchesLost              string `json:"matchesLost"`
 	Sessions                 string `json:"sessions"`
+	T8Beginner               string `json:"T8_BEGINNER"`
+	T81stDan                 string `json:"T8_1ST_DAN"`
+	T82ndDan                 string `json:"T8_2ND_DAN"`
+	T8Fighter                string `json:"T8_FIGHTER"`
+	T8Strategist             string `json:"T8_STRATEGIST"`
+	T8Combatant              string `json:"T8_COMBATANT"`
+	T8Brawler                string `json:"T8_BRAWLER"`
+	T8Ranger                 string `json:"T8_RANGER"`
+	T8Cavalry                string `json:"T8_CAVALRY"`
+	T8Warrior                string `json:"T8_WARRIOR"`
+	T8Assailant              string `json:"T8_ASSAILANT"`
+	T8Dominator              string `json:"T8_DOMINATOR"`
+	T8Vanquisher             string `json:"T8_VANQUISHER"`
+	T8Destroyer              string `json:"T8_DESTROYER"`
+	T8Eliminator             string `json:"T8_ELIMINATOR"`
+	T8Garyu                  string `json:"T8_GARYU"`
+	T8Shinryu                string `json:"T8_SHINRYU"`
+	T8Tenryu                 string `json:"T8_TENRYU"`
+	T8MightyRuler            string `json:"T8_MIGHTY_RULER"`
+	T8FlameRuler             string `json:"T8_FLAME_RULER"`
+	T8BattleRuler            string `json:"T8_BATTLE_RULER"`
+	T8Fujin                  string `json:"T8_FUJIN"`
+	T8Raijin                 string `json:"T8_RAIJIN"`
+	T8Kishin                 string `json:"T8_KISHIN"`
+	T8Bushin                 string `json:"T8_BUSHIN"`
+	T8TekkenKing             string `json:"T8_TEKKEN_KING"`
+	T8TekkenEmperor          string `json:"T8_TEKKEN_EMPEROR"`
+	T8TekkenGod              string `json:"T8_TEKKEN_GOD"`
+	T8TekkenGodSupreme       string `json:"T8_TEKKEN_GOD_SUPREME"`
+	T8GodOfDestruction       string `json:"T8_GOD_OF_DESTRUCTION"`
 	ErrUnauthorized          string `json:"errUnauthorized"`
 	ErrInternalServerError   string `json:"errInternalServerError"`
 	ErrNotFound              string `json:"errNotFound"`

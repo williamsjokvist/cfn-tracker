@@ -1,7 +1,7 @@
 package wavu
 
 type Replay struct {
-	BattleAt       int64 `json:"battle_at"`
+	BattleAt       int64  `json:"battle_at"`
 	BattleId       string `json:"battle_id"`
 	BattleType     uint8  `json:"battle_type"`
 	GameVersion    uint16 `json:"game_version"`
@@ -23,6 +23,6 @@ type Replay struct {
 	P2RatingChange *int   `json:"p2_rating_change"`
 	P2Rounds       uint8  `json:"p2_rounds"`
 	P2UserId       uint64 `json:"p2_user_id"`
-	StageId        uint16  `json:"stage_id"`
+	StageId        uint16 `json:"stage_id"`
 	Winner         uint8  `json:"winner"`
 }

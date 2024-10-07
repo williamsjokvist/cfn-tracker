@@ -19,6 +19,7 @@ func (s *Storage) SaveMatch(ctx context.Context, match model.Match) error {
 	query := `
 		INSERT OR IGNORE INTO matches (
 			user_id,
+			user_name,
 			session_id,
 			character,
 			lp,
@@ -41,6 +42,7 @@ func (s *Storage) SaveMatch(ctx context.Context, match model.Match) error {
 		)
 		VALUES (
 			:user_id,
+			:user_name,
 			:session_id,
 			:character,
 			:lp,

@@ -12,7 +12,7 @@ import (
 type UserStorage interface {
 	GetUserByCode(ctx context.Context, code string) (*model.User, error)
 	GetUsers(ctx context.Context) ([]*model.User, error)
-	SaveUser(ctx context.Context, displayName, code string) error
+	SaveUser(ctx context.Context, user model.User) error
 	RemoveUser(ctx context.Context, code string) error
 }
 
@@ -42,11 +42,7 @@ func (s *Storage) GetUsers(ctx context.Context) ([]*model.User, error) {
 	return users, nil
 }
 
-func (s *Storage) SaveUser(ctx context.Context, displayName, code string) error {
-	user := model.User{
-		DisplayName: displayName,
-		Code:        code,
-	}
+func (s *Storage) SaveUser(ctx context.Context, user model.User) error {
 	query := `
 		INSERT OR IGNORE INTO users (display_name, code)
 		VALUES (:display_name, :code)
@@ -61,7 +57,7 @@ func (s *Storage) SaveUser(ctx context.Context, displayName, code string) error 
 
 func (s *Storage) RemoveUser(ctx context.Context, code string) error {
 	query, args, err := sqlx.In(`
-		DELETE * FROM users 
+		DELETE * FROM users
 		WHERE code = (?)
 	`, code)
 	if err != nil {
