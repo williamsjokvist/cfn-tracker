@@ -16,7 +16,6 @@ import (
 	"github.com/williamsjokvist/cfn-tracker/pkg/storage/txt"
 	"github.com/williamsjokvist/cfn-tracker/pkg/tracker"
 	"github.com/williamsjokvist/cfn-tracker/pkg/tracker/t8/wavu"
-	"github.com/williamsjokvist/cfn-tracker/pkg/utils"
 )
 
 type T8Tracker struct {
@@ -48,6 +47,7 @@ func (t *T8Tracker) Start(ctx context.Context, polarisId string, restore bool, p
 			trackingState := model.ConvMatchToTrackingState(*lastMatch)
 			wails.EventsEmit(ctx, "cfn-data", trackingState)
 		}
+
 		go t.poll(ctx, session, polarisId, pollRate)
 		return nil
 	}
@@ -58,20 +58,8 @@ func (t *T8Tracker) Start(ctx context.Context, polarisId string, restore bool, p
 	}
 
 	if user == nil {
-		lastReplay, err := t.wavuClient.GetLastReplay(polarisId)
-		if err != nil {
-			return errorsx.NewFormattedError(http.StatusInternalServerError, fmt.Errorf("get last replay: %w", err))
-		}
-		name := polarisId
-		if lastReplay != nil {
-			if lastReplay.P1PolarisId == polarisId {
-				name = lastReplay.P1Name
-			} else {
-				name = lastReplay.P2Name
-			}
-		}
-		if err := t.sqlDb.SaveUser(ctx, model.User{DisplayName: name, Code: polarisId}); err != nil {
-			return errorsx.NewFormattedError(http.StatusInternalServerError, fmt.Errorf("save user: %w", err))
+		if err := t.createUser(ctx, polarisId); err != nil {
+			return errorsx.NewFormattedError(http.StatusNotFound, fmt.Errorf("create user: %w", err))
 		}
 	}
 
@@ -79,7 +67,27 @@ func (t *T8Tracker) Start(ctx context.Context, polarisId string, restore bool, p
 	if err != nil {
 		return errorsx.NewFormattedError(http.StatusInternalServerError, fmt.Errorf("create session: %w", err))
 	}
+
 	go t.poll(ctx, session, polarisId, pollRate)
+	return nil
+}
+
+func (t *T8Tracker) createUser(ctx context.Context, polarisId string) error {
+	lastReplay, err := t.wavuClient.GetLastReplay(polarisId)
+	if err != nil {
+		return fmt.Errorf("get last replay: %w", err)
+	}
+	name := polarisId
+	if lastReplay != nil {
+		if lastReplay.P1PolarisId == polarisId {
+			name = lastReplay.P1Name
+		} else {
+			name = lastReplay.P2Name
+		}
+	}
+	if err := t.sqlDb.SaveUser(ctx, model.User{DisplayName: name, Code: polarisId}); err != nil {
+		return fmt.Errorf("save user: %w", err)
+	}
 	return nil
 }
 
@@ -122,8 +130,10 @@ func (t *T8Tracker) poll(ctx context.Context, session *model.Session, polarisId 
 			}
 
 			trackingState := model.ConvMatchToTrackingState(match)
-			t.txtDb.SaveTrackingState(&trackingState)
 			wails.EventsEmit(ctx, "cfn-data", trackingState)
+			if err := t.txtDb.SaveTrackingState(&trackingState); err != nil {
+				continue
+			}
 		case <-pollCtx.Done():
 			return
 		}
@@ -149,16 +159,22 @@ func getMatch(wm *wavu.Replay, prevMatch *model.Match, p2 bool) model.Match {
 		opponentRank = wm.P1Rank
 	}
 
-	biota := utils.Biota(victory)
-	wins := biota
-	losses := (1 - biota)
-	winStreak := biota
 	sessionId := uint16(0)
+	wins := 0
+	losses := 0
+	winStreak := 0
 	if prevMatch != nil {
-		wins = prevMatch.Wins + biota
-		losses = prevMatch.Losses + (1 - biota)
-		winStreak = prevMatch.WinStreak*biota + biota
+		wins = prevMatch.Wins
+		losses = prevMatch.Losses
+		winStreak = prevMatch.WinStreak
 		sessionId = prevMatch.SessionId
+	}
+	if victory {
+		wins++
+		winStreak++
+	} else {
+		losses++
+		winStreak = 0
 	}
 
 	battleAt := time.Unix(wm.BattleAt, 0)

@@ -26,6 +26,8 @@ wailsjs
 
 gui/dist/*
 !gui/dist
+!gui/dist/.gitkeep
+
 
 node_modules
 

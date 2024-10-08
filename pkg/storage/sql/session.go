@@ -13,7 +13,7 @@ import (
 type SessionStorage interface {
 	CreateSession(ctx context.Context, userId string) error
 	GetSessions(ctx context.Context, userId string, limit uint8, offset uint16) ([]*model.Session, error)
-	UpdateSession(ctx context.Context, session *model.Session, match model.Match) error
+	UpdateSession(ctx context.Context, session *model.Session) error
 }
 
 func (s *Storage) CreateSession(ctx context.Context, userId string) (*model.Session, error) {
@@ -82,18 +82,14 @@ func (s *Storage) GetSessions(ctx context.Context, userId string, limit uint8, o
 }
 
 func (s *Storage) UpdateSession(ctx context.Context, session *model.Session) error {
-	query, args, err := sqlx.In(`
+	query := `
 		UPDATE sessions
 		SET
-			lp = ?,
-			mr = ?
-		WHERE id = (?)
-	`, session.LP, session.MR, session.Id)
-
-	if err != nil {
-		return fmt.Errorf("prepare query: %w", err)
-	}
-	_, err = s.db.ExecContext(ctx, s.db.Rebind(query), args...)
+			lp = :lp,
+			mr = :mr
+		WHERE id = :id
+	`
+	_, err := s.db.NamedExecContext(ctx, query, session)
 	if err != nil {
 		return fmt.Errorf("excute query: %w", err)
 	}
