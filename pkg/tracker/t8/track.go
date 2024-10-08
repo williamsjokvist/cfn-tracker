@@ -58,6 +58,9 @@ func (t *T8Tracker) Start(ctx context.Context, polarisId string, restore bool, p
 	}
 
 	lastReplay, err := t.wavuClient.GetLastReplay(polarisId)
+	if err != nil {
+		return errorsx.NewFormattedError(http.StatusInternalServerError, fmt.Errorf("get last replay: %w", err))
+	}
 	if lastReplay.P1PolarisId == polarisId {
 		user = &model.User{DisplayName: lastReplay.P1Name, Code: polarisId}
 	} else {
