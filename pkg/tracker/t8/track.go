@@ -27,12 +27,12 @@ type T8Tracker struct {
 var _ tracker.GameTracker = (*T8Tracker)(nil)
 
 func NewT8Tracker(sqlDb *sql.Storage, txtDb *txt.Storage) *T8Tracker {
-	wavu := wavu.NewClient()
+	wavuClient := wavu.NewClient()
 	return &T8Tracker{
 		stopPolling: func() {},
 		sqlDb:       sqlDb,
 		txtDb:       txtDb,
-		wavuClient:  &wavu,
+		wavuClient:  wavuClient,
 	}
 }
 
