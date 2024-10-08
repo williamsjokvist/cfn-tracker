@@ -172,7 +172,13 @@ func getMatch(wm *wavu.Replay, prevMatch *model.Match, p2 bool) model.Match {
 		Wins:              wins,
 		Losses:            losses,
 		WinStreak:         winStreak,
-		WinRate:           int((float64(wins) / float64(wins+losses)) * 100),
+		WinRate:           func() int {
+			totalGames := wins + losses
+			if totalGames == 0 {
+				return 0
+			}
+			return int((float64(wins) / float64(totalGames)) * 100)
+		}(),
 		Character:         wavu.ConvCharaIdToName(character),
 		OpponentCharacter: wavu.ConvCharaIdToName(opponentCharacter),
 		OpponentLeague:    wavu.ConvRankToName(opponentRank),
