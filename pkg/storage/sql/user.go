@@ -3,8 +3,10 @@ package sql
 import (
 	"context"
 	"fmt"
+	"errors"
 
 	"github.com/jmoiron/sqlx"
+	"database/sql"
 
 	"github.com/williamsjokvist/cfn-tracker/pkg/model"
 )
@@ -15,6 +17,10 @@ type UserStorage interface {
 	SaveUser(ctx context.Context, user model.User) error
 	RemoveUser(ctx context.Context, code string) error
 }
+
+var (
+	ErrUserNotFound = errors.New("user not found")
+)
 
 func (s *Storage) GetUserByCode(ctx context.Context, code string) (*model.User, error) {
 	query, args, err := sqlx.In(`
@@ -28,7 +34,10 @@ func (s *Storage) GetUserByCode(ctx context.Context, code string) (*model.User, 
 	var user model.User
 	err = s.db.GetContext(ctx, &user, query, args...)
 	if err != nil {
-		return nil, fmt.Errorf("get user by code: %w", err)
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrUserNotFound
+		}
+		return nil, err
 	}
 	return &user, nil
 }

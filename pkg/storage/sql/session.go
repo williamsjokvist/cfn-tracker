@@ -13,7 +13,7 @@ import (
 type SessionStorage interface {
 	CreateSession(ctx context.Context, userId string) error
 	GetSessions(ctx context.Context, userId string, limit uint8, offset uint16) ([]*model.Session, error)
-	UpdateLatestSession(ctx context.Context, userId string) error
+	UpdateSession(ctx context.Context, session *model.Session, match model.Match) error
 }
 
 func (s *Storage) CreateSession(ctx context.Context, userId string) (*model.Session, error) {
@@ -81,32 +81,21 @@ func (s *Storage) GetSessions(ctx context.Context, userId string, limit uint8, o
 	return sessions, nil
 }
 
-func (s *Storage) updateLatestSession(ctx context.Context, lp, mr int, sessionId uint16) error {
+func (s *Storage) UpdateSession(ctx context.Context, session *model.Session) error {
 	query, args, err := sqlx.In(`
 		UPDATE sessions
 		SET
 			lp = ?,
 			mr = ?
 		WHERE id = (?)
-`, lp, mr, sessionId)
+	`, session.LP, session.MR, session.Id)
+
 	if err != nil {
-		return fmt.Errorf("prepare update session query: %w", err)
+		return fmt.Errorf("prepare query: %w", err)
 	}
 	_, err = s.db.ExecContext(ctx, s.db.Rebind(query), args...)
 	if err != nil {
-		return fmt.Errorf("excute update last session query: %w", err)
-	}
-	return nil
-}
-
-func (s *Storage) UpdateSession(ctx context.Context, sesh *model.Session, match model.Match, sessionId uint16) error {
-	err := s.updateLatestSession(ctx, sesh.LP, sesh.MR, sessionId)
-	if err != nil {
-		return fmt.Errorf("update session: %w", err)
-	}
-	err = s.SaveMatch(ctx, match)
-	if err != nil {
-		return fmt.Errorf("save match in storage: %w", err)
+		return fmt.Errorf("excute query: %w", err)
 	}
 	return nil
 }

@@ -170,11 +170,13 @@ func (t *SF6Tracker) updateSession(ctx context.Context, bl *BattleLog) error {
 	t.sesh.LP = bl.GetLP()
 	t.sesh.MR = bl.GetMR()
 	t.sesh.Matches = append([]*model.Match{&match}, t.sesh.Matches...)
-	err := t.sqlDb.UpdateSession(ctx, t.sesh, match, t.sesh.Id)
+	err := t.sqlDb.UpdateSession(ctx, t.sesh)
 	if err != nil {
 		return fmt.Errorf("failed to update session: %w", err)
 	}
-
+	if err := t.sqlDb.SaveMatch(ctx, match); err != nil {
+		return fmt.Errorf("failed to save match: %w", err)
+	}
 	trackingState := t.getTrackingStateForLastMatch()
 	if trackingState != nil {
 		trackingState.Log()

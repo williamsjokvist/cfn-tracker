@@ -1,18 +1,21 @@
 package wavu
 
 type BattleType uint8
+
 const (
 	BattleTypeCasual BattleType = iota + 1
 	BattleTypeRanked
 )
 
 type WinningPlayer uint8
+
 const (
 	WinningPlayerOne WinningPlayer = iota + 1
 	WinningPlayerTwo
 )
 
 type Rank uint8
+
 const (
 	RankBeginner Rank = iota
 	RankFirstDan
