@@ -6,7 +6,7 @@
     "build": "vite build --config .config/vite.config.js",
     "format": "prettier src --config .config/prettier.config.js --write",
     "format:check": "prettier --config .config/prettier.config.js src --check",
-    "tsc": "tsc --project .config/tsconfig.json --noEmit",
+    "tsc": "tsc --project . --noEmit",
     "dev": "vite --config .config/vite.config.js"
   },
   "dependencies": {

@@ -13,6 +13,9 @@ jobs:
     name: "Update bun.lockb"
     if: github.actor == 'dependabot[bot]'
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./gui
     steps:
       - uses: oven-sh/setup-bun@v1
       - uses: actions/checkout@v4
@@ -20,8 +23,8 @@ jobs:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.ref }}
       - run: |
-          bun install --cwd gui
-          git add gui/bun.lockb
+          bun install
+          git add bun.lockb
           git config --global user.name 'dependabot[bot]'
           git config --global user.email 'dependabot[bot]@users.noreply.github.com'
           git commit --amend --no-edit
