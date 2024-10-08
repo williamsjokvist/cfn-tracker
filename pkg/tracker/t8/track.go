@@ -135,7 +135,7 @@ func (t *T8Tracker) getLatestMatch(sessionId uint16, wm *wavu.Replay, prevMatch 
 	opponentCharacter := wm.P2CharaId
 	victory := wm.Winner == 1
 	opponent := wm.P2Name
-	opponentLeague := wm.P2Rank
+	opponentRank := wm.P2Rank
 
 	if p2 {
 		polarisId = wm.P2PolarisId
@@ -144,7 +144,7 @@ func (t *T8Tracker) getLatestMatch(sessionId uint16, wm *wavu.Replay, prevMatch 
 		opponentCharacter = wm.P1CharaId
 		victory = wm.Winner == 2
 		opponent = wm.P1Name
-		opponentLeague = wm.P1Rank
+		opponentRank = wm.P1Rank
 	}
 
 	biota := utils.Biota(victory)
@@ -165,7 +165,7 @@ func (t *T8Tracker) getLatestMatch(sessionId uint16, wm *wavu.Replay, prevMatch 
 		Character:         wavu.ConvCharaIdToName(character),
 		Victory:           victory,
 		OpponentCharacter: wavu.ConvCharaIdToName(opponentCharacter),
-		OpponentLeague:    wavu.ConvDanToRank(opponentLeague),
+		OpponentLeague:    wavu.ConvRankToName(opponentRank),
 		Date:              battleTime.Format("2006-01-02"),
 		Time:              battleTime.Format("15:04"),
 		ReplayID:          wm.BattleId,

@@ -1,23 +1,23 @@
 package wavu
 
-func ConvCharaIdToName(charaId uint8) string {
-	name, ok := charaIdTable[charaId]
+func ConvCharaIdToName(characterId uint8) string {
+	name, ok := characterNames[characterId]
 	if !ok {
 		return "?"
 	}
 	return name
 }
 
-func ConvDanToRank(dan uint8) string {
-	rank, ok := danRankTable[dan]
+func ConvRankToName(rank Rank) string {
+	name, ok := rankNames[rank]
 	if !ok {
 		return "?"
 	}
-	return rank
+	return name
 }
 
 // todo: might be inaccurate
-var charaIdTable = map[uint8]string{
+var characterNames = map[uint8]string{
 	0:   "Paul",
 	1:   "Law",
 	2:   "King",
@@ -60,36 +60,35 @@ var charaIdTable = map[uint8]string{
 	121: "Devil Jin (Jin's Voice)",
 }
 
-var danRankTable = map[uint8]string{
-	0:   "T8_BEGINNER",
-	1:   "T8_1ST_DAN",
-	2:   "T8_2ND_DAN",
-	3:   "T8_FIGHTER",
-	4:   "T8_STRATEGIST",
-	5:   "T8_COMBATANT",
-	6:   "T8_BRAWLER",
-	7:   "T8_RANGER",
-	8:   "T8_CAVALRY",
-	9:   "T8_WARRIOR",
-	10:  "T8_ASSAILANT",
-	11:  "T8_DOMINATOR",
-	12:  "T8_VANQUISHER",
-	13:  "T8_DESTROYER",
-	14:  "T8_ELIMINATOR",
-	15:  "T8_GARYU",
-	16:  "T8_SHINRYU",
-	17:  "T8_TENRYU",
-	18:  "T8_MIGHTY_RULER",
-	19:  "T8_FLAME_RULER",
-	20:  "T8_BATTLE_RULER",
-	21:  "T8_FUJIN",
-	22:  "T8_RAIJIN",
-	23:  "T8_KISHIN",
-	24:  "T8_BUSHIN",
-	25:  "T8_TEKKEN_KING",
-	26:  "T8_TEKKEN_EMPEROR",
-	27:  "T8_TEKKEN_GOD",
-	28:  "T8_TEKKEN_GOD_SUPREME",
-	29:  "T8_GOD_OF_DESTRUCTION",
-	100: "T8_GOD_OF_DESTRUCTION",
+var rankNames = map[Rank]string{
+	RankBeginner:         "T8_BEGINNER",
+	RankFirstDan:         "T8_1ST_DAN",
+	RankSecondDan:        "T8_2ND_DAN",
+	RankFighter:          "T8_FIGHTER",
+	RankStrategist:       "T8_STRATEGIST",
+	RankCombatant:        "T8_COMBATANT",
+	RankBrawler:          "T8_BRAWLER",
+	RankRanger:           "T8_RANGER",
+	RankCavalry:          "T8_CAVALRY",
+	RankWarrior:          "T8_WARRIOR",
+	RankAssailant:        "T8_ASSAILANT",
+	RankDominator:        "T8_DOMINATOR",
+	RankVanquisher:       "T8_VANQUISHER",
+	RankDestroyer:        "T8_DESTROYER",
+	RankEliminator:       "T8_ELIMINATOR",
+	RankGaryu:            "T8_GARYU",
+	RankShinryu:          "T8_SHINRYU",
+	RankTenryu:           "T8_TENRYU",
+	RankMightyRuler:      "T8_MIGHTY_RULER",
+	RankFlameRuler:       "T8_FLAME_RULER",
+	RankBattleRuler:      "T8_BATTLE_RULER",
+	RankFujin:            "T8_FUJIN",
+	RankRaijin:           "T8_RAIJIN",
+	RankKishin:           "T8_KISHIN",
+	RankBushin:           "T8_BUSHIN",
+	RankTekkenKing:       "T8_TEKKEN_KING",
+	RankTekkenEmperor:    "T8_TEKKEN_EMPEROR",
+	RankTekkenGod:        "T8_TEKKEN_GOD",
+	RankTekkenGodSupreme: "T8_TEKKEN_GOD_SUPREME",
+	RankGodOfDestruction: "T8_GOD_OF_DESTRUCTION",
 }
