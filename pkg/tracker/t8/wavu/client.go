@@ -10,7 +10,6 @@ import (
 )
 
 type WavuClient interface {
-	getReplays() ([]Replay, error)
 	GetLastReplay(polarisId string) (*Replay, error)
 }
 
