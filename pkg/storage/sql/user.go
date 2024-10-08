@@ -57,7 +57,7 @@ func (s *Storage) SaveUser(ctx context.Context, user model.User) error {
 
 func (s *Storage) RemoveUser(ctx context.Context, code string) error {
 	query, args, err := sqlx.In(`
-		DELETE * FROM users
+		DELETE FROM users
 		WHERE code = (?)
 	`, code)
 	if err != nil {
