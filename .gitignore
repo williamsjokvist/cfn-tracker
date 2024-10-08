@@ -23,7 +23,10 @@ go.work
 results
 
 wailsjs
-dist
+
+gui/dist/*
+!gui/dist/.gitkeep
+
 node_modules
 
 resource.syso
