@@ -20,8 +20,8 @@ type Client struct {
 
 var _ WavuClient = (*Client)(nil)
 
-func NewClient() Client {
-	return Client{
+func NewClient() *Client {
+	return &Client{
 		httpClient: &http.Client{
 			Timeout: time.Second * 20,
 		},
