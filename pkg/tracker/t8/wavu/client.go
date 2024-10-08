@@ -67,5 +67,5 @@ func (c *Client) GetLastReplay(polarisId string) (*Replay, error) {
 	if len(playerReplays) == 0 {
 		return nil, nil
 	}
-	return &replays[0], nil
+	return &playerReplays[0], nil
 }
