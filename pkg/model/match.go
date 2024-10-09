@@ -2,6 +2,7 @@ package model
 
 type Match struct {
 	UserId            string `db:"user_id" json:"userId"`
+	UserName          string `db:"user_name" json:"userName"`
 	SessionId         uint16 `db:"session_id" json:"sessionId"`
 	ReplayID          string `db:"replay_id" json:"replayId"`
 	Character         string `db:"character" json:"character"`

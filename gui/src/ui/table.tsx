@@ -4,14 +4,9 @@ import { cn } from '@/helpers/cn'
 
 export function Page(props: React.PropsWithChildren) {
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ delay: 0.25 }}
-      className='mx-4 mt-3 h-full max-h-[340px] overflow-y-scroll px-4 pb-4'
-    >
+    <div className='mx-4 mt-3 h-full max-h-[340px] overflow-y-scroll px-4 pb-4'>
       {props.children}
-    </motion.div>
+    </div>
   )
 }
 

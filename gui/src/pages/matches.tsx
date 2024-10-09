@@ -8,6 +8,7 @@ import * as Table from "@/ui/table";
 
 import type { model } from "@model";
 import { Button } from "@/ui/button";
+import { type LocalizationKey } from "@/main/i18n";
 
 export function MatchesListPage() {
   const { t } = useTranslation();
@@ -95,7 +96,7 @@ export function MatchesListPage() {
                       filterLog("opponentLeague", log.opponentLeague)
                     }
                   >
-                    {log.opponentLeague}
+                    {t(log.opponentLeague as LocalizationKey)}
                   </Table.Td>
                   <Table.Td
                     interactive
@@ -112,13 +113,13 @@ export function MatchesListPage() {
                   >
                     {log.victory === true ? "W" : "L"}
                   </Table.Td>
-                  <Table.Td 
+                  <Table.Td
                     onClick={() => navigator.clipboard.writeText(log.replayId)}
-                    className="text-center group" 
+                    className="text-center group"
                     interactive
                   >
                     <div className="z-[9999] relative inline-flex justify-center">
-                      {log.replayId}
+                      <span className="block overflow-hidden overflow-ellipsis w-12">{log.replayId}</span>
                       <span className="select-none z-50 group-hover:opacity-100 group-hover:visible opacity-0 invisible transition-all top-[-33px] absolute rounded-full border text-black bg-white px-2.5 py-0.5 text-xs font-semibold">
                         {t('copy')}
                       </span>

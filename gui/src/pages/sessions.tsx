@@ -1,7 +1,6 @@
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useLoaderData, useNavigate } from 'react-router-dom'
-import { motion } from 'framer-motion'
 
 import * as Page from '@/ui/page'
 import * as Table from '@/ui/table'
@@ -37,12 +36,7 @@ export function SessionsListPage() {
         {Object.keys(groupedSessions)
           .reverse()
           .map(year => (
-            <motion.section
-              key={year}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.125 }}
-            >
+            <section key={year}>
               <h2 className='mt-2 text-4xl'>{year}</h2>
               {Object.keys(groupedSessions[year])
                 .reverse()
@@ -99,7 +93,7 @@ export function SessionsListPage() {
                     </Table.Content>
                   </section>
                 ))}
-            </motion.section>
+            </section>
           ))}
       </Table.Page>
     </Page.Root>

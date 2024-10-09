@@ -8,19 +8,25 @@ import { cn } from '@/helpers/cn'
 
 import sfv from './games/sfv.png'
 import sf6 from './games/sf6.png'
+import t8 from './games/t8.png'
 
-type GameCode = 'sfv' | 'sf6'
+type GameCode = 'sfv' | 'sf6' | 't8'
 
 const GAMES = [
   {
-    logo: sfv,
-    code: 'sfv',
-    alt: 'Street Fighter V'
+    logo: t8,
+    code: 't8',
+    alt: 'Tekken 8'
   },
   {
     logo: sf6,
     code: 'sf6',
     alt: 'Street Fighter 6'
+  },
+  {
+    logo: sfv,
+    code: 'sfv',
+    alt: 'Street Fighter V'
   }
 ] as const
 

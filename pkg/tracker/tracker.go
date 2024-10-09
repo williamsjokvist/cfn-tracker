@@ -32,6 +32,7 @@ const (
 	GameTypeUndefined GameType = iota
 	GameTypeSFV
 	GameTypeSF6
+	GameTypeT8
 )
 
 func (s GameType) String() string {
@@ -40,6 +41,8 @@ func (s GameType) String() string {
 		return `sfv`
 	case GameTypeSF6:
 		return `sf6`
+	case GameTypeT8:
+		return `t8`
 	case GameTypeUndefined:
 		return `undefined`
 	}
