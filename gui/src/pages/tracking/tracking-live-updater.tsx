@@ -49,7 +49,7 @@ export function TrackingLiveUpdater() {
             {mr > 0 && <SmallStat text='MR' value={`${mr == -1 ? t('placement') : mr}`} />}
           </div>
         </dl>
-        <div className='flex h-[calc(100%-32px)] gap-12 pb-5 pt-3'>
+        <div className='flex h-[calc(100%-32px)] pb-5 pt-3'>
           <div className='w-full'>
             <dl className='whitespace-nowrap text-lg'>
               <div className='flex justify-between gap-2'>
@@ -83,17 +83,13 @@ export function TrackingLiveUpdater() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.35 }}
-            className='relative h-full w-full max-w-[220px] gap-5 pt-8 text-center'
+            className='relative h-full w-full max-w-[240px] grid'
           >
             <PieChart
-              className='clip-circle animate-enter mx-auto h-[150px] w-[150px]'
+              className='mx-auto w-full h-52'
               animate
-              animationDuration={750}
+              animationDuration={2000}
               lineWidth={85}
-              paddingAngle={0}
-              viewBoxSize={[60, 60]}
-              center={[30, 30]}
-              animationEasing='ease-in-out'
               data={[
                 {
                   title: t('wins'),
@@ -125,8 +121,8 @@ export function TrackingLiveUpdater() {
               <Icon icon='fa6-solid:stop' className='mr-3 h-5 w-5' />
               {t('stop')}
             </Button>
-          </motion.div>
-        </div>
+            </motion.div>
+          </div>
         {/* TODO: fix character image for tekken 8 */}
         <img
           className='pointer-events-none absolute -right-20 top-0 z-[-1] h-full opacity-10 grayscale'
