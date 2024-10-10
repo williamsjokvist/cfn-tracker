@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"time"
 
@@ -19,59 +18,50 @@ import (
 )
 
 type T8Tracker struct {
-	cancel        context.CancelFunc
-	forcePollChan chan struct{}
-	wavuClient    *wavu.Client
-	sqlDb         *sql.Storage
-	txtDb         *txt.Storage
+	wavuClient *wavu.Client
+	sqlDb      *sql.Storage
+	txtDb      *txt.Storage
 }
 
 var _ tracker.GameTracker = (*T8Tracker)(nil)
 
 func NewT8Tracker(sqlDb *sql.Storage, txtDb *txt.Storage) *T8Tracker {
 	return &T8Tracker{
-		cancel:        func() {},
-		forcePollChan: nil,
-		sqlDb:         sqlDb,
-		txtDb:         txtDb,
-		wavuClient:    wavu.NewClient(),
+		wavuClient: wavu.NewClient(),
+		sqlDb:      sqlDb,
+		txtDb:      txtDb,
 	}
 }
 
-func (t *T8Tracker) Start(ctx context.Context, polarisId string, restore bool, pollRate time.Duration) error {
+func (t *T8Tracker) InitFn(ctx context.Context, polarisId string, restore bool) (*model.Session, error) {
 	if restore {
 		session, err := t.sqlDb.GetLatestSession(ctx, polarisId)
 		if err != nil {
-			return errorsx.NewFormattedError(http.StatusNotFound, fmt.Errorf("get last session: %w", err))
+			return nil, errorsx.NewFormattedError(http.StatusNotFound, fmt.Errorf("get last session: %w", err))
 		}
 		if len(session.Matches) > 0 {
-			lastMatch := session.Matches[0]
-			trackingState := model.ConvMatchToTrackingState(*lastMatch)
-			wails.EventsEmit(ctx, "cfn-data", trackingState)
+			wails.EventsEmit(ctx, "cfn-data", model.ConvMatchToTrackingState(*session.Matches[0]))
 		}
 
-		go t.poll(ctx, session, pollRate)
-		return nil
+		return session, nil
 	}
 
 	user, err := t.sqlDb.GetUserByCode(ctx, polarisId)
 	if err != nil && !errors.Is(err, sql.ErrUserNotFound) {
-		return errorsx.NewFormattedError(http.StatusNotFound, fmt.Errorf("get user: %w", err))
+		return nil, errorsx.NewFormattedError(http.StatusNotFound, fmt.Errorf("get user: %w", err))
 	}
 
 	if user == nil {
 		if err := t.createUser(ctx, polarisId); err != nil {
-			return errorsx.NewFormattedError(http.StatusNotFound, fmt.Errorf("create user: %w", err))
+			return nil, errorsx.NewFormattedError(http.StatusNotFound, fmt.Errorf("create user: %w", err))
 		}
 	}
 
 	session, err := t.sqlDb.CreateSession(ctx, polarisId)
 	if err != nil {
-		return errorsx.NewFormattedError(http.StatusInternalServerError, fmt.Errorf("create session: %w", err))
+		return nil, errorsx.NewFormattedError(http.StatusInternalServerError, fmt.Errorf("create session: %w", err))
 	}
-
-	go t.poll(ctx, session, pollRate)
-	return nil
+	return session, nil
 }
 
 func (t *T8Tracker) createUser(ctx context.Context, polarisId string) error {
@@ -93,40 +83,10 @@ func (t *T8Tracker) createUser(ctx context.Context, polarisId string) error {
 	return nil
 }
 
-func (t *T8Tracker) poll(ctx context.Context, session *model.Session, pollRate time.Duration) {
-	// todo: more sophisticated poll rate
-	ticker := time.NewTicker(pollRate)
-	defer func() {
-		ticker.Stop()
-		close(t.forcePollChan)
-		t.forcePollChan = nil
-		wails.EventsEmit(ctx, "stopped-tracking")
-	}()
-
-	t.forcePollChan = make(chan struct{})
-	pollCtx, cancelFn := context.WithCancel(ctx)
-	t.cancel = cancelFn
-
-	log.Println("polling")
-	t.pollFn(ctx, session)
-	for {
-		select {
-		case <-t.forcePollChan:
-			log.Println("forced poll")
-			t.pollFn(ctx, session)
-		case <-ticker.C:
-			log.Println("polling")
-			t.pollFn(ctx, session)
-		case <-pollCtx.Done():
-			return
-		}
-	}
-}
-
-func (t *T8Tracker) pollFn(ctx context.Context, session *model.Session) {
+func (t *T8Tracker) PollFn(ctx context.Context, session *model.Session, matchChan chan model.Match, cancel context.CancelFunc) {
 	lastReplay, err := t.wavuClient.GetLastReplay(session.UserId)
 	if err != nil {
-		t.Stop()
+		cancel()
 	}
 	var prevMatch *model.Match
 	if len(session.Matches) > 0 {
@@ -139,30 +99,7 @@ func (t *T8Tracker) pollFn(ctx context.Context, session *model.Session) {
 	if match.SessionId == 0 {
 		match.SessionId = session.Id
 	}
-	session.Matches = append([]*model.Match{&match}, session.Matches...)
-	if err := t.sqlDb.SaveMatch(ctx, match); err != nil {
-		t.Stop()
-	}
-
-	trackingState := model.ConvMatchToTrackingState(match)
-	wails.EventsEmit(ctx, "cfn-data", trackingState)
-	if err := t.txtDb.SaveTrackingState(&trackingState); err != nil {
-		t.Stop()
-	}
-}
-
-func (t *T8Tracker) ForcePoll() {
-	if t.forcePollChan != nil {
-		t.forcePollChan <- struct{}{}
-	}
-}
-
-func (t *T8Tracker) Stop() {
-	t.cancel()
-}
-
-func (t *T8Tracker) Authenticate(email string, password string, statChan chan tracker.AuthStatus) {
-	statChan <- tracker.AuthStatus{Progress: 100, Err: nil}
+	matchChan <- match
 }
 
 func getMatch(wm *wavu.Replay, prevMatch *model.Match, p2 bool) model.Match {
@@ -226,4 +163,8 @@ func getMatch(wm *wavu.Replay, prevMatch *model.Match, p2 bool) model.Match {
 		Date:              battleAt.Format("2006-01-02"),
 		Time:              battleAt.Format("15:04"),
 	}
+}
+
+func (t *T8Tracker) Authenticate(email string, password string, statChan chan tracker.AuthStatus) {
+	statChan <- tracker.AuthStatus{Progress: 100, Err: nil}
 }

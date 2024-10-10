@@ -21,7 +21,7 @@
       "@/*": ["src/*"],
       "@runtime": ["wailsjs/runtime/runtime"],
       "@model": ["wailsjs/go/models"],
-      "@cmd": ["wailsjs/go/cmd/CommandHandler"]
+      "@cmd": ["wailsjs/go/cmd/index"],
     },
     "types": ["node"]
   },

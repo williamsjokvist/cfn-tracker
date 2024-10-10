@@ -149,7 +149,10 @@ func main() {
 		closeWithError(fmt.Errorf(`failed to initalize text store: %w`, err))
 		return
 	}
+
 	cmdHandler := cmd.NewCommandHandler(appBrowser, sqlDb, noSqlDb, txtDb, &cfg)
+	trackingHandler := cmd.NewTrackingHandler(appBrowser, sqlDb, noSqlDb, txtDb, &cfg)
+	cmdHandlers := []cmd.CmdHandler{cmdHandler, trackingHandler}
 
 	var wailsCtx context.Context
 	err = wails.Run(&options.App{
@@ -184,7 +187,9 @@ func main() {
 		},
 		OnStartup: func(ctx context.Context) {
 			wailsCtx = ctx
-			cmdHandler.SetContext(ctx)
+			for _, c := range cmdHandlers {
+				c.SetContext(ctx)
+			}
 			go server.Start(ctx, &cfg)
 		},
 		OnShutdown: func(_ context.Context) {
@@ -206,6 +211,7 @@ func main() {
 		},
 		Bind: []interface{}{
 			cmdHandler,
+			trackingHandler,
 		},
 	})
 	if err != nil {

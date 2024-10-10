@@ -304,6 +304,8 @@ export namespace model {
 	    matches: Match[];
 	    matchesWon: number;
 	    matchesLost: number;
+	    endingLp: number;
+	    endingMr: number;
 	    startingLp: number;
 	    startingMr: number;
 	    lpGain: number;
@@ -324,6 +326,8 @@ export namespace model {
 	        this.matches = this.convertValues(source["matches"], Match);
 	        this.matchesWon = source["matchesWon"];
 	        this.matchesLost = source["matchesLost"];
+	        this.endingLp = source["endingLp"];
+	        this.endingMr = source["endingMr"];
 	        this.startingLp = source["startingLp"];
 	        this.startingMr = source["startingMr"];
 	        this.lpGain = source["lpGain"];

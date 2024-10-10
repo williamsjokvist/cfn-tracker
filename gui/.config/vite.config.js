@@ -15,7 +15,7 @@ export default defineConfig({
       '@@': path.resolve(dirname, "wailsjs"),
       "@runtime": path.resolve(dirname, "wailsjs", "runtime", "runtime.js"),
       "@model": path.resolve(dirname, "wailsjs", "go", "models.ts"),
-      "@cmd": path.resolve(dirname, "wailsjs", "go", "cmd", "CommandHandler.js"),
+      "@cmd": path.resolve(dirname, "wailsjs", "go", "cmd", "index.ts"),
     },
   },
   css: {
