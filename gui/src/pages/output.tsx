@@ -14,10 +14,7 @@ import { GetThemes, OpenResultsDirectory } from '@cmd'
 
 import { useErrorPopup } from '@/main/error-popup'
 
-type StatOptions = Omit<
-  Record<keyof model.TrackingState, boolean>,
-  'totalLosses' | 'totalWins'
-> & {
+type StatOptions = Omit<Record<keyof model.TrackingState, boolean>, 'totalLosses' | 'totalWins'> & {
   theme: string
 }
 
@@ -227,7 +224,7 @@ function ThemeSelect(props: { value: string; onSelect: (theme: string) => void }
                   id={`${theme.name}-checkbox`}
                   checked={theme.name === props.value}
                   onChange={e => props.onSelect(theme.name)}
-                  className="my-2"
+                  className='my-2'
                 />
                 <label
                   htmlFor={`${theme.name}-checkbox`}

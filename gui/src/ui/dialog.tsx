@@ -38,7 +38,7 @@ export const Content = React.forwardRef<HTMLDivElement, DialogContentProps>((pro
           </div>
           <DialogPrimitive.Close
             aria-label='Close'
-            className={cn('min-w-[44px] h-11 rounded-full', 'bg-[#202020] hover:bg-[#2b2a33]')}
+            className={cn('h-11 min-w-[44px] rounded-full', 'bg-[#202020] hover:bg-[#2b2a33]')}
           >
             <Icon icon='ci:close-big' width={28} className='mx-auto' />
           </DialogPrimitive.Close>

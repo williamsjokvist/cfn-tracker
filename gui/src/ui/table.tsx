@@ -18,10 +18,7 @@ export function Tr(props: React.PropsWithChildren<React.TdHTMLAttributes<HTMLTab
   const { className, ...restProps } = props
   return (
     <tr
-      className={cn(
-        '[&>*:first-child]:rounded-l-xl [&>*:last-child]:rounded-r-xl',
-        className
-      )}
+      className={cn('[&>*:first-child]:rounded-l-xl [&>*:last-child]:rounded-r-xl', className)}
       {...restProps}
     >
       {props.children}

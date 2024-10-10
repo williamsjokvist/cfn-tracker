@@ -61,8 +61,12 @@ export function TrackingLiveUpdater() {
                 <BigStat text={t('winStreak')} value={winStreak} />
               </div>
               <div className='flex justify-between gap-2'>
-                {lpGain > 0 && <BigStat text={t('lpGain')} value={`${lpGain > 0 ? `+` : ``}${lpGain}`} />}
-                {mrGain > 0 && <BigStat text={t('mrGain')} value={`${mrGain > 0 ? `+` : ``}${mrGain}`} />}
+                {lpGain > 0 && (
+                  <BigStat text={t('lpGain')} value={`${lpGain > 0 ? `+` : ``}${lpGain}`} />
+                )}
+                {mrGain > 0 && (
+                  <BigStat text={t('mrGain')} value={`${mrGain > 0 ? `+` : ``}${mrGain}`} />
+                )}
               </div>
             </dl>
             {opponent != '' && (
@@ -83,10 +87,10 @@ export function TrackingLiveUpdater() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.35 }}
-            className='relative h-full w-full max-w-[240px] grid'
+            className='relative grid h-full w-full max-w-[240px]'
           >
             <PieChart
-              className='mx-auto w-full h-52'
+              className='mx-auto h-52 w-full'
               animate
               animationDuration={2000}
               lineWidth={85}
@@ -121,8 +125,8 @@ export function TrackingLiveUpdater() {
               <Icon icon='fa6-solid:stop' className='mr-3 h-5 w-5' />
               {t('stop')}
             </Button>
-            </motion.div>
-          </div>
+          </motion.div>
+        </div>
         {/* TODO: fix character image for tekken 8 */}
         <img
           className='pointer-events-none absolute -right-20 top-0 z-[-1] h-full opacity-10 grayscale'

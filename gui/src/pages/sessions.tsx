@@ -62,7 +62,7 @@ export function SessionsListPage() {
                         {groupedSessions[year][month].map(sesh => (
                           <Table.Tr
                             key={sesh.id}
-                            className='cursor-pointer group'
+                            className='group cursor-pointer'
                             onClick={() => navigate(`/sessions/${sesh.id}/matches`)}
                           >
                             <Table.Td>

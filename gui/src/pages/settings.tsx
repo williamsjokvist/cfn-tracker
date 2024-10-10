@@ -47,7 +47,7 @@ export function SettingsPage() {
           <h3 className='font-bold'>{t('about')}</h3>
           <AppVersion />
           <div className='flex gap-8'>
-            <Link 
+            <Link
               icon={
                 <Icon
                   icon='mdi:scroll'
@@ -57,7 +57,7 @@ export function SettingsPage() {
               text={t('changelog')}
               url='https://cfn.williamsjokvist.se/changelog'
             />
-            <Link 
+            <Link
               icon={
                 <Icon
                   icon='fa6-brands:github'
@@ -70,8 +70,8 @@ export function SettingsPage() {
             <Link
               icon={
                 <Icon
-                icon='fa6-brands:twitter'
-                className='mr-2 h-6 w-6 text-[#49b3f5] transition-colors group-hover:text-white'
+                  icon='fa6-brands:twitter'
+                  className='mr-2 h-6 w-6 text-[#49b3f5] transition-colors group-hover:text-white'
                 />
               }
               text={t('follow')}
@@ -80,8 +80,8 @@ export function SettingsPage() {
             <Link
               icon={
                 <Icon
-                icon='fa6-brands:twitter'
-                className='mr-2 h-6 w-6 text-[#49b3f5] transition-colors group-hover:text-white'
+                  icon='fa6-brands:twitter'
+                  className='mr-2 h-6 w-6 text-[#49b3f5] transition-colors group-hover:text-white'
                 />
               }
               text='enth'
@@ -151,7 +151,11 @@ function ThemeSelect() {
         }}
       >
         {Object.keys(Themes).map(theme => (
-          <Select.Item key={theme} value={theme} className='flex items-center justify-between gap-2'>
+          <Select.Item
+            key={theme}
+            value={theme}
+            className='flex items-center justify-between gap-2'
+          >
             <i style={{ background: Themes[theme][0] }} className={`h-4 w-3 rounded-md`} />
             <i style={{ background: Themes[theme][1] }} className={`h-4 w-3 rounded-md`} />
             <span className='first-letter:uppercase'>{theme}</span>
@@ -214,7 +218,12 @@ function LanguageSelect(props: React.PropsWithChildren) {
   )
 }
 
-function Link(props: { url: string; icon: React.ReactNode; text: React.ReactNode; className?: string }) {
+function Link(props: {
+  url: string
+  icon: React.ReactNode
+  text: React.ReactNode
+  className?: string
+}) {
   return (
     <button
       onClick={() => BrowserOpenURL(props.url)}
@@ -224,7 +233,7 @@ function Link(props: { url: string; icon: React.ReactNode; text: React.ReactNode
         'hover:text-white'
       )}
     >
-      <div className='flex items-center justify-between lowercase whitespace-nowrap'>
+      <div className='flex items-center justify-between whitespace-nowrap lowercase'>
         {props.icon}
         <span>{props.text}</span>
       </div>
