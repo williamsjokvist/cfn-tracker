@@ -22,7 +22,8 @@ go.work
 
 results
 
-wailsjs
+/gui/wailsjs/**/**/*.js
+/gui/wailsjs/**/**/*.json
 
 gui/dist/*
 !gui/dist
