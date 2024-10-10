@@ -321,6 +321,7 @@ func isVictory(roundResults []int) bool {
 func (t *SF6Tracker) Stop() {
 	t.stopPolling()
 }
+func (t *SF6Tracker) ForcePoll() {}
 
 func getLeagueFromLP(lp int) string {
 	if lp >= 25000 {

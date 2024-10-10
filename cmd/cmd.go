@@ -222,6 +222,12 @@ func (ch *CommandHandler) SelectGame(game string) error {
 	return nil
 }
 
+func (ch *CommandHandler) ForcePoll() {
+	if ch.tracker != nil {
+		ch.tracker.ForcePoll()
+	}
+}
+
 func (ch *CommandHandler) SaveLocale(locale string) error {
 	return ch.nosqlDb.SaveLocale(locale)
 }

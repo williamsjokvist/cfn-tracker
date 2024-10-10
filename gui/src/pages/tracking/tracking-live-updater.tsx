@@ -1,3 +1,4 @@
+import React from 'react'
 import { motion } from 'framer-motion'
 import { Icon } from '@iconify/react'
 import { useTranslation } from 'react-i18next'
@@ -29,6 +30,8 @@ export function TrackingLiveUpdater() {
     opponentLeague,
     result
   } = useSelector(trackingActor, ({ context }) => context.trackingState)
+
+  const [refreshDisabled, setRefreshDisabled] = React.useState(false)
 
   return (
     <Page.Root>
@@ -118,13 +121,28 @@ export function TrackingLiveUpdater() {
                 </linearGradient>
               </defs>
             </PieChart>
-            <Button
-              className='absolute bottom-0 right-0'
-              onClick={() => trackingActor.send({ type: 'cease' })}
-            >
-              <Icon icon='fa6-solid:stop' className='mr-3 h-5 w-5' />
-              {t('stop')}
-            </Button>
+            <div className="flex justify-between self-end gap-2">
+              <Button
+                disabled={refreshDisabled}
+                style={{ filter: refreshDisabled ? 'grayscale(1)' : 'hue-rotate(-160deg)'}}
+                onClick={() => {
+                  if (!refreshDisabled) {
+                    trackingActor.send({ type: 'forcePoll' })
+                    setRefreshDisabled(true)
+                    setTimeout(() => setRefreshDisabled(false), 15000)
+                  }
+                }}
+              >
+                <Icon icon='fa6-solid:recycle' className='mr-3 h-5 w-5' />
+                Refresh
+              </Button>
+              <Button
+                onClick={() => trackingActor.send({ type: 'cease' })}
+              >
+                <Icon icon='fa6-solid:stop' className='mr-3 h-5 w-5' />
+                {t('stop')}
+              </Button>
+            </div>
           </motion.div>
         </div>
         {/* TODO: fix character image for tekken 8 */}
