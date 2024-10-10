@@ -62,6 +62,8 @@ var EN_GB = Localization{
 	MatchesWon:               "Matches Won",
 	MatchesLost:              "Matches Lost",
 	Sessions:                 "Sessions",
+	Refresh:                  "Refresh",
+	Cooldown:                 "Cooldown",
 	T8Beginner:               "Beginner",
 	T81stDan:                 "1st Dan",
 	T82ndDan:                 "2nd Dan",

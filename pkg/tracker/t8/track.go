@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
-	"os/signal"
 	"time"
 
 	wails "github.com/wailsapp/wails/v2/pkg/runtime"
@@ -22,7 +20,7 @@ import (
 
 type T8Tracker struct {
 	cancel        context.CancelFunc
-	forcePollChan chan os.Signal
+	forcePollChan chan struct{}
 	wavuClient    *wavu.Client
 	sqlDb         *sql.Storage
 	txtDb         *txt.Storage
@@ -31,11 +29,9 @@ type T8Tracker struct {
 var _ tracker.GameTracker = (*T8Tracker)(nil)
 
 func NewT8Tracker(sqlDb *sql.Storage, txtDb *txt.Storage) *T8Tracker {
-	var forcePollChan = make(chan os.Signal, 2)
-	signal.Notify(forcePollChan, os.Interrupt)
 	return &T8Tracker{
 		cancel:        func() {},
-		forcePollChan: forcePollChan,
+		forcePollChan: nil,
 		sqlDb:         sqlDb,
 		txtDb:         txtDb,
 		wavuClient:    wavu.NewClient(),
@@ -102,22 +98,23 @@ func (t *T8Tracker) poll(ctx context.Context, session *model.Session, pollRate t
 	ticker := time.NewTicker(pollRate)
 	defer func() {
 		ticker.Stop()
+		close(t.forcePollChan)
 		wails.EventsEmit(ctx, "stopped-tracking")
 	}()
 
+	t.forcePollChan = make(chan struct{})
 	pollCtx, cancelFn := context.WithCancel(ctx)
 	t.cancel = cancelFn
 
-	i := 0
+	log.Println("polling")
+	t.pollFn(ctx, session)
 	for {
 		select {
 		case <-t.forcePollChan:
-			i++
-			log.Println("forced poll", i)
+			log.Println("forced poll")
 			t.pollFn(ctx, session)
 		case <-ticker.C:
-			i++
-			log.Println("polling", i)
+			log.Println("polling")
 			t.pollFn(ctx, session)
 		case <-pollCtx.Done():
 			return
@@ -154,7 +151,7 @@ func (t *T8Tracker) pollFn(ctx context.Context, session *model.Session) {
 }
 
 func (t *T8Tracker) ForcePoll() {
-	t.forcePollChan <- os.Interrupt
+	t.forcePollChan <- struct{}{}
 }
 
 func (t *T8Tracker) Stop() {

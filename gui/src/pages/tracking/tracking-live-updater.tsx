@@ -7,6 +7,7 @@ import { PieChart } from 'react-minimal-pie-chart'
 
 import { TrackingMachineContext } from '@/state/tracking-machine'
 import { Button } from '@/ui/button'
+import { Tooltip } from '@/ui/tooltip'
 import * as Page from '@/ui/page'
 import { type LocalizationKey } from '@/main/i18n'
 
@@ -52,7 +53,7 @@ export function TrackingLiveUpdater() {
             {mr > 0 && <SmallStat text='MR' value={`${mr == -1 ? t('placement') : mr}`} />}
           </div>
         </dl>
-        <div className='flex h-[calc(100%-32px)] pb-5 pt-3'>
+        <div className='flex flex-1 h-[calc(100%-32px)] pb-5 pt-3'>
           <div className='w-full'>
             <dl className='whitespace-nowrap text-lg'>
               <div className='flex justify-between gap-2'>
@@ -90,7 +91,7 @@ export function TrackingLiveUpdater() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.35 }}
-            className='relative grid h-full w-full max-w-[240px]'
+            className='relative h-full flex-0 grid'
           >
             <PieChart
               className='mx-auto h-52 w-full'
@@ -122,20 +123,22 @@ export function TrackingLiveUpdater() {
               </defs>
             </PieChart>
             <div className="flex justify-between self-end gap-2">
-              <Button
-                disabled={refreshDisabled}
-                style={{ filter: refreshDisabled ? 'grayscale(1)' : 'hue-rotate(-160deg)'}}
-                onClick={() => {
-                  if (!refreshDisabled) {
-                    trackingActor.send({ type: 'forcePoll' })
-                    setRefreshDisabled(true)
-                    setTimeout(() => setRefreshDisabled(false), 15000)
-                  }
-                }}
-              >
-                <Icon icon='fa6-solid:recycle' className='mr-3 h-5 w-5' />
-                Refresh
-              </Button>
+              <Tooltip text={t('cooldown')} disabled={!refreshDisabled}>
+                <Button
+                  disabled={refreshDisabled}
+                  style={{ filter: refreshDisabled ? 'grayscale(1)' : 'hue-rotate(-160deg)' }}
+                  onClick={() => {
+                    if (!refreshDisabled) {
+                      trackingActor.send({ type: 'forcePoll' })
+                      setRefreshDisabled(true)
+                      setTimeout(() => setRefreshDisabled(false), 15000)
+                    }
+                  }}
+                >
+                  <Icon icon='fa6-solid:recycle' className='mr-3 h-5 w-5' />
+                  {t('refresh')}
+                </Button>
+              </Tooltip>
               <Button
                 onClick={() => trackingActor.send({ type: 'cease' })}
               >

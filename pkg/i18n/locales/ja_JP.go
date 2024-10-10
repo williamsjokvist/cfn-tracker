@@ -62,6 +62,8 @@ var JA_JP = Localization{
 	MatchesWon:               "勝った試合",
 	MatchesLost:              "負けた試合",
 	Sessions:                 "セッション",
+	Refresh:                  "リフレッシュ",
+	Cooldown:                 "クールダウン",
 	T8Beginner:               "入門生",
 	T81stDan:                 "初段",
 	T82ndDan:                 "二段",

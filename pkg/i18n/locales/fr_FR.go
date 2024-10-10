@@ -62,6 +62,8 @@ var FR_FR = Localization{
 	MatchesWon:               "Matchs Gagnés",
 	MatchesLost:              "Matchs Perdus",
 	Sessions:                 "Séances",
+	Refresh:                  "Rafraîchir",
+	Cooldown:                 "Refroidir",
 	T8Beginner:               "Débutant",
 	T81stDan:                 "1er Dan",
 	T82ndDan:                 "2ème Dan",
