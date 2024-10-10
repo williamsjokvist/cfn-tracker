@@ -9,7 +9,7 @@ import * as Table from '@/ui/table'
 import type { model } from '@model'
 import { Button } from '@/ui/button'
 import { type LocalizationKey } from '@/main/i18n'
-import { Tooltip } from '@/ui/tooltip';
+import { Tooltip } from '@/ui/tooltip'
 
 export function MatchesListPage() {
   const { t } = useTranslation()
@@ -112,7 +112,9 @@ export function MatchesListPage() {
                     interactive
                   >
                     <Tooltip text={t('copy')}>
-                      <span className="block overflow-hidden overflow-ellipsis w-12">{log.replayId}</span>
+                      <span className='block w-12 overflow-hidden overflow-ellipsis'>
+                        {log.replayId}
+                      </span>
                     </Tooltip>
                   </Table.Td>
                 </Table.Tr>

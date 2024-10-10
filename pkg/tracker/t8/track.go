@@ -99,6 +99,7 @@ func (t *T8Tracker) poll(ctx context.Context, session *model.Session, pollRate t
 	defer func() {
 		ticker.Stop()
 		close(t.forcePollChan)
+		t.forcePollChan = nil
 		wails.EventsEmit(ctx, "stopped-tracking")
 	}()
 
@@ -151,7 +152,9 @@ func (t *T8Tracker) pollFn(ctx context.Context, session *model.Session) {
 }
 
 func (t *T8Tracker) ForcePoll() {
-	t.forcePollChan <- struct{}{}
+	if t.forcePollChan != nil {
+		t.forcePollChan <- struct{}{}
+	}
 }
 
 func (t *T8Tracker) Stop() {

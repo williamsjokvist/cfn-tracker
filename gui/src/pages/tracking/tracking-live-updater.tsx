@@ -53,7 +53,7 @@ export function TrackingLiveUpdater() {
             {mr > 0 && <SmallStat text='MR' value={`${mr == -1 ? t('placement') : mr}`} />}
           </div>
         </dl>
-        <div className='flex flex-1 h-[calc(100%-32px)] pb-5 pt-3'>
+        <div className='flex h-[calc(100%-32px)] flex-1 pb-5 pt-3'>
           <div className='w-full'>
             <dl className='whitespace-nowrap text-lg'>
               <div className='flex justify-between gap-2'>
@@ -91,7 +91,7 @@ export function TrackingLiveUpdater() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.35 }}
-            className='relative h-full flex-0 grid'
+            className='flex-0 relative grid h-full'
           >
             <PieChart
               className='mx-auto h-52 w-full'
@@ -122,7 +122,7 @@ export function TrackingLiveUpdater() {
                 </linearGradient>
               </defs>
             </PieChart>
-            <div className="flex justify-between self-end gap-2">
+            <div className='flex justify-between gap-2 self-end'>
               <Tooltip text={t('cooldown')} disabled={!refreshDisabled}>
                 <Button
                   disabled={refreshDisabled}
@@ -139,9 +139,7 @@ export function TrackingLiveUpdater() {
                   {t('refresh')}
                 </Button>
               </Tooltip>
-              <Button
-                onClick={() => trackingActor.send({ type: 'cease' })}
-              >
+              <Button onClick={() => trackingActor.send({ type: 'cease' })}>
                 <Icon icon='fa6-solid:stop' className='mr-3 h-5 w-5' />
                 {t('stop')}
               </Button>
