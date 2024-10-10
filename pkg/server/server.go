@@ -41,7 +41,7 @@ func GetInternalThemes() []model.Theme {
 	return themes
 }
 
-func Start(ctx context.Context, cfg *config.Config) error {
+func Start(ctx context.Context, cfg *config.Config) {
 	log.Println(`Starting browser source server`)
 
 	wails.EventsOn(ctx, `cfn-data`, func(incomingData ...interface{}) {
@@ -61,9 +61,8 @@ func Start(ctx context.Context, cfg *config.Config) error {
 	http.Handle("/themes/", http.StripPrefix("/themes/", fs))
 
 	if err := http.ListenAndServe(fmt.Sprintf(`:%d`, cfg.BrowserSourcePort), nil); err != nil {
-		return fmt.Errorf(`failed to launch browser source server: %v`, err)
+		log.Println("failed to launch browser source server", err)
 	}
-	return nil
 }
 
 func handleStream(w http.ResponseWriter, _ *http.Request) {
@@ -114,7 +113,7 @@ func handleRoot(w http.ResponseWriter, _ *http.Request) {
 	} else {
 		w.Header().Set(`Content-Type`, `text/html`)
 		w.WriteHeader(http.StatusOK)
-		w.Write(html)
+		_, err := w.Write(html)
 		if err != nil {
 			log.Println("failed to write browser source html")
 		}
