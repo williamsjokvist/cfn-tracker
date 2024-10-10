@@ -116,9 +116,13 @@ func (ch *CommandHandler) StartTracking(cfn string, restore bool) error {
 func (ch *CommandHandler) OpenResultsDirectory() {
 	switch runtime.GOOS {
 	case `darwin`:
-		exec.Command(`Open`, `./results`).Run()
+		if err := exec.Command(`Open`, `./results`).Run(); err != nil {
+			log.Println(err)
+		}
 	case `windows`:
-		exec.Command(`explorer.exe`, `.\results`).Run()
+		if err := exec.Command(`explorer.exe`, `.\results`).Run(); err != nil {
+			log.Println(err)
+		}
 	}
 }
 

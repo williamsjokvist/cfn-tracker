@@ -39,7 +39,10 @@ func NewStorage() (*Storage, error) {
 func getDataSource() string {
 	cacheDir, _ := os.UserCacheDir()
 	dataDir := filepath.Join(cacheDir, "cfn-tracker")
-	os.MkdirAll(dataDir, os.FileMode(0755))
+	if err := os.MkdirAll(dataDir, os.FileMode(0755)); err != nil {
+		return "cfn-tracker.db"
+	}
+
 	return filepath.Join(dataDir, "cfn-tracker.db")
 }
 

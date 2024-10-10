@@ -25,7 +25,7 @@ var mhJson *[]byte
 func GetInternalThemes() []model.Theme {
 	var themes = make([]model.Theme, 0, 10)
 
-	fs.WalkDir(staticFs, "static/themes", func(path string, d fs.DirEntry, err error) error {
+	if err := fs.WalkDir(staticFs, "static/themes", func(path string, d fs.DirEntry, err error) error {
 		if d.IsDir() {
 			return nil
 		}
@@ -35,7 +35,9 @@ func GetInternalThemes() []model.Theme {
 			CSS:  string(b),
 		})
 		return nil
-	})
+	}); err != nil {
+		return []model.Theme{}
+	}
 	return themes
 }
 
@@ -98,7 +100,10 @@ func handleTheme(w http.ResponseWriter, req *http.Request) {
 	} else {
 		w.Header().Set(`Content-Type`, `text/css`)
 		w.WriteHeader(http.StatusOK)
-		w.Write(css)
+		_, err := w.Write(css)
+		if err != nil {
+			log.Println("failed to write browser source css")
+		}
 	}
 }
 
@@ -110,5 +115,8 @@ func handleRoot(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set(`Content-Type`, `text/html`)
 		w.WriteHeader(http.StatusOK)
 		w.Write(html)
+		if err != nil {
+			log.Println("failed to write browser source html")
+		}
 	}
 }
