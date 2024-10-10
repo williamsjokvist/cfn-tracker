@@ -129,7 +129,7 @@ func (t *SFVTracker) refreshMatchHistory(ctx context.Context, cfn string, isFirs
 
 	if !isFirstFetch {
 		log.Println(`Reloading page`)
-		t.Page.Reload()
+		t.Page.MustReload()
 	}
 
 	// Read from DOM

@@ -98,7 +98,7 @@ func main() {
 			appBrowser.Page.Browser().Close()
 		}
 		log.Println("close with error", err)
-		wails.Run(&options.App{
+		if err := wails.Run(&options.App{
 			Title:                    `CFN Tracker - Error`,
 			Width:                    400,
 			Height:                   148,
@@ -115,12 +115,19 @@ func main() {
 						}{
 							Error: err.Error(),
 						}
-						tmpl.Execute(&b, params)
-						w.Write(b.Bytes())
+						if err := tmpl.Execute(&b, params); err != nil {
+							log.Println("failed to write error template: ", err)
+						}
+						_, err := w.Write(b.Bytes())
+						if err != nil {
+							log.Println("failed to write error page: ", err)
+						}
 					})
 				}),
 			},
-		})
+		}); err != nil {
+			log.Println("failed to launch error app")
+		}
 	}
 	appBrowser, err := browser.NewBrowser(cfg.Headless)
 	if err != nil {

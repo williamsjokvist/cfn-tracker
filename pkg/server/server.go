@@ -25,7 +25,7 @@ var mhJson *[]byte
 func GetInternalThemes() []model.Theme {
 	var themes = make([]model.Theme, 0, 10)
 
-	fs.WalkDir(staticFs, "static/themes", func(path string, d fs.DirEntry, err error) error {
+	if err := fs.WalkDir(staticFs, "static/themes", func(path string, d fs.DirEntry, err error) error {
 		if d.IsDir() {
 			return nil
 		}
@@ -35,11 +35,13 @@ func GetInternalThemes() []model.Theme {
 			CSS:  string(b),
 		})
 		return nil
-	})
+	}); err != nil {
+		return []model.Theme{}
+	}
 	return themes
 }
 
-func Start(ctx context.Context, cfg *config.Config) error {
+func Start(ctx context.Context, cfg *config.Config) {
 	log.Println(`Starting browser source server`)
 
 	wails.EventsOn(ctx, `cfn-data`, func(incomingData ...interface{}) {
@@ -59,9 +61,8 @@ func Start(ctx context.Context, cfg *config.Config) error {
 	http.Handle("/themes/", http.StripPrefix("/themes/", fs))
 
 	if err := http.ListenAndServe(fmt.Sprintf(`:%d`, cfg.BrowserSourcePort), nil); err != nil {
-		return fmt.Errorf(`failed to launch browser source server: %v`, err)
+		log.Println("failed to launch browser source server", err)
 	}
-	return nil
 }
 
 func handleStream(w http.ResponseWriter, _ *http.Request) {
@@ -98,7 +99,10 @@ func handleTheme(w http.ResponseWriter, req *http.Request) {
 	} else {
 		w.Header().Set(`Content-Type`, `text/css`)
 		w.WriteHeader(http.StatusOK)
-		w.Write(css)
+		_, err := w.Write(css)
+		if err != nil {
+			log.Println("failed to write browser source css")
+		}
 	}
 }
 
@@ -109,6 +113,9 @@ func handleRoot(w http.ResponseWriter, _ *http.Request) {
 	} else {
 		w.Header().Set(`Content-Type`, `text/html`)
 		w.WriteHeader(http.StatusOK)
-		w.Write(html)
+		_, err := w.Write(html)
+		if err != nil {
+			log.Println("failed to write browser source html")
+		}
 	}
 }

@@ -7,8 +7,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/go-rod/rod/lib/proto"
-
 	"github.com/williamsjokvist/cfn-tracker/pkg/tracker"
 )
 
@@ -47,7 +45,7 @@ func (t *SFVTracker) Authenticate(username string, password string, statChan cha
 		return
 	}
 
-	t.Page.WaitElementsMoreThan(`#loginModals`, 0)
+	t.Page.MustWaitElementsMoreThan(`#loginModals`, 0)
 
 	log.Println(`Passing the gateway`)
 	isSteamOpen := t.Page.MustHas(`#loginModals`)
@@ -62,7 +60,7 @@ func (t *SFVTracker) Authenticate(username string, password string, statChan cha
 	// Submit form
 	t.Page.MustElement(`.page_content form>div:first-child input`).MustInput(username)
 	t.Page.MustElement(`.page_content form>div:nth-child(2) input`).MustInput(password)
-	t.Page.MustElement(`.page_content form>div:nth-child(4) button`).Click(proto.InputMouseButtonLeft, 2)
+	t.Page.MustElement(`.page_content form>div:nth-child(4) button`).MustClick()
 
 	statChan <- *status.WithProgress(50)
 
@@ -103,8 +101,7 @@ func (t *SFVTracker) Authenticate(username string, password string, statChan cha
 		// Click accept if redirected to the confirmation page
 		isConfirmPageOpen := t.Page.MustHas(`#imageLogin`)
 		if isConfirmPageOpen && !hasClickedAccept {
-			buttonElement := t.Page.MustElement(`#imageLogin`)
-			buttonElement.Click(proto.InputMouseButtonLeft, 2)
+			t.Page.MustElement(`#imageLogin`).MustClick()
 			hasClickedAccept = true
 		}
 	}

@@ -180,8 +180,10 @@ func (t *SF6Tracker) updateSession(ctx context.Context, bl *BattleLog) error {
 	trackingState := t.getTrackingStateForLastMatch()
 	if trackingState != nil {
 		trackingState.Log()
-		t.txtDb.SaveTrackingState(trackingState)
 		wails.EventsEmit(ctx, `cfn-data`, trackingState)
+		if err := t.txtDb.SaveTrackingState(trackingState); err != nil {
+			return fmt.Errorf("failed to save tracking state: %w", err)
+		}
 	}
 
 	return nil
