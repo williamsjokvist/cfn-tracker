@@ -7,8 +7,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/go-rod/rod/lib/proto"
-
 	"github.com/williamsjokvist/cfn-tracker/pkg/tracker"
 )
 
