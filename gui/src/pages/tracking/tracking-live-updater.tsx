@@ -1,3 +1,4 @@
+import React from 'react'
 import { motion } from 'framer-motion'
 import { Icon } from '@iconify/react'
 import { useTranslation } from 'react-i18next'
@@ -6,6 +7,7 @@ import { PieChart } from 'react-minimal-pie-chart'
 
 import { TrackingMachineContext } from '@/state/tracking-machine'
 import { Button } from '@/ui/button'
+import { Tooltip } from '@/ui/tooltip'
 import * as Page from '@/ui/page'
 import { type LocalizationKey } from '@/main/i18n'
 
@@ -30,6 +32,8 @@ export function TrackingLiveUpdater() {
     result
   } = useSelector(trackingActor, ({ context }) => context.trackingState)
 
+  const [refreshDisabled, setRefreshDisabled] = React.useState(false)
+
   return (
     <Page.Root>
       <Page.Header>
@@ -49,7 +53,7 @@ export function TrackingLiveUpdater() {
             {mr > 0 && <SmallStat text='MR' value={`${mr == -1 ? t('placement') : mr}`} />}
           </div>
         </dl>
-        <div className='flex h-[calc(100%-32px)] pb-5 pt-3'>
+        <div className='flex h-[calc(100%-32px)] flex-1 pb-5 pt-3'>
           <div className='w-full'>
             <dl className='whitespace-nowrap text-lg'>
               <div className='flex justify-between gap-2'>
@@ -87,7 +91,7 @@ export function TrackingLiveUpdater() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.35 }}
-            className='relative grid h-full w-full max-w-[240px]'
+            className='flex-0 relative grid h-full'
           >
             <PieChart
               className='mx-auto h-52 w-full'
@@ -118,13 +122,28 @@ export function TrackingLiveUpdater() {
                 </linearGradient>
               </defs>
             </PieChart>
-            <Button
-              className='absolute bottom-0 right-0'
-              onClick={() => trackingActor.send({ type: 'cease' })}
-            >
-              <Icon icon='fa6-solid:stop' className='mr-3 h-5 w-5' />
-              {t('stop')}
-            </Button>
+            <div className='flex justify-between gap-2 self-end'>
+              <Tooltip text={t('cooldown')} disabled={!refreshDisabled}>
+                <Button
+                  disabled={refreshDisabled}
+                  style={{ filter: refreshDisabled ? 'grayscale(1)' : 'hue-rotate(-160deg)' }}
+                  onClick={() => {
+                    if (!refreshDisabled) {
+                      trackingActor.send({ type: 'forcePoll' })
+                      setRefreshDisabled(true)
+                      setTimeout(() => setRefreshDisabled(false), 15000)
+                    }
+                  }}
+                >
+                  <Icon icon='fa6-solid:recycle' className='mr-3 h-5 w-5' />
+                  {t('refresh')}
+                </Button>
+              </Tooltip>
+              <Button onClick={() => trackingActor.send({ type: 'cease' })}>
+                <Icon icon='fa6-solid:stop' className='mr-3 h-5 w-5' />
+                {t('stop')}
+              </Button>
+            </div>
           </motion.div>
         </div>
         {/* TODO: fix character image for tekken 8 */}

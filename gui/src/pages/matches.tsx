@@ -9,6 +9,7 @@ import * as Table from '@/ui/table'
 import type { model } from '@model'
 import { Button } from '@/ui/button'
 import { type LocalizationKey } from '@/main/i18n'
+import { Tooltip } from '@/ui/tooltip'
 
 export function MatchesListPage() {
   const { t } = useTranslation()
@@ -110,14 +111,11 @@ export function MatchesListPage() {
                     className='group text-center'
                     interactive
                   >
-                    <div className='relative z-[9999] inline-flex justify-center'>
+                    <Tooltip text={t('copy')}>
                       <span className='block w-12 overflow-hidden overflow-ellipsis'>
                         {log.replayId}
                       </span>
-                      <span className='invisible absolute top-[-33px] z-50 select-none rounded-full border bg-white px-2.5 py-0.5 text-xs font-semibold text-black opacity-0 transition-all group-hover:visible group-hover:opacity-100'>
-                        {t('copy')}
-                      </span>
-                    </div>
+                    </Tooltip>
                   </Table.Td>
                 </Table.Tr>
               ))}

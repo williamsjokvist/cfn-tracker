@@ -100,6 +100,8 @@ func (t *SFVTracker) Start(ctx context.Context, cfn string, restoreData bool, re
 	return nil
 }
 
+func (t *SFVTracker) ForcePoll() {}
+
 func (t *SFVTracker) poll(ctx context.Context, cfn string, refreshInterval time.Duration) {
 	for {
 		didBreak := utils.SleepOrBreak(refreshInterval, func() bool {

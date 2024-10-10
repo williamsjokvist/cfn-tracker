@@ -62,6 +62,8 @@ type Localization struct {
 	MatchesWon               string `json:"matchesWon"`
 	MatchesLost              string `json:"matchesLost"`
 	Sessions                 string `json:"sessions"`
+	Refresh                  string `json:"refresh"`
+	Cooldown                 string `json:"cooldown"`
 	T8Beginner               string `json:"T8_BEGINNER"`
 	T81stDan                 string `json:"T8_1ST_DAN"`
 	T82ndDan                 string `json:"T8_2ND_DAN"`

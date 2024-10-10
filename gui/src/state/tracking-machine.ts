@@ -1,7 +1,7 @@
 import { assign, setup } from 'xstate'
 import { createActorContext } from '@xstate/react'
 
-import { StartTracking, StopTracking } from '@cmd'
+import { ForcePoll, StartTracking, StopTracking } from '@cmd'
 import type { errorsx, model } from '@model'
 import { EventsOff, EventsOn } from '@runtime'
 
@@ -29,6 +29,9 @@ export const TRACKING_MACHINE = setup({
     },
     stopTracking: ({ self }) => {
       StopTracking().catch(error => self.send({ type: 'error', error }))
+    },
+    forcePoll: () => {
+      ForcePoll()
     },
     subscribeToTrackingEvents: ({ self }) => {
       EventsOn('cfn-data', trackingState => self.send({ type: 'matchPlayed', trackingState }))
@@ -90,6 +93,9 @@ export const TRACKING_MACHINE = setup({
     },
     tracking: {
       on: {
+        forcePoll: {
+          actions: ['forcePoll']
+        },
         cease: {
           actions: [
             'stopTracking',
