@@ -107,10 +107,9 @@ func (ch *TrackingHandler) StartTracking(userCode string, restore bool) {
 			log.Println("failed to save match", err)
 			return
 		}
-		trackingState := model.ConvMatchToTrackingState(match)
-		trackingState.Log()
-		wailsRuntime.EventsEmit(ch.ctx, `cfn-data`, trackingState)
-		if err := ch.txtDb.SaveTrackingState(&trackingState); err != nil {
+
+		wailsRuntime.EventsEmit(ch.ctx, `cfn-data`, match)
+		if err := ch.txtDb.SaveMatch(match); err != nil {
 			log.Print("failed to save tracking state:", err)
 			return
 		}
@@ -121,17 +120,17 @@ func (ch *TrackingHandler) StopTracking() {
 	ch.cancelPolling()
 }
 
-func (ch *TrackingHandler) SelectGame(game GameType) error {
+func (ch *TrackingHandler) SelectGame(game model.GameType) error {
 	var username, password string
 
 	switch game {
-	case GameTypeT8:
+	case model.GameTypeT8:
 		ch.gameTracker = t8.NewT8Tracker(ch.sqlDb, ch.txtDb)
-	case GameTypeSF6:
+	case model.GameTypeSF6:
 		ch.gameTracker = sf6.NewSF6Tracker(ch.browser, ch.sqlDb, ch.txtDb)
 		username = ch.cfg.CapIDEmail
 		password = ch.cfg.CapIDPassword
-	case GameTypeSFV:
+	case model.GameTypeSFV:
 		// gameTracker = sfv.NewSFVTracker(ch.browser)
 		username = ch.cfg.SteamUsername
 		password = ch.cfg.SteamPassword
@@ -160,11 +159,3 @@ func (ch *TrackingHandler) ForcePoll() {
 		ch.forcePollChan <- struct{}{}
 	}
 }
-
-type GameType string
-
-const (
-	GameTypeSFV GameType = "sfv"
-	GameTypeSF6 GameType = "sf6"
-	GameTypeT8  GameType = "t8"
-)

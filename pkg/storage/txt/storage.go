@@ -23,37 +23,37 @@ func NewStorage() (*Storage, error) {
 	}, nil
 }
 
-func (s *Storage) SaveTrackingState(ts *model.TrackingState) error {
-	err := s.saveTxtFile(`wins.txt`, strconv.Itoa(ts.Wins))
+func (s *Storage) SaveMatch(match model.Match) error {
+	err := s.saveTxtFile(`wins.txt`, strconv.Itoa(match.Wins))
 	if err != nil {
 		return fmt.Errorf(`save wins txt: %w`, err)
 	}
-	err = s.saveTxtFile(`losses.txt`, strconv.Itoa(ts.Losses))
+	err = s.saveTxtFile(`losses.txt`, strconv.Itoa(match.Losses))
 	if err != nil {
 		return fmt.Errorf(`save losses txt: %w`, err)
 	}
-	err = s.saveTxtFile(`win-rate.txt`, strconv.Itoa(ts.WinRate)+`%`)
+	err = s.saveTxtFile(`win-rate.txt`, strconv.Itoa(match.WinRate)+`%`)
 	if err != nil {
 		return fmt.Errorf(`save win rate txt: %w`, err)
 	}
-	err = s.saveTxtFile(`win-streak.txt`, strconv.Itoa(ts.WinStreak))
+	err = s.saveTxtFile(`win-streak.txt`, strconv.Itoa(match.WinStreak))
 	if err != nil {
 		return fmt.Errorf(`save win streak txt: %w`, err)
 	}
-	err = s.saveTxtFile(`lp.txt`, strconv.Itoa(ts.LP))
+	err = s.saveTxtFile(`lp.txt`, strconv.Itoa(match.LP))
 	if err != nil {
 		return fmt.Errorf(`save lp txt: %w`, err)
 	}
-	err = s.saveTxtFile(`mr.txt`, strconv.Itoa(ts.MR))
+	err = s.saveTxtFile(`mr.txt`, strconv.Itoa(match.MR))
 	if err != nil {
 		return fmt.Errorf(`save mr txt: %w`, err)
 	}
-	lpGain := strconv.Itoa(ts.LPGain)
-	if ts.LPGain > 0 {
+	lpGain := strconv.Itoa(match.LPGain)
+	if match.LPGain > 0 {
 		lpGain = `+` + lpGain
 	}
-	mrGain := strconv.Itoa(ts.MRGain)
-	if ts.MRGain > 0 {
+	mrGain := strconv.Itoa(match.MRGain)
+	if match.MRGain > 0 {
 		mrGain = `+` + mrGain
 	}
 	err = s.saveTxtFile(`lp-gain.txt`, lpGain)

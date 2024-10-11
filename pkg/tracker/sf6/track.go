@@ -60,12 +60,11 @@ func (t *SF6Tracker) InitFn(ctx context.Context, userCode string, restore bool) 
 			return session, nil
 		}
 
-		trackingState := model.ConvMatchToTrackingState(*session.Matches[0])
-		trackingState.Log()
-		if err := t.txtDb.SaveTrackingState(&trackingState); err != nil {
+		lastMatch := *session.Matches[0]
+		if err := t.txtDb.SaveMatch(lastMatch); err != nil {
 			return nil, err
 		}
-		wails.EventsEmit(ctx, `cfn-data`, trackingState)
+		wails.EventsEmit(ctx, `cfn-data`, lastMatch)
 		return session, nil
 	}
 

@@ -2,7 +2,7 @@ import React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import type { model } from '@model'
-import { GetGuiConfig } from '@cmd'
+import { GetGuiConfig } from '@cmd/CommandHandler'
 
 const initialConfig: model.GuiConfig = {
   locale: 'en-GB',

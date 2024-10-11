@@ -191,10 +191,6 @@ func (ch *CommandHandler) SaveTheme(theme model.ThemeName) error {
 	return ch.nosqlDb.SaveTheme(theme)
 }
 
-func (ch *CommandHandler) GetTrackingStateUnused() *model.TrackingState {
-	return nil
-}
-
 func (ch *CommandHandler) GetFormattedErrorModelUnused() *errorsx.FormattedError {
 	return nil
 }

@@ -1,7 +1,7 @@
 import { setup, assign } from 'xstate'
 import { createActorContext } from '@xstate/react'
 
-import { SelectGame } from '@cmd'
+import { SelectGame } from '@cmd/TrackingHandler'
 import type { errorsx } from '@model'
 import { EventsOff, EventsOn } from '@runtime'
 

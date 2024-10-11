@@ -5,7 +5,7 @@ import HttpBackend, { type HttpBackendOptions } from 'i18next-http-backend'
 import { I18nextProvider, initReactI18next } from 'react-i18next'
 
 import type { locales } from '@model'
-import { GetTranslation } from '@cmd'
+import { GetTranslation } from '@cmd/CommandHandler'
 
 export type LocalizationKey = keyof locales.Localization
 

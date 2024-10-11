@@ -40,7 +40,7 @@ func (t *T8Tracker) InitFn(ctx context.Context, polarisId string, restore bool) 
 			return nil, errorsx.NewFormattedError(http.StatusNotFound, fmt.Errorf("get last session: %w", err))
 		}
 		if len(session.Matches) > 0 {
-			wails.EventsEmit(ctx, "cfn-data", model.ConvMatchToTrackingState(*session.Matches[0]))
+			wails.EventsEmit(ctx, "cfn-data", *session.Matches[0])
 		}
 
 		return session, nil

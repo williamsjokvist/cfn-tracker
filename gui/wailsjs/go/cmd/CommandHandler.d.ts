@@ -21,8 +21,6 @@ export function GetSupportedLanguages():Promise<Array<string>>;
 
 export function GetThemes():Promise<Array<model.Theme>>;
 
-export function GetTrackingStateUnused():Promise<model.TrackingState>;
-
 export function GetTranslation(arg1:string):Promise<locales.Localization>;
 
 export function GetUsers():Promise<Array<model.User>>;

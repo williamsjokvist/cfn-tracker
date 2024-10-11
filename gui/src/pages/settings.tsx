@@ -12,7 +12,7 @@ import {
   SaveLocale,
   SaveSidebarMinimized,
   SaveTheme
-} from '@cmd'
+} from '@cmd/CommandHandler'
 import { BrowserOpenURL } from '@runtime'
 
 import * as Page from '@/ui/page'

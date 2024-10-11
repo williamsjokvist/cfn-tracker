@@ -10,17 +10,17 @@ import { Button } from '@/ui/button'
 import { Checkbox } from '@/ui/checkbox'
 
 import { model } from '@model'
-import { GetThemes, OpenResultsDirectory } from '@cmd'
+import { GetThemes, OpenResultsDirectory } from '@cmd/CommandHandler'
 
 import { useErrorPopup } from '@/main/error-popup'
 
-type StatOptions = Omit<Record<keyof model.TrackingState, boolean>, 'totalLosses' | 'totalWins'> & {
+type StatOptions = Omit<Record<keyof model.Match, boolean>, 'replayId' | 'sessionId'> & {
   theme: string
 }
 
 const defaultOptions: StatOptions = {
   theme: 'default',
-  cfn: false,
+  userName: false,
   wins: true,
   losses: true,
   winRate: true,
@@ -32,12 +32,12 @@ const defaultOptions: StatOptions = {
   opponent: false,
   opponentCharacter: false,
   opponentLeague: false,
-  opponentLP: false,
-  totalMatches: false,
+  opponentLp: false,
+  opponentMr: false,
   character: false,
-  result: false,
-  userCode: false,
-  timestamp: false,
+  victory: false,
+  userId: false,
+  time: false,
   date: false
 }
 

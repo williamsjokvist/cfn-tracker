@@ -6,7 +6,7 @@ import { Icon } from '@iconify/react'
 
 import { cn } from '@/helpers/cn'
 import { AuthMachineContext } from '@/state/auth-machine'
-import { CheckForUpdate } from '@cmd'
+import { CheckForUpdate } from '@cmd/CommandHandler'
 import { BrowserOpenURL } from '@runtime'
 
 import { useErrorPopup } from './error-popup'

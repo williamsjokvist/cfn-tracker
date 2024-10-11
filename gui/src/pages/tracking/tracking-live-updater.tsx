@@ -16,7 +16,6 @@ export function TrackingLiveUpdater() {
   const trackingActor = TrackingMachineContext.useActorRef()
 
   const {
-    cfn,
     lp,
     mr,
     wins,
@@ -29,7 +28,8 @@ export function TrackingLiveUpdater() {
     opponentCharacter,
     character,
     opponentLeague,
-    result
+    userName,
+    victory
   } = useSelector(trackingActor, ({ context }) => context.trackingState)
 
   const [refreshDisabled, setRefreshDisabled] = React.useState(false)
@@ -47,7 +47,7 @@ export function TrackingLiveUpdater() {
         className='h-full px-6 pt-4'
       >
         <dl className='flex w-full items-center justify-between whitespace-nowrap'>
-          <SmallStat text='CFN' value={cfn} />
+          <SmallStat text='CFN' value={userName} />
           <div className='flex justify-between gap-8'>
             {lp > 0 && <SmallStat text='LP' value={`${lp == -1 ? t('placement') : lp}`} />}
             {mr > 0 && <SmallStat text='MR' value={`${mr == -1 ? t('placement') : mr}`} />}
@@ -78,7 +78,7 @@ export function TrackingLiveUpdater() {
                 <span>{t('lastMatch')}</span>
                 <div className='relative flex items-center gap-2'>
                   <Icon
-                    icon={result ? 'twemoji:victory-hand' : 'twemoji:pensive-face'}
+                    icon={victory ? 'twemoji:victory-hand' : 'twemoji:pensive-face'}
                     width={25}
                   />{' '}
                   vs
