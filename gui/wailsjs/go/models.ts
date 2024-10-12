@@ -304,6 +304,8 @@ export namespace model {
 	    matches: Match[];
 	    matchesWon: number;
 	    matchesLost: number;
+	    endingLp: number;
+	    endingMr: number;
 	    startingLp: number;
 	    startingMr: number;
 	    lpGain: number;
@@ -324,6 +326,8 @@ export namespace model {
 	        this.matches = this.convertValues(source["matches"], Match);
 	        this.matchesWon = source["matchesWon"];
 	        this.matchesLost = source["matchesLost"];
+	        this.endingLp = source["endingLp"];
+	        this.endingMr = source["endingMr"];
 	        this.startingLp = source["startingLp"];
 	        this.startingMr = source["startingMr"];
 	        this.lpGain = source["lpGain"];
@@ -360,58 +364,6 @@ export namespace model {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.name = source["name"];
 	        this.css = source["css"];
-	    }
-	}
-	export class TrackingState {
-	    cfn: string;
-	    userCode: string;
-	    lp: number;
-	    lpGain: number;
-	    mr: number;
-	    mrGain: number;
-	    wins: number;
-	    totalWins: number;
-	    totalLosses: number;
-	    totalMatches: number;
-	    losses: number;
-	    winRate: number;
-	    character: string;
-	    opponent: string;
-	    opponentCharacter: string;
-	    opponentLP: number;
-	    opponentLeague: string;
-	    result: boolean;
-	    timestamp: string;
-	    date: string;
-	    winStreak: number;
-	
-	    static createFrom(source: any = {}) {
-	        return new TrackingState(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.cfn = source["cfn"];
-	        this.userCode = source["userCode"];
-	        this.lp = source["lp"];
-	        this.lpGain = source["lpGain"];
-	        this.mr = source["mr"];
-	        this.mrGain = source["mrGain"];
-	        this.wins = source["wins"];
-	        this.totalWins = source["totalWins"];
-	        this.totalLosses = source["totalLosses"];
-	        this.totalMatches = source["totalMatches"];
-	        this.losses = source["losses"];
-	        this.winRate = source["winRate"];
-	        this.character = source["character"];
-	        this.opponent = source["opponent"];
-	        this.opponentCharacter = source["opponentCharacter"];
-	        this.opponentLP = source["opponentLP"];
-	        this.opponentLeague = source["opponentLeague"];
-	        this.result = source["result"];
-	        this.timestamp = source["timestamp"];
-	        this.date = source["date"];
-	        this.winStreak = source["winStreak"];
 	    }
 	}
 	export class User {

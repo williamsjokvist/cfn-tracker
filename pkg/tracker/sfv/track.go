@@ -16,7 +16,7 @@ import (
 	"github.com/williamsjokvist/cfn-tracker/pkg/browser"
 	"github.com/williamsjokvist/cfn-tracker/pkg/errorsx"
 	"github.com/williamsjokvist/cfn-tracker/pkg/model"
-	"github.com/williamsjokvist/cfn-tracker/pkg/tracker"
+	_ "github.com/williamsjokvist/cfn-tracker/pkg/tracker"
 	"github.com/williamsjokvist/cfn-tracker/pkg/utils"
 )
 
@@ -29,7 +29,7 @@ type SFVTracker struct {
 	*browser.Browser
 }
 
-var _ tracker.GameTracker = (*SFVTracker)(nil)
+// var _ tracker.GameTracker = (*SFVTracker)(nil)
 
 func NewSFVTracker(browser *browser.Browser) *SFVTracker {
 	return &SFVTracker{
@@ -51,14 +51,14 @@ func (t *SFVTracker) stopFn(ctx context.Context) {
 }
 
 // Start will update the MatchHistory when new matches are played.
-func (t *SFVTracker) Start(ctx context.Context, cfn string, restoreData bool, refreshInterval time.Duration) error {
+func (t *SFVTracker) Init(ctx context.Context, cfn string, restore bool) (*model.Session, error) {
 	// safe guard
 	if t.isTracking {
-		return nil
+		return nil, errors.New("tracking is already in progress")
 	}
 
 	if !t.isAuthenticated {
-		return errorsx.NewFormattedError(http.StatusUnauthorized, errors.New(`tracker not authenticated`))
+		return nil, errorsx.NewFormattedError(http.StatusUnauthorized, errors.New(`tracker not authenticated`))
 	}
 
 	t.mh = &model.TrackingState{
@@ -84,7 +84,7 @@ func (t *SFVTracker) Start(ctx context.Context, cfn string, restoreData bool, re
 	isValidProfile := t.Page.MustHas(`.leagueInfo`)
 	if !isValidProfile {
 		t.stopFn(ctx)
-		return errorsx.NewFormattedError(http.StatusNotFound, fmt.Errorf(`failed to get user`))
+		return nil, fmt.Errorf("failed to get user")
 	}
 
 	log.Println(`Profile loaded`)
@@ -95,14 +95,12 @@ func (t *SFVTracker) Start(ctx context.Context, cfn string, restoreData bool, re
 
 	pollCtx, cancel := context.WithCancel(ctx)
 	t.stopTracking = cancel
-	go t.poll(pollCtx, cfn, refreshInterval)
+	go t.Poll(pollCtx, cfn, 30*time.Second)
 
-	return nil
+	return nil, nil
 }
 
-func (t *SFVTracker) ForcePoll() {}
-
-func (t *SFVTracker) poll(ctx context.Context, cfn string, refreshInterval time.Duration) {
+func (t *SFVTracker) Poll(ctx context.Context, cfn string, refreshInterval time.Duration) {
 	for {
 		didBreak := utils.SleepOrBreak(refreshInterval, func() bool {
 			select {

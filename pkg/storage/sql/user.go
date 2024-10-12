@@ -2,11 +2,11 @@ package sql
 
 import (
 	"context"
-	"fmt"
 	"errors"
+	"fmt"
 
-	"github.com/jmoiron/sqlx"
 	"database/sql"
+	"github.com/jmoiron/sqlx"
 
 	"github.com/williamsjokvist/cfn-tracker/pkg/model"
 )

@@ -1,4 +1,4 @@
-package sf6
+package cfn
 
 import "strconv"
 

@@ -7,8 +7,6 @@ import {context} from '../models';
 
 export function CheckForUpdate():Promise<boolean>;
 
-export function ForcePoll():Promise<void>;
-
 export function GetAppVersion():Promise<string>;
 
 export function GetFormattedErrorModelUnused():Promise<errorsx.FormattedError>;
@@ -23,8 +21,6 @@ export function GetSupportedLanguages():Promise<Array<string>>;
 
 export function GetThemes():Promise<Array<model.Theme>>;
 
-export function GetTrackingStateUnused():Promise<model.TrackingState>;
-
 export function GetTranslation(arg1:string):Promise<locales.Localization>;
 
 export function GetUsers():Promise<Array<model.User>>;
@@ -37,10 +33,4 @@ export function SaveSidebarMinimized(arg1:boolean):Promise<void>;
 
 export function SaveTheme(arg1:model.ThemeName):Promise<void>;
 
-export function SelectGame(arg1:string):Promise<void>;
-
 export function SetContext(arg1:context.Context):Promise<void>;
-
-export function StartTracking(arg1:string,arg2:boolean):Promise<void>;
-
-export function StopTracking():Promise<void>;

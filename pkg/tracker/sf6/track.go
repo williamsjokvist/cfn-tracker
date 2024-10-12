@@ -2,10 +2,7 @@ package sf6
 
 import (
 	"context"
-	"encoding/json"
-	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"time"
 
@@ -17,237 +14,102 @@ import (
 	"github.com/williamsjokvist/cfn-tracker/pkg/storage/sql"
 	"github.com/williamsjokvist/cfn-tracker/pkg/storage/txt"
 	"github.com/williamsjokvist/cfn-tracker/pkg/tracker"
+	"github.com/williamsjokvist/cfn-tracker/pkg/tracker/sf6/cfn"
 	"github.com/williamsjokvist/cfn-tracker/pkg/utils"
 )
 
 type SF6Tracker struct {
-	isAuthenticated bool
-	stopPolling     context.CancelFunc
-	state           map[string]*model.TrackingState
-	sesh            *model.Session
-	user            *model.User
-	*browser.Browser
-
-	sqlDb *sql.Storage
-	txtDb *txt.Storage
+	cfnClient *cfn.Client
+	sqlDb     *sql.Storage
+	txtDb     *txt.Storage
 }
 
 var _ tracker.GameTracker = (*SF6Tracker)(nil)
 
 func NewSF6Tracker(browser *browser.Browser, sqlDb *sql.Storage, txtDb *txt.Storage) *SF6Tracker {
 	return &SF6Tracker{
-		Browser:     browser,
-		stopPolling: func() {},
-		sqlDb:       sqlDb,
-		txtDb:       txtDb,
-		state:       make(map[string]*model.TrackingState, 4),
+		cfnClient: cfn.NewCFNClient(browser),
+		sqlDb:     sqlDb,
+		txtDb:     txtDb,
 	}
 }
 
 // Start will update the tracking state when new matches are played.
-func (t *SF6Tracker) Start(ctx context.Context, userCode string, restore bool, pollRate time.Duration) error {
-	if !t.isAuthenticated {
-		log.Println(`tracker not authenticated`)
-		return errorsx.NewFormattedError(http.StatusUnauthorized, errors.New(`tracker not authenticated`))
-	}
-
-	startPolling := func() {
-		pollCtx, cancelFn := context.WithCancel(ctx)
-		t.stopPolling = cancelFn
-		go t.poll(pollCtx, userCode, pollRate)
-	}
-
+func (t *SF6Tracker) Init(ctx context.Context, userCode string, restore bool) (*model.Session, error) {
 	if restore {
-		sesh, err := t.sqlDb.GetLatestSession(ctx, userCode)
+		session, err := t.sqlDb.GetLatestSession(ctx, userCode)
 		if err != nil {
-			return errorsx.NewFormattedError(http.StatusNotFound, fmt.Errorf(`failed to get last session: %w`, err))
+			return nil, errorsx.NewFormattedError(http.StatusNotFound, fmt.Errorf(`failed to get last session: %w`, err))
 		}
-		t.sesh = sesh
-		t.user, err = t.sqlDb.GetUserByCode(ctx, userCode)
+		_, err = t.sqlDb.GetUserByCode(ctx, userCode)
 		if err != nil {
-			return errorsx.NewFormattedError(http.StatusNotFound, fmt.Errorf(`failed to get user: %w`, err))
+			return nil, errorsx.NewFormattedError(http.StatusNotFound, fmt.Errorf(`failed to get user: %w`, err))
 		}
-		trackingState := t.getTrackingStateForLastMatch()
-		if trackingState == nil {
-			bl, err := t.fetchBattleLog(userCode)
+		if len(session.Matches) == 0 {
+			bl, err := t.cfnClient.GetBattleLog(userCode)
 			if err != nil {
-				return errorsx.NewFormattedError(http.StatusInternalServerError, fmt.Errorf(`failed to fetch battle log: %w`, err))
+				return nil, errorsx.NewFormattedError(http.StatusInternalServerError, fmt.Errorf(`failed to fetch battle log: %w`, err))
 			}
-			trackingState = &model.TrackingState{
+			wails.EventsEmit(ctx, `cfn-data`, model.TrackingState{
 				CFN:       bl.GetCFN(),
 				LP:        bl.GetLP(),
 				MR:        bl.GetMR(),
 				Character: bl.GetCharacter(),
-			}
+			})
+
+			return session, nil
 		}
-		wails.EventsEmit(ctx, `cfn-data`, trackingState)
-		startPolling()
-		return nil
+
+		lastMatch := *session.Matches[0]
+		if err := t.txtDb.SaveMatch(lastMatch); err != nil {
+			return nil, err
+		}
+		wails.EventsEmit(ctx, `cfn-data`, lastMatch)
+		return session, nil
 	}
 
-	bl, err := t.fetchBattleLog(userCode)
+	bl, err := t.cfnClient.GetBattleLog(userCode)
 	if err != nil {
-		return errorsx.NewFormattedError(http.StatusInternalServerError, fmt.Errorf(`failed to fetch battle log: %w`, err))
+		return nil, errorsx.NewFormattedError(http.StatusInternalServerError, fmt.Errorf(`failed to fetch battle log: %w`, err))
 	}
-	user := model.User{
+
+	err = t.sqlDb.SaveUser(ctx, model.User{
 		DisplayName: bl.GetCFN(),
 		Code:        userCode,
-	}
-	err = t.sqlDb.SaveUser(ctx, user)
+	})
 	if err != nil {
-		return errorsx.NewFormattedError(http.StatusInternalServerError, fmt.Errorf(`failed to save user: %w`, err))
+		return nil, errorsx.NewFormattedError(http.StatusInternalServerError, fmt.Errorf(`failed to save user: %w`, err))
 	}
-	t.user = &user
-	sesh, err := t.sqlDb.CreateSession(ctx, userCode)
+	session, err := t.sqlDb.CreateSession(ctx, userCode)
 	if err != nil {
-		return errorsx.NewFormattedError(http.StatusInternalServerError, fmt.Errorf(`failed to create session: %w`, err))
+		return nil, errorsx.NewFormattedError(http.StatusInternalServerError, fmt.Errorf(`failed to create session: %w`, err))
 	}
-	t.sesh = sesh
 
 	// set starting LP so we don't count the first polled match
-	t.sesh.LP = bl.GetLP()
-	t.sesh.MR = bl.GetMR()
+	session.LP = bl.GetLP()
+	session.MR = bl.GetMR()
 	wails.EventsEmit(ctx, `cfn-data`, model.TrackingState{
 		CFN:       bl.GetCFN(),
 		LP:        bl.GetLP(),
 		MR:        bl.GetMR(),
 		Character: bl.GetCharacter(),
 	})
-
-	startPolling()
-	return nil
+	return session, nil
 }
 
-func (t *SF6Tracker) poll(ctx context.Context, userCode string, pollRate time.Duration) {
-	i := 0
-	retries := 0
-
-	didStop := func() bool {
-		return utils.SleepOrBreak(pollRate, func() bool {
-			select {
-			case <-ctx.Done():
-				return true
-			default:
-				return false
-			}
-		})
+func (t *SF6Tracker) Poll(ctx context.Context, cancel context.CancelFunc, session *model.Session, matchChan chan model.Match) {
+	bl, err := t.cfnClient.GetBattleLog(session.UserId)
+	if err != nil {
+		cancel()
 	}
-
-	for {
-		i++
-		log.Println(`polling`, i)
-
-		bl, err := t.fetchBattleLog(userCode)
-		if err != nil {
-			retries++
-			log.Println(`failed to poll battle log: `, err, `(retry: `, retries, `)`)
-			if didStop() || retries > 5 {
-				wails.EventsEmit(ctx, `stopped-tracking`)
-				break
-			}
-			continue
-		}
-
-		if didStop() {
-			wails.EventsEmit(ctx, `stopped-tracking`)
-			break
-		}
-
-		err = t.updateSession(ctx, bl)
-		if err != nil {
-			log.Println(`failed to update session: `, err)
-		}
-	}
-}
-
-func (t *SF6Tracker) updateSession(ctx context.Context, bl *BattleLog) error {
 	// no new match played
-	if t.sesh.LP == bl.GetLP() {
-		return nil
+	if session.LP == bl.GetLP() {
+		return
 	}
-	match := getNewestMatch(t.sesh, bl)
-
-	t.sesh.LP = bl.GetLP()
-	t.sesh.MR = bl.GetMR()
-	t.sesh.Matches = append([]*model.Match{&match}, t.sesh.Matches...)
-	err := t.sqlDb.UpdateSession(ctx, t.sesh)
-	if err != nil {
-		return fmt.Errorf("failed to update session: %w", err)
-	}
-	if err := t.sqlDb.SaveMatch(ctx, match); err != nil {
-		return fmt.Errorf("failed to save match: %w", err)
-	}
-	trackingState := t.getTrackingStateForLastMatch()
-	if trackingState != nil {
-		trackingState.Log()
-		wails.EventsEmit(ctx, `cfn-data`, trackingState)
-		if err := t.txtDb.SaveTrackingState(trackingState); err != nil {
-			return fmt.Errorf("failed to save tracking state: %w", err)
-		}
-	}
-
-	return nil
+	matchChan <- getMatch(session, bl)
 }
 
-func (t *SF6Tracker) getTrackingStateForLastMatch() *model.TrackingState {
-	if len(t.sesh.Matches) == 0 {
-		return nil
-	}
-	lastMatch := t.sesh.Matches[0]
-	return &model.TrackingState{
-		UserCode:          t.user.Code,
-		CFN:               t.user.DisplayName,
-		Wins:              lastMatch.Wins,
-		Losses:            lastMatch.Losses,
-		WinRate:           lastMatch.WinRate,
-		WinStreak:         lastMatch.WinStreak,
-		MR:                lastMatch.MR,
-		LP:                lastMatch.LP,
-		LPGain:            lastMatch.LPGain,
-		MRGain:            lastMatch.MRGain,
-		Character:         lastMatch.Character,
-		IsWin:             lastMatch.Victory,
-		Opponent:          lastMatch.Opponent,
-		OpponentCharacter: lastMatch.OpponentCharacter,
-		OpponentLP:        lastMatch.OpponentLP,
-		OpponentLeague:    lastMatch.OpponentLeague,
-		Date:              lastMatch.Date,
-		TimeStamp:         lastMatch.Time,
-	}
-}
-
-func (t *SF6Tracker) fetchBattleLog(userCode string) (*BattleLog, error) {
-	err := t.Page.Navigate(fmt.Sprintf(`https://www.streetfighter.com/6/buckler/profile/%s/battlelog/rank`, userCode))
-	if err != nil {
-		return nil, fmt.Errorf(`navigate to cfn: %w`, err)
-	}
-	err = t.Page.WaitLoad()
-	if err != nil {
-		return nil, fmt.Errorf(`wait for cfn to load: %w`, err)
-	}
-	nextData, err := t.Page.Element(`#__NEXT_DATA__`)
-	if err != nil {
-		return nil, fmt.Errorf(`get next_data element: %w`, err)
-	}
-	body, err := nextData.Text()
-	if err != nil {
-		return nil, fmt.Errorf(`get next_data json: %w`, err)
-	}
-
-	var profilePage ProfilePage
-	err = json.Unmarshal([]byte(body), &profilePage)
-	if err != nil {
-		return nil, fmt.Errorf(`unmarshal battle log: %w`, err)
-	}
-
-	bl := &profilePage.Props.PageProps
-	if bl.Common.StatusCode != 200 {
-		return nil, fmt.Errorf(`failed to fetch battle log, received status code %v`, bl.Common.StatusCode)
-	}
-	return bl, nil
-}
-
-func getOpponentInfo(myCfn string, replay *Replay) PlayerInfo {
+func getOpponentInfo(myCfn string, replay *cfn.Replay) cfn.PlayerInfo {
 	if myCfn == replay.Player1Info.Player.FighterID {
 		return replay.Player2Info
 	} else {
@@ -255,7 +117,7 @@ func getOpponentInfo(myCfn string, replay *Replay) PlayerInfo {
 	}
 }
 
-func getNewestMatch(sesh *model.Session, bl *BattleLog) model.Match {
+func getMatch(sesh *model.Session, bl *cfn.BattleLog) model.Match {
 	latestReplay := bl.ReplayList[0]
 	opponent := getOpponentInfo(bl.GetCFN(), &latestReplay)
 	victory := !isVictory(opponent.RoundResults)
@@ -319,12 +181,6 @@ func isVictory(roundResults []int) bool {
 	return (roundsPlayed == 3 && len(losses) == 1) || len(losses) == 0
 }
 
-// Stop will stop any current trackingz
-func (t *SF6Tracker) Stop() {
-	t.stopPolling()
-}
-func (t *SF6Tracker) ForcePoll() {}
-
 func getLeagueFromLP(lp int) string {
 	if lp >= 25000 {
 		return `Master`
@@ -343,4 +199,8 @@ func getLeagueFromLP(lp int) string {
 	}
 
 	return `Rookie`
+}
+
+func (t *SF6Tracker) Authenticate(email string, password string, statChan chan tracker.AuthStatus) {
+	t.cfnClient.Authenticate(email, password, statChan)
 }
