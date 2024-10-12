@@ -38,7 +38,7 @@ type TrackingHandler struct {
 	cfg *config.Config
 }
 
-var _ CmdHandler = (*CommandHandler)(nil)
+var _ CmdHandler = (*TrackingHandler)(nil)
 
 func NewTrackingHandler(browser *browser.Browser, sqlDb *sql.Storage, nosqlDb *nosql.Storage, txtDb *txt.Storage, cfg *config.Config) *TrackingHandler {
 	return &TrackingHandler{
@@ -57,11 +57,6 @@ func (ch *TrackingHandler) SetContext(ctx context.Context) {
 
 func (ch *TrackingHandler) StartTracking(userCode string, restore bool) {
 	log.Printf(`Starting tracking for %s, restoring = %v`, userCode, restore)
-	session, err := ch.gameTracker.InitFn(ch.ctx, userCode, restore)
-	if err != nil {
-		return
-	}
-
 	ticker := time.NewTicker(30 * time.Second)
 	pollCtx, cancel := context.WithCancel(ch.ctx)
 	ch.cancelPolling = cancel
@@ -76,6 +71,11 @@ func (ch *TrackingHandler) StartTracking(userCode string, restore bool) {
 		wailsRuntime.EventsEmit(ch.ctx, "stopped-tracking")
 		log.Println("stopped polling")
 	}()
+
+	session, err := ch.gameTracker.InitFn(ch.ctx, userCode, restore)
+	if err != nil {
+		return
+	}
 
 	go func() {
 		log.Println("polling")
@@ -132,8 +132,9 @@ func (ch *TrackingHandler) SelectGame(game model.GameType) error {
 		password = ch.cfg.CapIDPassword
 	case model.GameTypeSFV:
 		// gameTracker = sfv.NewSFVTracker(ch.browser)
-		username = ch.cfg.SteamUsername
-		password = ch.cfg.SteamPassword
+		// username = ch.cfg.SteamUsername
+		// password = ch.cfg.SteamPassword
+		fallthrough
 	default:
 		return errorsx.NewFormattedError(http.StatusInternalServerError, fmt.Errorf(`failed to select game`))
 	}
