@@ -3,6 +3,7 @@ package txt
 import (
 	"fmt"
 	"os"
+	"reflect"
 	"strconv"
 
 	"github.com/williamsjokvist/cfn-tracker/pkg/model"
@@ -24,45 +25,23 @@ func NewStorage() (*Storage, error) {
 }
 
 func (s *Storage) SaveMatch(match model.Match) error {
-	err := s.saveTxtFile(`wins.txt`, strconv.Itoa(match.Wins))
-	if err != nil {
-		return fmt.Errorf(`save wins txt: %w`, err)
-	}
-	err = s.saveTxtFile(`losses.txt`, strconv.Itoa(match.Losses))
-	if err != nil {
-		return fmt.Errorf(`save losses txt: %w`, err)
-	}
-	err = s.saveTxtFile(`win-rate.txt`, strconv.Itoa(match.WinRate)+`%`)
-	if err != nil {
-		return fmt.Errorf(`save win rate txt: %w`, err)
-	}
-	err = s.saveTxtFile(`win-streak.txt`, strconv.Itoa(match.WinStreak))
-	if err != nil {
-		return fmt.Errorf(`save win streak txt: %w`, err)
-	}
-	err = s.saveTxtFile(`lp.txt`, strconv.Itoa(match.LP))
-	if err != nil {
-		return fmt.Errorf(`save lp txt: %w`, err)
-	}
-	err = s.saveTxtFile(`mr.txt`, strconv.Itoa(match.MR))
-	if err != nil {
-		return fmt.Errorf(`save mr txt: %w`, err)
-	}
-	lpGain := strconv.Itoa(match.LPGain)
-	if match.LPGain > 0 {
-		lpGain = `+` + lpGain
-	}
-	mrGain := strconv.Itoa(match.MRGain)
-	if match.MRGain > 0 {
-		mrGain = `+` + mrGain
-	}
-	err = s.saveTxtFile(`lp-gain.txt`, lpGain)
-	if err != nil {
-		return fmt.Errorf(`save lp gain txt: %w`, err)
-	}
-	err = s.saveTxtFile(`mr-gain.txt`, mrGain)
-	if err != nil {
-		return fmt.Errorf(`save mr gain txt: %w`, err)
+	v := reflect.ValueOf(match)
+	t := v.Type()
+	for i := range t.NumField() {
+		field := t.Field(i).Name
+		value := v.Field(i)
+
+		parsedValue := ""
+		switch v.Kind() {
+		case reflect.Int, reflect.Uint16:
+			parsedValue = strconv.FormatInt(v.Int(), 10)
+		case reflect.String:
+			parsedValue = value.String()
+		}
+
+		if err := s.saveTxtFile(fmt.Sprintf("%s.txt", field), parsedValue); err != nil {
+			return fmt.Errorf(`save text file: %w`, err)
+		}
 	}
 	return nil
 }
