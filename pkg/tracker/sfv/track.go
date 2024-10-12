@@ -51,7 +51,7 @@ func (t *SFVTracker) stopFn(ctx context.Context) {
 }
 
 // Start will update the MatchHistory when new matches are played.
-func (t *SFVTracker) InitFn(ctx context.Context, cfn string, restoreData bool) (*model.Session, error) {
+func (t *SFVTracker) Init(ctx context.Context, cfn string, restore bool) (*model.Session, error) {
 	// safe guard
 	if t.isTracking {
 		return nil, errors.New("tracking is already in progress")
@@ -95,12 +95,12 @@ func (t *SFVTracker) InitFn(ctx context.Context, cfn string, restoreData bool) (
 
 	pollCtx, cancel := context.WithCancel(ctx)
 	t.stopTracking = cancel
-	go t.PollFn(pollCtx, cfn, 30*time.Second)
+	go t.Poll(pollCtx, cfn, 30*time.Second)
 
 	return nil, nil
 }
 
-func (t *SFVTracker) PollFn(ctx context.Context, cfn string, refreshInterval time.Duration) {
+func (t *SFVTracker) Poll(ctx context.Context, cfn string, refreshInterval time.Duration) {
 	for {
 		didBreak := utils.SleepOrBreak(refreshInterval, func() bool {
 			select {
