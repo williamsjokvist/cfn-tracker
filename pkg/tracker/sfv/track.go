@@ -54,7 +54,7 @@ func (t *SFVTracker) stopFn(ctx context.Context) {
 func (t *SFVTracker) InitFn(ctx context.Context, cfn string, restoreData bool) (*model.Session, error) {
 	// safe guard
 	if t.isTracking {
-		return nil, nil
+		return nil, errors.New("tracking is already in progress")
 	}
 
 	if !t.isAuthenticated {
@@ -84,7 +84,7 @@ func (t *SFVTracker) InitFn(ctx context.Context, cfn string, restoreData bool) (
 	isValidProfile := t.Page.MustHas(`.leagueInfo`)
 	if !isValidProfile {
 		t.stopFn(ctx)
-		return nil, errorsx.NewFormattedError(http.StatusNotFound, fmt.Errorf(`failed to get user`))
+		return nil, fmt.Errorf("failed to get user")
 	}
 
 	log.Println(`Profile loaded`)
