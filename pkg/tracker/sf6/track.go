@@ -35,7 +35,7 @@ func NewSF6Tracker(browser *browser.Browser, sqlDb *sql.Storage, txtDb *txt.Stor
 }
 
 // Start will update the tracking state when new matches are played.
-func (t *SF6Tracker) InitFn(ctx context.Context, userCode string, restore bool) (*model.Session, error) {
+func (t *SF6Tracker) Init(ctx context.Context, userCode string, restore bool) (*model.Session, error) {
 	if restore {
 		session, err := t.sqlDb.GetLatestSession(ctx, userCode)
 		if err != nil {
@@ -97,7 +97,7 @@ func (t *SF6Tracker) InitFn(ctx context.Context, userCode string, restore bool) 
 	return session, nil
 }
 
-func (t *SF6Tracker) PollFn(ctx context.Context, session *model.Session, matchChan chan model.Match, cancel context.CancelFunc) {
+func (t *SF6Tracker) Poll(ctx context.Context, cancel context.CancelFunc, session *model.Session, matchChan chan model.Match) {
 	bl, err := t.cfnClient.GetBattleLog(session.UserId)
 	if err != nil {
 		cancel()

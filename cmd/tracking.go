@@ -72,22 +72,22 @@ func (ch *TrackingHandler) StartTracking(userCode string, restore bool) {
 		log.Println("stopped polling")
 	}()
 
-	session, err := ch.gameTracker.InitFn(ch.ctx, userCode, restore)
+	session, err := ch.gameTracker.Init(pollCtx, userCode, restore)
 	if err != nil {
 		return
 	}
 
 	go func() {
 		log.Println("polling")
-		ch.gameTracker.PollFn(ch.ctx, session, matchChan, cancel)
+		ch.gameTracker.Poll(pollCtx, cancel, session, matchChan)
 		for {
 			select {
 			case <-ch.forcePollChan:
 				log.Println("forced poll")
-				ch.gameTracker.PollFn(ch.ctx, session, matchChan, cancel)
+				ch.gameTracker.Poll(pollCtx, cancel, session, matchChan)
 			case <-ticker.C:
 				log.Println("polling")
-				ch.gameTracker.PollFn(ch.ctx, session, matchChan, cancel)
+				ch.gameTracker.Poll(pollCtx, cancel, session, matchChan)
 			case <-pollCtx.Done():
 				close(matchChan)
 				return

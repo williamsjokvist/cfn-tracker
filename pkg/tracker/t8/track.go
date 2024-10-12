@@ -33,7 +33,7 @@ func NewT8Tracker(sqlDb *sql.Storage, txtDb *txt.Storage) *T8Tracker {
 	}
 }
 
-func (t *T8Tracker) InitFn(ctx context.Context, polarisId string, restore bool) (*model.Session, error) {
+func (t *T8Tracker) Init(ctx context.Context, polarisId string, restore bool) (*model.Session, error) {
 	if restore {
 		session, err := t.sqlDb.GetLatestSession(ctx, polarisId)
 		if err != nil {
@@ -83,7 +83,7 @@ func (t *T8Tracker) createUser(ctx context.Context, polarisId string) error {
 	return nil
 }
 
-func (t *T8Tracker) PollFn(ctx context.Context, session *model.Session, matchChan chan model.Match, cancel context.CancelFunc) {
+func (t *T8Tracker) Poll(ctx context.Context, cancel context.CancelFunc, session *model.Session, matchChan chan model.Match) {
 	lastReplay, err := t.wavuClient.GetLastReplay(session.UserId)
 	if err != nil {
 		cancel()
