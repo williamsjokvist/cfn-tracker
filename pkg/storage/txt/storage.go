@@ -33,8 +33,10 @@ func (s *Storage) SaveMatch(match model.Match) error {
 
 		parsedValue := ""
 		switch value.Kind() {
-		case reflect.Int, reflect.Uint16:
+		case reflect.Int:
 			parsedValue = strconv.FormatInt(value.Int(), 10)
+		case reflect.Uint16:
+			parsedValue = strconv.FormatUint(value.Uint(), 10)
 		case reflect.String:
 			parsedValue = value.String()
 		default:
