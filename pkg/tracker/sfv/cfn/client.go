@@ -1,17 +1,18 @@
 package cfn
 
 import (
-	"log"
 	"errors"
-	"strings"
-	"strconv"
 	"fmt"
+	"log"
+	"strconv"
+	"strings"
 	"time"
 
-	"github.com/williamsjokvist/cfn-tracker/pkg/tracker"
 	"github.com/williamsjokvist/cfn-tracker/pkg/browser"
 	"github.com/williamsjokvist/cfn-tracker/pkg/model"
+	"github.com/williamsjokvist/cfn-tracker/pkg/tracker"
 )
+
 type CFNClient interface {
 	GetLastMatch(cfn string) (model.Match, error)
 }
@@ -117,7 +118,6 @@ func (t *Client) Authenticate(username string, password string, statChan chan tr
 }
 
 type CFNSFVMatch struct {
-
 }
 
 func (t *Client) GetLastMatch(cfn string) (*model.CFNSFVMatch, error) {
@@ -169,11 +169,11 @@ func (t *Client) GetLastMatch(cfn string) (*model.CFNSFVMatch, error) {
 	}
 
 	return CFNSFVMatch{
-		LP: lp,
-		Opponent: opponent,
-		OpponentLP: opponentLP,
+		LP:                lp,
+		Opponent:          opponent,
+		OpponentLP:        opponentLP,
 		OpponentCharacter: opponentCharacter,
-		Time: time.Now().Format(`15:04`),
-		Date: time.Now().Format(`2006-01-02`),
+		Time:              time.Now().Format(`15:04`),
+		Date:              time.Now().Format(`2006-01-02`),
 	}, nil
 }

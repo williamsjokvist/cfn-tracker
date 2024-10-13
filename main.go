@@ -186,11 +186,15 @@ func main() {
 			},
 		},
 		OnStartup: func(ctx context.Context) {
-			wailsCtx = ctx
+			eventEmitter := func(eventName string, optionalData ...interface{}) {
+				runtime.EventsEmit(ctx, eventName, optionalData)
+			}
 			for _, c := range cmdHandlers {
-				c.SetContext(ctx)
+				c.SetEventEmitter(eventEmitter)
 			}
 			go server.Start(ctx, &cfg)
+
+			wailsCtx = ctx
 		},
 		OnShutdown: func(_ context.Context) {
 			appBrowser.Page.Browser().Close()

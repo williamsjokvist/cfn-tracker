@@ -7,8 +7,6 @@ import (
 	"net/http"
 	"time"
 
-	wailsRuntime "github.com/wailsapp/wails/v2/pkg/runtime"
-
 	"github.com/williamsjokvist/cfn-tracker/pkg/browser"
 	"github.com/williamsjokvist/cfn-tracker/pkg/config"
 	"github.com/williamsjokvist/cfn-tracker/pkg/errorsx"
@@ -23,7 +21,6 @@ import (
 )
 
 type TrackingHandler struct {
-	ctx         context.Context
 	gameTracker tracker.GameTracker
 
 	browser *browser.Browser
@@ -35,30 +32,32 @@ type TrackingHandler struct {
 	nosqlDb *nosql.Storage
 	txtDb   *txt.Storage
 
+	eventEmitter EventEmitFn
+
 	cfg *config.Config
 }
 
 var _ CmdHandler = (*TrackingHandler)(nil)
 
-func NewTrackingHandler(browser *browser.Browser, sqlDb *sql.Storage, nosqlDb *nosql.Storage, txtDb *txt.Storage, cfg *config.Config) *TrackingHandler {
+func NewTrackingHandler(browser *browser.Browser, sqlDb *sql.Storage, nosqlDb *nosql.Storage, txtDb *txt.Storage, cfg *config.Config, eventEmitter EventEmitFn) *TrackingHandler {
 	return &TrackingHandler{
-		sqlDb:   sqlDb,
-		nosqlDb: nosqlDb,
-		txtDb:   txtDb,
-		browser: browser,
-		cfg:     cfg,
+		sqlDb:        sqlDb,
+		nosqlDb:      nosqlDb,
+		txtDb:        txtDb,
+		browser:      browser,
+		cfg:          cfg,
+		eventEmitter: eventEmitter,
 	}
 }
 
-// The CommandHandler needs the wails runtime context in order to emit events
-func (ch *TrackingHandler) SetContext(ctx context.Context) {
-	ch.ctx = ctx
+func (ch *TrackingHandler) SetEventEmitter(eventEmitter EventEmitFn) {
+	ch.eventEmitter = eventEmitter
 }
 
 func (ch *TrackingHandler) StartTracking(userCode string, restore bool) {
 	log.Printf(`Starting tracking for %s, restoring = %v`, userCode, restore)
 	ticker := time.NewTicker(30 * time.Second)
-	ctx, cancel := context.WithCancel(ch.ctx)
+	ctx, cancel := context.WithCancel(context.Background())
 	ch.cancelPolling = cancel
 	ch.forcePollChan = make(chan struct{})
 	var matchChan = make(chan model.Match)
@@ -68,7 +67,7 @@ func (ch *TrackingHandler) StartTracking(userCode string, restore bool) {
 		cancel()
 		close(ch.forcePollChan)
 		ch.forcePollChan = nil
-		wailsRuntime.EventsEmit(ch.ctx, "stopped-tracking")
+		ch.eventEmitter("stopped-tracking")
 		log.Println("stopped polling")
 	}()
 
@@ -78,7 +77,7 @@ func (ch *TrackingHandler) StartTracking(userCode string, restore bool) {
 	}
 
 	if len(session.Matches) > 0 {
-		wailsRuntime.EventsEmit(ctx, "cfn-data", *session.Matches[0])
+		ch.eventEmitter("cfn-data", *session.Matches[0])
 	}
 
 	go func() {
@@ -112,7 +111,8 @@ func (ch *TrackingHandler) StartTracking(userCode string, restore bool) {
 			return
 		}
 
-		wailsRuntime.EventsEmit(ctx, `cfn-data`, match)
+		ch.eventEmitter("cfn-data", match)
+
 		if err := ch.txtDb.SaveMatch(match); err != nil {
 			log.Print("failed to save tracking state:", err)
 			return
@@ -149,7 +149,8 @@ func (ch *TrackingHandler) SelectGame(game model.GameType) error {
 		if status.Err != nil {
 			return errorsx.NewFormattedError(http.StatusUnauthorized, status.Err)
 		}
-		wailsRuntime.EventsEmit(ch.ctx, "auth-progress", status.Progress)
+
+		ch.eventEmitter("auth-progress", status.Progress)
 
 		if status.Progress >= 100 {
 			close(authChan)
