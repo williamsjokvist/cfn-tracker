@@ -58,7 +58,7 @@ func (ch *TrackingHandler) SetContext(ctx context.Context) {
 func (ch *TrackingHandler) StartTracking(userCode string, restore bool) {
 	log.Printf(`Starting tracking for %s, restoring = %v`, userCode, restore)
 	ticker := time.NewTicker(30 * time.Second)
-	pollCtx, cancel := context.WithCancel(ch.ctx)
+	ctx, cancel := context.WithCancel(ch.ctx)
 	ch.cancelPolling = cancel
 	ch.forcePollChan = make(chan struct{})
 	var matchChan = make(chan model.Match)
@@ -72,23 +72,27 @@ func (ch *TrackingHandler) StartTracking(userCode string, restore bool) {
 		log.Println("stopped polling")
 	}()
 
-	session, err := ch.gameTracker.Init(pollCtx, userCode, restore)
+	session, err := ch.gameTracker.Init(ctx, userCode, restore)
 	if err != nil {
 		return
 	}
 
+	if len(session.Matches) > 0 {
+		wailsRuntime.EventsEmit(ctx, "cfn-data", *session.Matches[0])
+	}
+
 	go func() {
 		log.Println("polling")
-		ch.gameTracker.Poll(pollCtx, cancel, session, matchChan)
+		ch.gameTracker.Poll(ctx, cancel, session, matchChan)
 		for {
 			select {
 			case <-ch.forcePollChan:
 				log.Println("forced poll")
-				ch.gameTracker.Poll(pollCtx, cancel, session, matchChan)
+				ch.gameTracker.Poll(ctx, cancel, session, matchChan)
 			case <-ticker.C:
 				log.Println("polling")
-				ch.gameTracker.Poll(pollCtx, cancel, session, matchChan)
-			case <-pollCtx.Done():
+				ch.gameTracker.Poll(ctx, cancel, session, matchChan)
+			case <-ctx.Done():
 				close(matchChan)
 				return
 			}
@@ -99,16 +103,16 @@ func (ch *TrackingHandler) StartTracking(userCode string, restore bool) {
 		session.LP = match.LP
 		session.MR = match.MR
 		session.Matches = append([]*model.Match{&match}, session.Matches...)
-		if err := ch.sqlDb.UpdateSession(ch.ctx, session); err != nil {
+		if err := ch.sqlDb.UpdateSession(ctx, session); err != nil {
 			log.Println("failed to update session", err)
 			return
 		}
-		if err := ch.sqlDb.SaveMatch(ch.ctx, match); err != nil {
+		if err := ch.sqlDb.SaveMatch(ctx, match); err != nil {
 			log.Println("failed to save match", err)
 			return
 		}
 
-		wailsRuntime.EventsEmit(ch.ctx, `cfn-data`, match)
+		wailsRuntime.EventsEmit(ctx, `cfn-data`, match)
 		if err := ch.txtDb.SaveMatch(match); err != nil {
 			log.Print("failed to save tracking state:", err)
 			return
