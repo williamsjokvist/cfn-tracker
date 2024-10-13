@@ -27,16 +27,18 @@ func NewStorage() (*Storage, error) {
 func (s *Storage) SaveMatch(match model.Match) error {
 	v := reflect.ValueOf(match)
 	t := v.Type()
-	for i := range t.NumField() {
+	for i := 0; i < t.NumField(); i++ {
 		field := t.Field(i).Name
 		value := v.Field(i)
 
 		parsedValue := ""
-		switch v.Kind() {
+		switch value.Kind() {
 		case reflect.Int, reflect.Uint16:
-			parsedValue = strconv.FormatInt(v.Int(), 10)
+			parsedValue = strconv.FormatInt(value.Int(), 10)
 		case reflect.String:
 			parsedValue = value.String()
+		default:
+			return fmt.Errorf("unsupported field type: %s", value.Kind())
 		}
 
 		if err := s.saveTxtFile(fmt.Sprintf("%s.txt", field), parsedValue); err != nil {
