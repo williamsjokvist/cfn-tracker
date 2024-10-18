@@ -25,13 +25,15 @@ import (
 	"github.com/williamsjokvist/cfn-tracker/pkg/storage/txt"
 )
 
+type EventEmitFn func(eventName string, optionalData ...interface{})
+
 type CmdHandler interface {
-	SetContext(ctx context.Context)
+	SetEventEmitter(eventEmitter EventEmitFn)
 }
 
 // The CommandHandler is the interface between the GUI and the core
 type CommandHandler struct {
-	ctx context.Context
+	eventEmitter EventEmitFn
 
 	browser *browser.Browser
 
@@ -54,9 +56,8 @@ func NewCommandHandler(browser *browser.Browser, sqlDb *sql.Storage, nosqlDb *no
 	}
 }
 
-// The CommandHandler needs the wails runtime context in order to emit events
-func (ch *CommandHandler) SetContext(ctx context.Context) {
-	ch.ctx = ctx
+func (ch *CommandHandler) SetEventEmitter(eventEmitter EventEmitFn) {
+	ch.eventEmitter = eventEmitter
 }
 
 func (ch *CommandHandler) CheckForUpdate() (bool, error) {
@@ -106,7 +107,7 @@ func (ch *CommandHandler) OpenResultsDirectory() {
 }
 
 func (ch *CommandHandler) GetSessions(userId string) ([]*model.Session, error) {
-	sessions, err := ch.sqlDb.GetSessions(ch.ctx, userId, 0, 0)
+	sessions, err := ch.sqlDb.GetSessions(context.Background(), userId, 0, 0)
 	if err != nil {
 		log.Println(err)
 		if !errorsx.ContainsFormattedError(err) {
@@ -117,7 +118,7 @@ func (ch *CommandHandler) GetSessions(userId string) ([]*model.Session, error) {
 }
 
 func (ch *CommandHandler) GetMatches(sessionId uint16, userId string, limit uint8, offset uint16) ([]*model.Match, error) {
-	matches, err := ch.sqlDb.GetMatches(ch.ctx, sessionId, userId, limit, offset)
+	matches, err := ch.sqlDb.GetMatches(context.Background(), sessionId, userId, limit, offset)
 	if err != nil {
 		log.Println(err)
 		if !errorsx.ContainsFormattedError(err) {
@@ -128,7 +129,7 @@ func (ch *CommandHandler) GetMatches(sessionId uint16, userId string, limit uint
 }
 
 func (ch *CommandHandler) GetUsers() ([]*model.User, error) {
-	users, err := ch.sqlDb.GetUsers(ch.ctx)
+	users, err := ch.sqlDb.GetUsers(context.Background())
 	if err != nil {
 		log.Println(err)
 		if !errorsx.ContainsFormattedError(err) {

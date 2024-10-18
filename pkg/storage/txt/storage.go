@@ -37,7 +37,7 @@ func (s *Storage) SaveMatch(match model.Match) error {
 			parsedValue = strconv.FormatInt(value.Int(), 10)
 		case reflect.Uint16:
 			parsedValue = strconv.FormatUint(value.Uint(), 10)
-		case reflect.String:
+		case reflect.String, reflect.Bool:
 			parsedValue = value.String()
 		default:
 			return fmt.Errorf("unsupported field type: %s", value.Kind())

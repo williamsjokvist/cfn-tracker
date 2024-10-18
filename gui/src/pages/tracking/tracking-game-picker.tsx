@@ -6,11 +6,10 @@ import { Button } from '@/ui/button'
 import * as Page from '@/ui/page'
 import { cn } from '@/helpers/cn'
 
-import sfv from './games/sfv.png'
 import sf6 from './games/sf6.png'
 import t8 from './games/t8.png'
 
-type GameCode = 'sfv' | 'sf6' | 't8'
+type GameCode = 'sf6' | 't8'
 
 const GAMES = [
   {
@@ -22,11 +21,6 @@ const GAMES = [
     logo: sf6,
     code: 'sf6',
     alt: 'Street Fighter 6'
-  },
-  {
-    logo: sfv,
-    code: 'sfv',
-    alt: 'Street Fighter V'
   }
 ] as const
 

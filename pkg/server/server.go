@@ -45,7 +45,7 @@ func Start(ctx context.Context, cfg *config.Config) {
 	log.Println(`Starting browser source server`)
 
 	wails.EventsOn(ctx, `cfn-data`, func(incomingData ...interface{}) {
-		mh, ok := incomingData[0].(*model.TrackingState)
+		mh, ok := incomingData[0].(*model.Match)
 		if !ok {
 			return
 		}

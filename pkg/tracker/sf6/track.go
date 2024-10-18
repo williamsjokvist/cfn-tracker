@@ -6,8 +6,6 @@ import (
 	"net/http"
 	"time"
 
-	wails "github.com/wailsapp/wails/v2/pkg/runtime"
-
 	"github.com/williamsjokvist/cfn-tracker/pkg/browser"
 	"github.com/williamsjokvist/cfn-tracker/pkg/errorsx"
 	"github.com/williamsjokvist/cfn-tracker/pkg/model"
@@ -45,26 +43,6 @@ func (t *SF6Tracker) Init(ctx context.Context, userCode string, restore bool) (*
 		if err != nil {
 			return nil, errorsx.NewFormattedError(http.StatusNotFound, fmt.Errorf(`failed to get user: %w`, err))
 		}
-		if len(session.Matches) == 0 {
-			bl, err := t.cfnClient.GetBattleLog(userCode)
-			if err != nil {
-				return nil, errorsx.NewFormattedError(http.StatusInternalServerError, fmt.Errorf(`failed to fetch battle log: %w`, err))
-			}
-			wails.EventsEmit(ctx, `cfn-data`, model.TrackingState{
-				CFN:       bl.GetCFN(),
-				LP:        bl.GetLP(),
-				MR:        bl.GetMR(),
-				Character: bl.GetCharacter(),
-			})
-
-			return session, nil
-		}
-
-		lastMatch := *session.Matches[0]
-		if err := t.txtDb.SaveMatch(lastMatch); err != nil {
-			return nil, err
-		}
-		wails.EventsEmit(ctx, `cfn-data`, lastMatch)
 		return session, nil
 	}
 
@@ -88,12 +66,7 @@ func (t *SF6Tracker) Init(ctx context.Context, userCode string, restore bool) (*
 	// set starting LP so we don't count the first polled match
 	session.LP = bl.GetLP()
 	session.MR = bl.GetMR()
-	wails.EventsEmit(ctx, `cfn-data`, model.TrackingState{
-		CFN:       bl.GetCFN(),
-		LP:        bl.GetLP(),
-		MR:        bl.GetMR(),
-		Character: bl.GetCharacter(),
-	})
+	session.UserName = bl.GetCFN()
 	return session, nil
 }
 

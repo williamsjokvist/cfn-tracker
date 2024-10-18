@@ -64,7 +64,7 @@
 
         // create elements for stats
         const statContainer = document.getElementsByClassName("stat-list")[0]
-        
+
         const statElements = {}
         for (const [stat, value] of searchParams) {
           if (value != "true") continue;
@@ -83,10 +83,10 @@
         src.addEventListener("open", _ => console.log("The connection has been established"));
         src.addEventListener("error", _ => console.log("An error occurred while attempting to connect"));
         src.addEventListener("message", (e) => {
-          const trackingState = JSON.parse(e.data);
-          console.log("New match played: ", trackingState);
-          
-          for (const [stat, value] of Object.entries(trackingState)) {
+          const match = JSON.parse(e.data);
+          console.log("New match played: ", match);
+
+          for (const [stat, value] of Object.entries(match)) {
             const el = statElements[stat]
             if (el !== undefined) {
               el.innerHTML = formatValue(stat, value)
