@@ -7,8 +7,6 @@ import (
 )
 
 func TestTrackingSelectGame(t *testing.T) {
-	tEnv.trackingHandler.SelectGame(model.GameTypeT8)
-
 	tests := []struct {
 		name     string
 		gameType model.GameType

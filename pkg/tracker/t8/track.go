@@ -90,11 +90,7 @@ func (t *T8Tracker) Poll(ctx context.Context, cancel context.CancelFunc, session
 		return
 	}
 	p2 := lastReplay.P2PolarisId == session.UserId
-	match := getMatch(lastReplay, prevMatch.Wins, prevMatch.Losses, prevMatch.WinStreak, session.Id, p2)
-	if match.SessionId == 0 {
-		match.SessionId = session.Id
-	}
-	matchChan <- match
+	matchChan <- getMatch(lastReplay, prevMatch.Wins, prevMatch.Losses, prevMatch.WinStreak, session.Id, p2)
 }
 
 func getMatch(wm *wavu.Replay, wins, losses, winStreak int, sessionId uint16, p2 bool) model.Match {
