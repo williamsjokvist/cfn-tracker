@@ -16,7 +16,6 @@ import (
 	"github.com/williamsjokvist/cfn-tracker/pkg/storage/txt"
 	"github.com/williamsjokvist/cfn-tracker/pkg/tracker"
 	"github.com/williamsjokvist/cfn-tracker/pkg/tracker/sf6"
-	_ "github.com/williamsjokvist/cfn-tracker/pkg/tracker/sfv"
 	"github.com/williamsjokvist/cfn-tracker/pkg/tracker/t8"
 )
 
@@ -39,14 +38,13 @@ type TrackingHandler struct {
 
 var _ CmdHandler = (*TrackingHandler)(nil)
 
-func NewTrackingHandler(browser *browser.Browser, sqlDb *sql.Storage, nosqlDb *nosql.Storage, txtDb *txt.Storage, cfg *config.Config, eventEmitter EventEmitFn) *TrackingHandler {
+func NewTrackingHandler(browser *browser.Browser, sqlDb *sql.Storage, nosqlDb *nosql.Storage, txtDb *txt.Storage, cfg *config.Config) *TrackingHandler {
 	return &TrackingHandler{
-		sqlDb:        sqlDb,
-		nosqlDb:      nosqlDb,
-		txtDb:        txtDb,
-		browser:      browser,
-		cfg:          cfg,
-		eventEmitter: eventEmitter,
+		sqlDb:   sqlDb,
+		nosqlDb: nosqlDb,
+		txtDb:   txtDb,
+		browser: browser,
+		cfg:     cfg,
 	}
 }
 
@@ -77,7 +75,7 @@ func (ch *TrackingHandler) StartTracking(userCode string, restore bool) {
 	}
 
 	if len(session.Matches) > 0 {
-		ch.eventEmitter("cfn-data", *session.Matches[0])
+		ch.eventEmitter("match", *session.Matches[0])
 	}
 
 	go func() {
@@ -102,6 +100,9 @@ func (ch *TrackingHandler) StartTracking(userCode string, restore bool) {
 		session.LP = match.LP
 		session.MR = match.MR
 		session.Matches = append([]*model.Match{&match}, session.Matches...)
+
+		ch.eventEmitter("match", match)
+
 		if err := ch.sqlDb.UpdateSession(ctx, session); err != nil {
 			log.Println("failed to update session", err)
 			return
@@ -110,8 +111,6 @@ func (ch *TrackingHandler) StartTracking(userCode string, restore bool) {
 			log.Println("failed to save match", err)
 			return
 		}
-
-		ch.eventEmitter("cfn-data", match)
 
 		if err := ch.txtDb.SaveMatch(match); err != nil {
 			log.Print("failed to save tracking state:", err)
@@ -134,11 +133,6 @@ func (ch *TrackingHandler) SelectGame(game model.GameType) error {
 		ch.gameTracker = sf6.NewSF6Tracker(ch.browser, ch.sqlDb, ch.txtDb)
 		username = ch.cfg.CapIDEmail
 		password = ch.cfg.CapIDPassword
-	case model.GameTypeSFV:
-		// gameTracker = sfv.NewSFVTracker(ch.browser)
-		// username = ch.cfg.SteamUsername
-		// password = ch.cfg.SteamPassword
-		fallthrough
 	default:
 		return errorsx.NewFormattedError(http.StatusInternalServerError, fmt.Errorf(`failed to select game`))
 	}

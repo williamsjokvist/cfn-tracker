@@ -30,7 +30,7 @@ export function TrackingLiveUpdater() {
     opponentLeague,
     userName,
     victory
-  } = useSelector(trackingActor, ({ context }) => context.trackingState)
+  } = useSelector(trackingActor, ({ context: { match } }) => match)
 
   const [refreshDisabled, setRefreshDisabled] = React.useState(false)
 

@@ -9,7 +9,7 @@ type TrackingMachineContextProps = {
   user: model.User | null
   restore: boolean
   isTracking: boolean
-  trackingState: model.Match
+  match: model.Match
   error: errorsx.FormattedError | null
 }
 
@@ -30,15 +30,13 @@ export const TRACKING_MACHINE = setup({
     stopTracking: ({ self }) => {
       StopTracking().catch(error => self.send({ type: 'error', error }))
     },
-    forcePoll: () => {
-      ForcePoll()
-    },
+    forcePoll: ForcePoll,
     subscribeToTrackingEvents: ({ self }) => {
-      EventsOn('cfn-data', trackingState => self.send({ type: 'matchPlayed', trackingState }))
+      EventsOn('match', match => self.send({ type: 'matchPlayed', match }))
       EventsOn('stopped-tracking', () => self.send({ type: 'cease' }))
     },
     unsubscribeToTrackingEvents: ({ self }) => {
-      EventsOff('cfn-data')
+      EventsOff('match')
       EventsOff('stopped-tracking')
     }
   }
@@ -49,7 +47,7 @@ export const TRACKING_MACHINE = setup({
     error: null,
     restore: false,
     isTracking: false,
-    trackingState: <model.Match>{}
+    match: <model.Match>{}
   },
   initial: 'cfnForm',
   states: {
@@ -75,7 +73,7 @@ export const TRACKING_MACHINE = setup({
       on: {
         matchPlayed: {
           actions: assign({
-            trackingState: ({ event }) => event.trackingState
+            match: ({ event }) => event.match
           }),
           target: 'tracking'
         },
@@ -108,7 +106,7 @@ export const TRACKING_MACHINE = setup({
         },
         matchPlayed: {
           actions: assign({
-            trackingState: ({ event }) => event.trackingState
+            match: ({ event }) => event.match
           })
         }
       }

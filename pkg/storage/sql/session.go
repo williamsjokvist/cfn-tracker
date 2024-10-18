@@ -34,6 +34,19 @@ func (s *Storage) CreateSession(ctx context.Context, userId string) (*model.Sess
 		return nil, err
 	}
 	sesh.Id = uint16(lastInsertId)
+
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		return nil, err
+	}
+	if rowsAffected == 0 {
+		matches, err := s.GetMatches(ctx, sesh.Id, userId, 0, 0)
+		if err != nil {
+			return nil, fmt.Errorf("get session matches: %w", err)
+		}
+		sesh.Matches = matches
+	}
+
 	return &sesh, nil
 }
 

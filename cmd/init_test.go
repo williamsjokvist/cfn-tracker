@@ -28,9 +28,8 @@ func TestMain(t *testing.T) {
 		t.Fatal("failed to init txt store")
 	}
 
-	eventEmitter := func(eventName string, optionalData ...interface{}) {
-		t.Log(fmt.Sprintf("[EVENT] %s", eventName), optionalData)
-	}
-
-	tEnv.trackingHandler = cmd.NewTrackingHandler(nil, sqlDb, nosqlDb, txtDb, nil, eventEmitter)
+	tEnv.trackingHandler = cmd.NewTrackingHandler(nil, sqlDb, nosqlDb, txtDb, nil)
+	tEnv.trackingHandler.SetEventEmitter(func(eventName string, optionalData ...interface{}) {
+		t.Log(fmt.Sprintf("[EVENT] %s", eventName), optionalData[0])
+	})
 }
