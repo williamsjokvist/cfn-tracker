@@ -30,6 +30,7 @@ import (
 	"github.com/williamsjokvist/cfn-tracker/pkg/storage/nosql"
 	"github.com/williamsjokvist/cfn-tracker/pkg/storage/sql"
 	"github.com/williamsjokvist/cfn-tracker/pkg/storage/txt"
+	"github.com/williamsjokvist/cfn-tracker/pkg/update/github"
 )
 
 var (
@@ -149,7 +150,7 @@ func main() {
 
 	browserSrcMatchChan := make(chan model.Match, 1)
 
-	cmdHandler := cmd.NewCommandHandler(appBrowser, sqlDb, noSqlDb, txtDb, &cfg)
+	cmdHandler := cmd.NewCommandHandler(github.NewClient(), appBrowser, sqlDb, noSqlDb, txtDb, &cfg)
 	trackingHandler := cmd.NewTrackingHandler(appBrowser, sqlDb, noSqlDb, txtDb, &cfg, browserSrcMatchChan)
 	cmdHandlers := []cmd.CmdHandler{cmdHandler, trackingHandler}
 
