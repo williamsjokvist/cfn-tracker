@@ -155,7 +155,7 @@ func main() {
 	trackingHandler := cmd.NewTrackingHandler(appBrowser, sqlDb, noSqlDb, txtDb, &cfg)
 	cmdHandlers := []cmd.CmdHandler{cmdHandler, trackingHandler}
 
-	var singleInstanceLock *options.SingleInstanceLock
+	var onSecondInstanceLaunch func(secondInstanceData options.SecondInstanceData)
 	err = wails.Run(&options.App{
 		Title:              fmt.Sprintf(`CFN Tracker v%s`, appVersion),
 		Assets:             assets,
@@ -187,15 +187,12 @@ func main() {
 			},
 		},
 		OnDomReady: func(ctx context.Context) {
-			singleInstanceLock = &options.SingleInstanceLock{
-				UniqueId: "d0ef6612-49f7-437a-9ffc-2076ec9e37db",
-				OnSecondInstanceLaunch: func(secondInstanceData options.SecondInstanceData) {
-					log.Println("user opened second instance", strings.Join(secondInstanceData.Args, ","))
-					log.Println("user opened second from", secondInstanceData.WorkingDirectory)
-					runtime.WindowUnminimise(ctx)
-					runtime.Show(ctx)
-					go runtime.EventsEmit(ctx, "launchArgs", secondInstanceData.Args)
-				},
+			onSecondInstanceLaunch = func(secondInstanceData options.SecondInstanceData) {
+				log.Println("user opened second instance", strings.Join(secondInstanceData.Args, ","))
+				log.Println("user opened second from", secondInstanceData.WorkingDirectory)
+				runtime.WindowUnminimise(ctx)
+				runtime.Show(ctx)
+				go runtime.EventsEmit(ctx, "launchArgs", secondInstanceData.Args)
 			}
 
 			for _, c := range cmdHandlers {
@@ -217,7 +214,10 @@ func main() {
 			appBrowser.Page.Browser().Close()
 			return false
 		},
-		SingleInstanceLock: singleInstanceLock,
+		SingleInstanceLock: &options.SingleInstanceLock{
+			UniqueId:               "d0ef6612-49f7-437a-9ffc-2076ec9e37db",
+			OnSecondInstanceLaunch: onSecondInstanceLaunch,
+		},
 		Bind: []interface{}{
 			cmdHandler,
 			trackingHandler,
