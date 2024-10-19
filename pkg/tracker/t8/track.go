@@ -82,11 +82,11 @@ func (t *T8Tracker) Poll(ctx context.Context, cancel context.CancelFunc, session
 	if err != nil {
 		cancel()
 	}
-	var prevMatch *model.Match
+	var prevMatch model.Match
 	if len(session.Matches) > 0 {
-		prevMatch = session.Matches[0]
+		prevMatch = *session.Matches[0]
 	}
-	if lastReplay == nil || (prevMatch != nil && prevMatch.ReplayID == lastReplay.BattleId) {
+	if lastReplay == nil || prevMatch.ReplayID == lastReplay.BattleId {
 		return
 	}
 	p2 := lastReplay.P2PolarisId == session.UserId
