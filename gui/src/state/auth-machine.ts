@@ -2,14 +2,14 @@ import { setup, assign } from 'xstate'
 import { createActorContext } from '@xstate/react'
 
 import { SelectGame } from '@cmd/TrackingHandler'
-import type { errorsx } from '@model'
+import { model, type errorsx } from '@model'
 import { EventsOff, EventsOn } from '@runtime'
 
 import { TRACKING_MACHINE } from './tracking-machine'
 
 type AuthMachineContextProps = {
   progress: number
-  game?: 'sfv' | 'sf6'
+  game?: model.GameType
   error: errorsx.FormattedError | null
 }
 export const AUTH_MACHINE = setup({
@@ -18,7 +18,9 @@ export const AUTH_MACHINE = setup({
   },
   actions: {
     selectGame: ({ context, self }) => {
-      SelectGame(context.game ?? 'sf6').catch(error => self.send({ type: 'error', error }))
+      if (context.game) {
+        SelectGame(context.game).catch(error => self.send({ type: 'error', error }))
+      }
     },
     subscribeToProgressEvents: ({ self }) => {
       EventsOn('auth-progress', progress => {

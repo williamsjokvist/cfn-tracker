@@ -231,6 +231,10 @@ export namespace model {
 	    ENTH = "enth",
 	    TEKKEN = "tekken",
 	}
+	export enum GameType {
+	    STREET_FIGHTER_6 = "sf6",
+	    TEKKEN_8 = "t8",
+	}
 	export class GuiConfig {
 	    locale: string;
 	    theme: ThemeName;
