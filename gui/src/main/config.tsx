@@ -24,7 +24,7 @@ export function ConfigProvider({ children }: React.PropsWithChildren) {
   const [cfg, setCfg] = React.useState(initialConfig)
 
   React.useEffect(() => {
-    ; (async function () {
+    ;(async function () {
       const cfg = await GetGuiConfig()
       setCfg(cfg)
       i18n.changeLanguage(cfg.locale)
