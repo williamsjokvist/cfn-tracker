@@ -68,7 +68,6 @@ func (ch *TrackingHandler) StartTracking(userCode string, restore bool) {
 	ch.cancelPolling = cancel
 	ch.forcePollChan = make(chan struct{})
 	matchChan := make(chan model.Match, 1)
-	ch.matchChans = append(ch.matchChans, matchChan)
 
 	defer func() {
 		ch.eventEmitter("stopped-tracking")
@@ -76,9 +75,6 @@ func (ch *TrackingHandler) StartTracking(userCode string, restore bool) {
 		cancel()
 		close(ch.forcePollChan)
 		ch.forcePollChan = nil
-		for _, mc := range ch.matchChans {
-			close(mc)
-		}
 	}()
 
 	session, err := ch.gameTracker.Init(ctx, userCode, restore)
@@ -90,14 +86,13 @@ func (ch *TrackingHandler) StartTracking(userCode string, restore bool) {
 		for _, mc := range ch.matchChans {
 			mc <- match
 		}
+		matchChan <- match
 	}
 
 	if len(session.Matches) > 0 {
 		match := *session.Matches[0]
 		ch.eventEmitter("match", match)
-		// send msg to all except matchChan
-		// since it has already been recorded
-		for _, mc := range ch.matchChans[:len(ch.matchChans)-1] {
+		for _, mc := range ch.matchChans {
 			mc <- match
 		}
 	}
@@ -114,6 +109,7 @@ func (ch *TrackingHandler) StartTracking(userCode string, restore bool) {
 				log.Println("polling")
 				ch.gameTracker.Poll(ctx, cancel, session, onNewMatch)
 			case <-ctx.Done():
+				close(matchChan)
 				return
 			}
 		}
