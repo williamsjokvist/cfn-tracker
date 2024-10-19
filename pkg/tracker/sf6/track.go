@@ -74,12 +74,15 @@ func (t *SF6Tracker) Poll(ctx context.Context, cancel context.CancelFunc, sessio
 	if err != nil {
 		cancel()
 	}
+	if len(bl.ReplayList) == 0 {
+		return
+	}
 	lastReplay := bl.ReplayList[0]
 	var prevMatch model.Match
 	if len(session.Matches) > 0 {
 		prevMatch = *session.Matches[0]
 	}
-	if prevMatch.ReplayID == lastReplay.ReplayID {
+	if session.LP == bl.GetLP() || prevMatch.ReplayID == lastReplay.ReplayID {
 		return
 	}
 	onNewMatch(getMatch(session, bl))
