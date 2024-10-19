@@ -67,20 +67,18 @@ func (ch *TrackingHandler) StartTracking(userCode string, restore bool) {
 	ctx, cancel := context.WithCancel(context.Background())
 	ch.cancelPolling = cancel
 	ch.forcePollChan = make(chan struct{})
-	matchChan := make(chan model.Match)
+	matchChan := make(chan model.Match, 1)
 	ch.matchChans = append(ch.matchChans, matchChan)
 
 	defer func() {
-		for _, matchChan := range ch.matchChans {
-			close(matchChan)
-			matchChan = nil
-		}
-
+		ch.eventEmitter("stopped-tracking")
 		ticker.Stop()
 		cancel()
 		close(ch.forcePollChan)
 		ch.forcePollChan = nil
-		ch.eventEmitter("stopped-tracking")
+		for _, mc := range ch.matchChans {
+			close(mc)
+		}
 	}()
 
 	session, err := ch.gameTracker.Init(ctx, userCode, restore)
@@ -88,13 +86,19 @@ func (ch *TrackingHandler) StartTracking(userCode string, restore bool) {
 		return
 	}
 
-	if len(session.Matches) > 0 {
-		ch.eventEmitter("match", *session.Matches[0])
+	onNewMatch := func(match model.Match) {
+		for _, mc := range ch.matchChans {
+			mc <- match
+		}
 	}
 
-	onNewMatch := func(match model.Match) {
-		for _, matchChan := range ch.matchChans {
-			matchChan <- match
+	if len(session.Matches) > 0 {
+		match := *session.Matches[0]
+		ch.eventEmitter("match", match)
+		// send msg to all except matchChan
+		// since it has already been recorded
+		for _, mc := range ch.matchChans[:len(ch.matchChans)-1] {
+			mc <- match
 		}
 	}
 

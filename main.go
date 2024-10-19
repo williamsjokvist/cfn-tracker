@@ -151,7 +151,7 @@ func main() {
 		return
 	}
 
-	browserSrcMatchChan := make(chan model.Match)
+	browserSrcMatchChan := make(chan model.Match, 1)
 
 	cmdHandler := cmd.NewCommandHandler(appBrowser, sqlDb, noSqlDb, txtDb, &cfg)
 	trackingHandler := cmd.NewTrackingHandler(appBrowser, sqlDb, noSqlDb, txtDb, &cfg, browserSrcMatchChan)
@@ -201,7 +201,7 @@ func main() {
 
 			for _, c := range cmdHandlers {
 				c.SetEventEmitter(func(eventName string, optionalData ...interface{}) {
-					log.Println(eventName, optionalData)
+					log.Println("[FE EVENT]", eventName, optionalData)
 					runtime.EventsEmit(ctx, eventName, optionalData...)
 				})
 			}

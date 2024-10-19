@@ -63,15 +63,14 @@ func (b *BrowserSourceServer) handleStream(w http.ResponseWriter, _ *http.Reques
 	}
 
 	for match := range b.matchChan {
-		log.Print("[w] straem match browser src", match)
+		log.Println("[BS EVENT] new match played")
 		matchJson, err := json.Marshal(match)
-		b.lastMatch = matchJson
-
 		if err != nil {
-			log.Println("browser source: failed to marshal match json", err)
-			http.Error(w, "browser source: failed to marshal match data", http.StatusInternalServerError)
+			log.Println("browser source: failed to marshal match", err)
+			http.Error(w, "browser source: failed to marshal match", http.StatusInternalServerError)
 			break
 		}
+		b.lastMatch = matchJson
 		fmt.Fprint(w, "event: message\n\n")
 		fmt.Fprintf(w, "data: %s\n\n", matchJson)
 		flusher.Flush()
