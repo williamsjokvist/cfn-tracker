@@ -26,6 +26,7 @@ type TrackingHandler struct {
 
 	cancelPolling context.CancelFunc
 	forcePollChan chan struct{}
+	matchChans    []chan model.Match
 
 	sqlDb   *sql.Storage
 	nosqlDb *nosql.Storage
@@ -38,13 +39,21 @@ type TrackingHandler struct {
 
 var _ CmdHandler = (*TrackingHandler)(nil)
 
-func NewTrackingHandler(browser *browser.Browser, sqlDb *sql.Storage, nosqlDb *nosql.Storage, txtDb *txt.Storage, cfg *config.Config) *TrackingHandler {
+func NewTrackingHandler(
+	browser *browser.Browser,
+	sqlDb *sql.Storage,
+	nosqlDb *nosql.Storage,
+	txtDb *txt.Storage,
+	cfg *config.Config,
+	matchChans ...chan model.Match,
+) *TrackingHandler {
 	return &TrackingHandler{
-		sqlDb:   sqlDb,
-		nosqlDb: nosqlDb,
-		txtDb:   txtDb,
-		browser: browser,
-		cfg:     cfg,
+		sqlDb:      sqlDb,
+		nosqlDb:    nosqlDb,
+		txtDb:      txtDb,
+		browser:    browser,
+		cfg:        cfg,
+		matchChans: matchChans,
 	}
 }
 
@@ -58,14 +67,14 @@ func (ch *TrackingHandler) StartTracking(userCode string, restore bool) {
 	ctx, cancel := context.WithCancel(context.Background())
 	ch.cancelPolling = cancel
 	ch.forcePollChan = make(chan struct{})
-	var matchChan = make(chan model.Match)
+	matchChan := make(chan model.Match, 1)
 
 	defer func() {
+		ch.eventEmitter("stopped-tracking")
 		ticker.Stop()
 		cancel()
 		close(ch.forcePollChan)
 		ch.forcePollChan = nil
-		ch.eventEmitter("stopped-tracking")
 	}()
 
 	session, err := ch.gameTracker.Init(ctx, userCode, restore)
@@ -73,21 +82,32 @@ func (ch *TrackingHandler) StartTracking(userCode string, restore bool) {
 		return
 	}
 
+	onNewMatch := func(match model.Match) {
+		for _, mc := range ch.matchChans {
+			mc <- match
+		}
+		matchChan <- match
+	}
+
 	if len(session.Matches) > 0 {
-		ch.eventEmitter("match", *session.Matches[0])
+		match := *session.Matches[0]
+		ch.eventEmitter("match", match)
+		for _, mc := range ch.matchChans {
+			mc <- match
+		}
 	}
 
 	go func() {
 		log.Println("polling")
-		ch.gameTracker.Poll(ctx, cancel, session, matchChan)
+		ch.gameTracker.Poll(ctx, cancel, session, onNewMatch)
 		for {
 			select {
 			case <-ch.forcePollChan:
 				log.Println("forced poll")
-				ch.gameTracker.Poll(ctx, cancel, session, matchChan)
+				ch.gameTracker.Poll(ctx, cancel, session, onNewMatch)
 			case <-ticker.C:
 				log.Println("polling")
-				ch.gameTracker.Poll(ctx, cancel, session, matchChan)
+				ch.gameTracker.Poll(ctx, cancel, session, onNewMatch)
 			case <-ctx.Done():
 				close(matchChan)
 				return
@@ -103,11 +123,11 @@ func (ch *TrackingHandler) StartTracking(userCode string, restore bool) {
 		session.Matches = append([]*model.Match{&match}, session.Matches...)
 
 		if err := ch.sqlDb.UpdateSession(ctx, session); err != nil {
-			log.Println("failed to update session", err)
+			log.Println("failed to update session:", err)
 			break
 		}
 		if err := ch.sqlDb.SaveMatch(ctx, match); err != nil {
-			log.Println("failed to save match to database", err)
+			log.Println("failed to save match to database:", err)
 			break
 		}
 		if err := ch.txtDb.SaveMatch(match); err != nil {
