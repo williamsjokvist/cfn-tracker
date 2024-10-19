@@ -127,16 +127,20 @@ function SideBarToggle() {
   )
 }
 
-const Themes: Array<{ name: model.ThemeName, colors: string[] }> = [{
-  name: model.ThemeName.DEFAULT,
-  colors: ['#901169', '#330083'],
-}, {
-  name: model.ThemeName.ENTH,
-  colors: ['#95F3F6', '#0E254D'],
-}, {
-  name: model.ThemeName.TEKKEN,
-  colors: ['#dd1d5b', '#1e3c52']
-}]
+const Themes: Array<{ name: model.ThemeName; colors: string[] }> = [
+  {
+    name: model.ThemeName.DEFAULT,
+    colors: ['#901169', '#330083']
+  },
+  {
+    name: model.ThemeName.ENTH,
+    colors: ['#95F3F6', '#0E254D']
+  },
+  {
+    name: model.ThemeName.TEKKEN,
+    colors: ['#dd1d5b', '#1e3c52']
+  }
+]
 
 function ThemeSelect() {
   const { t } = useTranslation()
