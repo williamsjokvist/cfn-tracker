@@ -67,8 +67,6 @@ func (ch *TrackingHandler) StartTracking(userCode string, restore bool) {
 	ctx, cancel := context.WithCancel(context.Background())
 	ch.cancelPolling = cancel
 	ch.forcePollChan = make(chan struct{})
-	matchChan := make(chan model.Match, 1)
-
 	defer func() {
 		ch.eventEmitter("stopped-tracking")
 		ticker.Stop()
@@ -82,18 +80,24 @@ func (ch *TrackingHandler) StartTracking(userCode string, restore bool) {
 		return
 	}
 
+	matchChan := make(chan model.Match)
+
 	onNewMatch := func(match model.Match) {
-		for _, mc := range ch.matchChans {
-			mc <- match
-		}
 		matchChan <- match
+		for _, mc := range ch.matchChans {
+			if mc != nil {
+				mc <- match
+			}
+		}
 	}
 
 	if len(session.Matches) > 0 {
 		match := *session.Matches[0]
 		ch.eventEmitter("match", match)
 		for _, mc := range ch.matchChans {
-			mc <- match
+			if mc != nil {
+				mc <- match
+			}
 		}
 	}
 

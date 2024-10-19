@@ -19,6 +19,7 @@ var staticFs embed.FS
 
 type BrowserSourceServer struct {
 	matchChan chan model.Match
+	sseChans  []chan []byte
 	lastMatch []byte
 }
 
@@ -26,14 +27,31 @@ func NewBrowserSourceServer(matchChan chan model.Match) *BrowserSourceServer {
 	return &BrowserSourceServer{
 		matchChan: matchChan,
 		lastMatch: nil,
+		sseChans:  make([]chan []byte, 0, 2),
 	}
 }
 
 func (b *BrowserSourceServer) Start(ctx context.Context, cfg *config.Config) {
+	go func() {
+		for match := range b.matchChan {
+			log.Println("[BS EVENT] new match played")
+			matchJson, err := json.Marshal(match)
+			if err != nil {
+				log.Println("browser src: failed to marshal match data")
+			}
+			b.lastMatch = matchJson
+			for _, sse := range b.sseChans {
+				if sse != nil {
+					sse <- matchJson
+				}
+			}
+		}
+	}()
+
 	log.Println("Starting browser source server")
 
 	http.HandleFunc("/", b.handleRoot)
-	http.HandleFunc(`GET /stream`, b.handleStream)
+	http.HandleFunc("GET /stream", b.handleStream)
 	http.HandleFunc("GET /themes/{theme}", b.handleTheme)
 
 	// serve custom themes through "themes" directory in the same directory as the user's executable
@@ -62,17 +80,12 @@ func (b *BrowserSourceServer) handleStream(w http.ResponseWriter, _ *http.Reques
 		flusher.Flush()
 	}
 
-	for match := range b.matchChan {
-		log.Println("[BS EVENT] new match played")
-		matchJson, err := json.Marshal(match)
-		if err != nil {
-			log.Println("browser source: failed to marshal match", err)
-			http.Error(w, "browser source: failed to marshal match", http.StatusInternalServerError)
-			break
-		}
-		b.lastMatch = matchJson
+	sseChan := make(chan []byte, 1)
+	defer close(sseChan)
+	b.sseChans = append(b.sseChans, sseChan)
+	for match := range sseChan {
 		fmt.Fprint(w, "event: message\n\n")
-		fmt.Fprintf(w, "data: %s\n\n", matchJson)
+		fmt.Fprintf(w, "data: %s\n\n", match)
 		flusher.Flush()
 	}
 }
