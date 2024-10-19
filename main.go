@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
@@ -154,7 +155,7 @@ func main() {
 	trackingHandler := cmd.NewTrackingHandler(appBrowser, sqlDb, noSqlDb, txtDb, &cfg)
 	cmdHandlers := []cmd.CmdHandler{cmdHandler, trackingHandler}
 
-	var wailsCtx context.Context
+	var onSecondInstanceLaunch func(secondInstanceData options.SecondInstanceData)
 	err = wails.Run(&options.App{
 		Title:              fmt.Sprintf(`CFN Tracker v%s`, appVersion),
 		Assets:             assets,
@@ -185,12 +186,26 @@ func main() {
 				Message: fmt.Sprintf(`CFN Tracker version %s © 2023 William Sjökvist <william.sjokvist@gmail.com>`, appVersion),
 			},
 		},
-		OnStartup: func(ctx context.Context) {
-			wailsCtx = ctx
-			for _, c := range cmdHandlers {
-				c.SetContext(ctx)
+		OnDomReady: func(ctx context.Context) {
+			onSecondInstanceLaunch = func(secondInstanceData options.SecondInstanceData) {
+				log.Println("user opened second instance", strings.Join(secondInstanceData.Args, ","))
+				log.Println("user opened second from", secondInstanceData.WorkingDirectory)
+				runtime.WindowUnminimise(ctx)
+				runtime.Show(ctx)
+				go runtime.EventsEmit(ctx, "launchArgs", secondInstanceData.Args)
 			}
-			go server.Start(ctx, &cfg)
+
+			for _, c := range cmdHandlers {
+				c.SetEventEmitter(func(eventName string, optionalData ...interface{}) {
+					log.Println(eventName, optionalData)
+					runtime.EventsEmit(ctx, eventName, optionalData[0])
+				})
+			}
+		},
+		OnStartup: func(ctx context.Context) {
+			ctx, cancel := context.WithTimeout(ctx, 20*time.Second)
+			defer cancel()
+			server.Start(ctx, &cfg)
 		},
 		OnShutdown: func(_ context.Context) {
 			appBrowser.Page.Browser().Close()
@@ -200,14 +215,8 @@ func main() {
 			return false
 		},
 		SingleInstanceLock: &options.SingleInstanceLock{
-			UniqueId: "d0ef6612-49f7-437a-9ffc-2076ec9e37db",
-			OnSecondInstanceLaunch: func(secondInstanceData options.SecondInstanceData) {
-				log.Println("user opened second instance", strings.Join(secondInstanceData.Args, ","))
-				log.Println("user opened second from", secondInstanceData.WorkingDirectory)
-				runtime.WindowUnminimise(wailsCtx)
-				runtime.Show(wailsCtx)
-				go runtime.EventsEmit(wailsCtx, "launchArgs", secondInstanceData.Args)
-			},
+			UniqueId:               "d0ef6612-49f7-437a-9ffc-2076ec9e37db",
+			OnSecondInstanceLaunch: onSecondInstanceLaunch,
 		},
 		Bind: []interface{}{
 			cmdHandler,

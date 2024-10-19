@@ -7,8 +7,6 @@ import (
 	"net/http"
 	"time"
 
-	wailsRuntime "github.com/wailsapp/wails/v2/pkg/runtime"
-
 	"github.com/williamsjokvist/cfn-tracker/pkg/browser"
 	"github.com/williamsjokvist/cfn-tracker/pkg/config"
 	"github.com/williamsjokvist/cfn-tracker/pkg/errorsx"
@@ -18,12 +16,10 @@ import (
 	"github.com/williamsjokvist/cfn-tracker/pkg/storage/txt"
 	"github.com/williamsjokvist/cfn-tracker/pkg/tracker"
 	"github.com/williamsjokvist/cfn-tracker/pkg/tracker/sf6"
-	_ "github.com/williamsjokvist/cfn-tracker/pkg/tracker/sfv"
 	"github.com/williamsjokvist/cfn-tracker/pkg/tracker/t8"
 )
 
 type TrackingHandler struct {
-	ctx         context.Context
 	gameTracker tracker.GameTracker
 
 	browser *browser.Browser
@@ -34,6 +30,8 @@ type TrackingHandler struct {
 	sqlDb   *sql.Storage
 	nosqlDb *nosql.Storage
 	txtDb   *txt.Storage
+
+	eventEmitter EventEmitFn
 
 	cfg *config.Config
 }
@@ -50,15 +48,14 @@ func NewTrackingHandler(browser *browser.Browser, sqlDb *sql.Storage, nosqlDb *n
 	}
 }
 
-// The CommandHandler needs the wails runtime context in order to emit events
-func (ch *TrackingHandler) SetContext(ctx context.Context) {
-	ch.ctx = ctx
+func (ch *TrackingHandler) SetEventEmitter(eventEmitter EventEmitFn) {
+	ch.eventEmitter = eventEmitter
 }
 
 func (ch *TrackingHandler) StartTracking(userCode string, restore bool) {
 	log.Printf(`Starting tracking for %s, restoring = %v`, userCode, restore)
 	ticker := time.NewTicker(30 * time.Second)
-	pollCtx, cancel := context.WithCancel(ch.ctx)
+	ctx, cancel := context.WithCancel(context.Background())
 	ch.cancelPolling = cancel
 	ch.forcePollChan = make(chan struct{})
 	var matchChan = make(chan model.Match)
@@ -68,27 +65,30 @@ func (ch *TrackingHandler) StartTracking(userCode string, restore bool) {
 		cancel()
 		close(ch.forcePollChan)
 		ch.forcePollChan = nil
-		wailsRuntime.EventsEmit(ch.ctx, "stopped-tracking")
-		log.Println("stopped polling")
+		ch.eventEmitter("stopped-tracking")
 	}()
 
-	session, err := ch.gameTracker.Init(pollCtx, userCode, restore)
+	session, err := ch.gameTracker.Init(ctx, userCode, restore)
 	if err != nil {
 		return
 	}
 
+	if len(session.Matches) > 0 {
+		ch.eventEmitter("match", *session.Matches[0])
+	}
+
 	go func() {
 		log.Println("polling")
-		ch.gameTracker.Poll(pollCtx, cancel, session, matchChan)
+		ch.gameTracker.Poll(ctx, cancel, session, matchChan)
 		for {
 			select {
 			case <-ch.forcePollChan:
 				log.Println("forced poll")
-				ch.gameTracker.Poll(pollCtx, cancel, session, matchChan)
+				ch.gameTracker.Poll(ctx, cancel, session, matchChan)
 			case <-ticker.C:
 				log.Println("polling")
-				ch.gameTracker.Poll(pollCtx, cancel, session, matchChan)
-			case <-pollCtx.Done():
+				ch.gameTracker.Poll(ctx, cancel, session, matchChan)
+			case <-ctx.Done():
 				close(matchChan)
 				return
 			}
@@ -96,22 +96,23 @@ func (ch *TrackingHandler) StartTracking(userCode string, restore bool) {
 	}()
 
 	for match := range matchChan {
+		ch.eventEmitter("match", match)
+
 		session.LP = match.LP
 		session.MR = match.MR
 		session.Matches = append([]*model.Match{&match}, session.Matches...)
-		if err := ch.sqlDb.UpdateSession(ch.ctx, session); err != nil {
-			log.Println("failed to update session", err)
-			return
-		}
-		if err := ch.sqlDb.SaveMatch(ch.ctx, match); err != nil {
-			log.Println("failed to save match", err)
-			return
-		}
 
-		wailsRuntime.EventsEmit(ch.ctx, `cfn-data`, match)
+		if err := ch.sqlDb.UpdateSession(ctx, session); err != nil {
+			log.Println("failed to update session", err)
+			break
+		}
+		if err := ch.sqlDb.SaveMatch(ctx, match); err != nil {
+			log.Println("failed to save match to database", err)
+			break
+		}
 		if err := ch.txtDb.SaveMatch(match); err != nil {
-			log.Print("failed to save tracking state:", err)
-			return
+			log.Println("failed to save to text files:", err)
+			break
 		}
 	}
 }
@@ -130,11 +131,6 @@ func (ch *TrackingHandler) SelectGame(game model.GameType) error {
 		ch.gameTracker = sf6.NewSF6Tracker(ch.browser, ch.sqlDb, ch.txtDb)
 		username = ch.cfg.CapIDEmail
 		password = ch.cfg.CapIDPassword
-	case model.GameTypeSFV:
-		// gameTracker = sfv.NewSFVTracker(ch.browser)
-		// username = ch.cfg.SteamUsername
-		// password = ch.cfg.SteamPassword
-		fallthrough
 	default:
 		return errorsx.NewFormattedError(http.StatusInternalServerError, fmt.Errorf(`failed to select game`))
 	}
@@ -145,7 +141,8 @@ func (ch *TrackingHandler) SelectGame(game model.GameType) error {
 		if status.Err != nil {
 			return errorsx.NewFormattedError(http.StatusUnauthorized, status.Err)
 		}
-		wailsRuntime.EventsEmit(ch.ctx, "auth-progress", status.Progress)
+
+		ch.eventEmitter("auth-progress", status.Progress)
 
 		if status.Progress >= 100 {
 			close(authChan)

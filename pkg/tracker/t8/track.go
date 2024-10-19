@@ -7,8 +7,6 @@ import (
 	"net/http"
 	"time"
 
-	wails "github.com/wailsapp/wails/v2/pkg/runtime"
-
 	"github.com/williamsjokvist/cfn-tracker/pkg/errorsx"
 	"github.com/williamsjokvist/cfn-tracker/pkg/model"
 	"github.com/williamsjokvist/cfn-tracker/pkg/storage/sql"
@@ -39,10 +37,6 @@ func (t *T8Tracker) Init(ctx context.Context, polarisId string, restore bool) (*
 		if err != nil {
 			return nil, errorsx.NewFormattedError(http.StatusNotFound, fmt.Errorf("get last session: %w", err))
 		}
-		if len(session.Matches) > 0 {
-			wails.EventsEmit(ctx, "cfn-data", *session.Matches[0])
-		}
-
 		return session, nil
 	}
 
@@ -95,14 +89,11 @@ func (t *T8Tracker) Poll(ctx context.Context, cancel context.CancelFunc, session
 	if lastReplay == nil || (prevMatch != nil && prevMatch.ReplayID == lastReplay.BattleId) {
 		return
 	}
-	match := getMatch(lastReplay, prevMatch, lastReplay.P2PolarisId == session.UserId)
-	if match.SessionId == 0 {
-		match.SessionId = session.Id
-	}
-	matchChan <- match
+	p2 := lastReplay.P2PolarisId == session.UserId
+	matchChan <- getMatch(lastReplay, prevMatch.Wins, prevMatch.Losses, prevMatch.WinStreak, session.Id, p2)
 }
 
-func getMatch(wm *wavu.Replay, prevMatch *model.Match, p2 bool) model.Match {
+func getMatch(wm *wavu.Replay, wins, losses, winStreak int, sessionId uint16, p2 bool) model.Match {
 	polarisId := wm.P1PolarisId
 	userName := wm.P1Name
 	character := wm.P1CharaId
@@ -121,16 +112,6 @@ func getMatch(wm *wavu.Replay, prevMatch *model.Match, p2 bool) model.Match {
 		opponentRank = wm.P1Rank
 	}
 
-	sessionId := uint16(0)
-	wins := 0
-	losses := 0
-	winStreak := 0
-	if prevMatch != nil {
-		wins = prevMatch.Wins
-		losses = prevMatch.Losses
-		winStreak = prevMatch.WinStreak
-		sessionId = prevMatch.SessionId
-	}
 	if victory {
 		wins++
 		winStreak++

@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"database/sql"
+
 	"github.com/jmoiron/sqlx"
 
 	"github.com/williamsjokvist/cfn-tracker/pkg/model"

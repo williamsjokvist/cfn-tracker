@@ -27,7 +27,6 @@ type Match struct {
 type GameType string
 
 const (
-	GameTypeSFV GameType = "sfv"
 	GameTypeSF6 GameType = "sf6"
 	GameTypeT8  GameType = "t8"
 )
