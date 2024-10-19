@@ -10,7 +10,7 @@ import (
 	"github.com/williamsjokvist/cfn-tracker/pkg/storage/txt"
 )
 
-var tEnv = struct {
+var testSuite = struct {
 	trackingHandler *cmd.TrackingHandler
 }{}
 
@@ -28,8 +28,8 @@ func TestMain(t *testing.T) {
 		t.Fatal("failed to init txt store")
 	}
 
-	tEnv.trackingHandler = cmd.NewTrackingHandler(nil, sqlDb, nosqlDb, txtDb, nil)
-	tEnv.trackingHandler.SetEventEmitter(func(eventName string, optionalData ...interface{}) {
+	testSuite.trackingHandler = cmd.NewTrackingHandler(nil, sqlDb, nosqlDb, txtDb, nil)
+	testSuite.trackingHandler.SetEventEmitter(func(eventName string, optionalData ...interface{}) {
 		t.Log(fmt.Sprintf("[EVENT] %s", eventName), optionalData[0])
 	})
 }

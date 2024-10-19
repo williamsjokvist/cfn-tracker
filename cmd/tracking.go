@@ -66,7 +66,6 @@ func (ch *TrackingHandler) StartTracking(userCode string, restore bool) {
 		close(ch.forcePollChan)
 		ch.forcePollChan = nil
 		ch.eventEmitter("stopped-tracking")
-		log.Println("stopped polling")
 	}()
 
 	session, err := ch.gameTracker.Init(ctx, userCode, restore)
@@ -97,24 +96,23 @@ func (ch *TrackingHandler) StartTracking(userCode string, restore bool) {
 	}()
 
 	for match := range matchChan {
+		ch.eventEmitter("match", match)
+
 		session.LP = match.LP
 		session.MR = match.MR
 		session.Matches = append([]*model.Match{&match}, session.Matches...)
 
-		ch.eventEmitter("match", match)
-
 		if err := ch.sqlDb.UpdateSession(ctx, session); err != nil {
 			log.Println("failed to update session", err)
-			return
+			break
 		}
 		if err := ch.sqlDb.SaveMatch(ctx, match); err != nil {
-			log.Println("failed to save match", err)
-			return
+			log.Println("failed to save match to database", err)
+			break
 		}
-
 		if err := ch.txtDb.SaveMatch(match); err != nil {
-			log.Print("failed to save tracking state:", err)
-			return
+			log.Println("failed to save to text files:", err)
+			break
 		}
 	}
 }
