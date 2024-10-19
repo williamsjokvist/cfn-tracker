@@ -23,6 +23,7 @@ import (
 	"github.com/williamsjokvist/cfn-tracker/pkg/storage/nosql"
 	"github.com/williamsjokvist/cfn-tracker/pkg/storage/sql"
 	"github.com/williamsjokvist/cfn-tracker/pkg/storage/txt"
+	"github.com/williamsjokvist/cfn-tracker/pkg/update/github"
 )
 
 type EventEmitFn func(eventName string, optionalData ...interface{})
@@ -35,7 +36,8 @@ type CmdHandler interface {
 type CommandHandler struct {
 	eventEmitter EventEmitFn
 
-	browser *browser.Browser
+	browser      *browser.Browser
+	githubClient github.GithubClient
 
 	sqlDb   *sql.Storage
 	nosqlDb *nosql.Storage
@@ -46,13 +48,14 @@ type CommandHandler struct {
 
 var _ CmdHandler = (*CommandHandler)(nil)
 
-func NewCommandHandler(browser *browser.Browser, sqlDb *sql.Storage, nosqlDb *nosql.Storage, txtDb *txt.Storage, cfg *config.Config) *CommandHandler {
+func NewCommandHandler(githubClient github.GithubClient, browser *browser.Browser, sqlDb *sql.Storage, nosqlDb *nosql.Storage, txtDb *txt.Storage, cfg *config.Config) *CommandHandler {
 	return &CommandHandler{
-		sqlDb:   sqlDb,
-		nosqlDb: nosqlDb,
-		txtDb:   txtDb,
-		browser: browser,
-		cfg:     cfg,
+		sqlDb:        sqlDb,
+		nosqlDb:      nosqlDb,
+		txtDb:        txtDb,
+		browser:      browser,
+		githubClient: githubClient,
+		cfg:          cfg,
 	}
 }
 
@@ -66,7 +69,7 @@ func (ch *CommandHandler) CheckForUpdate() (bool, error) {
 		log.Println(err)
 		return false, fmt.Errorf(`failed to parse current app version: %w`, err)
 	}
-	latestVersion, err := ch.browser.GetLatestAppVersion()
+	latestVersion, err := ch.githubClient.GetLatestAppVersion()
 	if err != nil {
 		log.Println(err)
 		return false, fmt.Errorf(`failed to check for update: %w`, err)
