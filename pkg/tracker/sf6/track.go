@@ -13,7 +13,6 @@ import (
 	"github.com/williamsjokvist/cfn-tracker/pkg/storage/txt"
 	"github.com/williamsjokvist/cfn-tracker/pkg/tracker"
 	"github.com/williamsjokvist/cfn-tracker/pkg/tracker/sf6/cfn"
-	"github.com/williamsjokvist/cfn-tracker/pkg/utils"
 )
 
 type SF6Tracker struct {
@@ -75,8 +74,12 @@ func (t *SF6Tracker) Poll(ctx context.Context, cancel context.CancelFunc, sessio
 	if err != nil {
 		cancel()
 	}
-	// no new match played
-	if session.LP == bl.GetLP() {
+	lastReplay := bl.ReplayList[0]
+	var prevMatch model.Match
+	if len(session.Matches) > 0 {
+		prevMatch = *session.Matches[0]
+	}
+	if prevMatch.ReplayID == lastReplay.ReplayID {
 		return
 	}
 	onNewMatch(getMatch(session, bl))
@@ -94,20 +97,20 @@ func getMatch(sesh *model.Session, bl *cfn.BattleLog) model.Match {
 	latestReplay := bl.ReplayList[0]
 	opponent := getOpponentInfo(bl.GetCFN(), &latestReplay)
 	victory := !isVictory(opponent.RoundResults)
-	biota := utils.Biota(victory)
-	wins := biota
-	losses := (1 - biota)
-	winStreak := biota
-	lpGain := bl.GetLP() - sesh.LP
-	mrGain := bl.GetMR() - sesh.MR
+
 	prevMatch := getPreviousMatchForCharacter(sesh, bl.GetCharacter())
-	if prevMatch != nil {
-		wins = prevMatch.Wins + biota
-		losses = prevMatch.Losses + (1 - biota)
-		winStreak = prevMatch.WinStreak*biota + biota
-		lpGain = prevMatch.LPGain + lpGain
-		mrGain = prevMatch.MRGain + mrGain
+
+	wins := prevMatch.Wins
+	losses := prevMatch.Losses
+	winStreak := prevMatch.WinStreak
+	if victory {
+		wins++
+		winStreak++
+	} else {
+		losses++
+		winStreak = 0
 	}
+
 	return model.Match{
 		Character:         bl.GetCharacter(),
 		LP:                bl.GetLP(),
@@ -123,8 +126,8 @@ func getMatch(sesh *model.Session, bl *cfn.BattleLog) model.Match {
 		WinStreak:         winStreak,
 		Date:              time.Now().Format(`2006-01-02`),
 		Time:              time.Now().Format(`15:04`),
-		LPGain:            lpGain,
-		MRGain:            mrGain,
+		LPGain:            prevMatch.LPGain + bl.GetLP() - sesh.LP,
+		MRGain:            prevMatch.MRGain + bl.GetMR() - sesh.MR,
 		WinRate:           int((float64(wins) / float64(wins+losses)) * 100),
 		UserId:            sesh.UserId,
 		UserName:          sesh.UserName,
@@ -133,14 +136,14 @@ func getMatch(sesh *model.Session, bl *cfn.BattleLog) model.Match {
 	}
 }
 
-func getPreviousMatchForCharacter(sesh *model.Session, character string) *model.Match {
+func getPreviousMatchForCharacter(sesh *model.Session, character string) model.Match {
 	for i := 0; i < len(sesh.Matches); i++ {
 		match := sesh.Matches[i]
 		if match.Character == character {
-			return match
+			return *match
 		}
 	}
-	return nil
+	return model.Match{}
 }
 
 func isVictory(roundResults []int) bool {
