@@ -10,7 +10,6 @@ import (
 	"github.com/williamsjokvist/cfn-tracker/pkg/errorsx"
 	"github.com/williamsjokvist/cfn-tracker/pkg/model"
 	"github.com/williamsjokvist/cfn-tracker/pkg/storage/sql"
-	"github.com/williamsjokvist/cfn-tracker/pkg/storage/txt"
 	"github.com/williamsjokvist/cfn-tracker/pkg/tracker"
 	"github.com/williamsjokvist/cfn-tracker/pkg/tracker/sf6/cfn"
 )
@@ -18,16 +17,14 @@ import (
 type SF6Tracker struct {
 	cfnClient *cfn.Client
 	sqlDb     *sql.Storage
-	txtDb     *txt.Storage
 }
 
 var _ tracker.GameTracker = (*SF6Tracker)(nil)
 
-func NewSF6Tracker(browser *browser.Browser, sqlDb *sql.Storage, txtDb *txt.Storage) *SF6Tracker {
+func NewSF6Tracker(browser *browser.Browser, sqlDb *sql.Storage) *SF6Tracker {
 	return &SF6Tracker{
 		cfnClient: cfn.NewCFNClient(browser),
 		sqlDb:     sqlDb,
-		txtDb:     txtDb,
 	}
 }
 
