@@ -77,7 +77,7 @@ func (t *T8Tracker) createUser(ctx context.Context, polarisId string) error {
 	return nil
 }
 
-func (t *T8Tracker) Poll(ctx context.Context, cancel context.CancelFunc, session *model.Session, matchChan chan model.Match) {
+func (t *T8Tracker) Poll(ctx context.Context, cancel context.CancelFunc, session *model.Session, onNewMatch func(model.Match)) {
 	lastReplay, err := t.wavuClient.GetLastReplay(session.UserId)
 	if err != nil {
 		cancel()
@@ -90,7 +90,7 @@ func (t *T8Tracker) Poll(ctx context.Context, cancel context.CancelFunc, session
 		return
 	}
 	p2 := lastReplay.P2PolarisId == session.UserId
-	matchChan <- getMatch(lastReplay, prevMatch.Wins, prevMatch.Losses, prevMatch.WinStreak, session.Id, p2)
+	onNewMatch(getMatch(lastReplay, prevMatch.Wins, prevMatch.Losses, prevMatch.WinStreak, session.Id, p2))
 }
 
 func getMatch(wm *wavu.Replay, wins, losses, winStreak int, sessionId uint16, p2 bool) model.Match {

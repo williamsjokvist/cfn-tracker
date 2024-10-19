@@ -70,7 +70,7 @@ func (t *SF6Tracker) Init(ctx context.Context, userCode string, restore bool) (*
 	return session, nil
 }
 
-func (t *SF6Tracker) Poll(ctx context.Context, cancel context.CancelFunc, session *model.Session, matchChan chan model.Match) {
+func (t *SF6Tracker) Poll(ctx context.Context, cancel context.CancelFunc, session *model.Session, onNewMatch func(model.Match)) {
 	bl, err := t.cfnClient.GetBattleLog(session.UserId)
 	if err != nil {
 		cancel()
@@ -79,7 +79,7 @@ func (t *SF6Tracker) Poll(ctx context.Context, cancel context.CancelFunc, sessio
 	if session.LP == bl.GetLP() {
 		return
 	}
-	matchChan <- getMatch(session, bl)
+	onNewMatch(getMatch(session, bl))
 }
 
 func getOpponentInfo(myCfn string, replay *cfn.Replay) cfn.PlayerInfo {

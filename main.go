@@ -10,7 +10,6 @@ import (
 	"net/http"
 	"os"
 	"strings"
-	"time"
 
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
@@ -26,6 +25,7 @@ import (
 	"github.com/williamsjokvist/cfn-tracker/pkg/browser"
 	"github.com/williamsjokvist/cfn-tracker/pkg/config"
 	"github.com/williamsjokvist/cfn-tracker/pkg/errorsx"
+	"github.com/williamsjokvist/cfn-tracker/pkg/model"
 	"github.com/williamsjokvist/cfn-tracker/pkg/server"
 	"github.com/williamsjokvist/cfn-tracker/pkg/storage/nosql"
 	"github.com/williamsjokvist/cfn-tracker/pkg/storage/sql"
@@ -151,9 +151,13 @@ func main() {
 		return
 	}
 
+	browserSrcMatchChan := make(chan model.Match)
+
 	cmdHandler := cmd.NewCommandHandler(appBrowser, sqlDb, noSqlDb, txtDb, &cfg)
-	trackingHandler := cmd.NewTrackingHandler(appBrowser, sqlDb, noSqlDb, txtDb, &cfg)
+	trackingHandler := cmd.NewTrackingHandler(appBrowser, sqlDb, noSqlDb, txtDb, &cfg, browserSrcMatchChan)
 	cmdHandlers := []cmd.CmdHandler{cmdHandler, trackingHandler}
+
+	browserSrcServer := server.NewBrowserSourceServer(browserSrcMatchChan)
 
 	var onSecondInstanceLaunch func(secondInstanceData options.SecondInstanceData)
 	err = wails.Run(&options.App{
@@ -198,14 +202,12 @@ func main() {
 			for _, c := range cmdHandlers {
 				c.SetEventEmitter(func(eventName string, optionalData ...interface{}) {
 					log.Println(eventName, optionalData)
-					runtime.EventsEmit(ctx, eventName, optionalData[0])
+					runtime.EventsEmit(ctx, eventName, optionalData...)
 				})
 			}
 		},
 		OnStartup: func(ctx context.Context) {
-			ctx, cancel := context.WithTimeout(ctx, 20*time.Second)
-			defer cancel()
-			server.Start(ctx, &cfg)
+			go browserSrcServer.Start(ctx, &cfg)
 		},
 		OnShutdown: func(_ context.Context) {
 			appBrowser.Page.Browser().Close()
