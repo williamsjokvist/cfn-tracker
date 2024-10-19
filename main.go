@@ -223,6 +223,7 @@ func main() {
 		},
 		EnumBind: []interface{}{
 			model.AllThemes,
+			model.AllGameTypes,
 		},
 	})
 	if err != nil {

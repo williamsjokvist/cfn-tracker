@@ -2,6 +2,8 @@ import React from 'react'
 import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
 
+import { model } from '@model'
+
 import { Button } from '@/ui/button'
 import * as Page from '@/ui/page'
 import { cn } from '@/helpers/cn'
@@ -14,19 +16,19 @@ type GameCode = 'sf6' | 't8'
 const GAMES = [
   {
     logo: t8,
-    code: 't8',
+    code: model.GameType.TEKKEN_8,
     alt: 'Tekken 8'
   },
   {
     logo: sf6,
-    code: 'sf6',
+    code: model.GameType.STREET_FIGHTER_6,
     alt: 'Street Fighter 6'
   }
 ] as const
 
-export function TrackingGamePicker(props: { onSubmit: (game: GameCode) => void }) {
+export function TrackingGamePicker(props: { onSubmit: (game: model.GameType) => void }) {
   const { t } = useTranslation()
-  const [selectedGame, setSelectedGame] = React.useState<GameCode | undefined>()
+  const [selectedGame, setSelectedGame] = React.useState<model.GameType>()
 
   return (
     <Page.Root>

@@ -23,10 +23,3 @@ type Match struct {
 	Losses            int    `db:"losses" json:"losses"`
 	WinRate           int    `db:"win_rate" json:"winRate"`
 }
-
-type GameType string
-
-const (
-	GameTypeSF6 GameType = "sf6"
-	GameTypeT8  GameType = "t8"
-)
