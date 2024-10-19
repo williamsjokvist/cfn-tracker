@@ -150,9 +150,9 @@ func (ch *TrackingHandler) SelectGame(game model.GameType) error {
 
 	switch game {
 	case model.GameTypeT8:
-		ch.gameTracker = t8.NewT8Tracker(ch.sqlDb, ch.txtDb)
+		ch.gameTracker = t8.NewT8Tracker(ch.sqlDb)
 	case model.GameTypeSF6:
-		ch.gameTracker = sf6.NewSF6Tracker(ch.browser, ch.sqlDb, ch.txtDb)
+		ch.gameTracker = sf6.NewSF6Tracker(ch.browser, ch.sqlDb)
 		username = ch.cfg.CapIDEmail
 		password = ch.cfg.CapIDPassword
 	default:

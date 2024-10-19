@@ -10,7 +10,6 @@ import (
 	"github.com/williamsjokvist/cfn-tracker/pkg/errorsx"
 	"github.com/williamsjokvist/cfn-tracker/pkg/model"
 	"github.com/williamsjokvist/cfn-tracker/pkg/storage/sql"
-	"github.com/williamsjokvist/cfn-tracker/pkg/storage/txt"
 	"github.com/williamsjokvist/cfn-tracker/pkg/tracker"
 	"github.com/williamsjokvist/cfn-tracker/pkg/tracker/t8/wavu"
 )
@@ -18,16 +17,14 @@ import (
 type T8Tracker struct {
 	wavuClient *wavu.Client
 	sqlDb      *sql.Storage
-	txtDb      *txt.Storage
 }
 
 var _ tracker.GameTracker = (*T8Tracker)(nil)
 
-func NewT8Tracker(sqlDb *sql.Storage, txtDb *txt.Storage) *T8Tracker {
+func NewT8Tracker(sqlDb *sql.Storage) *T8Tracker {
 	return &T8Tracker{
 		wavuClient: wavu.NewClient(),
 		sqlDb:      sqlDb,
-		txtDb:      txtDb,
 	}
 }
 
