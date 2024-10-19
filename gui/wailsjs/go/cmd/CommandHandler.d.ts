@@ -3,7 +3,7 @@
 import {errorsx} from '../models';
 import {model} from '../models';
 import {locales} from '../models';
-import {context} from '../models';
+import {cmd} from '../models';
 
 export function CheckForUpdate():Promise<boolean>;
 
@@ -33,4 +33,4 @@ export function SaveSidebarMinimized(arg1:boolean):Promise<void>;
 
 export function SaveTheme(arg1:model.ThemeName):Promise<void>;
 
-export function SetContext(arg1:context.Context):Promise<void>;
+export function SetEventEmitter(arg1:cmd.EventEmitFn):Promise<void>;

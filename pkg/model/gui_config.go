@@ -5,7 +5,17 @@ type ThemeName string
 const (
 	ThemeDefault ThemeName = "default"
 	ThemeEnth    ThemeName = "enth"
+	ThemeTekken  ThemeName = "tekken"
 )
+
+var AllThemes = []struct {
+	Value  ThemeName
+	TSName string
+}{
+	{ThemeDefault, "DEFAULT"},
+	{ThemeEnth, "ENTH"},
+	{ThemeTekken, "TEKKEN"},
+}
 
 type GuiConfig struct {
 	Locale           string    `json:"locale"`

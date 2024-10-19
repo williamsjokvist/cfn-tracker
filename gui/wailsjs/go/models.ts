@@ -226,9 +226,14 @@ export namespace locales {
 
 export namespace model {
 	
+	export enum ThemeName {
+	    DEFAULT = "default",
+	    ENTH = "enth",
+	    TEKKEN = "tekken",
+	}
 	export class GuiConfig {
 	    locale: string;
-	    theme: string;
+	    theme: ThemeName;
 	    sidebarMinified: boolean;
 	
 	    static createFrom(source: any = {}) {

@@ -224,6 +224,9 @@ func main() {
 			cmdHandler,
 			trackingHandler,
 		},
+		EnumBind: []interface{}{
+			model.AllThemes,
+		},
 	})
 	if err != nil {
 		closeWithError(fmt.Errorf(`failed to launch app: %w`, err))
