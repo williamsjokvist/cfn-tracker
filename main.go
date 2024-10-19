@@ -33,8 +33,6 @@ import (
 )
 
 var (
-	steamUsername string = ``
-	steamPassword string = ``
 	capIDEmail    string = ``
 	capIDPassword string = ``
 	appVersion    string = ``
@@ -72,8 +70,6 @@ func init() {
 		cfg = config.Config{
 			AppVersion:        appVersion,
 			Headless:          isProduction == `true`,
-			SteamUsername:     steamUsername,
-			SteamPassword:     steamPassword,
 			CapIDEmail:        capIDEmail,
 			CapIDPassword:     capIDPassword,
 			BrowserSourcePort: 4242,
