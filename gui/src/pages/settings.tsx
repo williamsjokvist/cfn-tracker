@@ -20,6 +20,7 @@ import * as Select from '@/ui/select'
 import { Switch } from '@/ui/switch'
 import { Flag } from '@/ui/flag'
 import { cn } from '@/helpers/cn'
+import { model } from '@model'
 
 export function SettingsPage() {
   const { t } = useTranslation()
@@ -126,10 +127,20 @@ function SideBarToggle() {
   )
 }
 
-const Themes = {
-  default: ['#901169', '#330083'],
-  enth: ['#95F3F6', '#0E254D']
-} as const
+const Themes = [
+  {
+    name: model.ThemeName.DEFAULT,
+    colors: ['#901169', '#330083']
+  },
+  {
+    name: model.ThemeName.ENTH,
+    colors: ['#95F3F6', '#0E254D']
+  },
+  {
+    name: model.ThemeName.TEKKEN,
+    colors: ['#dd1d5b', '#1e3c52']
+  }
+]
 
 function ThemeSelect() {
   const { t } = useTranslation()
@@ -141,24 +152,25 @@ function ThemeSelect() {
       <h3 className='font-bold'>{t('theme')}</h3>
       <Select.Root
         value={cfg.theme}
-        onValueChange={theme => {
+        onValueChange={(theme: model.ThemeName) => {
           SaveTheme(theme)
             .then(() => {
               document.body.setAttribute('data-theme', theme)
-              setCfg({ ...cfg, theme })
+              setCfg({ ...cfg, theme: theme })
             })
             .catch(setError)
         }}
       >
-        {Object.keys(Themes).map(theme => (
+        {Themes.map(theme => (
           <Select.Item
-            key={theme}
-            value={theme}
+            key={theme.name}
+            value={theme.name}
             className='flex items-center justify-between gap-2'
           >
-            <i style={{ background: Themes[theme][0] }} className={`h-4 w-3 rounded-md`} />
-            <i style={{ background: Themes[theme][1] }} className={`h-4 w-3 rounded-md`} />
-            <span className='first-letter:uppercase'>{theme}</span>
+            {theme.colors.map(color => (
+              <i key={color} style={{ background: color }} className={`h-4 w-3 rounded-md`} />
+            ))}
+            <span className='first-letter:uppercase'>{theme.name}</span>
           </Select.Item>
         ))}
       </Select.Root>

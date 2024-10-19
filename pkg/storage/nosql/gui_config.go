@@ -20,9 +20,6 @@ func (s *Storage) SaveLocale(locale string) error {
 }
 
 func (s *Storage) SaveTheme(theme model.ThemeName) error {
-	if theme != model.ThemeDefault && theme != model.ThemeEnth {
-		return fmt.Errorf(`invalid theme`)
-	}
 	cfg, err := s.GetGuiConfig()
 	if err != nil {
 		return fmt.Errorf(`failed to read config: %w`, err)
