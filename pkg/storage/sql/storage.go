@@ -23,11 +23,16 @@ type Storage struct {
 	db *sqlx.DB
 }
 
-func NewStorage() (*Storage, error) {
+func NewStorage(useInMemoryDb bool) (*Storage, error) {
 	if err := migrateSchema(nil); err != nil {
 		return nil, fmt.Errorf("failed to perform migrations: %w", err)
 	}
-	db, err := sqlx.Open("sqlite", getDataSource())
+	dataSource := getDataSource()
+	if useInMemoryDb {
+		dataSource = ":memory:"
+	}
+
+	db, err := sqlx.Open("sqlite", dataSource)
 	if err != nil {
 		return nil, fmt.Errorf("open sqlite connection: %w", err)
 	}

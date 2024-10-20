@@ -61,6 +61,12 @@ func (c *Client) GetBattleLog(cfn string) (*BattleLog, error) {
 
 func (t *Client) Authenticate(email string, password string, statChan chan tracker.AuthStatus) {
 	status := &tracker.AuthStatus{Progress: 0, Err: nil}
+
+	if t.browser == nil {
+		statChan <- *status.WithError(fmt.Errorf("browser not initialized"))
+		return
+	}
+
 	defer func() {
 		if r := recover(); r != nil {
 			log.Println(`Recovered from panic: `, r)

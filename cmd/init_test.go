@@ -2,9 +2,12 @@ package cmd_test
 
 import (
 	"fmt"
+	"log"
+	"os"
 	"testing"
 
 	"github.com/williamsjokvist/cfn-tracker/cmd"
+	"github.com/williamsjokvist/cfn-tracker/pkg/config"
 	"github.com/williamsjokvist/cfn-tracker/pkg/storage/nosql"
 	"github.com/williamsjokvist/cfn-tracker/pkg/storage/sql"
 	"github.com/williamsjokvist/cfn-tracker/pkg/storage/txt"
@@ -14,22 +17,31 @@ var testSuite = struct {
 	trackingHandler *cmd.TrackingHandler
 }{}
 
-func TestMain(t *testing.T) {
-	sqlDb, err := sql.NewStorage()
+func TestMain(m *testing.M) {
+	sqlDb, err := sql.NewStorage(true)
 	if err != nil {
-		t.Fatal("failed to init sql store")
+		log.Fatalf("failed to init sql store: %v", err)
 	}
 	nosqlDb, err := nosql.NewStorage()
 	if err != nil {
-		t.Fatal("failed to init nosql store")
+		log.Fatalf("failed to init nosql store: %v", err)
 	}
 	txtDb, err := txt.NewStorage()
 	if err != nil {
-		t.Fatal("failed to init txt store")
+		log.Fatalf("failed to init txt store: %v", err)
 	}
 
-	testSuite.trackingHandler = cmd.NewTrackingHandler(nil, sqlDb, nosqlDb, txtDb, nil, nil)
+	cfg := config.Config{
+		AppVersion:        "4.0.0",
+		Headless:          true,
+		CapIDEmail:        "test",
+		CapIDPassword:     "test",
+		BrowserSourcePort: 4242,
+	}
+
+	testSuite.trackingHandler = cmd.NewTrackingHandler(nil, sqlDb, nosqlDb, txtDb, &cfg, nil)
 	testSuite.trackingHandler.SetEventEmitter(func(eventName string, optionalData ...interface{}) {
-		t.Log(fmt.Sprintf("[EVENT] %s", eventName), optionalData[0])
+		log.Println(fmt.Sprintf("[EVENT] %s", eventName), optionalData[0])
 	})
+	os.Exit(m.Run())
 }
