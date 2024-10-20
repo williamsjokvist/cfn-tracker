@@ -47,7 +47,7 @@ export function SessionsListPage() {
         {Object.keys(groupedSessions)
           .reverse()
           .map(year => (
-            <section key={year} className=''>
+            <section key={year}>
               <h2 className='px-8 py-6 text-4xl font-bold'>{year}</h2>
               {Object.keys(groupedSessions[year])
                 .reverse()
@@ -70,13 +70,15 @@ export function SessionsListPage() {
                       className='relative flex flex-wrap items-stretch border-y-[0.5px] border-solid border-divider px-8'
                     >
                       {Object.keys(groupedSessions[year][month]).map(day => (
-                        <div className='flex w-[193.5px] flex-col border-b-[0.5px] border-solid border-divider px-2'>
+                        <div
+                          key={day}
+                          className='flex w-[193.5px] flex-col border-b-[0.5px] border-solid border-divider px-2'
+                        >
                           <span className='text-center text-xl font-bold'>{day}</span>
                           {groupedSessions[year][month][day].reverse().map(s => (
                             <HoverCard>
                               <HoverCardTrigger>
                                 <Button
-                                  key={day}
                                   className='mb-1 w-full !justify-between gap-2 rounded-xl !px-[6px] !py-0 !pt-[2px] text-xl'
                                   onClick={() => navigate(`/sessions/${s.id}/matches`)}
                                 >
