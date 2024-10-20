@@ -12,7 +12,7 @@ import (
 
 type SessionStorage interface {
 	CreateSession(ctx context.Context, userId string) error
-	GetSessions(ctx context.Context, userId string, limit uint8, offset uint16) ([]*model.Session, error)
+	GetSessions(ctx context.Context, userId string, date string, limit uint8, offset uint16) ([]*model.Session, error)
 	UpdateSession(ctx context.Context, session *model.Session) error
 }
 
@@ -50,7 +50,7 @@ func (s *Storage) CreateSession(ctx context.Context, userId string) (*model.Sess
 	return &sesh, nil
 }
 
-func (s *Storage) GetSessions(ctx context.Context, userId string, limit uint8, offset uint16) ([]*model.Session, error) {
+func (s *Storage) GetSessions(ctx context.Context, userId string, date string, limit uint8, offset uint16) ([]*model.Session, error) {
 	pagination := ``
 	if limit != 0 || offset != 0 {
 		pagination = fmt.Sprintf(`LIMIT %d OFFSET %d`, limit, offset)
@@ -60,6 +60,14 @@ func (s *Storage) GetSessions(ctx context.Context, userId string, limit uint8, o
 	if userId != "" {
 		where = `WHERE s.user_id = (?)`
 		whereArgs = append(whereArgs, userId)
+	}
+	if date != "" {
+		if where == "" {
+			where = `WHERE s.created_at = %(?)%`
+		} else {
+			where = ` AND s.created_at like %(?)%`
+		}
+		whereArgs = append(whereArgs, date)
 	}
 	query, args, err := sqlx.In(fmt.Sprintf(`
 		SELECT
@@ -110,7 +118,7 @@ func (s *Storage) UpdateSession(ctx context.Context, session *model.Session) err
 }
 
 func (s *Storage) GetLatestSession(ctx context.Context, userId string) (*model.Session, error) {
-	sessions, err := s.GetSessions(ctx, userId, 1, 0)
+	sessions, err := s.GetSessions(ctx, userId, "", 1, 0)
 	if err != nil {
 		return nil, fmt.Errorf("get session: %w", err)
 	}

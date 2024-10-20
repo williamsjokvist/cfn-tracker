@@ -109,8 +109,8 @@ func (ch *CommandHandler) OpenResultsDirectory() {
 	}
 }
 
-func (ch *CommandHandler) GetSessions(userId string) ([]*model.Session, error) {
-	sessions, err := ch.sqlDb.GetSessions(context.Background(), userId, 0, 0)
+func (ch *CommandHandler) GetSessions(userId, date string, limit uint8, offset uint16) ([]*model.Session, error) {
+	sessions, err := ch.sqlDb.GetSessions(context.Background(), userId, date, limit, offset)
 	if err != nil {
 		log.Println(err)
 		if !errorsx.ContainsFormattedError(err) {

@@ -15,7 +15,7 @@ export function GetGuiConfig():Promise<model.GuiConfig>;
 
 export function GetMatches(arg1:number,arg2:string,arg3:number,arg4:number):Promise<Array<model.Match>>;
 
-export function GetSessions(arg1:string):Promise<Array<model.Session>>;
+export function GetSessions(arg1:string,arg2:string,arg3:number,arg4:number):Promise<Array<model.Session>>;
 
 export function GetSupportedLanguages():Promise<Array<string>>;
 
