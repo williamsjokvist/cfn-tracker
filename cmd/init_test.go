@@ -3,6 +3,7 @@ package cmd_test
 import (
 	"fmt"
 	"log"
+	"os"
 	"testing"
 
 	"github.com/williamsjokvist/cfn-tracker/cmd"
@@ -16,18 +17,18 @@ var testSuite = struct {
 	trackingHandler *cmd.TrackingHandler
 }{}
 
-func TestMain(t *testing.M) {
+func TestMain(m *testing.M) {
 	sqlDb, err := sql.NewStorage(true)
 	if err != nil {
-		log.Fatal("failed to init sql store")
+		log.Fatalf("failed to init sql store: %v", err)
 	}
 	nosqlDb, err := nosql.NewStorage()
 	if err != nil {
-		log.Fatal("failed to init nosql store")
+		log.Fatalf("failed to init nosql store: %v", err)
 	}
 	txtDb, err := txt.NewStorage()
 	if err != nil {
-		log.Fatal("failed to init txt store")
+		log.Fatalf("failed to init txt store: %v", err)
 	}
 
 	cfg := config.Config{
@@ -42,5 +43,5 @@ func TestMain(t *testing.M) {
 	testSuite.trackingHandler.SetEventEmitter(func(eventName string, optionalData ...interface{}) {
 		log.Println(fmt.Sprintf("[EVENT] %s", eventName), optionalData[0])
 	})
-	t.Run()
+	os.Exit(m.Run())
 }
