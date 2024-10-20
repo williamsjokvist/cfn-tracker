@@ -17,3 +17,13 @@ type Session struct {
 	LPGain      int      `db:"lp_gain" json:"lpGain"`
 	MRGain      int      `db:"mr_gain" json:"mrGain"`
 }
+
+type SessionMonth struct {
+	Date  string
+	Count uint16
+}
+
+// future: extend with legendary stats
+type SessionsStatistics struct {
+	Months []SessionMonth
+}

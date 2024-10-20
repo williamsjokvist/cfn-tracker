@@ -120,6 +120,17 @@ func (ch *CommandHandler) GetSessions(userId, date string, limit uint8, offset u
 	return sessions, err
 }
 
+func (ch *CommandHandler) GetSessionsStatistics(userId string) (*model.SessionsStatistics, error) {
+	sessionStatistics, err := ch.sqlDb.GetSessionsStatistics(context.Background(), userId)
+	if err != nil {
+		log.Println(err)
+		if !errorsx.ContainsFormattedError(err) {
+			err = errorsx.NewFormattedError(http.StatusNotFound, fmt.Errorf(`failed to get monthly session counts %w`, err))
+		}
+	}
+	return sessionStatistics, err
+}
+
 func (ch *CommandHandler) GetMatches(sessionId uint16, userId string, limit uint8, offset uint16) ([]*model.Match, error) {
 	matches, err := ch.sqlDb.GetMatches(context.Background(), sessionId, userId, limit, offset)
 	if err != nil {

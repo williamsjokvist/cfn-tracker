@@ -38,14 +38,7 @@ const router = createHashRouter([
           },
           {
             element: <SessionsListPage />,
-            path: '/sessions/:userId?/:date?/:page?/:limit?',
-            loader: ({ params }) =>
-              GetSessions(
-                params.userId ?? '',
-                '',
-                Number(params.page ?? 0),
-                Number(params.limit ?? 0)
-              )
+            path: '/sessions',
           },
           {
             element: <MatchesListPage />,
