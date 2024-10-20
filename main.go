@@ -132,7 +132,7 @@ func main() {
 		closeWithError(fmt.Errorf(`failed to launch browser: %v`, err))
 		return
 	}
-	sqlDb, err := sql.NewStorage()
+	sqlDb, err := sql.NewStorage(false)
 	if err != nil {
 		closeWithError(fmt.Errorf(`failed to initalize database: %w`, err))
 		return
