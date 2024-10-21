@@ -83,7 +83,9 @@ func (s *Storage) GetSessionsStatistics(ctx context.Context, userId string) (*mo
 
 	for rows.Next() {
 		var monthCount monthlySessionCount
-		rows.Scan(&monthCount.Month, &monthCount.Count)
+		if err := rows.Scan(&monthCount.Month, &monthCount.Count); err != nil {
+			return nil, fmt.Errorf("scan monthly session count row: %w", err)
+		}
 		monthCounts = append(monthCounts, model.SessionMonth{
 			Date:  monthCount.Month,
 			Count: monthCount.Count,
