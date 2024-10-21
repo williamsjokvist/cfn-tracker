@@ -13,6 +13,7 @@ import (
 type SessionStorage interface {
 	CreateSession(ctx context.Context, userId string) error
 	GetSessions(ctx context.Context, userId string, date string, limit uint8, offset uint16) ([]*model.Session, error)
+	GetSessionsStatistics(ctx context.Context, userId string) (*model.SessionsStatistics, error)
 	UpdateSession(ctx context.Context, session *model.Session) error
 }
 
@@ -50,6 +51,52 @@ func (s *Storage) CreateSession(ctx context.Context, userId string) (*model.Sess
 	return &sesh, nil
 }
 
+type monthlySessionCount struct {
+	Month string `db:"month"`
+	Count uint16 `db:"count"`
+}
+
+func (s *Storage) GetSessionsStatistics(ctx context.Context, userId string) (*model.SessionsStatistics, error) {
+	where := ``
+	var whereArgs []interface{}
+	if userId != "" {
+		where = `WHERE s.user_id = (?)`
+		whereArgs = append(whereArgs, userId)
+	}
+	query, args, err := sqlx.In(fmt.Sprintf(`
+		SELECT
+			STRFTIME('%%m-%%Y', s.created_at) as month,
+			COUNT(s.id) as count
+		FROM sessions as s
+		%s
+		GROUP BY STRFTIME('%%m-%%Y', s.created_at)
+		ORDER BY s.id DESC
+`, where), whereArgs...)
+	if err != nil {
+		return nil, fmt.Errorf("prepare get monthly session count query: %w", err)
+	}
+	rows, err := s.db.QueryContext(ctx, query, args...)
+	if err != nil {
+		return nil, fmt.Errorf("excute get monthly session count query: %w", err)
+	}
+	monthCounts := make([]model.SessionMonth, 0, 10)
+
+	for rows.Next() {
+		var monthCount monthlySessionCount
+		if err := rows.Scan(&monthCount.Month, &monthCount.Count); err != nil {
+			return nil, fmt.Errorf("scan monthly session count row: %w", err)
+		}
+		monthCounts = append(monthCounts, model.SessionMonth{
+			Date:  monthCount.Month,
+			Count: monthCount.Count,
+		})
+	}
+
+	return &model.SessionsStatistics{
+		Months: monthCounts,
+	}, nil
+}
+
 func (s *Storage) GetSessions(ctx context.Context, userId string, date string, limit uint8, offset uint16) ([]*model.Session, error) {
 	pagination := ``
 	if limit != 0 || offset != 0 {
@@ -63,9 +110,9 @@ func (s *Storage) GetSessions(ctx context.Context, userId string, date string, l
 	}
 	if date != "" {
 		if where == "" {
-			where = `WHERE s.created_at = %(?)%`
+			where = `WHERE STRFTIME('%m', s.created_at) = (?)`
 		} else {
-			where = ` AND s.created_at like %(?)%`
+			where = ` AND STRFTIME('%m', s.created_at) = (?)`
 		}
 		whereArgs = append(whereArgs, date)
 	}
