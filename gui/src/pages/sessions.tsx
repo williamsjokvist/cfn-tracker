@@ -4,10 +4,8 @@ import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Icon } from '@iconify/react'
 
-
 import { GetSessions, GetSessionsStatistics } from '@cmd/CommandHandler'
 import type { model } from '@model'
-
 
 import { useErrorPopup } from '@/main/error-popup'
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/ui/hover-card'
@@ -21,8 +19,8 @@ export function SessionsListPage() {
 
   const [sessions, setSessions] = React.useState<model.Session[]>([])
   const [sessionStatistics, setSessionStatistics] = React.useState<model.SessionsStatistics>()
-  const [year, setYear] = React.useState("")
-  const [month, setMonth] = React.useState("01")
+  const [year, setYear] = React.useState('')
+  const [month, setMonth] = React.useState('01')
   const [monthIndex, setMonthIndex] = React.useState(0)
 
   const months = sessionStatistics?.Months ?? []
@@ -40,16 +38,19 @@ export function SessionsListPage() {
   }, [sessionStatistics, monthIndex])
 
   React.useEffect(() => {
-    GetSessions("", month, 0, 0).then(setSessions).catch(setError)
+    GetSessions('', month, 0, 0).then(setSessions).catch(setError)
   }, [month])
 
-  const sessionsByDay = (sessions ?? []).reduce((group, session) => {
-    const date = new Date(session.createdAt)
-    const day = date.getDate()
-    group[day] = group[day] ?? []
-    group[day].push(session)
-    return group
-  }, {} as Record<string, model.Session[]>)
+  const sessionsByDay = (sessions ?? []).reduce(
+    (group, session) => {
+      const date = new Date(session.createdAt)
+      const day = date.getDate()
+      group[day] = group[day] ?? []
+      group[day].push(session)
+      return group
+    },
+    {} as Record<string, model.Session[]>
+  )
 
   return (
     <Page.Root>
@@ -62,21 +63,28 @@ export function SessionsListPage() {
         transition={{ delay: 0.125 }}
         className='overflow-y-scroll'
       >
-        <header className='px-8 py-4 text-xl flex gap-2 items-center'>
+        <header className='flex items-center gap-2 px-8 py-4 text-xl'>
           <Button
-            className="!py-0 !px-0 !text-md !font-normal"
+            className='!text-md !px-0 !py-0 !font-normal'
             disabled={months[monthIndex + 1] === undefined}
-            onClick={() => setMonthIndex(monthIndex + 1)}>
+            onClick={() => setMonthIndex(monthIndex + 1)}
+          >
             <Icon width={26} height={26} icon='material-symbols:chevron-left' />
           </Button>
           <Button
-            className="!py-0 !px-0 !text-md !font-normal"
+            className='!text-md !px-0 !py-0 !font-normal'
             disabled={monthIndex === 0}
-            onClick={() => setMonthIndex(monthIndex - 1)}>
-            <Icon width={26} height={26} icon='material-symbols:chevron-left' className='rotate-180' />
+            onClick={() => setMonthIndex(monthIndex - 1)}
+          >
+            <Icon
+              width={26}
+              height={26}
+              icon='material-symbols:chevron-left'
+              className='rotate-180'
+            />
           </Button>
           <h2 className='ml-2 font-bold'>
-            {year}{" "}/{" "}
+            {year} /{' '}
             {Intl.DateTimeFormat(i18n.resolvedLanguage, {
               month: 'long'
             }).format(new Date(`2024-${month}-01`))}

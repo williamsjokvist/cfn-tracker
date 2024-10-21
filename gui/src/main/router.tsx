@@ -38,7 +38,7 @@ const router = createHashRouter([
           },
           {
             element: <SessionsListPage />,
-            path: '/sessions',
+            path: '/sessions'
           },
           {
             element: <MatchesListPage />,

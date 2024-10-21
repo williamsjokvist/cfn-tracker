@@ -16,7 +16,7 @@ export const Button = React.forwardRef<
           backgroundColor: 'rgba(0,0,0,.25)',
           border: '1px solid rgba(255,255,255,.25)',
           cursor: 'not-allowed'
-        },
+        }
       })}
       className={cn(
         'flex items-center justify-between',
