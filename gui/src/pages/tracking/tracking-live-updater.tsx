@@ -125,8 +125,8 @@ export function TrackingLiveUpdater() {
             <div className='flex justify-between gap-2 self-end'>
               <Tooltip text={t('cooldown')} disabled={!refreshDisabled}>
                 <Button
+                  style={{ filter: 'hue-rotate(-160deg)' }}
                   disabled={refreshDisabled}
-                  style={{ filter: refreshDisabled ? 'grayscale(1)' : 'hue-rotate(-160deg)' }}
                   onClick={() => {
                     if (!refreshDisabled) {
                       trackingActor.send({ type: 'forcePoll' })

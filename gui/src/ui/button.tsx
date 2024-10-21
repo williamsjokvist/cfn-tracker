@@ -6,18 +6,19 @@ export const Button = React.forwardRef<
   HTMLButtonElement,
   React.PropsWithChildren<React.ButtonHTMLAttributes<HTMLButtonElement>>
 >((props, ref) => {
-  const { disabled, className, children, onClick, ...restProps } = props
+  const { disabled, style, className, children, onClick, ...restProps } = props
   return (
     <button
       ref={ref}
       onClick={disabled ? undefined : onClick}
-      {...(disabled && {
+      {...(disabled ? {
         style: {
           backgroundColor: 'rgba(0,0,0,.25)',
           border: '1px solid rgba(255,255,255,.25)',
-          cursor: 'not-allowed'
+          cursor: 'not-allowed',
+          ...style
         }
-      })}
+      } : { style })}
       className={cn(
         'flex items-center justify-between',
         'text-md whitespace-nowrap font-semibold',
