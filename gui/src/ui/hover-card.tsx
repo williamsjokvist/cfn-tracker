@@ -28,12 +28,7 @@ const HoverCardContent = React.forwardRef<
         transition: { type: 'tween', duration: 0.3 }
       }}
       exit={{ y: 50, opacity: 0, transition: { duration: 0.1 } }}
-      className={cn(
-        'overflow-hidden p-4 text-white',
-        'bg-black bg-opacity-90 backdrop-blur-xl',
-        'rounded-xl shadow-[0_3px_16px_rgba(0,0,0,.5)]',
-        className
-      )}
+      className={className}
     >
       {props.children}
     </motion.div>

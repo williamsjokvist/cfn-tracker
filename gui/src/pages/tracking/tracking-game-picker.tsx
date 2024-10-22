@@ -52,18 +52,23 @@ export function TrackingGamePicker(props: { onSubmit: (game: model.GameType) => 
               <button
                 type='button'
                 className={cn(
-                  'relative rounded-2xl px-3 w-60 h-[70px]',
+                  'relative h-[70px] w-60 rounded-2xl px-3',
                   'transition-colors hover:bg-slate-50 hover:bg-opacity-5'
                 )}
                 {...(game.code === selectedGame && {
                   style: {
                     outline: '1px solid lightblue',
-                    background: 'rgb(248 250 252 / 0.05)',
+                    background: 'rgb(248 250 252 / 0.05)'
                   }
                 })}
                 onClick={() => setSelectedGame(game.code)}
               >
-                <img src={game.logo} alt={game.alt} style={game.style} className='pointer-events-none select-none' />
+                <img
+                  src={game.logo}
+                  alt={game.alt}
+                  style={game.style}
+                  className='pointer-events-none select-none'
+                />
               </button>
             </li>
           ))}
