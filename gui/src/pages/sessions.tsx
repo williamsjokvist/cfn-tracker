@@ -11,6 +11,7 @@ import { useErrorPopup } from '@/main/error-popup'
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/ui/hover-card'
 import * as Page from '@/ui/page'
 import { Button } from '@/ui/button'
+import { cn } from '@/helpers/cn'
 
 export function SessionsListPage() {
   const { i18n, t } = useTranslation()
@@ -124,7 +125,14 @@ export function SessionsListPage() {
                       <span className='text-base font-light'>{s.userName}</span>
                     </Button>
                   </HoverCardTrigger>
-                  <HoverCardContent side='bottom'>
+                  <HoverCardContent
+                    side='bottom'
+                    className={cn(
+                      'overflow-hidden p-4 text-white',
+                      'bg-black bg-opacity-90 backdrop-blur-xl',
+                      'rounded-xl shadow-[0_3px_16px_rgba(0,0,0,.5)]'
+                    )}
+                  >
                     <dl>
                       <div className='flex justify-between gap-2'>
                         <dt>{t('wins')}</dt>

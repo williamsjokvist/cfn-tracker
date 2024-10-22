@@ -7,12 +7,15 @@ import { motion, useAnimate } from 'framer-motion'
 import * as Page from '@/ui/page'
 import * as Dialog from '@/ui/dialog'
 import { Button } from '@/ui/button'
+import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/ui/hover-card'
+
 import { Checkbox } from '@/ui/checkbox'
 
 import { model } from '@model'
 import { GetThemes, OpenResultsDirectory } from '@cmd/CommandHandler'
 
 import { useErrorPopup } from '@/main/error-popup'
+import { cn } from '@/helpers/cn'
 
 type StatOptions = Omit<Record<keyof model.Match, boolean>, 'replayId' | 'sessionId'> & {
   theme: string
@@ -163,7 +166,7 @@ function StatSelect(props: {
                 onClick={() => props.onSelect(opt, !checked)}
               >
                 <Checkbox checked={props.options[opt] === true} readOnly />
-                <span className='ml-2 cursor-pointer text-center capitalize'>{opt}</span>
+                <span className='ml-4 cursor-pointer text-center capitalize'>{opt}</span>
               </button>
             </li>
           ))}
@@ -177,6 +180,8 @@ function ThemeSelect(props: { value: string; onSelect: (theme: string) => void }
   const [themes, setThemes] = React.useState<model.Theme[]>([])
   const [isOpen, setOpen] = React.useState(false)
   const setError = useErrorPopup()
+
+  const selectedTheme = themes.find(t => t.name === props.value) ?? themes[0]
 
   React.useEffect(() => {
     GetThemes().then(setThemes).catch(setError)
@@ -216,29 +221,42 @@ function ThemeSelect(props: { value: string; onSelect: (theme: string) => void }
         </Button>
       </Dialog.Trigger>
       <Dialog.Content title='selectTheme'>
-        <ul className='mt-2 grid h-80 w-full gap-4 overflow-y-scroll pr-2'>
+        <ul className='my-4 w-full overflow-y-scroll'>
           {themes.map(theme => (
-            <li key={theme.name}>
-              <div className='mb-4 flex px-2 hover:bg-white hover:bg-opacity-[.075]'>
-                <Checkbox
-                  id={`${theme.name}-checkbox`}
-                  checked={theme.name === props.value}
-                  onChange={e => props.onSelect(theme.name)}
-                  className='my-2'
-                />
-                <label
-                  htmlFor={`${theme.name}-checkbox`}
-                  className='font-spartan w-full cursor-pointer py-2 text-lg font-bold capitalize'
-                >
-                  {theme.name}
-                </label>
-              </div>
-              <div className={`${theme.name}-preview`}>
-                <style>{theme.css.match(/@import.*;/g)}</style>
-              </div>
+            <li
+              key={theme.name}
+              className='relative flex w-full cursor-pointer items-center text-lg hover:bg-white hover:bg-opacity-[.075]'
+            >
+              <Checkbox
+                id={`${theme.name}-checkbox`}
+                checked={theme.name === props.value}
+                onChange={e => props.onSelect(theme.name)}
+                className='absolute left-2 top-1'
+              />
+              <label
+                htmlFor={`${theme.name}-checkbox`}
+                className='font-spartan w-full cursor-pointer py-1 pl-14  capitalize'
+              >
+                {theme.name}
+              </label>
             </li>
           ))}
         </ul>
+        <div className='relative mx-auto h-[60px] w-[350px]'>
+          {themes.map(theme => (
+            <div
+              key={theme.name}
+              style={{ opacity: theme.name === selectedTheme.name ? '100' : '0' }}
+              className={cn(
+                `${theme.name}-preview`,
+                'absolute left-0 top-0 w-full transition-opacity',
+                'pointer-events-none mx-auto h-[60px] w-[350px] select-none'
+              )}
+            >
+              <style>{theme.css.match(/@import.*;/g)}</style>
+            </div>
+          ))}
+        </div>
       </Dialog.Content>
     </Dialog.Root>
   )

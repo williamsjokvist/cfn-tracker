@@ -11,14 +11,16 @@ export const Button = React.forwardRef<
     <button
       ref={ref}
       onClick={disabled ? undefined : onClick}
-      {...(disabled ? {
-        style: {
-          backgroundColor: 'rgba(0,0,0,.25)',
-          border: '1px solid rgba(255,255,255,.25)',
-          cursor: 'not-allowed',
-          ...style
-        }
-      } : { style })}
+      {...(disabled
+        ? {
+            style: {
+              backgroundColor: 'rgba(0,0,0,.25)',
+              border: '1px solid rgba(255,255,255,.25)',
+              cursor: 'not-allowed',
+              ...style
+            }
+          }
+        : { style })}
       className={cn(
         'flex items-center justify-between',
         'text-md whitespace-nowrap font-semibold',
