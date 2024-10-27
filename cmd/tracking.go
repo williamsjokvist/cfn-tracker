@@ -104,7 +104,7 @@ func (ch *TrackingHandler) StartTracking(userCode string, restore bool) error {
 	}
 
 	if session == nil {
-		cancel()
+		return errorsx.NewFormattedError(http.StatusInternalServerError, fmt.Errorf("session not created"))
 	}
 
 	ticker := time.NewTicker(30 * time.Second)
