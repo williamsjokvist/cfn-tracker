@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -16,7 +17,9 @@ import (
 	"github.com/williamsjokvist/cfn-tracker/pkg/storage/txt"
 	"github.com/williamsjokvist/cfn-tracker/pkg/tracker"
 	"github.com/williamsjokvist/cfn-tracker/pkg/tracker/sf6"
+	"github.com/williamsjokvist/cfn-tracker/pkg/tracker/sf6/cfn"
 	"github.com/williamsjokvist/cfn-tracker/pkg/tracker/t8"
+	"github.com/williamsjokvist/cfn-tracker/pkg/tracker/t8/wavu"
 )
 
 type TrackingHandler struct {
@@ -61,11 +64,50 @@ func (ch *TrackingHandler) SetEventEmitter(eventEmitter EventEmitFn) {
 	ch.eventEmitter = eventEmitter
 }
 
-func (ch *TrackingHandler) StartTracking(userCode string, restore bool) {
+func (ch *TrackingHandler) StartTracking(userCode string, restore bool) error {
 	log.Printf(`Starting tracking for %s, restoring = %v`, userCode, restore)
-	ticker := time.NewTicker(30 * time.Second)
+
 	ctx, cancel := context.WithCancel(context.Background())
 	ch.cancelPolling = cancel
+
+	var session *model.Session
+	if restore {
+		sesh, err := ch.sqlDb.GetLatestSession(ctx, userCode)
+		if err != nil {
+			return errorsx.NewFormattedError(http.StatusNotFound, fmt.Errorf("get latest session: %w", err))
+		}
+		session = sesh
+	} else {
+		user, err := ch.sqlDb.GetUserByCode(ctx, userCode)
+		if err != nil && !errors.Is(err, sql.ErrUserNotFound) {
+			return errorsx.NewFormattedError(http.StatusNotFound, fmt.Errorf("get user from db: %w", err))
+		}
+
+		if user == nil {
+			usr, err := ch.gameTracker.GetUser(ctx, userCode)
+			if err != nil {
+				return errorsx.NewFormattedError(http.StatusNotFound, fmt.Errorf("get user from api: %w", err))
+			}
+			if err := ch.sqlDb.SaveUser(ctx, *usr); err != nil {
+				return errorsx.NewFormattedError(http.StatusInternalServerError, fmt.Errorf("save user: %w", err))
+			}
+		}
+
+		sesh, err := ch.sqlDb.CreateSession(ctx, userCode)
+		if err != nil {
+			return errorsx.NewFormattedError(http.StatusInternalServerError, fmt.Errorf("create session: %w", err))
+		}
+		session = sesh
+		// session.LP = bl.GetLP()
+		// session.MR = bl.GetMR()
+		// session.UserName = bl.GetCFN()
+	}
+
+	if session == nil {
+		return errorsx.NewFormattedError(http.StatusInternalServerError, fmt.Errorf("session not created"))
+	}
+
+	ticker := time.NewTicker(30 * time.Second)
 	ch.forcePollChan = make(chan struct{})
 	defer func() {
 		ch.eventEmitter("stopped-tracking")
@@ -74,11 +116,6 @@ func (ch *TrackingHandler) StartTracking(userCode string, restore bool) {
 		close(ch.forcePollChan)
 		ch.forcePollChan = nil
 	}()
-
-	session, err := ch.gameTracker.Init(ctx, userCode, restore)
-	if err != nil {
-		return
-	}
 
 	matchChan := make(chan model.Match)
 
@@ -139,6 +176,7 @@ func (ch *TrackingHandler) StartTracking(userCode string, restore bool) {
 			break
 		}
 	}
+	return nil
 }
 
 func (ch *TrackingHandler) StopTracking() {
@@ -150,9 +188,9 @@ func (ch *TrackingHandler) SelectGame(game model.GameType) error {
 
 	switch game {
 	case model.GameTypeT8:
-		ch.gameTracker = t8.NewT8Tracker(ch.sqlDb)
+		ch.gameTracker = t8.NewT8Tracker(wavu.NewClient())
 	case model.GameTypeSF6:
-		ch.gameTracker = sf6.NewSF6Tracker(ch.browser, ch.sqlDb)
+		ch.gameTracker = sf6.NewSF6Tracker(cfn.NewClient(ch.browser))
 		username = ch.cfg.CapIDEmail
 		password = ch.cfg.CapIDPassword
 	default:
@@ -160,7 +198,9 @@ func (ch *TrackingHandler) SelectGame(game model.GameType) error {
 	}
 
 	authChan := make(chan tracker.AuthStatus)
-	go ch.gameTracker.Authenticate(username, password, authChan)
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+	defer cancel()
+	go ch.gameTracker.Authenticate(ctx, username, password, authChan)
 	for status := range authChan {
 		if status.Err != nil {
 			return errorsx.NewFormattedError(http.StatusUnauthorized, status.Err)
