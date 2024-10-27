@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/williamsjokvist/cfn-tracker/pkg/browser"
 	"github.com/williamsjokvist/cfn-tracker/pkg/config"
 	"github.com/williamsjokvist/cfn-tracker/pkg/errorsx"
 	"github.com/williamsjokvist/cfn-tracker/pkg/model"
@@ -22,28 +21,28 @@ import (
 	"github.com/williamsjokvist/cfn-tracker/pkg/tracker/t8/wavu"
 )
 
+type EventEmitFn func(eventName string, optionalData ...interface{})
+
 type TrackingHandler struct {
-	gameTracker tracker.GameTracker
-
-	browser *browser.Browser
-
-	cancelPolling context.CancelFunc
-	forcePollChan chan struct{}
-	matchChans    []chan model.Match
-
 	sqlDb   *sql.Storage
 	nosqlDb *nosql.Storage
 	txtDb   *txt.Storage
 
-	eventEmitter EventEmitFn
+	wavuClient wavu.WavuClient
+	cfnClient  cfn.CFNClient
 
-	cfg *config.Config
+	cfg        *config.Config
+	matchChans []chan model.Match
+
+	cancelPolling context.CancelFunc
+	forcePollChan chan struct{}
+	gameTracker   tracker.GameTracker
+	eventEmitter  EventEmitFn
 }
 
-var _ CmdHandler = (*TrackingHandler)(nil)
-
 func NewTrackingHandler(
-	browser *browser.Browser,
+	wavuClient wavu.WavuClient,
+	cfnClient cfn.CFNClient,
 	sqlDb *sql.Storage,
 	nosqlDb *nosql.Storage,
 	txtDb *txt.Storage,
@@ -51,10 +50,11 @@ func NewTrackingHandler(
 	matchChans ...chan model.Match,
 ) *TrackingHandler {
 	return &TrackingHandler{
+		wavuClient: wavuClient,
+		cfnClient:  cfnClient,
 		sqlDb:      sqlDb,
 		nosqlDb:    nosqlDb,
 		txtDb:      txtDb,
-		browser:    browser,
 		cfg:        cfg,
 		matchChans: matchChans,
 	}
@@ -188,9 +188,9 @@ func (ch *TrackingHandler) SelectGame(game model.GameType) error {
 
 	switch game {
 	case model.GameTypeT8:
-		ch.gameTracker = t8.NewT8Tracker(wavu.NewClient())
+		ch.gameTracker = t8.NewT8Tracker(ch.wavuClient)
 	case model.GameTypeSF6:
-		ch.gameTracker = sf6.NewSF6Tracker(cfn.NewClient(ch.browser))
+		ch.gameTracker = sf6.NewSF6Tracker(ch.cfnClient)
 		username = ch.cfg.CapIDEmail
 		password = ch.cfg.CapIDPassword
 	default:

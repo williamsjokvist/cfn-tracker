@@ -30,6 +30,8 @@ import (
 	"github.com/williamsjokvist/cfn-tracker/pkg/storage/nosql"
 	"github.com/williamsjokvist/cfn-tracker/pkg/storage/sql"
 	"github.com/williamsjokvist/cfn-tracker/pkg/storage/txt"
+	"github.com/williamsjokvist/cfn-tracker/pkg/tracker/sf6/cfn"
+	"github.com/williamsjokvist/cfn-tracker/pkg/tracker/t8/wavu"
 	"github.com/williamsjokvist/cfn-tracker/pkg/update/github"
 )
 
@@ -150,9 +152,22 @@ func main() {
 
 	browserSrcMatchChan := make(chan model.Match, 1)
 
-	cmdHandler := cmd.NewCommandHandler(github.NewClient(), appBrowser, sqlDb, noSqlDb, txtDb, &cfg)
-	trackingHandler := cmd.NewTrackingHandler(appBrowser, sqlDb, noSqlDb, txtDb, &cfg, browserSrcMatchChan)
-	cmdHandlers := []cmd.CmdHandler{cmdHandler, trackingHandler}
+	cmdHandler := cmd.NewCommandHandler(
+		github.NewClient(),
+		sqlDb,
+		noSqlDb,
+		txtDb,
+		&cfg,
+	)
+	trackingHandler := cmd.NewTrackingHandler(
+		wavu.NewClient(),
+		cfn.NewClient(appBrowser),
+		sqlDb,
+		noSqlDb,
+		txtDb,
+		&cfg,
+		browserSrcMatchChan,
+	)
 
 	browserSrcServer := server.NewBrowserSourceServer(browserSrcMatchChan)
 
@@ -196,12 +211,10 @@ func main() {
 				go runtime.EventsEmit(ctx, "launchArgs", secondInstanceData.Args)
 			}
 
-			for _, c := range cmdHandlers {
-				c.SetEventEmitter(func(eventName string, optionalData ...interface{}) {
-					log.Println("[FE EVENT]", eventName, optionalData)
-					runtime.EventsEmit(ctx, eventName, optionalData...)
-				})
-			}
+			trackingHandler.SetEventEmitter(func(eventName string, optionalData ...interface{}) {
+				log.Println("[FE EVENT]", eventName, optionalData)
+				runtime.EventsEmit(ctx, eventName, optionalData...)
+			})
 		},
 		OnStartup: func(ctx context.Context) {
 			go browserSrcServer.Start(ctx, &cfg)

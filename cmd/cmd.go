@@ -13,7 +13,6 @@ import (
 
 	"github.com/hashicorp/go-version"
 
-	"github.com/williamsjokvist/cfn-tracker/pkg/browser"
 	"github.com/williamsjokvist/cfn-tracker/pkg/config"
 	"github.com/williamsjokvist/cfn-tracker/pkg/errorsx"
 	"github.com/williamsjokvist/cfn-tracker/pkg/i18n"
@@ -26,41 +25,23 @@ import (
 	"github.com/williamsjokvist/cfn-tracker/pkg/update/github"
 )
 
-type EventEmitFn func(eventName string, optionalData ...interface{})
-
-type CmdHandler interface {
-	SetEventEmitter(eventEmitter EventEmitFn)
-}
-
 // The CommandHandler is the interface between the GUI and the core
 type CommandHandler struct {
-	eventEmitter EventEmitFn
-
-	browser      *browser.Browser
 	githubClient github.GithubClient
 
 	sqlDb   *sql.Storage
 	nosqlDb *nosql.Storage
-	txtDb   *txt.Storage
 
 	cfg *config.Config
 }
 
-var _ CmdHandler = (*CommandHandler)(nil)
-
-func NewCommandHandler(githubClient github.GithubClient, browser *browser.Browser, sqlDb *sql.Storage, nosqlDb *nosql.Storage, txtDb *txt.Storage, cfg *config.Config) *CommandHandler {
+func NewCommandHandler(githubClient github.GithubClient, sqlDb *sql.Storage, nosqlDb *nosql.Storage, txtDb *txt.Storage, cfg *config.Config) *CommandHandler {
 	return &CommandHandler{
 		sqlDb:        sqlDb,
 		nosqlDb:      nosqlDb,
-		txtDb:        txtDb,
-		browser:      browser,
 		githubClient: githubClient,
 		cfg:          cfg,
 	}
-}
-
-func (ch *CommandHandler) SetEventEmitter(eventEmitter EventEmitFn) {
-	ch.eventEmitter = eventEmitter
 }
 
 func (ch *CommandHandler) CheckForUpdate() (bool, error) {

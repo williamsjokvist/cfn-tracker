@@ -11,6 +11,8 @@ import (
 	"github.com/williamsjokvist/cfn-tracker/pkg/storage/nosql"
 	"github.com/williamsjokvist/cfn-tracker/pkg/storage/sql"
 	"github.com/williamsjokvist/cfn-tracker/pkg/storage/txt"
+	"github.com/williamsjokvist/cfn-tracker/pkg/tracker/sf6/cfn"
+	"github.com/williamsjokvist/cfn-tracker/pkg/tracker/t8/wavu"
 )
 
 var testSuite = struct {
@@ -39,7 +41,16 @@ func TestMain(m *testing.M) {
 		BrowserSourcePort: 4242,
 	}
 
-	testSuite.trackingHandler = cmd.NewTrackingHandler(nil, sqlDb, nosqlDb, txtDb, &cfg, nil)
+	testSuite.trackingHandler = cmd.NewTrackingHandler(
+		// todo mock api clients
+		wavu.NewClient(),
+		cfn.NewClient(nil),
+		sqlDb,
+		nosqlDb,
+		txtDb,
+		&cfg,
+		nil,
+	)
 	testSuite.trackingHandler.SetEventEmitter(func(eventName string, optionalData ...interface{}) {
 		log.Println(fmt.Sprintf("[EVENT] %s", eventName), optionalData[0])
 	})
