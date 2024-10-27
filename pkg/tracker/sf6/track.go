@@ -6,68 +6,37 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/williamsjokvist/cfn-tracker/pkg/browser"
 	"github.com/williamsjokvist/cfn-tracker/pkg/errorsx"
 	"github.com/williamsjokvist/cfn-tracker/pkg/model"
-	"github.com/williamsjokvist/cfn-tracker/pkg/storage/sql"
 	"github.com/williamsjokvist/cfn-tracker/pkg/tracker"
 	"github.com/williamsjokvist/cfn-tracker/pkg/tracker/sf6/cfn"
 )
 
 type SF6Tracker struct {
-	cfnClient *cfn.Client
-	sqlDb     *sql.Storage
+	cfnClient cfn.CFNClient
 }
 
 var _ tracker.GameTracker = (*SF6Tracker)(nil)
 
-func NewSF6Tracker(browser *browser.Browser, sqlDb *sql.Storage) *SF6Tracker {
+func NewSF6Tracker(cfnClient cfn.CFNClient) *SF6Tracker {
 	return &SF6Tracker{
-		cfnClient: cfn.NewCFNClient(browser),
-		sqlDb:     sqlDb,
+		cfnClient,
 	}
 }
 
-// Start will update the tracking state when new matches are played.
-func (t *SF6Tracker) Init(ctx context.Context, userCode string, restore bool) (*model.Session, error) {
-	if restore {
-		session, err := t.sqlDb.GetLatestSession(ctx, userCode)
-		if err != nil {
-			return nil, errorsx.NewFormattedError(http.StatusNotFound, fmt.Errorf(`failed to get last session: %w`, err))
-		}
-		_, err = t.sqlDb.GetUserByCode(ctx, userCode)
-		if err != nil {
-			return nil, errorsx.NewFormattedError(http.StatusNotFound, fmt.Errorf(`failed to get user: %w`, err))
-		}
-		return session, nil
-	}
-
-	bl, err := t.cfnClient.GetBattleLog(userCode)
+func (t *SF6Tracker) GetUser(ctx context.Context, userCode string) (*model.User, error) {
+	bl, err := t.cfnClient.GetBattleLog(ctx, userCode)
 	if err != nil {
-		return nil, errorsx.NewFormattedError(http.StatusInternalServerError, fmt.Errorf(`failed to fetch battle log: %w`, err))
+		return nil, errorsx.NewFormattedError(http.StatusInternalServerError, fmt.Errorf("fetch battle log: %w", err))
 	}
-
-	err = t.sqlDb.SaveUser(ctx, model.User{
+	return &model.User{
 		DisplayName: bl.GetCFN(),
 		Code:        userCode,
-	})
-	if err != nil {
-		return nil, errorsx.NewFormattedError(http.StatusInternalServerError, fmt.Errorf(`failed to save user: %w`, err))
-	}
-	session, err := t.sqlDb.CreateSession(ctx, userCode)
-	if err != nil {
-		return nil, errorsx.NewFormattedError(http.StatusInternalServerError, fmt.Errorf(`failed to create session: %w`, err))
-	}
-
-	// set starting LP so we don't count the first polled match
-	session.LP = bl.GetLP()
-	session.MR = bl.GetMR()
-	session.UserName = bl.GetCFN()
-	return session, nil
+	}, nil
 }
 
 func (t *SF6Tracker) Poll(ctx context.Context, cancel context.CancelFunc, session *model.Session, onNewMatch func(model.Match)) {
-	bl, err := t.cfnClient.GetBattleLog(session.UserId)
+	bl, err := t.cfnClient.GetBattleLog(ctx, session.UserId)
 	if err != nil {
 		cancel()
 	}
@@ -177,6 +146,6 @@ func getLeagueFromLP(lp int) string {
 	return `Rookie`
 }
 
-func (t *SF6Tracker) Authenticate(email string, password string, statChan chan tracker.AuthStatus) {
-	t.cfnClient.Authenticate(email, password, statChan)
+func (t *SF6Tracker) Authenticate(ctx context.Context, email string, password string, statChan chan tracker.AuthStatus) {
+	t.cfnClient.Authenticate(ctx, email, password, statChan)
 }

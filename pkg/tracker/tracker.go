@@ -7,9 +7,9 @@ import (
 )
 
 type GameTracker interface {
-	Init(ctx context.Context, polarisId string, restore bool) (*model.Session, error)
+	GetUser(ctx context.Context, userId string) (*model.User, error)
 	Poll(ctx context.Context, cancel context.CancelFunc, session *model.Session, onNewMatch func(model.Match))
-	Authenticate(email string, password string, statusChan chan AuthStatus)
+	Authenticate(ctx context.Context, email string, password string, statusChan chan AuthStatus)
 }
 
 type AuthStatus struct {

@@ -1,6 +1,7 @@
 package cfn
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -15,7 +16,8 @@ import (
 )
 
 type CFNClient interface {
-	GetBattleLog(cfn string) (*BattleLog, error)
+	GetBattleLog(ctx context.Context, cfn string) (*BattleLog, error)
+	Authenticate(ctx context.Context, email string, password string, statChan chan tracker.AuthStatus)
 }
 
 type Client struct {
@@ -24,20 +26,21 @@ type Client struct {
 
 var _ CFNClient = (*Client)(nil)
 
-func NewCFNClient(browser *browser.Browser) *Client {
+func NewClient(browser *browser.Browser) *Client {
 	return &Client{browser}
 }
 
-func (c *Client) GetBattleLog(cfn string) (*BattleLog, error) {
-	err := c.browser.Page.Navigate(fmt.Sprintf(`https://www.streetfighter.com/6/buckler/profile/%s/battlelog/rank`, cfn))
+func (c *Client) GetBattleLog(ctx context.Context, cfn string) (*BattleLog, error) {
+	page := c.browser.Page.Context(ctx)
+	err := page.Navigate(fmt.Sprintf(`https://www.streetfighter.com/6/buckler/profile/%s/battlelog/rank`, cfn))
 	if err != nil {
 		return nil, fmt.Errorf(`navigate to cfn: %w`, err)
 	}
-	err = c.browser.Page.WaitLoad()
+	err = page.WaitLoad()
 	if err != nil {
 		return nil, fmt.Errorf(`wait for cfn to load: %w`, err)
 	}
-	nextData, err := c.browser.Page.Element(`#__NEXT_DATA__`)
+	nextData, err := page.Element(`#__NEXT_DATA__`)
 	if err != nil {
 		return nil, fmt.Errorf(`get next_data element: %w`, err)
 	}
@@ -59,10 +62,11 @@ func (c *Client) GetBattleLog(cfn string) (*BattleLog, error) {
 	return bl, nil
 }
 
-func (t *Client) Authenticate(email string, password string, statChan chan tracker.AuthStatus) {
+func (c *Client) Authenticate(ctx context.Context, email string, password string, statChan chan tracker.AuthStatus) {
+	page := c.browser.Page.Context(ctx)
 	status := &tracker.AuthStatus{Progress: 0, Err: nil}
 
-	if t.browser == nil {
+	if c.browser == nil {
 		statChan <- *status.WithError(fmt.Errorf("browser not initialized"))
 		return
 	}
@@ -74,7 +78,7 @@ func (t *Client) Authenticate(email string, password string, statChan chan track
 		}
 	}()
 
-	if strings.Contains(t.browser.Page.MustInfo().URL, `buckler`) {
+	if strings.Contains(page.MustInfo().URL, `buckler`) {
 		statChan <- *status.WithProgress(100)
 		return
 	}
@@ -85,11 +89,11 @@ func (t *Client) Authenticate(email string, password string, statChan chan track
 	}
 
 	log.Println(`Logging in`)
-	t.browser.Page.MustNavigate(`https://cid.capcom.com/ja/login/?guidedBy=web`).MustWaitLoad().MustWaitIdle()
+	page.MustNavigate(`https://cid.capcom.com/ja/login/?guidedBy=web`).MustWaitLoad().MustWaitIdle()
 	statChan <- *status.WithProgress(10)
 
 	log.Print("Checking if already authed")
-	if strings.Contains(t.browser.Page.MustInfo().URL, `cid.capcom.com/ja/mypage`) {
+	if strings.Contains(page.MustInfo().URL, `cid.capcom.com/ja/mypage`) {
 		log.Print("User already authed")
 		statChan <- *status.WithProgress(100)
 		return
@@ -97,27 +101,27 @@ func (t *Client) Authenticate(email string, password string, statChan chan track
 	log.Print("Not authed, continuing with auth process")
 
 	// Bypass age check
-	if strings.Contains(t.browser.Page.MustInfo().URL, `agecheck`) {
-		t.browser.Page.MustElement(`#country`).MustSelect(COUNTRIES[rand.Intn(len(COUNTRIES))])
-		t.browser.Page.MustElement(`#birthYear`).MustSelect(strconv.Itoa(rand.Intn(1999-1970) + 1970))
-		t.browser.Page.MustElement(`#birthMonth`).MustSelect(strconv.Itoa(rand.Intn(12-1) + 1))
-		t.browser.Page.MustElement(`#birthDay`).MustSelect(strconv.Itoa(rand.Intn(28-1) + 1))
-		t.browser.Page.MustElement(`form button[type="submit"]`).MustClick()
-		t.browser.Page.MustWaitLoad().MustWaitRequestIdle()
+	if strings.Contains(page.MustInfo().URL, `agecheck`) {
+		page.MustElement(`#country`).MustSelect(COUNTRIES[rand.Intn(len(COUNTRIES))])
+		page.MustElement(`#birthYear`).MustSelect(strconv.Itoa(rand.Intn(1999-1970) + 1970))
+		page.MustElement(`#birthMonth`).MustSelect(strconv.Itoa(rand.Intn(12-1) + 1))
+		page.MustElement(`#birthDay`).MustSelect(strconv.Itoa(rand.Intn(28-1) + 1))
+		page.MustElement(`form button[type="submit"]`).MustClick()
+		page.MustWaitLoad().MustWaitRequestIdle()
 	}
 	statChan <- *status.WithProgress(30)
 
 	// Submit form
-	t.browser.Page.MustElement(`input[name="email"]`).MustInput(email)
-	t.browser.Page.MustElement(`input[name="password"]`).MustInput(password)
-	t.browser.Page.MustElement(`button[type="submit"]`).MustClick()
+	page.MustElement(`input[name="email"]`).MustInput(email)
+	page.MustElement(`input[name="password"]`).MustInput(password)
+	page.MustElement(`button[type="submit"]`).MustClick()
 	statChan <- *status.WithProgress(50)
 
 	// Wait for redirection
 	var secondsWaited time.Duration = 0
 	for {
 		// Break out if we are no longer on Auth0 (redirected to CFN)
-		if !strings.Contains(t.browser.Page.MustInfo().URL, `auth.cid.capcom.com`) {
+		if !strings.Contains(page.MustInfo().URL, `auth.cid.capcom.com`) {
 			break
 		}
 
@@ -127,8 +131,8 @@ func (t *Client) Authenticate(email string, password string, statChan chan track
 	}
 	statChan <- *status.WithProgress(65)
 
-	t.browser.Page.MustNavigate(`https://www.streetfighter.com/6/buckler/auth/loginep?redirect_url=/`)
-	t.browser.Page.MustWaitLoad().MustWaitRequestIdle()
+	page.MustNavigate(`https://www.streetfighter.com/6/buckler/auth/loginep?redirect_url=/`)
+	page.MustWaitLoad().MustWaitRequestIdle()
 
 	statChan <- *status.WithProgress(100)
 	log.Println(`Authentication passed`)

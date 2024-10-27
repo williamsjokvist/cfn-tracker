@@ -1,6 +1,7 @@
 package wavu
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -10,7 +11,7 @@ import (
 )
 
 type WavuClient interface {
-	GetLastReplay(polarisId string) (*Replay, error)
+	GetLastReplay(ctx context.Context, polarisId string) (*Replay, error)
 }
 
 type Client struct {
@@ -27,8 +28,8 @@ func NewClient() *Client {
 	}
 }
 
-func (c *Client) getReplays() ([]Replay, error) {
-	req, err := http.NewRequest(http.MethodGet, "https://wank.wavu.wiki/api/replays", nil)
+func (c *Client) getReplays(ctx context.Context) ([]Replay, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "https://wank.wavu.wiki/api/replays", nil)
 	if err != nil {
 		return nil, fmt.Errorf("make http request: %w", err)
 	}
@@ -56,8 +57,8 @@ func (c *Client) getReplays() ([]Replay, error) {
 	return replays, nil
 }
 
-func (c *Client) GetLastReplay(polarisId string) (*Replay, error) {
-	replays, err := c.getReplays()
+func (c *Client) GetLastReplay(ctx context.Context, polarisId string) (*Replay, error) {
+	replays, err := c.getReplays(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("get replays: %w", err)
 	}
