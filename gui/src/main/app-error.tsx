@@ -4,11 +4,11 @@ import { useRouteError } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Icon } from '@iconify/react'
 
+import { type model } from '@model'
 import * as Page from '@/ui/page'
-import { errorsx } from '@model'
 
-import { LocalizedErrorMessage } from './error-popup'
 import { AppTitleBar } from './app-titlebar'
+import { LocalizationKey } from './i18n'
 
 export function AppErrorBoundary() {
   const err = useFormattedError()
@@ -22,40 +22,39 @@ export function AppErrorBoundary() {
 export function PageErrorBoundary() {
   const { t } = useTranslation()
   const err = useFormattedError()
-  if (!err?.code) {
+  if (!err?.localizationKey) {
     return null
   }
   return (
     <ErrorWrapper err={err}>
       <Page.Header>
-        <Page.Title>{t(LocalizedErrorMessage[err!.code!])}</Page.Title>
+        <Page.Title>{t(err.localizationKey)}</Page.Title>
       </Page.Header>
     </ErrorWrapper>
   )
 }
 
-const isFormattedError = (error: unknown) =>
-  error instanceof Object && 'message' in error && 'code' in error
+const isFormattedError = (error: unknown) => error instanceof Object && 'translationKey' in error
 
 function useFormattedError() {
   const thrownError = useRouteError()
-  const [err, setErr] = React.useState<errorsx.FormattedError>()
+  const [err, setErr] = React.useState<model.FormattedError | unknown>()
 
   React.useEffect(() => {
     console.error(thrownError)
     if (thrownError instanceof Error) {
-      setErr({ code: 500, message: thrownError.message })
+      setErr({ translationKey: "", message: thrownError.message, error: thrownError })
     } else if (isFormattedError(thrownError)) {
-      setErr(thrownError as errorsx.FormattedError)
+      setErr(thrownError)
     }
   }, [thrownError])
 
-  return err
+  return err as model.FormattedError
 }
 
-function ErrorWrapper(props: React.PropsWithChildren & { err?: errorsx.FormattedError }) {
+function ErrorWrapper(props: React.PropsWithChildren & { err?: model.FormattedError }) {
   const { t } = useTranslation()
-  if (!props.err?.code) {
+  if (!props.err) {
     return null
   }
   return (
@@ -68,10 +67,8 @@ function ErrorWrapper(props: React.PropsWithChildren & { err?: errorsx.Formatted
       {props.children}
       <div className='mt-8 flex w-full flex-col items-center justify-center rounded-md pb-16 text-center'>
         <Icon icon='material-symbols:warning-outline' className='h-40 w-40 text-[#ff6388]' />
-        <h1 className='text-center text-2xl font-bold'>
-          {t(LocalizedErrorMessage[props.err.code])}
-        </h1>
-        <p className='text-xl'>{props.err.message}</p>
+        <h1 className='text-center text-2xl font-bold'>{t(props.err?.localizationKey)}</h1>
+        <p className='text-xl'>{props.err?.message}</p>
       </div>
     </motion.section>
   )

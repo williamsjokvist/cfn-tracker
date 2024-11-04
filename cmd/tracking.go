@@ -5,11 +5,9 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"net/http"
 	"time"
 
 	"github.com/williamsjokvist/cfn-tracker/pkg/config"
-	"github.com/williamsjokvist/cfn-tracker/pkg/errorsx"
 	"github.com/williamsjokvist/cfn-tracker/pkg/model"
 	"github.com/williamsjokvist/cfn-tracker/pkg/storage/nosql"
 	"github.com/williamsjokvist/cfn-tracker/pkg/storage/sql"
@@ -74,28 +72,28 @@ func (ch *TrackingHandler) StartTracking(userCode string, restore bool) error {
 	if restore {
 		sesh, err := ch.sqlDb.GetLatestSession(ctx, userCode)
 		if err != nil {
-			return errorsx.NewFormattedError(http.StatusNotFound, fmt.Errorf("get latest session: %w", err))
+			return model.NewError(model.ErrGetLatestSession, err)
 		}
 		session = sesh
 	} else {
 		user, err := ch.sqlDb.GetUserByCode(ctx, userCode)
 		if err != nil && !errors.Is(err, sql.ErrUserNotFound) {
-			return errorsx.NewFormattedError(http.StatusNotFound, fmt.Errorf("get user from db: %w", err))
+			return model.NewError(model.ErrGetUser, err)
 		}
 
 		if user == nil {
 			usr, err := ch.gameTracker.GetUser(ctx, userCode)
 			if err != nil {
-				return errorsx.NewFormattedError(http.StatusNotFound, fmt.Errorf("get user from api: %w", err))
+				return model.NewError(model.ErrGetUser, err)
 			}
 			if err := ch.sqlDb.SaveUser(ctx, *usr); err != nil {
-				return errorsx.NewFormattedError(http.StatusInternalServerError, fmt.Errorf("save user: %w", err))
+				return model.NewError(model.ErrGetUser, err)
 			}
 		}
 
 		sesh, err := ch.sqlDb.CreateSession(ctx, userCode)
 		if err != nil {
-			return errorsx.NewFormattedError(http.StatusInternalServerError, fmt.Errorf("create session: %w", err))
+			return model.NewError(model.ErrCreateSession, err)
 		}
 		session = sesh
 		// session.LP = bl.GetLP()
@@ -104,7 +102,7 @@ func (ch *TrackingHandler) StartTracking(userCode string, restore bool) error {
 	}
 
 	if session == nil {
-		return errorsx.NewFormattedError(http.StatusInternalServerError, fmt.Errorf("session not created"))
+		return model.ErrCreateSession
 	}
 
 	ticker := time.NewTicker(30 * time.Second)
@@ -185,7 +183,6 @@ func (ch *TrackingHandler) StopTracking() {
 
 func (ch *TrackingHandler) SelectGame(game model.GameType) error {
 	var username, password string
-
 	switch game {
 	case model.GameTypeT8:
 		ch.gameTracker = t8.NewT8Tracker(ch.wavuClient)
@@ -194,7 +191,8 @@ func (ch *TrackingHandler) SelectGame(game model.GameType) error {
 		username = ch.cfg.CapIDEmail
 		password = ch.cfg.CapIDPassword
 	default:
-		return errorsx.NewFormattedError(http.StatusInternalServerError, fmt.Errorf(`failed to select game`))
+		errGameNotExist := fmt.Errorf("game does not exist")
+		return model.NewError(model.ErrSelectGame, errGameNotExist)
 	}
 
 	authChan := make(chan tracker.AuthStatus)
@@ -203,7 +201,7 @@ func (ch *TrackingHandler) SelectGame(game model.GameType) error {
 	go ch.gameTracker.Authenticate(ctx, username, password, authChan)
 	for status := range authChan {
 		if status.Err != nil {
-			return errorsx.NewFormattedError(http.StatusUnauthorized, status.Err)
+			return model.NewError(model.ErrAuth, status.Err)
 		}
 
 		ch.eventEmitter("auth-progress", status.Progress)

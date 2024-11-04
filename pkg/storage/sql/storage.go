@@ -25,7 +25,7 @@ type Storage struct {
 
 func NewStorage(useInMemoryDb bool) (*Storage, error) {
 	if err := migrateSchema(nil); err != nil {
-		return nil, fmt.Errorf("failed to perform migrations: %w", err)
+		return nil, fmt.Errorf("perform sql migrations: %w", err)
 	}
 	dataSource := getDataSource()
 	if useInMemoryDb {
@@ -61,11 +61,11 @@ func migrateSchema(nSteps *int) error {
 		MigrationsTable: "migrations",
 	})
 	if err != nil {
-		return fmt.Errorf("failed to create migration driver: %w", err)
+		return fmt.Errorf("create migration driver: %w", err)
 	}
 	srcDriver, err := iofs.New(migrationsFs, "migrations")
 	if err != nil {
-		return fmt.Errorf("failed to create migration source driver: %w", err)
+		return fmt.Errorf("create migration source driver: %w", err)
 	}
 	preparedMigrations, err := migrate.NewWithInstance(
 		"iofs",
@@ -74,7 +74,7 @@ func migrateSchema(nSteps *int) error {
 		migrateDriver,
 	)
 	if err != nil {
-		return fmt.Errorf("failed to create migration tooling instance: %w", err)
+		return fmt.Errorf("create migration tooling instance: %w", err)
 	}
 	defer func() {
 		preparedMigrations.Close()
@@ -88,7 +88,7 @@ func migrateSchema(nSteps *int) error {
 	}
 
 	if err != nil && !errors.Is(err, migrate.ErrNoChange) {
-		return fmt.Errorf("failed to apply migrations: %w", err)
+		return fmt.Errorf("apply migrations: %w", err)
 	}
 
 	log.Println("Successfully applied db migrations")

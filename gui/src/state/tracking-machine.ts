@@ -2,7 +2,7 @@ import { assign, setup } from 'xstate'
 import { createActorContext } from '@xstate/react'
 
 import { ForcePoll, StartTracking, StopTracking } from '@cmd/TrackingHandler'
-import type { errorsx, model } from '@model'
+import type { model } from '@model'
 import { EventsOff, EventsOn } from '@runtime'
 
 type TrackingMachineContextProps = {
@@ -10,7 +10,7 @@ type TrackingMachineContextProps = {
   restore: boolean
   isTracking: boolean
   match: model.Match
-  error: errorsx.FormattedError | null
+  error: model.FormattedError | null
 }
 
 export const TRACKING_MACHINE = setup({

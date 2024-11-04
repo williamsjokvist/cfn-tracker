@@ -1,22 +1,3 @@
-export namespace errorsx {
-	
-	export class FormattedError {
-	    code?: number;
-	    message: any;
-	
-	    static createFrom(source: any = {}) {
-	        return new FormattedError(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.code = source["code"];
-	        this.message = source["message"];
-	    }
-	}
-
-}
-
 export namespace locales {
 	
 	export class Localization {
@@ -113,9 +94,22 @@ export namespace locales {
 	    T8_TEKKEN_GOD: string;
 	    T8_TEKKEN_GOD_SUPREME: string;
 	    T8_GOD_OF_DESTRUCTION: string;
-	    errUnauthorized: string;
-	    errInternalServerError: string;
-	    errNotFound: string;
+	    errSelectGame: string;
+	    errAuth: string;
+	    errGetLatestSession: string;
+	    errGetUser: string;
+	    errGetMatches: string;
+	    errSaveLocale: string;
+	    errCheckForUpdate: string;
+	    errGetGuiConfig: string;
+	    errSaveTheme: string;
+	    errSaveSidebarMinimized: string;
+	    errGetSessions: string;
+	    errGetTranslations: string;
+	    errGetSessionStatistics: string;
+	    errCreateSession: string;
+	    errOpenResultsDirectory: string;
+	    errReadThemeCSS: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new Localization(source);
@@ -216,9 +210,22 @@ export namespace locales {
 	        this.T8_TEKKEN_GOD = source["T8_TEKKEN_GOD"];
 	        this.T8_TEKKEN_GOD_SUPREME = source["T8_TEKKEN_GOD_SUPREME"];
 	        this.T8_GOD_OF_DESTRUCTION = source["T8_GOD_OF_DESTRUCTION"];
-	        this.errUnauthorized = source["errUnauthorized"];
-	        this.errInternalServerError = source["errInternalServerError"];
-	        this.errNotFound = source["errNotFound"];
+	        this.errSelectGame = source["errSelectGame"];
+	        this.errAuth = source["errAuth"];
+	        this.errGetLatestSession = source["errGetLatestSession"];
+	        this.errGetUser = source["errGetUser"];
+	        this.errGetMatches = source["errGetMatches"];
+	        this.errSaveLocale = source["errSaveLocale"];
+	        this.errCheckForUpdate = source["errCheckForUpdate"];
+	        this.errGetGuiConfig = source["errGetGuiConfig"];
+	        this.errSaveTheme = source["errSaveTheme"];
+	        this.errSaveSidebarMinimized = source["errSaveSidebarMinimized"];
+	        this.errGetSessions = source["errGetSessions"];
+	        this.errGetTranslations = source["errGetTranslations"];
+	        this.errGetSessionStatistics = source["errGetSessionStatistics"];
+	        this.errCreateSession = source["errCreateSession"];
+	        this.errOpenResultsDirectory = source["errOpenResultsDirectory"];
+	        this.errReadThemeCSS = source["errReadThemeCSS"];
 	    }
 	}
 
@@ -234,6 +241,40 @@ export namespace model {
 	export enum GameType {
 	    STREET_FIGHTER_6 = "sf6",
 	    TEKKEN_8 = "t8",
+	}
+	export enum ErrorLocalizationKey {
+	    errSelectGame = "errSelectGame",
+	    errAuth = "errAuth",
+	    errGetLatestSession = "errGetLatestSession",
+	    errGetUser = "errGetUser",
+	    errGetMatches = "errGetMatches",
+	    errSaveLocale = "errSaveLocale",
+	    errCheckForUpdate = "errCheckForUpdate",
+	    errGetGuiConfig = "errGetGuiConfig",
+	    errSaveTheme = "errSaveTheme",
+	    errSaveSidebarMinimized = "errSaveSidebarMinimized",
+	    errGetSessions = "errGetSessions",
+	    errGetTranslations = "errGetTranslations",
+	    errGetSessionStatistics = "errGetSessionStatistics",
+	    errCreateSession = "errCreateSession",
+	    errOpenResultsDirectory = "errOpenResultsDirectory",
+	    errReadThemeCSS = "errReadThemeCSS",
+	}
+	export class FormattedError {
+	    localizationKey: ErrorLocalizationKey;
+	    message: string;
+	    error: any;
+	
+	    static createFrom(source: any = {}) {
+	        return new FormattedError(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.localizationKey = source["localizationKey"];
+	        this.message = source["message"];
+	        this.error = source["error"];
+	    }
 	}
 	export class GuiConfig {
 	    locale: string;

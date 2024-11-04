@@ -22,15 +22,15 @@ var testSuite = struct {
 func TestMain(m *testing.M) {
 	sqlDb, err := sql.NewStorage(true)
 	if err != nil {
-		log.Fatalf("failed to init sql store: %v", err)
+		log.Fatalf("init sql storage: %v", err)
 	}
 	nosqlDb, err := nosql.NewStorage()
 	if err != nil {
-		log.Fatalf("failed to init nosql store: %v", err)
+		log.Fatalf("init nosql storage: %v", err)
 	}
 	txtDb, err := txt.NewStorage()
 	if err != nil {
-		log.Fatalf("failed to init txt store: %v", err)
+		log.Fatalf("init txt storage: %v", err)
 	}
 
 	cfg := config.Config{
