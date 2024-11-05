@@ -72,28 +72,28 @@ func (ch *TrackingHandler) StartTracking(userCode string, restore bool) error {
 	if restore {
 		sesh, err := ch.sqlDb.GetLatestSession(ctx, userCode)
 		if err != nil {
-			return model.NewError(model.ErrGetLatestSession, err)
+			return model.WrapError(model.ErrGetLatestSession, err)
 		}
 		session = sesh
 	} else {
 		user, err := ch.sqlDb.GetUserByCode(ctx, userCode)
 		if err != nil && !errors.Is(err, sql.ErrUserNotFound) {
-			return model.NewError(model.ErrGetUser, err)
+			return model.WrapError(model.ErrGetUser, err)
 		}
 
 		if user == nil {
 			usr, err := ch.gameTracker.GetUser(ctx, userCode)
 			if err != nil {
-				return model.NewError(model.ErrGetUser, err)
+				return model.WrapError(model.ErrGetUser, err)
 			}
 			if err := ch.sqlDb.SaveUser(ctx, *usr); err != nil {
-				return model.NewError(model.ErrSaveUser, err)
+				return model.WrapError(model.ErrSaveUser, err)
 			}
 		}
 
 		sesh, err := ch.sqlDb.CreateSession(ctx, userCode)
 		if err != nil {
-			return model.NewError(model.ErrCreateSession, err)
+			return model.WrapError(model.ErrCreateSession, err)
 		}
 		session = sesh
 		// session.LP = bl.GetLP()
@@ -191,7 +191,7 @@ func (ch *TrackingHandler) SelectGame(game model.GameType) error {
 		username = ch.cfg.CapIDEmail
 		password = ch.cfg.CapIDPassword
 	default:
-		return model.NewError(model.ErrSelectGame, fmt.Errorf("game does not exist"))
+		return model.WrapError(model.ErrSelectGame, fmt.Errorf("game does not exist"))
 	}
 
 	authChan := make(chan tracker.AuthStatus)
@@ -200,7 +200,7 @@ func (ch *TrackingHandler) SelectGame(game model.GameType) error {
 	go ch.gameTracker.Authenticate(ctx, username, password, authChan)
 	for status := range authChan {
 		if status.Err != nil {
-			return model.NewError(model.ErrAuth, status.Err)
+			return model.WrapError(model.ErrAuth, status.Err)
 		}
 
 		ch.eventEmitter("auth-progress", status.Progress)

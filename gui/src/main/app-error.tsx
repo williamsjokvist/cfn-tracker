@@ -33,7 +33,8 @@ export function PageErrorBoundary() {
   )
 }
 
-const isFGCTrackerError = (error: unknown) => error instanceof Object && 'localizationKey' in error
+const isFGCTrackerError = (error: unknown) =>
+  error instanceof Object && 'localizationKey' in error && 'message' in error
 
 function useFGCTrackerError() {
   const thrownError = useRouteError()
@@ -46,8 +47,7 @@ function useFGCTrackerError() {
     } else if (thrownError instanceof Error) {
       setErr({
         localizationKey: model.ErrorLocalizationKey.errUnknown,
-        message: thrownError.message,
-        InnerError: thrownError
+        message: thrownError.message
       })
     }
   }, [thrownError])

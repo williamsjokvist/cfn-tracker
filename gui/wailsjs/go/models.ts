@@ -269,7 +269,6 @@ export namespace model {
 	export class FGCTrackerError {
 	    localizationKey: ErrorLocalizationKey;
 	    message: string;
-	    InnerError: any;
 	
 	    static createFrom(source: any = {}) {
 	        return new FGCTrackerError(source);
@@ -279,7 +278,6 @@ export namespace model {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.localizationKey = source["localizationKey"];
 	        this.message = source["message"];
-	        this.InnerError = source["InnerError"];
 	    }
 	}
 	export class GuiConfig {

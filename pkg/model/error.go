@@ -76,10 +76,10 @@ var (
 type FGCTrackerError struct {
 	LocalizationKey ErrorLocalizationKey `json:"localizationKey"`
 	Message         string               `json:"message"`
-	InnerError      error
+	InnerError      error                `json:"-"`
 }
 
-func NewError(fmtErr *FGCTrackerError, err error) *FGCTrackerError {
+func WrapError(fmtErr *FGCTrackerError, err error) *FGCTrackerError {
 	return &FGCTrackerError{
 		LocalizationKey: fmtErr.LocalizationKey,
 		Message:         fmtErr.Message,
@@ -100,11 +100,6 @@ func (e *FGCTrackerError) Error() string {
 
 func (e *FGCTrackerError) Unwrap() error {
 	return e.InnerError
-}
-
-func ContainsFGCTrackerError(err error) bool {
-	var trackingErr *FGCTrackerError
-	return errors.As(err, &trackingErr)
 }
 
 func FormatError(err error) any {

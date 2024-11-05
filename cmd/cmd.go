@@ -43,11 +43,11 @@ func NewCommandHandler(githubClient github.GithubClient, sqlDb *sql.Storage, nos
 func (ch *CommandHandler) CheckForUpdate() (bool, error) {
 	currentVersion, err := version.NewVersion(ch.cfg.AppVersion)
 	if err != nil {
-		return false, model.NewError(model.ErrCheckForUpdate, err)
+		return false, model.WrapError(model.ErrCheckForUpdate, err)
 	}
 	latestVersion, err := ch.githubClient.GetLatestAppVersion()
 	if err != nil {
-		return false, model.NewError(model.ErrCheckForUpdate, err)
+		return false, model.WrapError(model.ErrCheckForUpdate, err)
 	}
 	return currentVersion.LessThan(latestVersion), nil
 }
@@ -55,7 +55,7 @@ func (ch *CommandHandler) CheckForUpdate() (bool, error) {
 func (ch *CommandHandler) GetTranslation(locale string) (*locales.Localization, error) {
 	lng, err := i18n.GetTranslation(locale)
 	if err != nil {
-		return nil, model.NewError(model.ErrGetTranslations, err)
+		return nil, model.WrapError(model.ErrGetTranslations, err)
 	}
 	return lng, nil
 }
@@ -68,11 +68,11 @@ func (ch *CommandHandler) OpenResultsDirectory() error {
 	switch runtime.GOOS {
 	case `darwin`:
 		if err := exec.Command(`Open`, `./results`).Run(); err != nil {
-			return model.NewError(model.ErrOpenResultsDirectory, err)
+			return model.WrapError(model.ErrOpenResultsDirectory, err)
 		}
 	case `windows`:
 		if err := exec.Command(`explorer.exe`, `.\results`).Run(); err != nil {
-			return model.NewError(model.ErrOpenResultsDirectory, err)
+			return model.WrapError(model.ErrOpenResultsDirectory, err)
 		}
 	}
 	return nil
@@ -81,7 +81,7 @@ func (ch *CommandHandler) OpenResultsDirectory() error {
 func (ch *CommandHandler) GetSessions(userId, date string, limit uint8, offset uint16) ([]*model.Session, error) {
 	sessions, err := ch.sqlDb.GetSessions(context.Background(), userId, date, limit, offset)
 	if err != nil {
-		return nil, model.NewError(model.ErrGetSessions, err)
+		return nil, model.WrapError(model.ErrGetSessions, err)
 	}
 	return sessions, nil
 }
@@ -89,7 +89,7 @@ func (ch *CommandHandler) GetSessions(userId, date string, limit uint8, offset u
 func (ch *CommandHandler) GetSessionsStatistics(userId string) (*model.SessionsStatistics, error) {
 	sessionStatistics, err := ch.sqlDb.GetSessionsStatistics(context.Background(), userId)
 	if err != nil {
-		return nil, model.NewError(model.ErrGetSessionStatistics, err)
+		return nil, model.WrapError(model.ErrGetSessionStatistics, err)
 	}
 	return sessionStatistics, nil
 }
@@ -97,7 +97,7 @@ func (ch *CommandHandler) GetSessionsStatistics(userId string) (*model.SessionsS
 func (ch *CommandHandler) GetMatches(sessionId uint16, userId string, limit uint8, offset uint16) ([]*model.Match, error) {
 	matches, err := ch.sqlDb.GetMatches(context.Background(), sessionId, userId, limit, offset)
 	if err != nil {
-		return nil, model.NewError(model.ErrGetMatches, err)
+		return nil, model.WrapError(model.ErrGetMatches, err)
 	}
 	return matches, nil
 }
@@ -105,7 +105,7 @@ func (ch *CommandHandler) GetMatches(sessionId uint16, userId string, limit uint
 func (ch *CommandHandler) GetUsers() ([]*model.User, error) {
 	users, err := ch.sqlDb.GetUsers(context.Background())
 	if err != nil {
-		return nil, model.NewError(model.ErrGetUser, err)
+		return nil, model.WrapError(model.ErrGetUser, err)
 	}
 	return users, nil
 }
@@ -128,7 +128,7 @@ func (ch *CommandHandler) GetThemes() ([]model.Theme, error) {
 		}
 		css, err := os.ReadFile(fmt.Sprintf(`themes/%s`, fileName))
 		if err != nil {
-			return nil, model.NewError(model.ErrReadThemeCSS, err)
+			return nil, model.WrapError(model.ErrReadThemeCSS, err)
 		}
 		name := strings.Split(fileName, `.css`)[0]
 
@@ -148,7 +148,7 @@ func (ch *CommandHandler) GetSupportedLanguages() []string {
 
 func (ch *CommandHandler) SaveLocale(locale string) error {
 	if err := ch.nosqlDb.SaveLocale(locale); err != nil {
-		return model.NewError(model.ErrSaveLocale, err)
+		return model.WrapError(model.ErrSaveLocale, err)
 	}
 	return nil
 }
@@ -156,21 +156,21 @@ func (ch *CommandHandler) SaveLocale(locale string) error {
 func (ch *CommandHandler) GetGuiConfig() (*model.GuiConfig, error) {
 	guiCfg, err := ch.nosqlDb.GetGuiConfig()
 	if err != nil {
-		return nil, model.NewError(model.ErrGetGUIConfig, err)
+		return nil, model.WrapError(model.ErrGetGUIConfig, err)
 	}
 	return guiCfg, nil
 }
 
 func (ch *CommandHandler) SaveSidebarMinimized(sidebarMinified bool) error {
 	if err := ch.nosqlDb.SaveSidebarMinimized(sidebarMinified); err != nil {
-		return model.NewError(model.ErrSaveSidebarMinimized, err)
+		return model.WrapError(model.ErrSaveSidebarMinimized, err)
 	}
 	return nil
 }
 
 func (ch *CommandHandler) SaveTheme(theme model.ThemeName) error {
 	if err := ch.nosqlDb.SaveTheme(theme); err != nil {
-		return model.NewError(model.ErrSaveTheme, err)
+		return model.WrapError(model.ErrSaveTheme, err)
 	}
 	return nil
 }
