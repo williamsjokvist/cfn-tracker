@@ -28,28 +28,28 @@ const (
 	tKeyErrReadThemeCSS         ErrorLocalizationKey = "errReadThemeCSS"
 )
 
-var AllErrors = []struct {
+var AllErrorKeys = []struct {
 	Value  ErrorLocalizationKey
 	TSName string
 }{
-	{tKeyErrUnknown, "errUnknown"},
-	{tKeyErrSelectGame, "errSelectGame"},
-	{tKeyErrAuth, "errAuth"},
-	{tKeyErrGetLatestSession, "errGetLatestSession"},
-	{tKeyErrGetUser, "errGetUser"},
-	{tKeyErrGetMatches, "errGetMatches"},
-	{tKeyErrSaveLocale, "errSaveLocale"},
-	{tKeyErrCheckForUpdate, "errCheckForUpdate"},
-	{tKeyErrGetGuiConfig, "errGetGuiConfig"},
-	{tKeyErrSaveTheme, "errSaveTheme"},
-	{tKeyErrSaveUser, "errSaveUser"},
-	{tKeyErrSaveSidebarMinimized, "errSaveSidebarMinimized"},
-	{tKeyErrGetSessions, "errGetSessions"},
-	{tKeyErrGetTranslations, "errGetTranslations"},
-	{tKeyErrGetSessionStatistics, "errGetSessionStatistics"},
-	{tKeyErrCreateSession, "errCreateSession"},
-	{tKeyErrOpenResultsDirectory, "errOpenResultsDirectory"},
-	{tKeyErrReadThemeCSS, "errReadThemeCSS"},
+	{tKeyErrUnknown, string(tKeyErrUnknown)},
+	{tKeyErrSelectGame, string(tKeyErrSelectGame)},
+	{tKeyErrAuth, string(tKeyErrAuth)},
+	{tKeyErrGetLatestSession, string(tKeyErrGetLatestSession)},
+	{tKeyErrGetUser, string(tKeyErrGetUser)},
+	{tKeyErrGetMatches, string(tKeyErrGetMatches)},
+	{tKeyErrSaveLocale, string(tKeyErrSaveLocale)},
+	{tKeyErrCheckForUpdate, string(tKeyErrCheckForUpdate)},
+	{tKeyErrGetGuiConfig, string(tKeyErrGetGuiConfig)},
+	{tKeyErrSaveTheme, string(tKeyErrSaveTheme)},
+	{tKeyErrSaveUser, string(tKeyErrSaveUser)},
+	{tKeyErrSaveSidebarMinimized, string(tKeyErrSaveSidebarMinimized)},
+	{tKeyErrGetSessions, string(tKeyErrGetSessions)},
+	{tKeyErrGetTranslations, string(tKeyErrGetTranslations)},
+	{tKeyErrGetSessionStatistics, string(tKeyErrGetSessionStatistics)},
+	{tKeyErrCreateSession, string(tKeyErrCreateSession)},
+	{tKeyErrOpenResultsDirectory, string(tKeyErrOpenResultsDirectory)},
+	{tKeyErrReadThemeCSS, string(tKeyErrReadThemeCSS)},
 }
 
 var (

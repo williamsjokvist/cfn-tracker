@@ -236,7 +236,7 @@ func main() {
 		EnumBind: []interface{}{
 			model.AllThemes,
 			model.AllGameTypes,
-			model.AllErrors,
+			model.AllErrorKeys,
 		},
 	})
 	if err != nil {
