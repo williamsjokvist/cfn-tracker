@@ -191,8 +191,7 @@ func (ch *TrackingHandler) SelectGame(game model.GameType) error {
 		username = ch.cfg.CapIDEmail
 		password = ch.cfg.CapIDPassword
 	default:
-		errGameNotExist := fmt.Errorf("game does not exist")
-		return model.NewError(model.ErrSelectGame, errGameNotExist)
+		return model.NewError(model.ErrSelectGame, fmt.Errorf("game does not exist"))
 	}
 
 	authChan := make(chan tracker.AuthStatus)
