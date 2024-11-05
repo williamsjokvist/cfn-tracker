@@ -27,7 +27,7 @@ func (s *Storage) SaveTheme(theme model.ThemeName) error {
 	cfg.Theme = theme
 	err = s.writeConfig(cfg)
 	if err != nil {
-		return fmt.Errorf(`save locale: %w`, err)
+		return fmt.Errorf(`save theme: %w`, err)
 	}
 	return nil
 }
