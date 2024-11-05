@@ -4,11 +4,10 @@ import { useRouteError } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Icon } from '@iconify/react'
 
-import { type model } from '@model'
+import { model } from '@model'
 import * as Page from '@/ui/page'
 
 import { AppTitleBar } from './app-titlebar'
-import { LocalizationKey } from './i18n'
 
 export function AppErrorBoundary() {
   const err = useFGCTrackerError()
@@ -22,7 +21,7 @@ export function AppErrorBoundary() {
 export function PageErrorBoundary() {
   const { t } = useTranslation()
   const err = useFGCTrackerError()
-  if (!err?.localizationKey) {
+  if (!err) {
     return null
   }
   return (
@@ -38,18 +37,22 @@ const isFGCTrackerError = (error: unknown) => error instanceof Object && 'locali
 
 function useFGCTrackerError() {
   const thrownError = useRouteError()
-  const [err, setErr] = React.useState<model.FGCTrackerError | unknown>()
+  const [err, setErr] = React.useState<model.FGCTrackerError>()
 
   React.useEffect(() => {
     console.error(thrownError)
-    if (thrownError instanceof Error) {
-      setErr({ translationKey: '', message: thrownError.message, error: thrownError })
-    } else if (isFGCTrackerError(thrownError)) {
-      setErr(thrownError)
+    if (isFGCTrackerError(thrownError)) {
+      setErr(thrownError as model.FGCTrackerError)
+    } else if (thrownError instanceof Error) {
+      setErr({
+        localizationKey: model.ErrorLocalizationKey.errUnknown,
+        message: thrownError.message,
+        InnerError: thrownError
+      })
     }
   }, [thrownError])
 
-  return err as model.FGCTrackerError
+  return err
 }
 
 function ErrorWrapper(props: React.PropsWithChildren & { err?: model.FGCTrackerError }) {
@@ -67,7 +70,7 @@ function ErrorWrapper(props: React.PropsWithChildren & { err?: model.FGCTrackerE
       {props.children}
       <div className='mt-8 flex w-full flex-col items-center justify-center rounded-md pb-16 text-center'>
         <Icon icon='material-symbols:warning-outline' className='h-40 w-40 text-[#ff6388]' />
-        <h1 className='text-center text-2xl font-bold'>{t(props.err?.localizationKey)}</h1>
+        <h1 className='text-center text-2xl font-bold'>{t(props.err.localizationKey)}</h1>
         <p className='text-xl'>{props.err?.message}</p>
       </div>
     </motion.section>

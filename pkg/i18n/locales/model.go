@@ -94,6 +94,7 @@ type Localization struct {
 	T8TekkenGod              string `json:"T8_TEKKEN_GOD"`
 	T8TekkenGodSupreme       string `json:"T8_TEKKEN_GOD_SUPREME"`
 	T8GodOfDestruction       string `json:"T8_GOD_OF_DESTRUCTION"`
+	ErrUnknown               string `json:"errUnknown"`
 	ErrSelectGame            string `json:"errSelectGame"`
 	ErrAuth                  string `json:"errAuth"`
 	ErrGetLatestSession      string `json:"errGetLatestSession"`
@@ -103,6 +104,7 @@ type Localization struct {
 	ErrCheckForUpdate        string `json:"errCheckForUpdate"`
 	ErrGetGuiConfig          string `json:"errGetGuiConfig"`
 	ErrSaveTheme             string `json:"errSaveTheme"`
+	ErrSaveUser              string `json:"errSaveUser"`
 	ErrSaveSidebarMinimized  string `json:"errSaveSidebarMinimized"`
 	ErrGetSessions           string `json:"errGetSessions"`
 	ErrGetTranslations       string `json:"errGetTranslations"`
