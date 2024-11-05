@@ -8,6 +8,7 @@ import (
 type ErrorLocalizationKey string
 
 const (
+	tKeyErrUnkown               ErrorLocalizationKey = "errUnknown"
 	tKeyErrSelectGame           ErrorLocalizationKey = "errSelectGame"
 	tKeyErrAuth                 ErrorLocalizationKey = "errAuth"
 	tKeyErrGetLatestSession     ErrorLocalizationKey = "errGetLatestSession"
@@ -31,6 +32,7 @@ var AllErrors = []struct {
 	Value  ErrorLocalizationKey
 	TSName string
 }{
+	{tKeyErrUnkown, "errUnknown"},
 	{tKeyErrSelectGame, "errSelectGame"},
 	{tKeyErrAuth, "errAuth"},
 	{tKeyErrGetLatestSession, "errGetLatestSession"},
@@ -51,6 +53,7 @@ var AllErrors = []struct {
 }
 
 var (
+	ErrUnknown              = newError(tKeyErrUnkown, errors.New("unknown error"))
 	ErrSelectGame           = newError(tKeyErrSelectGame, errors.New("select game"))
 	ErrAuth                 = newError(tKeyErrAuth, errors.New("unauthenticated"))
 	ErrGetLatestSession     = newError(tKeyErrGetLatestSession, errors.New("get latest session"))

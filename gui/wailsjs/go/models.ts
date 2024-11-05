@@ -94,6 +94,7 @@ export namespace locales {
 	    T8_TEKKEN_GOD: string;
 	    T8_TEKKEN_GOD_SUPREME: string;
 	    T8_GOD_OF_DESTRUCTION: string;
+	    errUnknown: string;
 	    errSelectGame: string;
 	    errAuth: string;
 	    errGetLatestSession: string;
@@ -103,6 +104,7 @@ export namespace locales {
 	    errCheckForUpdate: string;
 	    errGetGuiConfig: string;
 	    errSaveTheme: string;
+	    errSaveUser: string;
 	    errSaveSidebarMinimized: string;
 	    errGetSessions: string;
 	    errGetTranslations: string;
@@ -210,6 +212,7 @@ export namespace locales {
 	        this.T8_TEKKEN_GOD = source["T8_TEKKEN_GOD"];
 	        this.T8_TEKKEN_GOD_SUPREME = source["T8_TEKKEN_GOD_SUPREME"];
 	        this.T8_GOD_OF_DESTRUCTION = source["T8_GOD_OF_DESTRUCTION"];
+	        this.errUnknown = source["errUnknown"];
 	        this.errSelectGame = source["errSelectGame"];
 	        this.errAuth = source["errAuth"];
 	        this.errGetLatestSession = source["errGetLatestSession"];
@@ -219,6 +222,7 @@ export namespace locales {
 	        this.errCheckForUpdate = source["errCheckForUpdate"];
 	        this.errGetGuiConfig = source["errGetGuiConfig"];
 	        this.errSaveTheme = source["errSaveTheme"];
+	        this.errSaveUser = source["errSaveUser"];
 	        this.errSaveSidebarMinimized = source["errSaveSidebarMinimized"];
 	        this.errGetSessions = source["errGetSessions"];
 	        this.errGetTranslations = source["errGetTranslations"];
@@ -243,6 +247,7 @@ export namespace model {
 	    TEKKEN_8 = "t8",
 	}
 	export enum ErrorLocalizationKey {
+	    errUnknown = "errUnknown",
 	    errSelectGame = "errSelectGame",
 	    errAuth = "errAuth",
 	    errGetLatestSession = "errGetLatestSession",
@@ -252,6 +257,7 @@ export namespace model {
 	    errCheckForUpdate = "errCheckForUpdate",
 	    errGetGuiConfig = "errGetGuiConfig",
 	    errSaveTheme = "errSaveTheme",
+	    errSaveUser = "errSaveUser",
 	    errSaveSidebarMinimized = "errSaveSidebarMinimized",
 	    errGetSessions = "errGetSessions",
 	    errGetTranslations = "errGetTranslations",
