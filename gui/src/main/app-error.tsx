@@ -43,7 +43,7 @@ function useFormattedError() {
   React.useEffect(() => {
     console.error(thrownError)
     if (thrownError instanceof Error) {
-      setErr({ translationKey: "", message: thrownError.message, error: thrownError })
+      setErr({ translationKey: '', message: thrownError.message, error: thrownError })
     } else if (isFormattedError(thrownError)) {
       setErr(thrownError)
     }
