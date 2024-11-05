@@ -74,8 +74,11 @@ type FGCTrackerError struct {
 }
 
 func NewError(fmtErr *FGCTrackerError, err error) *FGCTrackerError {
-	fmtErr.InnerError = fmt.Errorf("%w: %w", fmtErr.InnerError, err)
-	return fmtErr
+	return &FGCTrackerError{
+		LocalizationKey: fmtErr.LocalizationKey,
+		Message:         fmtErr.Message,
+		InnerError:      fmt.Errorf("%w: %w", fmtErr.InnerError, err),
+	}
 }
 
 func newError(key ErrorLocalizationKey, err error) *FGCTrackerError {
