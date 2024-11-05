@@ -97,7 +97,7 @@ var FR_FR = Localization{
 	ErrUnknown:               "Erreur inconnue",
 	ErrSelectGame:            "échec de la sélection du jeu",
 	ErrAuth:                  "échec de l'authentification",
-	ErrGetLatestSession:      "impossible d'obtenir la dernière session",
+	ErrGetLatestSession:      "échec de l'obtention de la dernière session",
 	ErrGetUser:               "échec de l'obtention de l'utilisateur",
 	ErrGetMatches:            "échec de l'obtention des correspondances",
 	ErrCheckForUpdate:        "échec de la vérification de la mise à jour",
