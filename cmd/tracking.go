@@ -87,7 +87,7 @@ func (ch *TrackingHandler) StartTracking(userCode string, restore bool) error {
 				return model.NewError(model.ErrGetUser, err)
 			}
 			if err := ch.sqlDb.SaveUser(ctx, *usr); err != nil {
-				return model.NewError(model.ErrGetUser, err)
+				return model.NewError(model.ErrSaveUser, err)
 			}
 		}
 
