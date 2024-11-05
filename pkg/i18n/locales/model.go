@@ -94,7 +94,22 @@ type Localization struct {
 	T8TekkenGod              string `json:"T8_TEKKEN_GOD"`
 	T8TekkenGodSupreme       string `json:"T8_TEKKEN_GOD_SUPREME"`
 	T8GodOfDestruction       string `json:"T8_GOD_OF_DESTRUCTION"`
-	ErrUnauthorized          string `json:"errUnauthorized"`
-	ErrInternalServerError   string `json:"errInternalServerError"`
-	ErrNotFound              string `json:"errNotFound"`
+	ErrUnknown               string `json:"errUnknown"`
+	ErrSelectGame            string `json:"errSelectGame"`
+	ErrAuth                  string `json:"errAuth"`
+	ErrGetLatestSession      string `json:"errGetLatestSession"`
+	ErrGetUser               string `json:"errGetUser"`
+	ErrGetMatches            string `json:"errGetMatches"`
+	ErrSaveLocale            string `json:"errSaveLocale"`
+	ErrCheckForUpdate        string `json:"errCheckForUpdate"`
+	ErrGetGuiConfig          string `json:"errGetGuiConfig"`
+	ErrSaveTheme             string `json:"errSaveTheme"`
+	ErrSaveUser              string `json:"errSaveUser"`
+	ErrSaveSidebarMinimized  string `json:"errSaveSidebarMinimized"`
+	ErrGetSessions           string `json:"errGetSessions"`
+	ErrGetTranslations       string `json:"errGetTranslations"`
+	ErrGetSessionStatistics  string `json:"errGetSessionStatistics"`
+	ErrCreateSession         string `json:"errCreateSession"`
+	ErrOpenResultsDirectory  string `json:"errOpenResultsDirectory"`
+	ErrReadThemeCSS          string `json:"errReadThemeCSS"`
 }

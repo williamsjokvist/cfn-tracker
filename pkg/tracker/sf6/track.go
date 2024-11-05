@@ -3,10 +3,8 @@ package sf6
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"time"
 
-	"github.com/williamsjokvist/cfn-tracker/pkg/errorsx"
 	"github.com/williamsjokvist/cfn-tracker/pkg/model"
 	"github.com/williamsjokvist/cfn-tracker/pkg/tracker"
 	"github.com/williamsjokvist/cfn-tracker/pkg/tracker/sf6/cfn"
@@ -27,7 +25,7 @@ func NewSF6Tracker(cfnClient cfn.CFNClient) *SF6Tracker {
 func (t *SF6Tracker) GetUser(ctx context.Context, userCode string) (*model.User, error) {
 	bl, err := t.cfnClient.GetBattleLog(ctx, userCode)
 	if err != nil {
-		return nil, errorsx.NewFormattedError(http.StatusInternalServerError, fmt.Errorf("fetch battle log: %w", err))
+		return nil, fmt.Errorf("fetch battle log: %w", err)
 	}
 	return &model.User{
 		DisplayName: bl.GetCFN(),

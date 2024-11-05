@@ -57,7 +57,7 @@ func (c *Client) GetBattleLog(ctx context.Context, cfn string) (*BattleLog, erro
 
 	bl := &profilePage.Props.PageProps
 	if bl.Common.StatusCode != 200 {
-		return nil, fmt.Errorf(`failed to fetch battle log, received status code %v`, bl.Common.StatusCode)
+		return nil, fmt.Errorf("fetch battle log, received status code %v", bl.Common.StatusCode)
 	}
 	return bl, nil
 }

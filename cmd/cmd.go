@@ -2,10 +2,7 @@ package cmd
 
 import (
 	"context"
-	"errors"
 	"fmt"
-	"log"
-	"net/http"
 	"os"
 	"os/exec"
 	"runtime"
@@ -14,7 +11,6 @@ import (
 	"github.com/hashicorp/go-version"
 
 	"github.com/williamsjokvist/cfn-tracker/pkg/config"
-	"github.com/williamsjokvist/cfn-tracker/pkg/errorsx"
 	"github.com/williamsjokvist/cfn-tracker/pkg/i18n"
 	"github.com/williamsjokvist/cfn-tracker/pkg/i18n/locales"
 	"github.com/williamsjokvist/cfn-tracker/pkg/model"
@@ -47,28 +43,19 @@ func NewCommandHandler(githubClient github.GithubClient, sqlDb *sql.Storage, nos
 func (ch *CommandHandler) CheckForUpdate() (bool, error) {
 	currentVersion, err := version.NewVersion(ch.cfg.AppVersion)
 	if err != nil {
-		log.Println(err)
-		return false, fmt.Errorf(`failed to parse current app version: %w`, err)
+		return false, model.WrapError(model.ErrCheckForUpdate, err)
 	}
 	latestVersion, err := ch.githubClient.GetLatestAppVersion()
 	if err != nil {
-		log.Println(err)
-		return false, fmt.Errorf(`failed to check for update: %w`, err)
+		return false, model.WrapError(model.ErrCheckForUpdate, err)
 	}
-
-	hasUpdate := currentVersion.LessThan(latestVersion)
-	log.Println(`Has update: `, hasUpdate, `. Current: `, currentVersion.String(), ` Latest: `, latestVersion.String())
-	return hasUpdate, nil
+	return currentVersion.LessThan(latestVersion), nil
 }
 
 func (ch *CommandHandler) GetTranslation(locale string) (*locales.Localization, error) {
 	lng, err := i18n.GetTranslation(locale)
 	if err != nil {
-		log.Println(err)
-		if !errorsx.ContainsFormattedError(err) {
-			err = errorsx.NewFormattedError(http.StatusNotFound, fmt.Errorf(`failed to get translation %w`, err))
-		}
-		return nil, err
+		return nil, model.WrapError(model.ErrGetTranslations, err)
 	}
 	return lng, nil
 }
@@ -77,61 +64,50 @@ func (ch *CommandHandler) GetAppVersion() string {
 	return ch.cfg.AppVersion
 }
 
-func (ch *CommandHandler) OpenResultsDirectory() {
+func (ch *CommandHandler) OpenResultsDirectory() error {
 	switch runtime.GOOS {
 	case `darwin`:
 		if err := exec.Command(`Open`, `./results`).Run(); err != nil {
-			log.Println(err)
+			return model.WrapError(model.ErrOpenResultsDirectory, err)
 		}
 	case `windows`:
 		if err := exec.Command(`explorer.exe`, `.\results`).Run(); err != nil {
-			log.Println(err)
+			return model.WrapError(model.ErrOpenResultsDirectory, err)
 		}
 	}
+	return nil
 }
 
 func (ch *CommandHandler) GetSessions(userId, date string, limit uint8, offset uint16) ([]*model.Session, error) {
 	sessions, err := ch.sqlDb.GetSessions(context.Background(), userId, date, limit, offset)
 	if err != nil {
-		log.Println(err)
-		if !errorsx.ContainsFormattedError(err) {
-			err = errorsx.NewFormattedError(http.StatusNotFound, fmt.Errorf(`failed to get sessions %w`, err))
-		}
+		return nil, model.WrapError(model.ErrGetSessions, err)
 	}
-	return sessions, err
+	return sessions, nil
 }
 
 func (ch *CommandHandler) GetSessionsStatistics(userId string) (*model.SessionsStatistics, error) {
 	sessionStatistics, err := ch.sqlDb.GetSessionsStatistics(context.Background(), userId)
 	if err != nil {
-		log.Println(err)
-		if !errorsx.ContainsFormattedError(err) {
-			err = errorsx.NewFormattedError(http.StatusNotFound, fmt.Errorf(`failed to get monthly session counts %w`, err))
-		}
+		return nil, model.WrapError(model.ErrGetSessionStatistics, err)
 	}
-	return sessionStatistics, err
+	return sessionStatistics, nil
 }
 
 func (ch *CommandHandler) GetMatches(sessionId uint16, userId string, limit uint8, offset uint16) ([]*model.Match, error) {
 	matches, err := ch.sqlDb.GetMatches(context.Background(), sessionId, userId, limit, offset)
 	if err != nil {
-		log.Println(err)
-		if !errorsx.ContainsFormattedError(err) {
-			err = errorsx.NewFormattedError(http.StatusNotFound, fmt.Errorf(`failed to get matches %w`, err))
-		}
+		return nil, model.WrapError(model.ErrGetMatches, err)
 	}
-	return matches, err
+	return matches, nil
 }
 
 func (ch *CommandHandler) GetUsers() ([]*model.User, error) {
 	users, err := ch.sqlDb.GetUsers(context.Background())
 	if err != nil {
-		log.Println(err)
-		if !errorsx.ContainsFormattedError(err) {
-			err = errorsx.NewFormattedError(http.StatusNotFound, fmt.Errorf(`failed to get users %w`, err))
-		}
+		return nil, model.WrapError(model.ErrGetUser, err)
 	}
-	return users, err
+	return users, nil
 }
 
 func (ch *CommandHandler) GetThemes() ([]model.Theme, error) {
@@ -152,8 +128,7 @@ func (ch *CommandHandler) GetThemes() ([]model.Theme, error) {
 		}
 		css, err := os.ReadFile(fmt.Sprintf(`themes/%s`, fileName))
 		if err != nil {
-			log.Println(err)
-			return nil, errorsx.NewFormattedError(http.StatusInternalServerError, errors.New("failed to read theme css"))
+			return nil, model.WrapError(model.ErrReadThemeCSS, err)
 		}
 		name := strings.Split(fileName, `.css`)[0]
 
@@ -172,21 +147,34 @@ func (ch *CommandHandler) GetSupportedLanguages() []string {
 }
 
 func (ch *CommandHandler) SaveLocale(locale string) error {
-	return ch.nosqlDb.SaveLocale(locale)
+	if err := ch.nosqlDb.SaveLocale(locale); err != nil {
+		return model.WrapError(model.ErrSaveLocale, err)
+	}
+	return nil
 }
 
 func (ch *CommandHandler) GetGuiConfig() (*model.GuiConfig, error) {
-	return ch.nosqlDb.GetGuiConfig()
+	guiCfg, err := ch.nosqlDb.GetGuiConfig()
+	if err != nil {
+		return nil, model.WrapError(model.ErrGetGUIConfig, err)
+	}
+	return guiCfg, nil
 }
 
 func (ch *CommandHandler) SaveSidebarMinimized(sidebarMinified bool) error {
-	return ch.nosqlDb.SaveSidebarMinimized(sidebarMinified)
+	if err := ch.nosqlDb.SaveSidebarMinimized(sidebarMinified); err != nil {
+		return model.WrapError(model.ErrSaveSidebarMinimized, err)
+	}
+	return nil
 }
 
 func (ch *CommandHandler) SaveTheme(theme model.ThemeName) error {
-	return ch.nosqlDb.SaveTheme(theme)
+	if err := ch.nosqlDb.SaveTheme(theme); err != nil {
+		return model.WrapError(model.ErrSaveTheme, err)
+	}
+	return nil
 }
 
-func (ch *CommandHandler) GetFormattedErrorModelUnused() *errorsx.FormattedError {
+func (ch *CommandHandler) GetFGCTrackerErrorModelUnused() *model.FGCTrackerError {
 	return nil
 }

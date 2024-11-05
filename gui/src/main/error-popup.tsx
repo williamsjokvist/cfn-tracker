@@ -3,28 +3,22 @@ import { Icon } from '@iconify/react'
 import { useAnimate } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 
+import { type model } from '@model'
 import { cn } from '@/helpers/cn'
-import type { errorsx } from '@model'
 
 import type { LocalizationKey } from './i18n'
 
 type ErrorContextType = [
-  error: errorsx.FormattedError | null,
-  setError: React.Dispatch<errorsx.FormattedError>
+  error: model.FGCTrackerError | null,
+  setError: React.Dispatch<model.FGCTrackerError>
 ]
 const ErrorContext = React.createContext<ErrorContextType | null>(null)
 export const useErrorPopup = () => React.useContext(ErrorContext)![1]
 
-export const LocalizedErrorMessage: Record<number, LocalizationKey> = {
-  401: 'errUnauthorized',
-  404: 'errNotFound',
-  500: 'errInternalServerError'
-}
-
 export function ErrorPopupProvider(props: React.PropsWithChildren) {
   const { t } = useTranslation()
   const [scope, animate] = useAnimate()
-  const [error, setError] = React.useState<errorsx.FormattedError | null>(null)
+  const [error, setError] = React.useState<model.FGCTrackerError | null>(null)
 
   React.useEffect(() => {
     if (error === null) {
@@ -52,13 +46,7 @@ export function ErrorPopupProvider(props: React.PropsWithChildren) {
             icon='material-symbols:warning-outline'
             className='h-8 w-8 animate-blink text-[#ff6388]'
           />
-          {error && (
-            <span>
-              {error?.code && LocalizedErrorMessage[error.code]
-                ? t(LocalizedErrorMessage[error.code])
-                : error.message}
-            </span>
-          )}
+          {error?.localizationKey && <span>{t(error.localizationKey)}</span>}
         </div>
       </div>
       {props.children}

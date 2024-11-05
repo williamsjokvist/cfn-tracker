@@ -175,7 +175,7 @@ func (s *Storage) GetLatestSession(ctx context.Context, userId string) (*model.S
 	sesh := sessions[0]
 	matches, err := s.GetMatches(ctx, sesh.Id, userId, 0, 0)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get matches by session: %w", err)
+		return nil, fmt.Errorf("get matches by session: %w", err)
 	}
 	sesh.Matches = matches
 	return sesh, nil

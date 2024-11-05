@@ -23,7 +23,7 @@ func NewBrowser(headless bool) (*Browser, error) {
 
 	userHomeDir, err := os.UserCacheDir()
 	if err != nil {
-		return nil, fmt.Errorf("failed to get cache dir for browser: %w", err)
+		return nil, fmt.Errorf("get cache dir for browser: %w", err)
 	}
 	userDataDir := filepath.Join(userHomeDir, "cfn-tracker")
 	l := launcher.New()
@@ -31,14 +31,14 @@ func NewBrowser(headless bool) (*Browser, error) {
 	l.RemoteDebuggingPort(6969)
 	u, err := l.Leakless(false).Headless(headless).Launch()
 	if err != nil {
-		return nil, fmt.Errorf("failed to launch temp browser: %w", err)
+		return nil, fmt.Errorf("launch temp browser: %w", err)
 	}
 
 	log.Println("Browser connecting to", u)
 	browser := rod.New().ControlURL(u)
 	err = browser.Connect()
 	if err != nil {
-		return nil, fmt.Errorf("failed to connect to browser: %w", err)
+		return nil, fmt.Errorf("connect to browser: %w", err)
 	}
 
 	var page *rod.Page

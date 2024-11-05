@@ -2,7 +2,7 @@ import { setup, assign } from 'xstate'
 import { createActorContext } from '@xstate/react'
 
 import { SelectGame } from '@cmd/TrackingHandler'
-import { model, type errorsx } from '@model'
+import { model } from '@model'
 import { EventsOff, EventsOn } from '@runtime'
 
 import { TRACKING_MACHINE } from './tracking-machine'
@@ -10,7 +10,7 @@ import { TRACKING_MACHINE } from './tracking-machine'
 type AuthMachineContextProps = {
   progress: number
   game?: model.GameType
-  error: errorsx.FormattedError | null
+  error: model.FGCTrackerError | null
 }
 export const AUTH_MACHINE = setup({
   types: {

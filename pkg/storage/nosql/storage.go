@@ -33,7 +33,7 @@ func NewStorage() (*Storage, error) {
 		}
 		err = storage.writeConfig(model.NewGuiConfig())
 		if err != nil {
-			return nil, fmt.Errorf(`failed to write initial config: %w`, err)
+			return nil, fmt.Errorf("write initial config: %w", err)
 		}
 	}
 	return storage, nil
@@ -52,12 +52,12 @@ func getDocumentPath() (string, error) {
 func (s *Storage) GetGuiConfig() (*model.GuiConfig, error) {
 	data, err := os.ReadFile(s.directory)
 	if err != nil {
-		return nil, fmt.Errorf(`failed to read nosql db: %w`, err)
+		return nil, fmt.Errorf("read json file: %w", err)
 	}
 	var cfg model.GuiConfig
 	err = json.Unmarshal(data, &cfg)
 	if err != nil {
-		return nil, fmt.Errorf(`failed to parse nosql db: %w`, err)
+		return nil, fmt.Errorf("parse json db: %w", err)
 	}
 	return &cfg, nil
 }
@@ -69,7 +69,7 @@ func (s *Storage) writeConfig(cfg *model.GuiConfig) error {
 	}
 	err = os.WriteFile(s.directory, data, os.FileMode(0755))
 	if err != nil {
-		return fmt.Errorf(`failed to read nosql db: %w`, err)
+		return fmt.Errorf("write json: %w", err)
 	}
 	return nil
 }

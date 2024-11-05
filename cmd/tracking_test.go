@@ -19,12 +19,12 @@ func TestTrackingSelectGame(t *testing.T) {
 		{
 			name:      "select SF6",
 			gameType:  model.GameTypeSF6,
-			expErrMsg: "browser not initialized",
+			expErrMsg: "unauthenticated: browser not initialized",
 		},
 		{
 			name:      "select game that doesn't exist",
 			gameType:  "undefined",
-			expErrMsg: "failed to select game",
+			expErrMsg: "select game: game does not exist",
 		},
 	}
 

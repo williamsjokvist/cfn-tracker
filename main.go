@@ -24,7 +24,6 @@ import (
 	"github.com/williamsjokvist/cfn-tracker/cmd"
 	"github.com/williamsjokvist/cfn-tracker/pkg/browser"
 	"github.com/williamsjokvist/cfn-tracker/pkg/config"
-	"github.com/williamsjokvist/cfn-tracker/pkg/errorsx"
 	"github.com/williamsjokvist/cfn-tracker/pkg/model"
 	"github.com/williamsjokvist/cfn-tracker/pkg/server"
 	"github.com/williamsjokvist/cfn-tracker/pkg/storage/nosql"
@@ -81,7 +80,7 @@ func init() {
 	}
 	err = envconfig.Process("", &cfg)
 	if err != nil {
-		log.Fatalf(`failed to process envconfig: %v`, err)
+		log.Fatalf("process envconfig: %v", err)
 	}
 }
 
@@ -131,22 +130,22 @@ func main() {
 	}
 	appBrowser, err := browser.NewBrowser(cfg.Headless)
 	if err != nil {
-		closeWithError(fmt.Errorf(`failed to launch browser: %v`, err))
+		closeWithError(fmt.Errorf("failed to launch browser: %w", err))
 		return
 	}
 	sqlDb, err := sql.NewStorage(false)
 	if err != nil {
-		closeWithError(fmt.Errorf(`failed to initalize database: %w`, err))
+		closeWithError(fmt.Errorf("failed to initalize database: %w", err))
 		return
 	}
 	noSqlDb, err := nosql.NewStorage()
 	if err != nil {
-		closeWithError(fmt.Errorf(`failed to initalize app config: %w`, err))
+		closeWithError(fmt.Errorf("failed to initalize app config: %w", err))
 		return
 	}
 	txtDb, err := txt.NewStorage()
 	if err != nil {
-		closeWithError(fmt.Errorf(`failed to initalize text store: %w`, err))
+		closeWithError(fmt.Errorf("failed to initalize text store: %w", err))
 		return
 	}
 
@@ -186,7 +185,7 @@ func main() {
 		HideWindowOnClose:  false,
 		LogLevel:           logger.WARNING,
 		LogLevelProduction: logger.ERROR,
-		ErrorFormatter:     errorsx.FormatError,
+		ErrorFormatter:     model.FormatError,
 		BackgroundColour:   options.NewRGBA(0, 0, 0, 1),
 		CSSDragProperty:    `--draggable`,
 		Windows: &windows.Options{
@@ -237,9 +236,10 @@ func main() {
 		EnumBind: []interface{}{
 			model.AllThemes,
 			model.AllGameTypes,
+			model.AllErrorKeys,
 		},
 	})
 	if err != nil {
-		closeWithError(fmt.Errorf(`failed to launch app: %w`, err))
+		closeWithError(fmt.Errorf("failed to launch: %w", err))
 	}
 }
