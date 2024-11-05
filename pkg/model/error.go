@@ -67,43 +67,43 @@ var (
 	ErrReadThemeCSS         = newError(tKeyErrReadThemeCSS, errors.New("read theme css"))
 )
 
-type FormattedError struct {
-	ErrorLocalizationKey ErrorLocalizationKey `json:"localizationKey"`
-	Message              string               `json:"message"`
-	InnerError           error                `json:"error"`
+type FGCTrackerError struct {
+	LocalizationKey ErrorLocalizationKey `json:"localizationKey"`
+	Message         string               `json:"message"`
+	InnerError      error
 }
 
-func NewError(fmtErr *FormattedError, err error) *FormattedError {
+func NewError(fmtErr *FGCTrackerError, err error) *FGCTrackerError {
 	fmtErr.InnerError = fmt.Errorf("%w: %w", fmtErr.InnerError, err)
 	return fmtErr
 }
 
-func newError(key ErrorLocalizationKey, err error) *FormattedError {
-	return &FormattedError{
-		ErrorLocalizationKey: key,
-		InnerError:           err,
+func newError(key ErrorLocalizationKey, err error) *FGCTrackerError {
+	return &FGCTrackerError{
+		LocalizationKey: key,
+		InnerError:      err,
 	}
 }
 
-func (e *FormattedError) Error() string {
+func (e *FGCTrackerError) Error() string {
 	return e.InnerError.Error()
 }
 
-func (e *FormattedError) Unwrap() error {
+func (e *FGCTrackerError) Unwrap() error {
 	return e.InnerError
 }
 
-func ContainsFormattedError(err error) bool {
-	var trackingErr *FormattedError
+func ContainsFGCTrackerError(err error) bool {
+	var trackingErr *FGCTrackerError
 	return errors.As(err, &trackingErr)
 }
 
 func FormatError(err error) any {
-	var formattedErr *FormattedError
+	var formattedErr *FGCTrackerError
 	var message string
 	var localizationKey ErrorLocalizationKey
 	if errors.As(err, &formattedErr) {
-		localizationKey = formattedErr.ErrorLocalizationKey
+		localizationKey = formattedErr.LocalizationKey
 		message = formattedErr.InnerError.Error()
 	}
 

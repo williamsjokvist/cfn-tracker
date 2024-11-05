@@ -11,7 +11,7 @@ import { AppTitleBar } from './app-titlebar'
 import { LocalizationKey } from './i18n'
 
 export function AppErrorBoundary() {
-  const err = useFormattedError()
+  const err = useFGCTrackerError()
   return (
     <ErrorWrapper err={err}>
       <AppTitleBar />
@@ -21,7 +21,7 @@ export function AppErrorBoundary() {
 
 export function PageErrorBoundary() {
   const { t } = useTranslation()
-  const err = useFormattedError()
+  const err = useFGCTrackerError()
   if (!err?.localizationKey) {
     return null
   }
@@ -34,25 +34,25 @@ export function PageErrorBoundary() {
   )
 }
 
-const isFormattedError = (error: unknown) => error instanceof Object && 'translationKey' in error
+const isFGCTrackerError = (error: unknown) => error instanceof Object && 'translationKey' in error
 
-function useFormattedError() {
+function useFGCTrackerError() {
   const thrownError = useRouteError()
-  const [err, setErr] = React.useState<model.FormattedError | unknown>()
+  const [err, setErr] = React.useState<model.FGCTrackerError | unknown>()
 
   React.useEffect(() => {
     console.error(thrownError)
     if (thrownError instanceof Error) {
       setErr({ translationKey: '', message: thrownError.message, error: thrownError })
-    } else if (isFormattedError(thrownError)) {
+    } else if (isFGCTrackerError(thrownError)) {
       setErr(thrownError)
     }
   }, [thrownError])
 
-  return err as model.FormattedError
+  return err as model.FGCTrackerError
 }
 
-function ErrorWrapper(props: React.PropsWithChildren & { err?: model.FormattedError }) {
+function ErrorWrapper(props: React.PropsWithChildren & { err?: model.FGCTrackerError }) {
   const { t } = useTranslation()
   if (!props.err) {
     return null

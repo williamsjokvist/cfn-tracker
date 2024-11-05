@@ -7,7 +7,7 @@ export function CheckForUpdate():Promise<boolean>;
 
 export function GetAppVersion():Promise<string>;
 
-export function GetFormattedErrorModelUnused():Promise<model.FormattedError>;
+export function GetFGCTrackerErrorModelUnused():Promise<model.FGCTrackerError>;
 
 export function GetGuiConfig():Promise<model.GuiConfig>;
 

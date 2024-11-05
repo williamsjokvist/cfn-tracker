@@ -10,7 +10,7 @@ import { TRACKING_MACHINE } from './tracking-machine'
 type AuthMachineContextProps = {
   progress: number
   game?: model.GameType
-  error: model.FormattedError | null
+  error: model.FGCTrackerError | null
 }
 export const AUTH_MACHINE = setup({
   types: {

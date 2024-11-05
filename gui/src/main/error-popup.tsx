@@ -9,8 +9,8 @@ import { cn } from '@/helpers/cn'
 import type { LocalizationKey } from './i18n'
 
 type ErrorContextType = [
-  error: model.FormattedError | null,
-  setError: React.Dispatch<model.FormattedError>
+  error: model.FGCTrackerError | null,
+  setError: React.Dispatch<model.FGCTrackerError>
 ]
 const ErrorContext = React.createContext<ErrorContextType | null>(null)
 export const useErrorPopup = () => React.useContext(ErrorContext)![1]
@@ -18,7 +18,7 @@ export const useErrorPopup = () => React.useContext(ErrorContext)![1]
 export function ErrorPopupProvider(props: React.PropsWithChildren) {
   const { t } = useTranslation()
   const [scope, animate] = useAnimate()
-  const [error, setError] = React.useState<model.FormattedError | null>(null)
+  const [error, setError] = React.useState<model.FGCTrackerError | null>(null)
 
   React.useEffect(() => {
     if (error === null) {

@@ -10,7 +10,7 @@ type TrackingMachineContextProps = {
   restore: boolean
   isTracking: boolean
   match: model.Match
-  error: model.FormattedError | null
+  error: model.FGCTrackerError | null
 }
 
 export const TRACKING_MACHINE = setup({

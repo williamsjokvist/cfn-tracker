@@ -260,20 +260,20 @@ export namespace model {
 	    errOpenResultsDirectory = "errOpenResultsDirectory",
 	    errReadThemeCSS = "errReadThemeCSS",
 	}
-	export class FormattedError {
+	export class FGCTrackerError {
 	    localizationKey: ErrorLocalizationKey;
 	    message: string;
-	    error: any;
+	    InnerError: any;
 	
 	    static createFrom(source: any = {}) {
-	        return new FormattedError(source);
+	        return new FGCTrackerError(source);
 	    }
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.localizationKey = source["localizationKey"];
 	        this.message = source["message"];
-	        this.error = source["error"];
+	        this.InnerError = source["InnerError"];
 	    }
 	}
 	export class GuiConfig {

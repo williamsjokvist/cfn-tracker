@@ -175,6 +175,6 @@ func (ch *CommandHandler) SaveTheme(theme model.ThemeName) error {
 	return nil
 }
 
-func (ch *CommandHandler) GetFormattedErrorModelUnused() *model.FormattedError {
+func (ch *CommandHandler) GetFGCTrackerErrorModelUnused() *model.FGCTrackerError {
 	return nil
 }
