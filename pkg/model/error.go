@@ -8,7 +8,7 @@ import (
 type ErrorLocalizationKey string
 
 const (
-	tKeyErrUnkown               ErrorLocalizationKey = "errUnknown"
+	tKeyErrUnknown              ErrorLocalizationKey = "errUnknown"
 	tKeyErrSelectGame           ErrorLocalizationKey = "errSelectGame"
 	tKeyErrAuth                 ErrorLocalizationKey = "errAuth"
 	tKeyErrGetLatestSession     ErrorLocalizationKey = "errGetLatestSession"
@@ -32,7 +32,7 @@ var AllErrors = []struct {
 	Value  ErrorLocalizationKey
 	TSName string
 }{
-	{tKeyErrUnkown, "errUnknown"},
+	{tKeyErrUnknown, "errUnknown"},
 	{tKeyErrSelectGame, "errSelectGame"},
 	{tKeyErrAuth, "errAuth"},
 	{tKeyErrGetLatestSession, "errGetLatestSession"},
@@ -53,7 +53,7 @@ var AllErrors = []struct {
 }
 
 var (
-	ErrUnknown              = newError(tKeyErrUnkown, errors.New("unknown error"))
+	ErrUnknown              = newError(tKeyErrUnknown, errors.New("unknown error"))
 	ErrSelectGame           = newError(tKeyErrSelectGame, errors.New("select game"))
 	ErrAuth                 = newError(tKeyErrAuth, errors.New("unauthenticated"))
 	ErrGetLatestSession     = newError(tKeyErrGetLatestSession, errors.New("get latest session"))
@@ -116,7 +116,7 @@ func FormatError(err error) any {
 		}
 	}
 	return &FGCTrackerError{
-		LocalizationKey: tKeyErrUnkown,
+		LocalizationKey: tKeyErrUnknown,
 		Message:         err.Error(),
 	}
 }
