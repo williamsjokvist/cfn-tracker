@@ -12,7 +12,6 @@ import (
 
 	"github.com/williamsjokvist/cfn-tracker/pkg/config"
 	"github.com/williamsjokvist/cfn-tracker/pkg/i18n"
-	"github.com/williamsjokvist/cfn-tracker/pkg/i18n/locales"
 	"github.com/williamsjokvist/cfn-tracker/pkg/model"
 	"github.com/williamsjokvist/cfn-tracker/pkg/server"
 	"github.com/williamsjokvist/cfn-tracker/pkg/storage/nosql"
@@ -52,7 +51,7 @@ func (ch *CommandHandler) CheckForUpdate() (bool, error) {
 	return currentVersion.LessThan(latestVersion), nil
 }
 
-func (ch *CommandHandler) GetTranslation(locale string) (*locales.Localization, error) {
+func (ch *CommandHandler) GetTranslation(locale string) (*model.Localization, error) {
 	lng, err := i18n.GetTranslation(locale)
 	if err != nil {
 		return nil, model.WrapError(model.ErrGetTranslations, err)
@@ -142,7 +141,7 @@ func (ch *CommandHandler) GetThemes() ([]model.Theme, error) {
 	return combinedThemes, nil
 }
 
-func (ch *CommandHandler) GetSupportedLanguages() []string {
+func (ch *CommandHandler) GetSupportedLanguages() ([]string, error) {
 	return i18n.GetSupportedLanguages()
 }
 

@@ -1,4 +1,4 @@
-package locales
+package model
 
 type Localization struct {
 	AppVersion               string `json:"appVersion"`

@@ -4,10 +4,10 @@ import LanguageDetector from 'i18next-browser-languagedetector'
 import HttpBackend, { type HttpBackendOptions } from 'i18next-http-backend'
 import { I18nextProvider, initReactI18next } from 'react-i18next'
 
-import type { locales } from '@model'
+import type { model } from '@model'
 import { GetTranslation } from '@cmd/CommandHandler'
 
-export type LocalizationKey = keyof locales.Localization
+export type LocalizationKey = keyof model.Localization
 
 // https://www.i18next.com/overview/configuration-options
 export function I18nProvider(props: React.PropsWithChildren) {
