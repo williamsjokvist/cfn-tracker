@@ -1,5 +1,64 @@
-export namespace locales {
+export namespace model {
 	
+	export enum ThemeName {
+	    DEFAULT = "default",
+	    ENTH = "enth",
+	    TEKKEN = "tekken",
+	}
+	export enum GameType {
+	    STREET_FIGHTER_6 = "sf6",
+	    TEKKEN_8 = "t8",
+	}
+	export enum ErrorLocalizationKey {
+	    errUnknown = "errUnknown",
+	    errSelectGame = "errSelectGame",
+	    errAuth = "errAuth",
+	    errGetLatestSession = "errGetLatestSession",
+	    errGetUser = "errGetUser",
+	    errGetMatches = "errGetMatches",
+	    errSaveLocale = "errSaveLocale",
+	    errCheckForUpdate = "errCheckForUpdate",
+	    errGetGuiConfig = "errGetGuiConfig",
+	    errSaveTheme = "errSaveTheme",
+	    errSaveUser = "errSaveUser",
+	    errSaveSidebarMinimized = "errSaveSidebarMinimized",
+	    errGetSessions = "errGetSessions",
+	    errGetTranslations = "errGetTranslations",
+	    errGetSessionStatistics = "errGetSessionStatistics",
+	    errCreateSession = "errCreateSession",
+	    errOpenResultsDirectory = "errOpenResultsDirectory",
+	    errReadThemeCSS = "errReadThemeCSS",
+	}
+	export class FGCTrackerError {
+	    localizationKey: ErrorLocalizationKey;
+	    message: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new FGCTrackerError(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.localizationKey = source["localizationKey"];
+	        this.message = source["message"];
+	    }
+	}
+	export class GuiConfig {
+	    locale: string;
+	    theme: ThemeName;
+	    sidebarMinified: boolean;
+	
+	    static createFrom(source: any = {}) {
+	        return new GuiConfig(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.locale = source["locale"];
+	        this.theme = source["theme"];
+	        this.sidebarMinified = source["sidebarMinified"];
+	    }
+	}
 	export class Localization {
 	    appVersion: string;
 	    source: string;
@@ -230,70 +289,6 @@ export namespace locales {
 	        this.errCreateSession = source["errCreateSession"];
 	        this.errOpenResultsDirectory = source["errOpenResultsDirectory"];
 	        this.errReadThemeCSS = source["errReadThemeCSS"];
-	    }
-	}
-
-}
-
-export namespace model {
-	
-	export enum ThemeName {
-	    DEFAULT = "default",
-	    ENTH = "enth",
-	    TEKKEN = "tekken",
-	}
-	export enum GameType {
-	    STREET_FIGHTER_6 = "sf6",
-	    TEKKEN_8 = "t8",
-	}
-	export enum ErrorLocalizationKey {
-	    errUnknown = "errUnknown",
-	    errSelectGame = "errSelectGame",
-	    errAuth = "errAuth",
-	    errGetLatestSession = "errGetLatestSession",
-	    errGetUser = "errGetUser",
-	    errGetMatches = "errGetMatches",
-	    errSaveLocale = "errSaveLocale",
-	    errCheckForUpdate = "errCheckForUpdate",
-	    errGetGuiConfig = "errGetGuiConfig",
-	    errSaveTheme = "errSaveTheme",
-	    errSaveUser = "errSaveUser",
-	    errSaveSidebarMinimized = "errSaveSidebarMinimized",
-	    errGetSessions = "errGetSessions",
-	    errGetTranslations = "errGetTranslations",
-	    errGetSessionStatistics = "errGetSessionStatistics",
-	    errCreateSession = "errCreateSession",
-	    errOpenResultsDirectory = "errOpenResultsDirectory",
-	    errReadThemeCSS = "errReadThemeCSS",
-	}
-	export class FGCTrackerError {
-	    localizationKey: ErrorLocalizationKey;
-	    message: string;
-	
-	    static createFrom(source: any = {}) {
-	        return new FGCTrackerError(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.localizationKey = source["localizationKey"];
-	        this.message = source["message"];
-	    }
-	}
-	export class GuiConfig {
-	    locale: string;
-	    theme: ThemeName;
-	    sidebarMinified: boolean;
-	
-	    static createFrom(source: any = {}) {
-	        return new GuiConfig(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.locale = source["locale"];
-	        this.theme = source["theme"];
-	        this.sidebarMinified = source["sidebarMinified"];
 	    }
 	}
 	export class Match {

@@ -1,5 +1,5 @@
 import 'i18next'
-import type { locales } from '@model'
+import type { model } from '@model'
 
 declare module 'i18next' {
   interface CustomTypeOptions {
@@ -7,7 +7,7 @@ declare module 'i18next' {
     defaultNS: ''
     nsSeparator: ''
     resources: {
-      '': locales.Localization
+      '': model.Localization
     }
   }
 }

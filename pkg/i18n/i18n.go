@@ -1,29 +1,38 @@
 package i18n
 
 import (
-	"errors"
+	"embed"
+	"encoding/json"
+	"fmt"
+	"io/fs"
+	"strings"
 
-	"github.com/williamsjokvist/cfn-tracker/pkg/i18n/locales"
+	"github.com/williamsjokvist/cfn-tracker/pkg/model"
 )
 
-var languages = map[string]locales.Localization{
-	"en-GB": locales.EN_GB,
-	"fr-FR": locales.FR_FR,
-	"ja-JP": locales.JA_JP,
-}
+//go:embed locales
+var localeFs embed.FS
 
-func GetTranslation(locale string) (*locales.Localization, error) {
-	lng, ok := languages[locale]
-	if !ok {
-		return nil, errors.New(`locale does not exist`)
+func GetTranslation(locale string) (*model.Localization, error) {
+	localeJson, err := localeFs.ReadFile(fmt.Sprintf("locales/%s.json", locale))
+	if err != nil {
+		return nil, fmt.Errorf("read locale json: %w", err)
+	}
+	var lng model.Localization
+	if err := json.Unmarshal(localeJson, &lng); err != nil {
+		return nil, fmt.Errorf("unmarshal locale json: %w", err)
 	}
 	return &lng, nil
 }
 
-func GetSupportedLanguages() []string {
-	keys := make([]string, 0, len(languages))
-	for k := range languages {
-		keys = append(keys, k)
+func GetSupportedLanguages() ([]string, error) {
+	dirEntries, err := fs.ReadDir(localeFs, "locales")
+	if err != nil {
+		return nil, fmt.Errorf("read locales directory: %w", err)
 	}
-	return keys
+	var languages = make([]string, 0, len(dirEntries))
+	for _, d := range dirEntries {
+		languages = append(languages, strings.Split(d.Name(), ".json")[0])
+	}
+	return languages, nil
 }
