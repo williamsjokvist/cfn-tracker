@@ -37,7 +37,7 @@
     "autoprefixer": "^10.4.12",
     "postcss": "^8.4.17",
     "prettier": "^3.0.1",
-    "prettier-plugin-tailwindcss": "^0.5.11",
+    "prettier-plugin-tailwindcss": "^0.6.9",
     "sass": "^1.62.1",
     "tailwindcss": "^3.1.8",
     "typescript": "^5.3.3",
