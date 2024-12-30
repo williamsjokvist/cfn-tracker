@@ -235,7 +235,7 @@ function ThemeSelect(props: { value: string; onSelect: (theme: string) => void }
               />
               <label
                 htmlFor={`${theme.name}-checkbox`}
-                className='font-spartan w-full cursor-pointer py-1 pl-14  capitalize'
+                className='font-spartan w-full cursor-pointer py-1 pl-14 capitalize'
               >
                 {theme.name}
               </label>

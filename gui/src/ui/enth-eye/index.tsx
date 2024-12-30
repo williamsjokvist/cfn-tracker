@@ -8,7 +8,7 @@ export function EnthEye(props: React.ImgHTMLAttributes<HTMLImageElement>) {
       <span
         className={cn(
           'relative inline-block',
-          'rounded-full ',
+          'rounded-full',
           'w-[624px] origin-[bottom_left] -rotate-90'
         )}
         style={{

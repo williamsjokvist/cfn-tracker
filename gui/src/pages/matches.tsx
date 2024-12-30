@@ -45,7 +45,7 @@ export function MatchesListPage() {
       </Page.Header>
 
       <div className='relative w-full'>
-        <div className='mb-2 flex h-10 items-center justify-between border-b border-slate-50 border-opacity-10 px-8 pt-1 '>
+        <div className='mb-2 flex h-10 items-center justify-between border-b border-slate-50 border-opacity-10 px-8 pt-1'>
           <Button
             className='flex items-center gap-1 px-1 py-[2px]'
             style={{ filter: 'hue-rotate(-65deg)' }}
