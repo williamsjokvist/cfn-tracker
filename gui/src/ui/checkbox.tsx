@@ -1,15 +1,12 @@
-import React from 'react'
+import type { JSX } from 'react'
 
 import { cn } from '@/helpers/cn'
 
-export const Checkbox = React.forwardRef<
-  HTMLInputElement,
-  React.InputHTMLAttributes<HTMLInputElement>
->((props, ref) => {
+export function Checkbox(props: JSX.IntrinsicElements['input']) {
   const { className, ...restProps } = props
   return (
     <input
-      ref={ref}
+      ref={props.ref}
       type='checkbox'
       className={cn(
         'h-7 w-7 cursor-pointer rounded-md bg-transparent text-transparent',
@@ -21,4 +18,4 @@ export const Checkbox = React.forwardRef<
       {...restProps}
     />
   )
-})
+}
