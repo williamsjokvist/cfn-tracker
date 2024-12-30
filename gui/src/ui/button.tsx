@@ -1,25 +1,22 @@
-import React from 'react'
+import type { JSX } from 'react'
 
 import { cn } from '@/helpers/cn'
 
-export const Button = React.forwardRef<
-  HTMLButtonElement,
-  React.PropsWithChildren<React.ButtonHTMLAttributes<HTMLButtonElement>>
->((props, ref) => {
+export function Button(props: JSX.IntrinsicElements['button']) {
   const { disabled, style, className, children, onClick, ...restProps } = props
   return (
     <button
-      ref={ref}
+      ref={props.ref}
       onClick={disabled ? undefined : onClick}
       {...(disabled
         ? {
-            style: {
-              backgroundColor: 'rgba(0,0,0,.25)',
-              border: '1px solid rgba(255,255,255,.25)',
-              cursor: 'not-allowed',
-              ...style
-            }
+          style: {
+            backgroundColor: 'rgba(0,0,0,.25)',
+            border: '1px solid rgba(255,255,255,.25)',
+            cursor: 'not-allowed',
+            ...style
           }
+        }
         : { style })}
       className={cn(
         'flex items-center justify-between',
@@ -35,4 +32,4 @@ export const Button = React.forwardRef<
       {children}
     </button>
   )
-})
+}
