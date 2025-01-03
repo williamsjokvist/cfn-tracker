@@ -32,15 +32,17 @@ export function SessionsListPage() {
 
   React.useEffect(() => {
     if (months.length > 0 && months[monthIndex]) {
-      const [month, year] = months[monthIndex].Date.split('-')
+      const [year, month] = months[monthIndex].Date.split('-')
       setMonth(month)
       setYear(year)
     }
   }, [sessionStatistics, monthIndex])
 
   React.useEffect(() => {
-    GetSessions('', month, 0, 0).then(setSessions).catch(setError)
-  }, [month])
+    if (months.length > 0 && months[monthIndex]) {
+      GetSessions('', months[monthIndex].Date, 0, 0).then(setSessions).catch(setError)
+    }
+  }, [monthIndex, months])
 
   const sessionsByDay = (sessions ?? []).reduce(
     (group, session) => {
