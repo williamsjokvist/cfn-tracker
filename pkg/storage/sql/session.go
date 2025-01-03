@@ -65,11 +65,11 @@ func (s *Storage) GetSessionsStatistics(ctx context.Context, userId string) (*mo
 	}
 	query, args, err := sqlx.In(fmt.Sprintf(`
 		SELECT
-			STRFTIME('%%m-%%Y', s.created_at) as month,
+			STRFTIME('%%Y-%%m', s.created_at) as month,
 			COUNT(s.id) as count
 		FROM sessions as s
 		%s
-		GROUP BY STRFTIME('%%m-%%Y', s.created_at)
+		GROUP BY STRFTIME('%%Y-%%m', s.created_at)
 		ORDER BY s.id DESC
 `, where), whereArgs...)
 	if err != nil {
@@ -110,9 +110,9 @@ func (s *Storage) GetSessions(ctx context.Context, userId string, date string, l
 	}
 	if date != "" {
 		if where == "" {
-			where = `WHERE STRFTIME('%m', s.created_at) = (?)`
+			where = `WHERE STRFTIME('%Y-%m', s.created_at) = (?)`
 		} else {
-			where = ` AND STRFTIME('%m', s.created_at) = (?)`
+			where = ` AND STRFTIME('%Y-%m', s.created_at) = (?)`
 		}
 		whereArgs = append(whereArgs, date)
 	}
