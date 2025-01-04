@@ -20,29 +20,9 @@ export function SessionsListPage() {
 
   const [sessions, setSessions] = React.useState<model.Session[]>([])
   const [sessionStatistics, setSessionStatistics] = React.useState<model.SessionsStatistics>()
-  const [year, setYear] = React.useState('')
-  const [month, setMonth] = React.useState('01')
   const [monthIndex, setMonthIndex] = React.useState(0)
 
   const months = sessionStatistics?.Months ?? []
-
-  React.useEffect(() => {
-    GetSessionsStatistics('').then(setSessionStatistics).catch(setError)
-  }, [])
-
-  React.useEffect(() => {
-    if (months.length > 0 && months[monthIndex]) {
-      const [year, month] = months[monthIndex].Date.split('-')
-      setMonth(month)
-      setYear(year)
-    }
-  }, [sessionStatistics, monthIndex])
-
-  React.useEffect(() => {
-    if (months.length > 0 && months[monthIndex]) {
-      GetSessions('', months[monthIndex].Date, 0, 0).then(setSessions).catch(setError)
-    }
-  }, [monthIndex, months])
 
   const sessionsByDay = (sessions ?? []).reduce(
     (group, session) => {
@@ -54,6 +34,16 @@ export function SessionsListPage() {
     },
     {} as Record<string, model.Session[]>
   )
+
+  React.useEffect(() => {
+    GetSessionsStatistics('').then(setSessionStatistics).catch(setError)
+  }, [])
+
+  React.useEffect(() => {
+    if (months.length > 0 && months[monthIndex]) {
+      GetSessions('', months[monthIndex].Date, 0, 0).then(setSessions).catch(setError)
+    }
+  }, [monthIndex, months])
 
   return (
     <Page.Root>
@@ -87,10 +77,14 @@ export function SessionsListPage() {
             />
           </Button>
           <h2 className='ml-2 font-bold'>
-            {year} /{' '}
-            {Intl.DateTimeFormat(i18n.resolvedLanguage, {
-              month: 'long'
-            }).format(new Date(`2024-${month}-01`))}
+            {months.length > 0 && months[monthIndex] && (
+              <>
+                {months[monthIndex].Date.split('-')[0]} /{' '}
+                {Intl.DateTimeFormat(i18n.resolvedLanguage, {
+                  month: 'long'
+                }).format(new Date(`2024-${months[monthIndex].Date.split('-')[1]}-01`))}
+              </>
+            )}
           </h2>
         </header>
 
