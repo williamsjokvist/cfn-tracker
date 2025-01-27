@@ -1,5 +1,14 @@
 export namespace model {
 	
+	export enum ThemeName {
+	    DEFAULT = "default",
+	    ENTH = "enth",
+	    TEKKEN = "tekken",
+	}
+	export enum GameType {
+	    STREET_FIGHTER_6 = "sf6",
+	    TEKKEN_8 = "t8",
+	}
 	export enum ErrorLocalizationKey {
 	    errUnknown = "errUnknown",
 	    errSelectGame = "errSelectGame",
@@ -19,15 +28,6 @@ export namespace model {
 	    errCreateSession = "errCreateSession",
 	    errOpenResultsDirectory = "errOpenResultsDirectory",
 	    errReadThemeCSS = "errReadThemeCSS",
-	}
-	export enum ThemeName {
-	    DEFAULT = "default",
-	    ENTH = "enth",
-	    TEKKEN = "tekken",
-	}
-	export enum GameType {
-	    STREET_FIGHTER_6 = "sf6",
-	    TEKKEN_8 = "t8",
 	}
 	export class FGCTrackerError {
 	    localizationKey: ErrorLocalizationKey;
@@ -164,7 +164,7 @@ export namespace model {
 	    errGetGuiConfig: string;
 	    errSaveTheme: string;
 	    errSaveUser: string;
-	    errSaveSidebarMinimized: string;
+	    errSaveSidebar: string;
 	    errGetSessions: string;
 	    errGetTranslations: string;
 	    errGetSessionStatistics: string;
@@ -282,7 +282,7 @@ export namespace model {
 	        this.errGetGuiConfig = source["errGetGuiConfig"];
 	        this.errSaveTheme = source["errSaveTheme"];
 	        this.errSaveUser = source["errSaveUser"];
-	        this.errSaveSidebarMinimized = source["errSaveSidebarMinimized"];
+	        this.errSaveSidebar = source["errSaveSidebar"];
 	        this.errGetSessions = source["errGetSessions"];
 	        this.errGetTranslations = source["errGetTranslations"];
 	        this.errGetSessionStatistics = source["errGetSessionStatistics"];
