@@ -20,10 +20,10 @@ export function AppSidebar() {
   React.useEffect(() => {
     animate(
       'span',
-      { opacity: +!cfg.sidebarMinified, display: cfg.sidebarMinified ? 'none' : 'block' },
+      { opacity: +!cfg.sidebar, display: cfg.sidebar ? 'none' : 'block' },
       { duration: 0.175, ease: 'circIn' }
     )
-  }, [cfg.sidebarMinified])
+  }, [cfg.sidebar])
 
   return (
     <div
@@ -35,7 +35,7 @@ export function AppSidebar() {
         'transition-[width_250ms_ease-out]'
       )}
       style={{
-        width: cfg.sidebarMinified ? '76px' : '175px'
+        width: cfg.sidebar ? '76px' : '175px'
       }}
     >
       <AppTitleBar />
@@ -94,7 +94,7 @@ function Nav() {
               />
               <span>{t(href)}</span>
             </div>
-            {!cfg.sidebarMinified && (
+            {!cfg.sidebar && (
               <Icon
                 icon='fa6-solid:chevron-left'
                 className='h-3 w-3 rotate-180 opacity-0 transition-opacity group-hover:opacity-100'

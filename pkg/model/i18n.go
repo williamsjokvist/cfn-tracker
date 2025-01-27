@@ -105,7 +105,7 @@ type Localization struct {
 	ErrGetGuiConfig          string `json:"errGetGuiConfig"`
 	ErrSaveTheme             string `json:"errSaveTheme"`
 	ErrSaveUser              string `json:"errSaveUser"`
-	ErrSaveSidebarMinimized  string `json:"errSaveSidebarMinimized"`
+	ErrSaveSidebar           string `json:"errSaveSidebar"`
 	ErrGetSessions           string `json:"errGetSessions"`
 	ErrGetTranslations       string `json:"errGetTranslations"`
 	ErrGetSessionStatistics  string `json:"errGetSessionStatistics"`

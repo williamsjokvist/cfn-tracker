@@ -103,7 +103,7 @@
   "errGetGuiConfig": "Failed to get interface configuration",
   "errSaveTheme": "Failed to save interface theme setting",
   "errSaveUser": "Failed to save user profile data",
-  "errSaveSidebarMinimized": "Failed to save interface sidebar toggle",
+  "errSaveSidebar": "Failed to save interface sidebar toggle",
   "errGetSessions": "Failed to get sessions",
   "errGetTranslations": "Failed to get translations",
   "errGetSessionStatistics": "Failed to get session statistics",

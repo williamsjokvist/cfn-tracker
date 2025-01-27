@@ -21,7 +21,7 @@ export namespace model {
 	    errGetGuiConfig = "errGetGuiConfig",
 	    errSaveTheme = "errSaveTheme",
 	    errSaveUser = "errSaveUser",
-	    errSaveSidebarMinimized = "errSaveSidebarMinimized",
+	    errSaveSidebar = "errSaveSidebar",
 	    errGetSessions = "errGetSessions",
 	    errGetTranslations = "errGetTranslations",
 	    errGetSessionStatistics = "errGetSessionStatistics",
@@ -43,20 +43,20 @@ export namespace model {
 	        this.message = source["message"];
 	    }
 	}
-	export class GuiConfig {
+	export class GUIConfig {
 	    locale: string;
 	    theme: ThemeName;
-	    sidebarMinified: boolean;
+	    sidebar: boolean;
 	
 	    static createFrom(source: any = {}) {
-	        return new GuiConfig(source);
+	        return new GUIConfig(source);
 	    }
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.locale = source["locale"];
 	        this.theme = source["theme"];
-	        this.sidebarMinified = source["sidebarMinified"];
+	        this.sidebar = source["sidebar"];
 	    }
 	}
 	export class Localization {
@@ -164,7 +164,7 @@ export namespace model {
 	    errGetGuiConfig: string;
 	    errSaveTheme: string;
 	    errSaveUser: string;
-	    errSaveSidebarMinimized: string;
+	    errSaveSidebar: string;
 	    errGetSessions: string;
 	    errGetTranslations: string;
 	    errGetSessionStatistics: string;
@@ -282,7 +282,7 @@ export namespace model {
 	        this.errGetGuiConfig = source["errGetGuiConfig"];
 	        this.errSaveTheme = source["errSaveTheme"];
 	        this.errSaveUser = source["errSaveUser"];
-	        this.errSaveSidebarMinimized = source["errSaveSidebarMinimized"];
+	        this.errSaveSidebar = source["errSaveSidebar"];
 	        this.errGetSessions = source["errGetSessions"];
 	        this.errGetTranslations = source["errGetTranslations"];
 	        this.errGetSessionStatistics = source["errGetSessionStatistics"];

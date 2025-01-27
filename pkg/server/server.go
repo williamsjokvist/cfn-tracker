@@ -31,7 +31,7 @@ func NewBrowserSourceServer(matchChan chan model.Match) *BrowserSourceServer {
 	}
 }
 
-func (b *BrowserSourceServer) Start(ctx context.Context, cfg *config.Config) {
+func (b *BrowserSourceServer) Start(ctx context.Context, cfg *config.BuildConfig) {
 	go func() {
 		for match := range b.matchChan {
 			log.Println("[BS EVENT] new match played")

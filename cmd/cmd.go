@@ -14,7 +14,7 @@ import (
 	"github.com/williamsjokvist/cfn-tracker/pkg/i18n"
 	"github.com/williamsjokvist/cfn-tracker/pkg/model"
 	"github.com/williamsjokvist/cfn-tracker/pkg/server"
-	"github.com/williamsjokvist/cfn-tracker/pkg/storage/nosql"
+	cfgDb "github.com/williamsjokvist/cfn-tracker/pkg/storage/config"
 	"github.com/williamsjokvist/cfn-tracker/pkg/storage/sql"
 	"github.com/williamsjokvist/cfn-tracker/pkg/storage/txt"
 	"github.com/williamsjokvist/cfn-tracker/pkg/update/github"
@@ -24,16 +24,16 @@ import (
 type CommandHandler struct {
 	githubClient github.GithubClient
 
-	sqlDb   *sql.Storage
-	nosqlDb *nosql.Storage
+	sqlDb *sql.Storage
+	cfgDb *cfgDb.Storage
 
-	cfg *config.Config
+	cfg *config.BuildConfig
 }
 
-func NewCommandHandler(githubClient github.GithubClient, sqlDb *sql.Storage, nosqlDb *nosql.Storage, txtDb *txt.Storage, cfg *config.Config) *CommandHandler {
+func NewCommandHandler(githubClient github.GithubClient, sqlDb *sql.Storage, cfgDb *cfgDb.Storage, txtDb *txt.Storage, cfg *config.BuildConfig) *CommandHandler {
 	return &CommandHandler{
 		sqlDb:        sqlDb,
-		nosqlDb:      nosqlDb,
+		cfgDb:        cfgDb,
 		githubClient: githubClient,
 		cfg:          cfg,
 	}
@@ -146,29 +146,44 @@ func (ch *CommandHandler) GetSupportedLanguages() ([]string, error) {
 }
 
 func (ch *CommandHandler) SaveLocale(locale string) error {
-	if err := ch.nosqlDb.SaveLocale(locale); err != nil {
+	runtimeCfg, err := ch.cfgDb.GetRuntimeConfig()
+	if err != nil {
+		return model.WrapError(model.ErrGetGUIConfig, err)
+	}
+	runtimeCfg.GUI.Locale = locale
+	if err := ch.cfgDb.SaveRuntimeConfig(runtimeCfg); err != nil {
 		return model.WrapError(model.ErrSaveLocale, err)
 	}
 	return nil
 }
 
-func (ch *CommandHandler) GetGuiConfig() (*model.GuiConfig, error) {
-	guiCfg, err := ch.nosqlDb.GetGuiConfig()
+func (ch *CommandHandler) GetGuiConfig() (*model.GUIConfig, error) {
+	runtimeCfg, err := ch.cfgDb.GetRuntimeConfig()
 	if err != nil {
 		return nil, model.WrapError(model.ErrGetGUIConfig, err)
 	}
-	return guiCfg, nil
+	return &runtimeCfg.GUI, nil
 }
 
-func (ch *CommandHandler) SaveSidebarMinimized(sidebarMinified bool) error {
-	if err := ch.nosqlDb.SaveSidebarMinimized(sidebarMinified); err != nil {
-		return model.WrapError(model.ErrSaveSidebarMinimized, err)
+func (ch *CommandHandler) SaveSidebarMinimized(sidebar bool) error {
+	runtimeCfg, err := ch.cfgDb.GetRuntimeConfig()
+	if err != nil {
+		return model.WrapError(model.ErrGetGUIConfig, err)
+	}
+	runtimeCfg.GUI.SideBar = sidebar
+	if err := ch.cfgDb.SaveRuntimeConfig(runtimeCfg); err != nil {
+		return model.WrapError(model.ErrSaveSidebar, err)
 	}
 	return nil
 }
 
 func (ch *CommandHandler) SaveTheme(theme model.ThemeName) error {
-	if err := ch.nosqlDb.SaveTheme(theme); err != nil {
+	runtimeCfg, err := ch.cfgDb.GetRuntimeConfig()
+	if err != nil {
+		return model.WrapError(model.ErrGetGUIConfig, err)
+	}
+	runtimeCfg.GUI.Theme = theme
+	if err := ch.cfgDb.SaveRuntimeConfig(runtimeCfg); err != nil {
 		return model.WrapError(model.ErrSaveTheme, err)
 	}
 	return nil

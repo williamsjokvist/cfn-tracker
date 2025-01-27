@@ -103,7 +103,7 @@
   "errGetGuiConfig": "échec de l'obtention de la configuration de l'interface",
   "errSaveTheme": "échec de l'enregistrement du paramètre de thème de l'interface",
   "errSaveUser": "échec de l'enregistrement du données de profil utilisateur",
-  "errSaveSidebarMinimized": "échec de l'enregistrement de la bascule de la barre latérale de l'interface",
+  "errSaveSidebar": "échec de l'enregistrement de la bascule de la barre latérale de l'interface",
   "errGetSessions": "échec de l'obtention des séances",
   "errGetTranslations": "échec de l'obtention des traductions",
   "errGetSessionStatistics": "échec d'obtention des statistiques de session",

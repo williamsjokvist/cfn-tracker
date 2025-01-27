@@ -8,7 +8,7 @@ export function GetAppVersion():Promise<string>;
 
 export function GetFGCTrackerErrorModelUnused():Promise<model.FGCTrackerError>;
 
-export function GetGuiConfig():Promise<model.GuiConfig>;
+export function GetGuiConfig():Promise<model.GUIConfig>;
 
 export function GetMatches(arg1:number,arg2:string,arg3:number,arg4:number):Promise<Array<model.Match>>;
 

@@ -9,7 +9,7 @@ import (
 
 	"github.com/williamsjokvist/cfn-tracker/pkg/config"
 	"github.com/williamsjokvist/cfn-tracker/pkg/model"
-	"github.com/williamsjokvist/cfn-tracker/pkg/storage/nosql"
+	cfgDb "github.com/williamsjokvist/cfn-tracker/pkg/storage/config"
 	"github.com/williamsjokvist/cfn-tracker/pkg/storage/sql"
 	"github.com/williamsjokvist/cfn-tracker/pkg/storage/txt"
 	"github.com/williamsjokvist/cfn-tracker/pkg/tracker"
@@ -23,13 +23,13 @@ type EventEmitFn func(eventName string, optionalData ...interface{})
 
 type TrackingHandler struct {
 	sqlDb   *sql.Storage
-	nosqlDb *nosql.Storage
+	nosqlDb *cfgDb.Storage
 	txtDb   *txt.Storage
 
 	wavuClient wavu.WavuClient
 	cfnClient  cfn.CFNClient
 
-	cfg        *config.Config
+	cfg        *config.BuildConfig
 	matchChans []chan model.Match
 
 	cancelPolling context.CancelFunc
@@ -42,9 +42,9 @@ func NewTrackingHandler(
 	wavuClient wavu.WavuClient,
 	cfnClient cfn.CFNClient,
 	sqlDb *sql.Storage,
-	nosqlDb *nosql.Storage,
+	nosqlDb *cfgDb.Storage,
 	txtDb *txt.Storage,
-	cfg *config.Config,
+	cfg *config.BuildConfig,
 	matchChans ...chan model.Match,
 ) *TrackingHandler {
 	return &TrackingHandler{
