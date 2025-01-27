@@ -78,16 +78,6 @@ export function SettingsPage() {
               text={t('follow')}
               url='https://x.com/greensoap_'
             />
-            <Link
-              icon={
-                <Icon
-                  icon='fa6-brands:twitter'
-                  className='mr-2 h-6 w-6 text-[#49b3f5] transition-colors group-hover:text-white'
-                />
-              }
-              text='enth'
-              url='https://x.com/enthcreations'
-            />
           </div>
         </div>
       </motion.section>
@@ -116,10 +106,10 @@ function SideBarToggle() {
     <div className='flex w-full justify-between'>
       <h3 className='font-bold'>{t('minimize')}</h3>
       <Switch
-        checked={cfg.sidebarMinified}
+        checked={cfg.sidebar}
         onCheckedChange={checked => {
           SaveSidebarMinimized(checked)
-            .then(() => setCfg({ ...cfg, sidebarMinified: checked }))
+            .then(() => setCfg({ ...cfg, sidebar: checked }))
             .catch(setError)
         }}
       />

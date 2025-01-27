@@ -21,7 +21,7 @@ export namespace model {
 	    errGetGuiConfig = "errGetGuiConfig",
 	    errSaveTheme = "errSaveTheme",
 	    errSaveUser = "errSaveUser",
-	    errSaveSidebarMinimized = "errSaveSidebarMinimized",
+	    errSaveSidebar = "errSaveSidebar",
 	    errGetSessions = "errGetSessions",
 	    errGetTranslations = "errGetTranslations",
 	    errGetSessionStatistics = "errGetSessionStatistics",
@@ -43,20 +43,20 @@ export namespace model {
 	        this.message = source["message"];
 	    }
 	}
-	export class GuiConfig {
+	export class GUIConfig {
 	    locale: string;
 	    theme: ThemeName;
-	    sidebarMinified: boolean;
+	    sidebar: boolean;
 	
 	    static createFrom(source: any = {}) {
-	        return new GuiConfig(source);
+	        return new GUIConfig(source);
 	    }
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.locale = source["locale"];
 	        this.theme = source["theme"];
-	        this.sidebarMinified = source["sidebarMinified"];
+	        this.sidebar = source["sidebar"];
 	    }
 	}
 	export class Localization {

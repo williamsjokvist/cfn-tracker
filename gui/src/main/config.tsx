@@ -4,14 +4,14 @@ import { useTranslation } from 'react-i18next'
 import { model } from '@model'
 import { GetGuiConfig } from '@cmd/CommandHandler'
 
-const initialConfig: model.GuiConfig = {
+const initialConfig: model.GUIConfig = {
   locale: 'en-GB',
   theme: model.ThemeName.DEFAULT,
-  sidebarMinified: false
+  sidebar: false
 }
 
 export const ConfigContext = React.createContext<
-  [cfg: model.GuiConfig, setCfg: React.Dispatch<model.GuiConfig>]
+  [cfg: model.GUIConfig, setCfg: React.Dispatch<model.GUIConfig>]
 >([
   initialConfig,
   () => {

@@ -26,7 +26,7 @@ import (
 	"github.com/williamsjokvist/cfn-tracker/pkg/config"
 	"github.com/williamsjokvist/cfn-tracker/pkg/model"
 	"github.com/williamsjokvist/cfn-tracker/pkg/server"
-	"github.com/williamsjokvist/cfn-tracker/pkg/storage/nosql"
+	cfgDb "github.com/williamsjokvist/cfn-tracker/pkg/storage/config"
 	"github.com/williamsjokvist/cfn-tracker/pkg/storage/sql"
 	"github.com/williamsjokvist/cfn-tracker/pkg/storage/txt"
 	"github.com/williamsjokvist/cfn-tracker/pkg/tracker/sf6/cfn"
@@ -47,7 +47,7 @@ var assets embed.FS
 //go:embed gui/error/error.html
 var errorTmpl []byte
 
-var cfg config.Config
+var cfg config.BuildConfig
 var logFile *os.File
 
 func logToFile() {
@@ -69,7 +69,7 @@ func init() {
 	err := godotenv.Load(`.env`)
 	if err != nil {
 		log.Println(fmt.Errorf(`missing .env file: %w`, err))
-		cfg = config.Config{
+		cfg = config.BuildConfig{
 			AppVersion:        appVersion,
 			Headless:          isProduction == `true`,
 			CapIDEmail:        capIDEmail,
@@ -138,7 +138,7 @@ func main() {
 		closeWithError(fmt.Errorf("failed to initalize database: %w", err))
 		return
 	}
-	noSqlDb, err := nosql.NewStorage()
+	noSqlDb, err := cfgDb.NewStorage()
 	if err != nil {
 		closeWithError(fmt.Errorf("failed to initalize app config: %w", err))
 		return

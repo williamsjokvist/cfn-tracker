@@ -6,7 +6,6 @@ export function Button(props: JSX.IntrinsicElements['button']) {
   const { disabled, style, className, children, onClick, ...restProps } = props
   return (
     <button
-      ref={props.ref}
       onClick={disabled ? undefined : onClick}
       {...(disabled
         ? {

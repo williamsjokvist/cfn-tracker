@@ -8,7 +8,7 @@ import (
 
 	"github.com/williamsjokvist/cfn-tracker/cmd"
 	"github.com/williamsjokvist/cfn-tracker/pkg/config"
-	"github.com/williamsjokvist/cfn-tracker/pkg/storage/nosql"
+	cfgDb "github.com/williamsjokvist/cfn-tracker/pkg/storage/config"
 	"github.com/williamsjokvist/cfn-tracker/pkg/storage/sql"
 	"github.com/williamsjokvist/cfn-tracker/pkg/storage/txt"
 	"github.com/williamsjokvist/cfn-tracker/pkg/tracker/sf6/cfn"
@@ -24,7 +24,7 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		log.Fatalf("init sql storage: %v", err)
 	}
-	nosqlDb, err := nosql.NewStorage()
+	cfgDb, err := cfgDb.NewStorage()
 	if err != nil {
 		log.Fatalf("init nosql storage: %v", err)
 	}
@@ -33,7 +33,7 @@ func TestMain(m *testing.M) {
 		log.Fatalf("init txt storage: %v", err)
 	}
 
-	cfg := config.Config{
+	cfg := config.BuildConfig{
 		AppVersion:        "4.0.0",
 		Headless:          true,
 		CapIDEmail:        "test",
@@ -46,7 +46,7 @@ func TestMain(m *testing.M) {
 		wavu.NewClient(),
 		cfn.NewClient(nil),
 		sqlDb,
-		nosqlDb,
+		cfgDb,
 		txtDb,
 		&cfg,
 		nil,

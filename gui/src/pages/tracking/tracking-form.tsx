@@ -100,7 +100,7 @@ export function TrackingForm() {
         )}
         <footer className='flex w-full items-center'>
           {users.some(old => old.code === playerIdInput) && (
-            <div className='group flex items-center'>
+            <div className='group flex items-center gap-4'>
               <Checkbox ref={restoreRef} id='restore-session' />
               <label
                 htmlFor='restore-session'

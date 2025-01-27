@@ -19,7 +19,7 @@ const (
 	tKeyErrGetGuiConfig         ErrorLocalizationKey = "errGetGuiConfig"
 	tKeyErrSaveTheme            ErrorLocalizationKey = "errSaveTheme"
 	tKeyErrSaveUser             ErrorLocalizationKey = "errSaveUser"
-	tKeyErrSaveSidebarMinimized ErrorLocalizationKey = "errSaveSidebarMinimized"
+	tKeyErrSaveSidebar          ErrorLocalizationKey = "errSaveSidebar"
 	tKeyErrGetSessions          ErrorLocalizationKey = "errGetSessions"
 	tKeyErrGetTranslations      ErrorLocalizationKey = "errGetTranslations"
 	tKeyErrGetSessionStatistics ErrorLocalizationKey = "errGetSessionStatistics"
@@ -43,7 +43,7 @@ var AllErrorKeys = []struct {
 	{tKeyErrGetGuiConfig, string(tKeyErrGetGuiConfig)},
 	{tKeyErrSaveTheme, string(tKeyErrSaveTheme)},
 	{tKeyErrSaveUser, string(tKeyErrSaveUser)},
-	{tKeyErrSaveSidebarMinimized, string(tKeyErrSaveSidebarMinimized)},
+	{tKeyErrSaveSidebar, string(tKeyErrSaveSidebar)},
 	{tKeyErrGetSessions, string(tKeyErrGetSessions)},
 	{tKeyErrGetTranslations, string(tKeyErrGetTranslations)},
 	{tKeyErrGetSessionStatistics, string(tKeyErrGetSessionStatistics)},
@@ -64,7 +64,7 @@ var (
 	ErrGetGUIConfig         = newError(tKeyErrGetGuiConfig, errors.New("get gui config"))
 	ErrSaveTheme            = newError(tKeyErrSaveTheme, errors.New("save theme"))
 	ErrSaveUser             = newError(tKeyErrSaveUser, errors.New("save user"))
-	ErrSaveSidebarMinimized = newError(tKeyErrSaveSidebarMinimized, errors.New("save sidebar"))
+	ErrSaveSidebar          = newError(tKeyErrSaveSidebar, errors.New("save sidebar"))
 	ErrGetSessions          = newError(tKeyErrGetSessions, errors.New("get sessions"))
 	ErrGetTranslations      = newError(tKeyErrGetTranslations, errors.New("get translations"))
 	ErrGetSessionStatistics = newError(tKeyErrGetSessionStatistics, errors.New("get session statistics"))
