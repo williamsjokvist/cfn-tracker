@@ -1,4 +1,4 @@
-package nosql
+package config
 
 import (
 	"errors"
