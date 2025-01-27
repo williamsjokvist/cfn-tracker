@@ -103,7 +103,7 @@
   "errGetGuiConfig": "インターフェース構成の取得に失敗しました",
   "errSaveTheme": "インターフェースのテーマ設定を保存できませんでした",
   "errSaveUser": "ユーザープロフィールデータを保存できませんでした",
-  "errSaveSidebarMinimized": "インターフェイスのサイドバーの切り替えを保存できませんでした",
+  "errSaveSidebar": "インターフェイスのサイドバーの切り替えを保存できませんでした",
   "errGetSessions": "セッションの取得に失敗しました",
   "errGetTranslations": "翻訳を取得できませんでした",
   "errGetSessionStatistics": "セッション統計の取得に失敗しました",
