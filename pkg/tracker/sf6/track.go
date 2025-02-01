@@ -37,10 +37,10 @@ func (t *SF6Tracker) GetUser(ctx context.Context, userCode string) (*model.User,
 
 func (t *SF6Tracker) Poll(ctx context.Context, cancel context.CancelFunc, session *model.Session, onNewMatch func(model.Match)) {
 	bl, err := t.cfnClient.GetBattleLog(ctx, session.UserId)
-	if bl == nil || err != nil {
+	if err != nil {
 		cancel()
 	}
-	if len(bl.ReplayList) == 0 {
+	if bl == nil || len(bl.ReplayList) == 0 {
 		return
 	}
 	lastReplay := bl.ReplayList[0]
