@@ -11,6 +11,7 @@ import (
 	"github.com/go-rod/rod/lib/launcher"
 	"github.com/go-rod/rod/lib/launcher/flags"
 	"github.com/go-rod/rod/lib/proto"
+	"github.com/go-rod/stealth"
 )
 
 type Browser struct {
@@ -40,13 +41,7 @@ func NewBrowser(headless bool) (*Browser, error) {
 	if err != nil {
 		return nil, fmt.Errorf("connect to browser: %w", err)
 	}
-
-	var page *rod.Page
-	if browser.MustPages().Empty() {
-		page = browser.MustPage("")
-	} else {
-		page = browser.MustPages().First()
-	}
+	page := stealth.MustPage(browser)
 
 	router := page.HijackRequests()
 	// Block the browser from fetching unnecessary resources
