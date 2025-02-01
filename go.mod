@@ -4,6 +4,7 @@ go 1.23.1
 
 require (
 	github.com/go-rod/rod v0.116.2
+	github.com/go-rod/stealth v0.4.9
 	github.com/golang-migrate/migrate/v4 v4.18.1
 	github.com/hashicorp/go-version v1.7.0
 	github.com/jmoiron/sqlx v1.4.0
