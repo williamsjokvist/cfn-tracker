@@ -45,6 +45,7 @@ func (t *T8Tracker) Poll(ctx context.Context, cancel context.CancelFunc, session
 	lastReplay, err := t.wavuClient.GetLastReplay(ctx, session.UserId)
 	if err != nil {
 		cancel()
+		return
 	}
 	var prevMatch model.Match
 	if len(session.Matches) > 0 {

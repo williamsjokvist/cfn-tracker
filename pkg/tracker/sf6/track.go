@@ -39,6 +39,7 @@ func (t *SF6Tracker) Poll(ctx context.Context, cancel context.CancelFunc, sessio
 	bl, err := t.cfnClient.GetBattleLog(ctx, session.UserId)
 	if err != nil {
 		cancel()
+		return
 	}
 	if bl == nil || len(bl.ReplayList) == 0 {
 		return
