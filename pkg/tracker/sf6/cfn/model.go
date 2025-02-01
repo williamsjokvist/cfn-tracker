@@ -268,7 +268,7 @@ type Replay struct {
 	ReplayBattleSubType     int        `json:"replay_battle_sub_type"`
 	ReplayBattleType        int        `json:"replay_battle_type"`
 	ReplayID                string     `json:"replay_id"`
-	UploadedAt              int        `json:"uploaded_at"`
+	UploadedAt              int64      `json:"uploaded_at"`
 	Views                   int        `json:"views"`
 	ReplayBattleTypeName    string     `json:"replay_battle_type_name"`
 	ReplayBattleSubTypeName string     `json:"replay_battle_sub_type_name"`

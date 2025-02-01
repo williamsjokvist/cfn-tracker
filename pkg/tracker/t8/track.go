@@ -42,7 +42,7 @@ func (t *T8Tracker) GetUser(ctx context.Context, polarisId string) (*model.User,
 }
 
 func (t *T8Tracker) Poll(ctx context.Context, cancel context.CancelFunc, session *model.Session, onNewMatch func(model.Match)) {
-	wm, err := t.wavuClient.GetLastReplay(ctx, session.UserId)
+	lastReplay, err := t.wavuClient.GetLastReplay(ctx, session.UserId)
 	if err != nil {
 		cancel()
 	}
@@ -50,26 +50,29 @@ func (t *T8Tracker) Poll(ctx context.Context, cancel context.CancelFunc, session
 	if len(session.Matches) > 0 {
 		prevMatch = *session.Matches[0]
 	}
-	if wm == nil || prevMatch.ReplayID == wm.BattleId {
+	if lastReplay == nil || prevMatch.ReplayID == lastReplay.BattleId {
 		return
 	}
-	battleAt := time.Unix(wm.BattleAt, 0)
-	polarisId := wm.P1PolarisId
-	userName := wm.P1Name
-	character := wm.P1CharaId
-	opponentCharacter := wm.P2CharaId
-	victory := wm.Winner == 1
-	opponent := wm.P2Name
-	opponentRank := wm.P2Rank
+	battleAt := time.Unix(lastReplay.BattleAt, 0)
+	if time.Since(battleAt).Hours() >= 24 {
+		return
+	}
+	polarisId := lastReplay.P1PolarisId
+	userName := lastReplay.P1Name
+	character := lastReplay.P1CharaId
+	opponentCharacter := lastReplay.P2CharaId
+	victory := lastReplay.Winner == 1
+	opponent := lastReplay.P2Name
+	opponentRank := lastReplay.P2Rank
 
-	if wm.P2PolarisId == session.UserId {
-		polarisId = wm.P2PolarisId
-		userName = wm.P2Name
-		character = wm.P2CharaId
-		opponentCharacter = wm.P1CharaId
-		victory = wm.Winner == 2
-		opponent = wm.P1Name
-		opponentRank = wm.P1Rank
+	if lastReplay.P2PolarisId == session.UserId {
+		polarisId = lastReplay.P2PolarisId
+		userName = lastReplay.P2Name
+		character = lastReplay.P2CharaId
+		opponentCharacter = lastReplay.P1CharaId
+		victory = lastReplay.Winner == 2
+		opponent = lastReplay.P1Name
+		opponentRank = lastReplay.P1Rank
 	}
 
 	wins := prevMatch.Wins
@@ -89,7 +92,7 @@ func (t *T8Tracker) Poll(ctx context.Context, cancel context.CancelFunc, session
 		UserId:    polarisId,
 		Opponent:  opponent,
 		Victory:   victory,
-		ReplayID:  wm.BattleId,
+		ReplayID:  lastReplay.BattleId,
 		Wins:      wins,
 		Losses:    losses,
 		WinStreak: winStreak,

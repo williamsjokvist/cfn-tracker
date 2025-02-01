@@ -30,6 +30,8 @@ func (t *SF6Tracker) GetUser(ctx context.Context, userCode string) (*model.User,
 	return &model.User{
 		DisplayName: bl.GetCFN(),
 		Code:        userCode,
+		LP:          bl.GetLP(),
+		MR:          bl.GetMR(),
 	}, nil
 }
 
@@ -49,10 +51,19 @@ func (t *SF6Tracker) Poll(ctx context.Context, cancel context.CancelFunc, sessio
 	if session.LP == bl.GetLP() || prevMatch.ReplayID == lastReplay.ReplayID {
 		return
 	}
-	latestReplay := bl.ReplayList[0]
-	opponent := getOpponentInfo(bl.GetCFN(), &latestReplay)
-	victory := !isVictory(opponent.RoundResults)
 
+	battleAt := time.Unix(lastReplay.UploadedAt, 0)
+	if time.Since(battleAt).Hours() >= 24 {
+		return
+	}
+
+	var opponent cfn.PlayerInfo
+	if bl.GetCFN() == lastReplay.Player1Info.Player.FighterID {
+		opponent = lastReplay.Player2Info
+	} else {
+		opponent = lastReplay.Player1Info
+	}
+	victory := !isVictory(opponent.RoundResults)
 	wins := prevMatch.Wins
 	losses := prevMatch.Losses
 	winStreak := prevMatch.WinStreak
@@ -85,16 +96,8 @@ func (t *SF6Tracker) Poll(ctx context.Context, cancel context.CancelFunc, sessio
 		UserId:            session.UserId,
 		UserName:          session.UserName,
 		SessionId:         session.Id,
-		ReplayID:          latestReplay.ReplayID,
+		ReplayID:          lastReplay.ReplayID,
 	})
-}
-
-func getOpponentInfo(myCfn string, replay *cfn.Replay) cfn.PlayerInfo {
-	if myCfn == replay.Player1Info.Player.FighterID {
-		return replay.Player2Info
-	} else {
-		return replay.Player1Info
-	}
 }
 
 func getPreviousMatchForCharacter(sesh *model.Session, character string) model.Match {

@@ -82,23 +82,22 @@ func (ch *TrackingHandler) StartTracking(userCode string, restore bool) error {
 		}
 
 		if user == nil {
-			usr, err := ch.gameTracker.GetUser(ctx, userCode)
+			user, err = ch.gameTracker.GetUser(ctx, userCode)
 			if err != nil {
 				return model.WrapError(model.ErrGetUser, err)
 			}
-			if err := ch.sqlDb.SaveUser(ctx, *usr); err != nil {
+			if err := ch.sqlDb.SaveUser(ctx, *user); err != nil {
 				return model.WrapError(model.ErrSaveUser, err)
 			}
 		}
 
-		sesh, err := ch.sqlDb.CreateSession(ctx, userCode)
+		session, err = ch.sqlDb.CreateSession(ctx, userCode)
 		if err != nil {
 			return model.WrapError(model.ErrCreateSession, err)
 		}
-		session = sesh
-		// session.LP = bl.GetLP()
-		// session.MR = bl.GetMR()
-		// session.UserName = bl.GetCFN()
+		session.LP = user.LP
+		session.MR = user.MR
+		session.UserName = user.DisplayName
 	}
 
 	if session == nil {
