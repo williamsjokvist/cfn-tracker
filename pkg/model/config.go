@@ -6,6 +6,6 @@ type RuntimeConfig struct {
 
 type GUIConfig struct {
 	Locale  string    `ini:"locale" json:"locale" default:"en-GB"`
-	Theme   ThemeName `ini:"theme" json:"theme" default:"default"`
+	Theme   ThemeName `ini:"theme" json:"theme" default:"tekken"`
 	SideBar bool      `ini:"sidebar" json:"sidebar" default:"true"`
 }

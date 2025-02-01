@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"log"
 	"time"
@@ -76,33 +75,34 @@ func (ch *TrackingHandler) StartTracking(userCode string, restore bool) error {
 		}
 		session = sesh
 	} else {
-		user, err := ch.sqlDb.GetUserByCode(ctx, userCode)
-		if err != nil && !errors.Is(err, sql.ErrUserNotFound) {
-			return model.WrapError(model.ErrGetUser, err)
-		}
-
-		if user == nil {
-			user, err = ch.gameTracker.GetUser(ctx, userCode)
-			if err != nil {
-				return model.WrapError(model.ErrGetUser, err)
-			}
-			if err := ch.sqlDb.SaveUser(ctx, *user); err != nil {
-				return model.WrapError(model.ErrSaveUser, err)
-			}
-		}
-
-		session, err = ch.sqlDb.CreateSession(ctx, userCode)
+		sesh, err := ch.sqlDb.CreateSession(ctx, userCode)
 		if err != nil {
 			return model.WrapError(model.ErrCreateSession, err)
 		}
-		session.LP = user.LP
-		session.MR = user.MR
-		session.UserName = user.DisplayName
+		session = sesh
 	}
-
 	if session == nil {
 		return model.ErrCreateSession
 	}
+
+	user, err := ch.gameTracker.GetUser(ctx, userCode)
+	if err != nil {
+		return model.WrapError(model.ErrGetUser, err)
+	}
+	if err := ch.sqlDb.SaveUser(ctx, *user); err != nil {
+		return model.WrapError(model.ErrSaveUser, err)
+	}
+	session.LP = user.LP
+	session.MR = user.MR
+	session.UserName = user.DisplayName
+
+	ch.eventEmitter("match", model.Match{
+		UserName:  session.UserName,
+		LP:        session.LP,
+		MR:        session.MR,
+		SessionId: session.Id,
+		UserId:    session.UserId,
+	})
 
 	ticker := time.NewTicker(30 * time.Second)
 	ch.forcePollChan = make(chan struct{})
