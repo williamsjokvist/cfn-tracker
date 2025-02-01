@@ -54,7 +54,7 @@ func (t *T8Tracker) Poll(ctx context.Context, cancel context.CancelFunc, session
 		return
 	}
 	battleAt := time.Unix(lastReplay.BattleAt, 0)
-	if time.Now().Sub(battleAt).Hours() >= 24 {
+	if time.Since(battleAt).Hours() >= 24 {
 		return
 	}
 	polarisId := lastReplay.P1PolarisId

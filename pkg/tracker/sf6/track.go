@@ -53,7 +53,7 @@ func (t *SF6Tracker) Poll(ctx context.Context, cancel context.CancelFunc, sessio
 	}
 
 	battleAt := time.Unix(lastReplay.UploadedAt, 0)
-	if time.Now().Sub(battleAt).Hours() >= 24 {
+	if time.Since(battleAt).Hours() >= 24 {
 		return
 	}
 
