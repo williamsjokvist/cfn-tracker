@@ -2,14 +2,14 @@ package update
 
 import (
 	"fmt"
+	"io"
 	"log/slog"
+	"net/http"
 	"os"
 	"path/filepath"
 	"runtime"
 	"strconv"
 	"strings"
-	"net/http"
-	"io"
 
 	"github.com/williamsjokvist/cfn-tracker/pkg/utils"
 )
@@ -19,8 +19,7 @@ func HandleAutoUpdateTo(version string) error {
 	slog.Info(fmt.Sprintf("starting update to version: %s", version))
 
 	zipFileName := getOsSpecificZipFileName()
-	downloadLink := fmt.Sprintf("https://github.com/williamsjokvist/cfn-tracker/releases/download/v%s/%s", version, zipFileName)
-	//downloadLink := fmt.Sprintf("/home/johan/cfn.zip")
+	downloadLink := fmt.Sprintf("https://github.com/williamsjokvist/cfn-tracker/releases/download/%s/%s", version, zipFileName)
 	binaryFileName := getOsSpecificBinaryFileName()
 
 	var zipBytes []byte
@@ -28,11 +27,11 @@ func HandleAutoUpdateTo(version string) error {
 	if strings.HasPrefix(downloadLink, "http") {
 		res, err := http.Get(downloadLink)
 		if err != nil {
-			return fmt.Errorf("download latest version %w", err)
+			return fmt.Errorf("download version %s (%s): %w", version, zipFileName, err)
 		}
 
 		if res.StatusCode != 200 {
-			return fmt.Errorf("download latest version, got status: %v", res.Status)
+			return fmt.Errorf("download version %s (%s): got status: %v", version, zipFileName, res.Status)
 		}
 
 		resBody, err := io.ReadAll(res.Body)
