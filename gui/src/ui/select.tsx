@@ -13,11 +13,11 @@ export const Root = React.forwardRef<HTMLButtonElement, SelectPrimitive.SelectPr
         <SelectPrimitive.Trigger
           className={cn(
             'transition-colors',
-            'bg-white bg-opacity-5 hover:bg-opacity-20 active:bg-opacity-30',
-            'rounded-2xl border-[1px] border-white border-opacity-20',
+            'bg-white/5 hover:bg-white/20 active:bg-white/30',
+            'rounded-2xl border-[1px] border-white/20',
             'inline-flex items-center justify-between rounded-lg text-lg',
             'w-48 px-4 py-2 font-normal',
-            '[&>*:last-child]:data-[state=open]:rotate-180'
+            'data-[state=open]:[&>*:last-child]:rotate-180'
           )}
           ref={forwardedRef}
         >
@@ -40,7 +40,7 @@ export const Root = React.forwardRef<HTMLButtonElement, SelectPrimitive.SelectPr
                 exit={{ y: 50, opacity: 0, transition: { duration: 0.1 } }}
                 className={cn(
                   'z-50 overflow-hidden text-white',
-                  'bg-black bg-opacity-60 backdrop-blur-xl',
+                  'bg-black/60 backdrop-blur-xl',
                   'rounded-xl shadow-[0_3px_16px_rgba(0,0,0,.5)]'
                 )}
               >

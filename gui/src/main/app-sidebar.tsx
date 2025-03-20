@@ -31,7 +31,7 @@ export function AppSidebar() {
       className={cn(
         'relative z-50 grid grid-rows-[0fr_1fr_0fr] gap-5',
         'select-none overflow-visible whitespace-nowrap px-[10px] py-3',
-        'bg-[rgba(3,5,19,0.33)] text-white',
+        'bg-(rgba(3,5,19,0.33)) text-white',
         'transition-[width_250ms_ease-out]'
       )}
       style={{
@@ -79,8 +79,8 @@ function Nav() {
             className={cn(
               'flex items-center justify-between',
               'group flex items-center justify-between',
-              'transition-colors hover:bg-slate-50 hover:bg-opacity-5 hover:!text-white active:bg-[rgba(255,255,255,.075)]',
-              'rounded px-1 py-2 text-lg text-[#bfbcff] text-opacity-80'
+              'transition-colors hover:bg-slate-50/5 hover:text-white! active:bg-(rgba(255,255,255,.075))',
+              'rounded-sm px-1 py-2 text-lg text-[#bfbcff]/80'
             )}
             style={{
               fontWeight: selected ? '600' : '200',

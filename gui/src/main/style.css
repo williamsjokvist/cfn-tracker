@@ -1,1 +1,110 @@
-@import "tailwindcss";
+@import 'tailwindcss';
+@plugin '@tailwindcss/forms';
+
+@theme {
+  --color-highlight: var(--color-highlight);
+  --color-divider: var(--color-divider);
+  --opacity-enth: var(--enth-only);
+  --font-app: var(--app-font);
+  --animate-blink: blink 1s linear infinite;
+
+  @keyframes blink {
+    50% {
+      color: white;
+    }
+  }
+}
+
+/*
+  The default border color has changed to `currentColor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
+}
+
+@utility clip-circle {
+  clip-path: circle(30% at 50% 50%);
+}
+
+@utility main-background {
+  background: var(--bg-main);
+}
+
+@layer base {
+  :root {
+    --bg-main: radial-gradient(circle at 52.1% -29.6%, #901169 0%, #330083 100%);
+    --color-highlight: #F85961;
+    --color-divider: rgba(255, 255, 255, 0.125);
+    --enth-only: 0;
+    --app-font: "League Spartan", sans serif;
+  }
+
+  body[data-theme="tekken"] {
+    --bg-main: radial-gradient(circle at 52.1% -29.6%, #1e3c52 0%, #000 100%);
+    --color-highlight: #dd1d5b;
+    --color-divider: rgba(255, 255, 255, 0.125);
+    --enth-only: 0;
+    --app-font: "League Spartan", sans serif;
+  }
+
+  body[data-theme="enth"] {
+    --bg-main: radial-gradient(circle at 52.1% -29.6%, #0E254D 0%, #010814 100%);
+    --color-highlight: #95F3F6;
+    --color-divider: rgba(149, 243, 246, 0.075);
+    --enth-only: 1;
+    --app-font: "League Spartan", sans serif;
+  }
+
+  body {
+    @apply overflow-hidden main-background font-app {}
+  }
+
+  #root {
+    @apply flex {}
+  }
+}
+
+* {
+  user-select: none;
+}
+
+p,
+h1,
+h2,
+h3,
+h4 {
+  cursor: default;
+}
+
+button,
+a {
+  cursor: pointer;
+}
+
+::-webkit-scrollbar-track {
+  border-radius: 10px;
+  background-color: transparent;
+}
+
+::-webkit-scrollbar {
+  width: 5px;
+  background-color: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  background-color: #F5F5F5;
+}

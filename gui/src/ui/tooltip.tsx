@@ -8,7 +8,7 @@ export function Tooltip(
   }
 ) {
   return (
-    <div className='group relative z-[9999] inline-flex justify-center'>
+    <div className='group relative z-9999 inline-flex justify-center'>
       {props.children}
       {!props.disabled && (
         <motion.span

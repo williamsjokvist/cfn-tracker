@@ -10,7 +10,7 @@ export function AppWrapper() {
   return (
     <>
       <AppSidebar />
-      <div className='flex-[1]'>
+      <div className='flex-1'>
         <LoadingBar />
         <React.StrictMode>
           <Outlet />

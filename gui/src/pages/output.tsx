@@ -162,7 +162,7 @@ function StatSelect(props: {
           {Object.entries(props.options).map(([opt, checked]) => (
             <li key={opt}>
               <button
-                className='flex w-full cursor-pointer items-center px-2 py-1 text-lg hover:bg-white hover:bg-opacity-[.075]'
+                className='flex w-full cursor-pointer items-center px-2 py-1 text-lg hover:bg-white/[0.075]'
                 onClick={() => props.onSelect(opt, !checked)}
               >
                 <Checkbox checked={props.options[opt] === true} readOnly />
@@ -225,7 +225,7 @@ function ThemeSelect(props: { value: string; onSelect: (theme: string) => void }
           {themes.map(theme => (
             <li
               key={theme.name}
-              className='relative flex w-full cursor-pointer items-center text-lg hover:bg-white hover:bg-opacity-[.075]'
+              className='relative flex w-full cursor-pointer items-center text-lg hover:bg-white/[0.075]'
             >
               <Checkbox
                 id={`${theme.name}-checkbox`}

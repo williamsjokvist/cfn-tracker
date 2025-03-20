@@ -8,7 +8,7 @@ export function Switch(props: SwitchPrimitive.SwitchProps) {
     <SwitchPrimitive.Root
       className={cn(
         'relative h-7 w-12 cursor-pointer',
-        'rounded-full bg-white bg-opacity-25 backdrop-blur-xl',
+        'rounded-full bg-white/25 backdrop-blur-xl',
         className
       )}
       {...restProps}

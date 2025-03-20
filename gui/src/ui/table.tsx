@@ -44,10 +44,10 @@ export function Td(
   return (
     <td
       className={cn(
-        'whitespace-nowrap px-3 py-2 backdrop-blur-sm',
-        'bg-white bg-opacity-5 group-hover:bg-opacity-10',
+        'whitespace-nowrap px-3 py-2 backdrop-blur-xs',
+        'bg-white/5 group-hover:bg-white/10',
         'transition-colors',
-        interactive && 'cursor-pointer hover:bg-opacity-20 active:bg-opacity-30',
+        interactive && 'cursor-pointer hover:bg-white/20 active:bg-white/30',
         className
       )}
       {...restProps}

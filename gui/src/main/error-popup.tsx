@@ -37,8 +37,8 @@ export function ErrorPopupProvider(props: React.PropsWithChildren) {
           className={cn(
             'flex items-center justify-around gap-6',
             'fixed z-50 mx-auto',
-            'pointer-events-none rounded-bl-xl px-8 py-3 text-xl backdrop-blur-sm',
-            'bg-gradient-to-r from-[#870e65] to-[#6c086d] text-white'
+            'pointer-events-none rounded-bl-xl px-8 py-3 text-xl backdrop-blur-xs',
+            'bg-linear-to-r from-[#870e65] to-[#6c086d] text-white'
           )}
           style={{ opacity: 0 }}
         >

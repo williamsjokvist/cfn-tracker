@@ -74,7 +74,7 @@ export function TrackingLiveUpdater() {
               </div>
             </dl>
             {opponent != '' && (
-              <div className='group flex items-center justify-between rounded-xl bg-slate-50 bg-opacity-5 p-3 pb-2 text-lg leading-none'>
+              <div className='group flex items-center justify-between rounded-xl bg-slate-50/5 p-3 pb-2 text-lg leading-none'>
                 <span>{t('lastMatch')}</span>
                 <div className='relative flex items-center gap-2'>
                   <Icon
@@ -162,7 +162,7 @@ export function TrackingLiveUpdater() {
 
 type StatProps = { text: string; value: string | number }
 const BigStat = ({ text, value }: StatProps) => (
-  <div className='mb-2 flex flex-1 justify-between gap-4 rounded-xl bg-slate-50 bg-opacity-5 p-3 pb-1'>
+  <div className='mb-2 flex flex-1 justify-between gap-4 rounded-xl bg-slate-50/5 p-3 pb-1'>
     <dt className='font-extralight tracking-wider'>{text}</dt>
     <dd className='text-4xl font-semibold'>{value}</dd>
   </div>
