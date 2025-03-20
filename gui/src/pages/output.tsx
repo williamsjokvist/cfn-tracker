@@ -78,7 +78,7 @@ export function OutputPage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.125 }}
-          className='grid w-full gap-4 border-b-[1px] border-solid border-b-divider px-8 py-6'
+          className='border-b-divider grid w-full gap-4 border-b-[1px] border-solid px-8 py-6'
         >
           <div className='flex items-center justify-between gap-8'>
             <div>
@@ -95,7 +95,7 @@ export function OutputPage() {
                   icon='twemoji:ok-hand'
                   width={45}
                   id='ok'
-                  className='absolute right-7 top-0 opacity-0'
+                  className='absolute top-0 right-7 opacity-0'
                 />
               </div>
               <Button onClick={copyUrlToClipBoard} style={{ filter: 'hue-rotate(-120deg)' }}>
@@ -231,7 +231,7 @@ function ThemeSelect(props: { value: string; onSelect: (theme: string) => void }
                 id={`${theme.name}-checkbox`}
                 checked={theme.name === props.value}
                 onChange={e => props.onSelect(theme.name)}
-                className='absolute left-2 top-1'
+                className='absolute top-1 left-2'
               />
               <label
                 htmlFor={`${theme.name}-checkbox`}
@@ -249,7 +249,7 @@ function ThemeSelect(props: { value: string; onSelect: (theme: string) => void }
               style={{ opacity: theme.name === selectedTheme.name ? '100' : '0' }}
               className={cn(
                 `${theme.name}-preview`,
-                'absolute left-0 top-0 w-full transition-opacity',
+                'absolute top-0 left-0 w-full transition-opacity',
                 'pointer-events-none mx-auto h-[60px] w-[350px] select-none'
               )}
             >

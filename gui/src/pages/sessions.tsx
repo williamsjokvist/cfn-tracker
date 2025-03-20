@@ -97,12 +97,12 @@ export function SessionsListPage() {
             rgba(255, 255, 255, 0.125) 225px
           )`
           }}
-          className='relative flex flex-wrap items-stretch border-y-[0.5px] border-solid border-divider px-8'
+          className='border-divider relative flex flex-wrap items-stretch border-y-[0.5px] border-solid px-8'
         >
           {Object.keys(sessionsByDay).map(day => (
             <div
               key={day}
-              className='flex w-[193.5px] flex-col border-b-[0.5px] border-solid border-divider px-2'
+              className='border-divider flex w-[193.5px] flex-col border-b-[0.5px] border-solid px-2'
             >
               <span className='text-center text-xl font-bold'>{day}</span>
               {sessionsByDay[day].reverse().map(s => (

@@ -53,9 +53,9 @@ export function TrackingLiveUpdater() {
             {mr > 0 && <SmallStat text='MR' value={`${mr == -1 ? t('placement') : mr}`} />}
           </div>
         </dl>
-        <div className='flex h-[calc(100%-32px)] flex-1 pb-5 pt-3'>
+        <div className='flex h-[calc(100%-32px)] flex-1 pt-3 pb-5'>
           <div className='w-full'>
-            <dl className='whitespace-nowrap text-lg'>
+            <dl className='text-lg whitespace-nowrap'>
               <div className='flex justify-between gap-2'>
                 <BigStat text={t('wins')} value={wins} />
                 <BigStat text={t('losses')} value={losses} />
@@ -91,7 +91,7 @@ export function TrackingLiveUpdater() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.35 }}
-            className='flex-0 relative grid h-full'
+            className='relative grid h-full flex-0'
           >
             <PieChart
               className='mx-auto h-52 w-full'
@@ -148,7 +148,7 @@ export function TrackingLiveUpdater() {
         </div>
         {/* TODO: fix character image for tekken 8 */}
         <img
-          className='pointer-events-none absolute -right-20 top-0 z-[-1] h-full opacity-10 grayscale'
+          className='pointer-events-none absolute top-0 -right-20 z-[-1] h-full opacity-10 grayscale'
           src={`https://www.streetfighter.com/6/buckler/assets/images/material/character/character_${character
             .toLowerCase()
             .replace(/\s/g, '')

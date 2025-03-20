@@ -44,7 +44,7 @@ export function ErrorPopupProvider(props: React.PropsWithChildren) {
         >
           <Icon
             icon='material-symbols:warning-outline'
-            className='h-8 w-8 animate-blink text-[#ff6388]'
+            className='animate-blink h-8 w-8 text-[#ff6388]'
           />
           {error?.localizationKey && <span>{t(error.localizationKey)}</span>}
         </div>

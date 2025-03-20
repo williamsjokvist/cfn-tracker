@@ -19,8 +19,8 @@ export function Header(props: React.PropsWithChildren) {
     <header
       className={cn(
         'relative flex items-center justify-between',
-        'h-[53px] select-none px-8',
-        'border-b-[1px] border-solid border-b-divider'
+        'h-[53px] px-8 select-none',
+        'border-b-divider border-b-[1px] border-solid'
       )}
       style={{ '--draggable': 'drag' } as React.CSSProperties}
     >
@@ -41,7 +41,7 @@ export function Title(props: React.PropsWithChildren) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ delay: 0.125 }}
-      className='whitespace-nowrap text-sm uppercase tracking-widest'
+      className='text-sm tracking-widest whitespace-nowrap uppercase'
     >
       {props.children}
     </motion.h2>
@@ -53,7 +53,7 @@ export function LoadingIcon() {
     <motion.i
       animate={{ opacity: 1 }}
       aria-label='loading'
-      className='inline-block h-5 w-5 animate-spin rounded-full border-[3px] border-current border-t-transparent text-highlight'
+      className='text-highlight inline-block h-5 w-5 animate-spin rounded-full border-[3px] border-current border-t-transparent'
       initial={{ opacity: 0 }}
       role='status'
       transition={{ delay: 0.125 }}

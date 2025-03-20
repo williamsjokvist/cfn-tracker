@@ -29,7 +29,7 @@ export function Tr(props: React.PropsWithChildren<React.TdHTMLAttributes<HTMLTab
 export function Th(props: React.PropsWithChildren<React.ThHTMLAttributes<HTMLTableCellElement>>) {
   const { className, ...restProps } = props
   return (
-    <th className={cn('whitespace-nowrap px-3 text-left', className)} {...restProps}>
+    <th className={cn('px-3 text-left whitespace-nowrap', className)} {...restProps}>
       {props.children}
     </th>
   )
@@ -44,7 +44,7 @@ export function Td(
   return (
     <td
       className={cn(
-        'whitespace-nowrap px-3 py-2 backdrop-blur-xs',
+        'px-3 py-2 whitespace-nowrap backdrop-blur-xs',
         'bg-white/5 group-hover:bg-white/10',
         'transition-colors',
         interactive && 'cursor-pointer hover:bg-white/20 active:bg-white/30',
