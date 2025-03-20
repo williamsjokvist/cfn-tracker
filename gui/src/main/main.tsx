@@ -11,7 +11,7 @@ import { ConfigProvider } from './config'
 import { RouterProvider } from './router'
 import { I18nProvider } from './i18n'
 
-import './style.sass'
+import './style.css'
 
 function AppLoader() {
   return (

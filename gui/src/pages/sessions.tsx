@@ -58,14 +58,14 @@ export function SessionsListPage() {
       >
         <header className='flex items-center gap-2 px-8 py-4 text-xl'>
           <Button
-            className='!text-md !px-0 !py-0 !font-normal'
+            className='text-md! px-0! py-0! font-normal!'
             disabled={months[monthIndex + 1] === undefined}
             onClick={() => setMonthIndex(monthIndex + 1)}
           >
             <Icon width={26} height={26} icon='material-symbols:chevron-left' />
           </Button>
           <Button
-            className='!text-md !px-0 !py-0 !font-normal'
+            className='text-md! px-0! py-0! font-normal!'
             disabled={monthIndex === 0}
             onClick={() => setMonthIndex(monthIndex - 1)}
           >
@@ -97,19 +97,19 @@ export function SessionsListPage() {
             rgba(255, 255, 255, 0.125) 225px
           )`
           }}
-          className='relative flex flex-wrap items-stretch border-y-[0.5px] border-solid border-divider px-8'
+          className='border-divider relative flex flex-wrap items-stretch border-y-[0.5px] border-solid px-8'
         >
           {Object.keys(sessionsByDay).map(day => (
             <div
               key={day}
-              className='flex w-[193.5px] flex-col border-b-[0.5px] border-solid border-divider px-2'
+              className='border-divider flex w-[193.5px] flex-col border-b-[0.5px] border-solid px-2'
             >
               <span className='text-center text-xl font-bold'>{day}</span>
               {sessionsByDay[day].reverse().map(s => (
                 <HoverCard key={s.id} openDelay={250}>
                   <HoverCardTrigger>
                     <Button
-                      className='mb-1 w-full !justify-between gap-2 rounded-xl !px-[6px] !py-0 !pt-[2px] text-xl'
+                      className='mb-1 w-full justify-between! gap-2 rounded-xl px-[6px]! py-0! pt-[2px]! text-xl'
                       onClick={() => navigate(`/sessions/${s.id}/matches`)}
                     >
                       <span className='text-base font-bold'>
@@ -125,7 +125,7 @@ export function SessionsListPage() {
                     side='bottom'
                     className={cn(
                       'overflow-hidden p-4 text-white',
-                      'bg-black bg-opacity-90 backdrop-blur-xl',
+                      'bg-black/90 backdrop-blur-xl',
                       'rounded-xl shadow-[0_3px_16px_rgba(0,0,0,.5)]'
                     )}
                   >

@@ -5,7 +5,7 @@ export function AppTitleBar() {
   return (
     <div style={{ '--draggable': 'drag' } as React.CSSProperties}>
       <div className='flex justify-start'>
-        <div className='group mb-3 ml-2 mt-2 flex'>
+        <div className='group mt-2 mb-3 ml-2 flex'>
           <button
             aria-label='close'
             className='mr-[8px] flex h-[14px] w-[14px] items-center justify-center rounded-full bg-slate-600 p-[2px] transition-all group-hover:bg-red-500'

@@ -4,7 +4,7 @@ import eye from './enth-eye.jpg'
 export function EnthEye(props: React.ImgHTMLAttributes<HTMLImageElement>) {
   const { className, ...restProps } = props
   return (
-    <div className='absolute -right-20 top-56 -z-50'>
+    <div className='absolute top-56 -right-20 -z-50'>
       <span
         className={cn(
           'relative inline-block',
@@ -24,7 +24,7 @@ export function EnthEye(props: React.ImgHTMLAttributes<HTMLImageElement>) {
             WebkitMaskSize: 'cover'
           }}
           className={cn(
-            'rounded-full opacity-enth transition-opacity',
+            'opacity-enth rounded-full transition-opacity',
             'pointer-events-none -z-10'
           )}
           {...restProps}

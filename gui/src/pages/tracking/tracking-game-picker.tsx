@@ -53,7 +53,7 @@ export function TrackingGamePicker(props: { onSubmit: (game: model.GameType) => 
                 type='button'
                 className={cn(
                   'relative h-[70px] w-60 rounded-2xl px-3',
-                  'transition-colors hover:bg-slate-50 hover:bg-opacity-5'
+                  'transition-colors hover:bg-slate-50/5'
                 )}
                 {...(game.code === selectedGame && {
                   style: {

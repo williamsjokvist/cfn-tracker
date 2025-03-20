@@ -37,7 +37,7 @@ export function SettingsPage() {
         transition={{ delay: 0.125 }}
         className='text-xl'
       >
-        <div className='border-b-[1px] border-solid border-b-divider px-8 py-6'>
+        <div className='border-b-divider border-b-[1px] border-solid px-8 py-6'>
           <div className='mx-auto grid max-w-xl gap-4'>
             <ThemeSelect />
             <LanguageSelect />

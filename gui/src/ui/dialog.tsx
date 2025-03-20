@@ -22,10 +22,10 @@ export const Content = React.forwardRef<HTMLDivElement, DialogContentProps>((pro
           animate={{ opacity: 1, top: '50%' }}
           transition={{ delay: 0.025 }}
           className={cn(
-            'fixed z-[9999] h-[420] w-[450px] p-4',
-            'left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%]',
+            'fixed z-9999 h-[420px] w-[450px] p-4',
+            'top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]',
             'text-lg text-white',
-            'bg-black bg-opacity-60 backdrop-blur-xl',
+            'bg-black/60 backdrop-blur-xl',
             'rounded-3xl shadow-[0_3px_16px_rgba(0,0,0,.5)]',
             className
           )}
@@ -59,8 +59,8 @@ export const Content = React.forwardRef<HTMLDivElement, DialogContentProps>((pro
           transition={{ delay: 0.025 }}
           className={cn(
             'grid place-items-center overflow-y-auto',
-            'fixed bottom-0 left-0 right-0 top-0',
-            'z-50 bg-black bg-opacity-40 backdrop-blur-sm'
+            'fixed top-0 right-0 bottom-0 left-0',
+            'z-50 bg-black/40 backdrop-blur-xs'
           )}
         />
       </DialogPrimitive.Overlay>

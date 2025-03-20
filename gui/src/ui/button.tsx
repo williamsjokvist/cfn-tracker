@@ -19,7 +19,7 @@ export function Button(props: JSX.IntrinsicElements['button']) {
         : { style })}
       className={cn(
         'flex items-center justify-between',
-        'text-md whitespace-nowrap font-semibold',
+        'text-md font-semibold whitespace-nowrap',
         'bg-[rgba(255,10,10,.1)] transition-colors',
         'hover:bg-[#FF3D51] active:bg-[#ff6474]',
         'rounded-[18px] border-[1px] border-[#FF3D51]',
