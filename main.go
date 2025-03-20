@@ -179,7 +179,6 @@ func main() {
 	browserSrcMatchChan := make(chan model.Match, 1)
 
 	cmdHandler := cmd.NewCommandHandler(
-		newUpdateAvailable,
 		sqlDb,
 		noSqlDb,
 		txtDb,

@@ -19,25 +19,17 @@ import (
 
 // The CommandHandler is the interface between the GUI and the core
 type CommandHandler struct {
-	hasUpdate bool
-
 	sqlDb *sql.Storage
 	cfgDb *cfgDb.Storage
-
-	cfg *config.BuildConfig
+	cfg   *config.BuildConfig
 }
 
-func NewCommandHandler(hasUpdate bool, sqlDb *sql.Storage, cfgDb *cfgDb.Storage, txtDb *txt.Storage, cfg *config.BuildConfig) *CommandHandler {
+func NewCommandHandler(sqlDb *sql.Storage, cfgDb *cfgDb.Storage, txtDb *txt.Storage, cfg *config.BuildConfig) *CommandHandler {
 	return &CommandHandler{
-		sqlDb:        sqlDb,
-		cfgDb:        cfgDb,
-		hasUpdate: hasUpdate,
-		cfg:          cfg,
+		sqlDb: sqlDb,
+		cfgDb: cfgDb,
+		cfg:   cfg,
 	}
-}
-
-func (ch *CommandHandler) CheckForUpdate() (bool, error) {
-	return ch.hasUpdate, nil
 }
 
 func (ch *CommandHandler) GetTranslation(locale string) (*model.Localization, error) {
