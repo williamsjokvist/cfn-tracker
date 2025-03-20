@@ -463,6 +463,8 @@ export namespace model {
 	    id: number;
 	    displayName: string;
 	    code: string;
+	    LP: number;
+	    MR: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new User(source);
@@ -473,6 +475,8 @@ export namespace model {
 	        this.id = source["id"];
 	        this.displayName = source["displayName"];
 	        this.code = source["code"];
+	        this.LP = source["LP"];
+	        this.MR = source["MR"];
 	    }
 	}
 
