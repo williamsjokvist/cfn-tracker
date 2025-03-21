@@ -9,7 +9,7 @@ const dirname = __dirname.split("/.config")[0]
 export default defineConfig({
   plugins: [
     react(),
-    tailwind({ config: './.config/tailwind.config.js' }),
+    tailwind(),
   ],
   resolve: {
     alias: {
