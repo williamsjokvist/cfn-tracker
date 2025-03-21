@@ -3,7 +3,7 @@ import Icon from "astro-icon"
 ---
 
 <script>
-  function removeNonUserAgentDownloads() { 
+  function removeNonUserAgentDownloads() {
     const isWindows = window.navigator.userAgent.indexOf("Win") != -1
     const isMacOS = window.navigator.userAgent.indexOf("Mac") != -1
 
@@ -23,7 +23,7 @@ import Icon from "astro-icon"
 
 <a
   id="windows-download"
-  href="https://github.com/williamsjokvist/cfn-tracker/releases/download/v4.1.0/cfn-tracker-windows-amd64.zip"
+  href="https://github.com/williamsjokvist/cfn-tracker/releases/download/v5.0.0/cfn-tracker-windows-amd64.zip"
   class="link-card windows my-1 inline-flex gap-2 justify-between items-center rounded-full px-6 py-4 text-2xl"
 >
   <Icon name="mdi:microsoft-windows" class="w-8 h-8" />
@@ -31,7 +31,7 @@ import Icon from "astro-icon"
 </a>
 <a
   id="mac-download-arm"
-  href="https://github.com/williamsjokvist/cfn-tracker/releases/download/v4.1.0/cfn-tracker-darwin-arm64.zip"
+  href="https://github.com/williamsjokvist/cfn-tracker/releases/download/v5.0.0/cfn-tracker-darwin-arm64.zip"
   class="link-card mac my-1 inline-flex gap-2 justify-between items-center rounded-full px-6 py-4 text-2xl"
 >
   <div class="grid justify-items-center h-8">
@@ -61,9 +61,9 @@ import Icon from "astro-icon"
     background-position: 100%
     transition: background-position 0.6s cubic-bezier(0.22, 1, 0.36, 1)
 
-  .link-card:is(:hover, :focus-within) 
+  .link-card:is(:hover, :focus-within)
     background-position: 0
-  
+
   .windows
     --accent-gradient: linear-gradient(45deg,rgb(124, 58, 237), #627ada 30%, rgba(115, 115, 115, 0.125) 60%)
 

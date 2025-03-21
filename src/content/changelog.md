@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.0.0](https://github.com/williamsjokvist/cfn-tracker/tree/v5.0.0)
+
+## Added
+- Tekken 8 support
+- Themes for the app UI
+- Sessions calendar page
+- Force update tracking button
+
+## Changed
+- Settings have been moved from the side bar to a separate page
+- Updates are now automatic instead of prompted in the app
+
+## Fixed
+- All stats are now logged in text files instead of just a couple
+
+## Removed
+- Support for SFV
+
 ## [4.1.0](https://github.com/williamsjokvist/cfn-tracker/tree/v4.1.0)
 
 ### Fixed
