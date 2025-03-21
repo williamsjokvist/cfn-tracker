@@ -65,7 +65,7 @@ export function TrackingForm() {
           <input
             ref={playerIdInputRef}
             onChange={e => setPlayerIdInput(e.target.value)}
-            className='block w-full border-0 border-b-2 border-b-[rgba(255,255,255,0.275)] bg-transparent px-4 pt-4 pr-12 pb-3 text-lg text-gray-300 outline-hidden transition-colors hover:border-white hover:text-white focus:border-white focus:ring-transparent focus:ring-offset-transparent focus:outline-hidden'
+            className='block w-full border-0 border-b-2 border-b-[rgba(255,255,255,0.275)] bg-transparent px-4 pt-4 pr-12 pb-3 text-lg text-gray-300 outline-hidden transition-colors hover:border-white hover:text-white focus:border-white focus:ring-transparent focus:ring-offset-transparent focus:outline-none'
             type='text'
             placeholder={t('cfnName')!}
             autoCapitalize='off'
@@ -78,7 +78,7 @@ export function TrackingForm() {
               type='button'
               onClick={clearInput}
               aria-label='Clear'
-              className='hover:bg-(rgba(255,255,255,.11)) absolute top-0 right-0 mt-4 mr-4 rounded-md text-[#bfbcff] transition-colors hover:text-white'
+              className='absolute top-0 right-0 mt-4 mr-4 rounded-md text-[#bfbcff] transition-colors hover:bg-white/11 hover:text-white'
             >
               <Icon icon='ci:close-big' className='h-6 w-6' />
             </button>
