@@ -78,7 +78,7 @@ export function TrackingForm() {
               type='button'
               onClick={clearInput}
               aria-label='Clear'
-              className='hover:bg-white/11 absolute top-0 right-0 mt-4 mr-4 rounded-md text-[#bfbcff] transition-colors hover:text-white'
+              className='absolute top-0 right-0 mt-4 mr-4 rounded-md text-[#bfbcff] transition-colors hover:bg-white/11 hover:text-white'
             >
               <Icon icon='ci:close-big' className='h-6 w-6' />
             </button>

@@ -79,7 +79,7 @@ function Nav() {
             className={cn(
               'flex items-center justify-between',
               'group flex items-center justify-between',
-              'active:bg-white/75 transition-colors hover:bg-slate-50/5 hover:text-white!',
+              'transition-colors hover:bg-slate-50/5 hover:text-white! active:bg-white/75',
               'rounded-sm px-1 py-2 text-lg text-[#bfbcff]/80'
             )}
             style={{
