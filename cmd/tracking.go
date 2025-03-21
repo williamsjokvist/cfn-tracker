@@ -158,7 +158,7 @@ func (ch *TrackingHandler) StartTracking(userCode string, restore bool) error {
 				onNewMatch(match)
 			case <-ticker.C:
 				log.Println("polling")
-				ch.gameTracker.Poll(ctx, session)
+				match, err := ch.gameTracker.Poll(ctx, session)
 				if err != nil {
 					cancel()
 					return
