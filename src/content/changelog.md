@@ -8,16 +8,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [5.0.0](https://github.com/williamsjokvist/cfn-tracker/tree/v5.0.0)
 
 ## Added
-- Tekken 8 tracking
+- Tekken 8 support
 - Themes for the app UI
 - Sessions calendar page
 - Force update tracking button
 
 ## Changed
 - Settings have been moved from the side bar to a separate page
+- Updates are now automatic instead of prompted in the app
 
 ## Fixed
-- All stats are now logged in text files
+- All stats are now logged in text files instead of just a couple
 
 ## Removed
 - Support for SFV
