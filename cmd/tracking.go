@@ -116,11 +116,14 @@ func (ch *TrackingHandler) StartTracking(userCode string, restore bool) error {
 
 	matchChan := make(chan model.Match)
 
-	onNewMatch := func(match model.Match) {
-		matchChan <- match
+	onNewMatch := func(match *model.Match) {
+		if match == nil {
+			return
+		}
+		matchChan <- *match
 		for _, mc := range ch.matchChans {
 			if mc != nil {
-				mc <- match
+				mc <- *match
 			}
 		}
 	}
@@ -137,15 +140,30 @@ func (ch *TrackingHandler) StartTracking(userCode string, restore bool) error {
 
 	go func() {
 		log.Println("polling")
-		ch.gameTracker.Poll(ctx, cancel, session, onNewMatch)
+		match, err := ch.gameTracker.Poll(ctx, session)
+		if err != nil {
+			cancel()
+			return
+		}
+		onNewMatch(match)
 		for {
 			select {
 			case <-ch.forcePollChan:
 				log.Println("forced poll")
-				ch.gameTracker.Poll(ctx, cancel, session, onNewMatch)
+				match, err := ch.gameTracker.Poll(ctx, session)
+				if err != nil {
+					cancel()
+					return
+				}
+				onNewMatch(match)
 			case <-ticker.C:
 				log.Println("polling")
-				ch.gameTracker.Poll(ctx, cancel, session, onNewMatch)
+				ch.gameTracker.Poll(ctx, session)
+				if err != nil {
+					cancel()
+					return
+				}
+				onNewMatch(match)
 			case <-ctx.Done():
 				close(matchChan)
 				return

@@ -35,27 +35,23 @@ func (t *SF6Tracker) GetUser(ctx context.Context, userCode string) (*model.User,
 	}, nil
 }
 
-func (t *SF6Tracker) Poll(ctx context.Context, cancel context.CancelFunc, session *model.Session, onNewMatch func(model.Match)) {
+func (t *SF6Tracker) Poll(ctx context.Context, session *model.Session) (*model.Match, error) {
 	bl, err := t.cfnClient.GetBattleLog(ctx, session.UserId)
 	if err != nil {
-		cancel()
-		return
+		return nil, fmt.Errorf("cfn: get battle log: %w", err)
 	}
 	if bl == nil || len(bl.ReplayList) == 0 {
-		return
+		return nil, nil
 	}
 	lastReplay := bl.ReplayList[0]
 	var prevMatch model.Match
 	if len(session.Matches) > 0 {
 		prevMatch = getPreviousMatchForCharacter(session, bl.GetCharacter())
 	}
-	if session.LP == bl.GetLP() || prevMatch.ReplayID == lastReplay.ReplayID {
-		return
-	}
 
 	battleAt := time.Unix(lastReplay.UploadedAt, 0)
-	if time.Since(battleAt).Hours() >= 24 {
-		return
+	if time.Since(battleAt).Minutes() >= 15 || prevMatch.ReplayID == lastReplay.ReplayID {
+		return nil, nil
 	}
 
 	var opponent cfn.PlayerInfo
@@ -76,7 +72,7 @@ func (t *SF6Tracker) Poll(ctx context.Context, cancel context.CancelFunc, sessio
 		winStreak = 0
 	}
 
-	onNewMatch(model.Match{
+	return &model.Match{
 		Character:         bl.GetCharacter(),
 		LP:                bl.GetLP(),
 		MR:                bl.GetMR(),
@@ -98,7 +94,7 @@ func (t *SF6Tracker) Poll(ctx context.Context, cancel context.CancelFunc, sessio
 		UserName:          session.UserName,
 		SessionId:         session.Id,
 		ReplayID:          lastReplay.ReplayID,
-	})
+	}, nil
 }
 
 func getPreviousMatchForCharacter(sesh *model.Session, character string) model.Match {

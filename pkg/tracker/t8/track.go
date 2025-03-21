@@ -41,23 +41,20 @@ func (t *T8Tracker) GetUser(ctx context.Context, polarisId string) (*model.User,
 	}, nil
 }
 
-func (t *T8Tracker) Poll(ctx context.Context, cancel context.CancelFunc, session *model.Session, onNewMatch func(model.Match)) {
+func (t *T8Tracker) Poll(ctx context.Context, session *model.Session) (*model.Match, error) {
 	lastReplay, err := t.wavuClient.GetLastReplay(ctx, session.UserId)
 	if err != nil {
-		cancel()
-		return
+		return nil, fmt.Errorf("wavu: get last replay: %w", err)
 	}
 	var prevMatch model.Match
 	if len(session.Matches) > 0 {
 		prevMatch = *session.Matches[0]
 	}
-	if lastReplay == nil || prevMatch.ReplayID == lastReplay.BattleId {
-		return
-	}
 	battleAt := time.Unix(lastReplay.BattleAt, 0)
-	if time.Since(battleAt).Hours() >= 24 {
-		return
+	if time.Since(battleAt).Minutes() >= 15 || prevMatch.ReplayID == lastReplay.BattleId {
+		return nil, nil
 	}
+
 	polarisId := lastReplay.P1PolarisId
 	userName := lastReplay.P1Name
 	character := lastReplay.P1CharaId
@@ -87,7 +84,7 @@ func (t *T8Tracker) Poll(ctx context.Context, cancel context.CancelFunc, session
 		winStreak = 0
 	}
 
-	onNewMatch(model.Match{
+	return &model.Match{
 		SessionId: session.Id,
 		UserName:  userName,
 		UserId:    polarisId,
@@ -109,7 +106,7 @@ func (t *T8Tracker) Poll(ctx context.Context, cancel context.CancelFunc, session
 		OpponentLeague:    wavu.ConvRankToName(opponentRank),
 		Date:              battleAt.Format("2006-01-02"),
 		Time:              battleAt.Format("15:04"),
-	})
+	}, nil
 }
 
 func (t *T8Tracker) Authenticate(ctx context.Context, email string, password string, statChan chan tracker.AuthStatus) {
