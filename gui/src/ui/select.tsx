@@ -13,7 +13,7 @@ export const Root = React.forwardRef<HTMLButtonElement, SelectPrimitive.SelectPr
         <SelectPrimitive.Trigger
           className={cn(
             'transition-colors',
-            'bg-white/5 hover:bg-white/20 active:bg-white/30',
+            'bg-white/5 hover:bg-white/10 active:bg-white/20',
             'rounded-2xl border-[1px] border-white/20',
             'inline-flex items-center justify-between rounded-lg text-lg',
             'w-48 px-4 py-2 font-normal',
