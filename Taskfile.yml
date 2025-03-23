@@ -1,6 +1,6 @@
-version: '3'
+version: "3"
 
-dotenv: ['.env']
+dotenv: [".env"]
 
 tasks:
   dev:
@@ -23,52 +23,40 @@ tasks:
     vars:
       ldflags: -X 'main.isProduction="true"' -X 'main.appVersion=${APP_VERSION}' -X 'main.capIDEmail=${CAP_ID_EMAIL}' -X 'main.capIDPassword=${CAP_ID_PASSWORD}'
     cmds:
-      - cmd: wails build -ldflags="{{.ldflags}}"
+      - cmd: GOOS={{.GOOS}} GOARCH={{.GOARCH}} wails build -ldflags="{{.ldflags}}"
 
   build-windows-amd64:
     desc: Build for Linux (x86)
-    env:
-      GOOS: windows
-      GOARCH: amd64
     cmds:
       - task: build
+        vars: { GOOS: windows, GOARCH: amd64 }
 
   build-windows-arm64:
     desc: Build for Windows (arm)
-    env:
-      GOOS: windows
-      GOARCH: arm64
     cmds:
       - task: build
+        vars: { GOOS: windows, GOARCH: arm64 }
 
   build-linux-amd64:
     desc: Build for Linux (x86)
-    env:
-      GOOS: linux
-      GOARCH: amd64
     cmds:
       - task: build
+        vars: { GOOS: linux, GOARCH: amd64 }
 
   build-linux-arm64:
     desc: Build for Linux (arm)
-    env:
-      GOOS: linux
-      GOARCH: arm64
     cmds:
       - task: build
+        vars: { GOOS: linux, GOARCH: arm64 }
 
   build-mac-amd64:
     desc: Build for Mac (x86)
-    env:
-      GOOS: darwin
-      GOARCH: amd64
     cmds:
       - task: build
+        vars: { GOOS: darwin, GOARCH: amd64 }
 
   build-mac-arm64:
     desc: Build for Mac (arm)
-    env:
-      GOOS: darwin
-      GOARCH: arm64
     cmds:
       - task: build
+        vars: { GOOS: darwin, GOARCH: arm64 }
