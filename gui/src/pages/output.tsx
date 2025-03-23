@@ -7,7 +7,6 @@ import { motion, useAnimate } from 'framer-motion'
 import * as Page from '@/ui/page'
 import * as Dialog from '@/ui/dialog'
 import { Button } from '@/ui/button'
-import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/ui/hover-card'
 
 import { Checkbox } from '@/ui/checkbox'
 

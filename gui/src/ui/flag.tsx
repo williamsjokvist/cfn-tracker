@@ -1,20 +1,13 @@
-import { FR, JP, GB, type FlagComponent, Props } from 'country-flag-icons/react/3x2'
+import { FR, JP, GB, Props } from 'country-flag-icons/react/3x2'
 
-export function Flag(props: { code: string } & Props) {
+const flagMap = {
+  'fr-FR': FR,
+  'ja-JP': JP,
+  'en-GB': GB
+}
+
+export function Flag(props: Props & { code: string }) {
   const { code, ...restProps } = props
-
-  let Flag: FlagComponent
-  switch (props.code) {
-    case 'fr-FR':
-      Flag = FR
-      break
-    case 'ja-JP':
-      Flag = JP
-      break
-    case 'en-GB':
-    default:
-      Flag = GB
-  }
-
+  const Flag = flagMap[code]
   return <Flag {...restProps} />
 }

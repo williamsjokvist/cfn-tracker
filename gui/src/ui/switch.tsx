@@ -3,7 +3,7 @@ import * as SwitchPrimitive from '@radix-ui/react-switch'
 import { cn } from '@/helpers/cn'
 
 export function Switch(props: SwitchPrimitive.SwitchProps) {
-  const { className, ...restProps } = props
+  const { className, children, ...restProps } = props
   return (
     <SwitchPrimitive.Root
       className={cn(
@@ -19,7 +19,7 @@ export function Switch(props: SwitchPrimitive.SwitchProps) {
           'translate-x-1 transition-transform data-[state=checked]:translate-x-6'
         )}
       >
-        {props.children}
+        {children}
       </SwitchPrimitive.Thumb>
     </SwitchPrimitive.Root>
   )

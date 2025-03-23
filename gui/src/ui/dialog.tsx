@@ -1,4 +1,3 @@
-import React from 'react'
 import { Icon } from '@iconify/react'
 import { useTranslation } from 'react-i18next'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
@@ -10,13 +9,17 @@ import { motion } from 'framer-motion'
 type DialogContentProps = {
   title: LocalizationKey
   description?: LocalizationKey
-} & React.PropsWithChildren<DialogPrimitive.DialogContentProps>
-export const Content = React.forwardRef<HTMLDivElement, DialogContentProps>((props, ref) => {
-  const { title, className, description, ...restProps } = props
+} & DialogPrimitive.DialogContentProps
+
+export const Root = DialogPrimitive.Root
+export const Trigger = DialogPrimitive.Trigger
+
+export function Content(props: DialogContentProps) {
+  const { title, description, className, children, ...restProps } = props
   const { t } = useTranslation()
   return (
     <DialogPrimitive.Portal>
-      <DialogPrimitive.Content asChild ref={ref} {...restProps}>
+      <DialogPrimitive.Content asChild {...restProps}>
         <motion.div
           initial={{ opacity: 0, top: '55%' }}
           animate={{ opacity: 1, top: '50%' }}
@@ -49,7 +52,7 @@ export const Content = React.forwardRef<HTMLDivElement, DialogContentProps>((pro
             </DialogPrimitive.Close>
           </header>
 
-          {props.children}
+          {children}
         </motion.div>
       </DialogPrimitive.Content>
       <DialogPrimitive.Overlay asChild>
@@ -66,7 +69,4 @@ export const Content = React.forwardRef<HTMLDivElement, DialogContentProps>((pro
       </DialogPrimitive.Overlay>
     </DialogPrimitive.Portal>
   )
-})
-
-export const Root = DialogPrimitive.Root
-export const Trigger = DialogPrimitive.Trigger
+}

@@ -9,5 +9,4 @@ export default {
   trailingComma: 'none',
   plugins: ['prettier-plugin-tailwindcss'],
   tailwindFunctions: ['cn'],
-  tailwindConfig: './.config/tailwind.config.js'
 }
