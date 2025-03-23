@@ -10,8 +10,8 @@ export function Root(props: React.PropsWithChildren) {
   return (
     <main className='relative z-40 grid h-screen w-full grid-rows-[0fr_1fr] text-white'>
       {props.children}
-      < EnthEye />
-    </main >
+      <EnthEye />
+    </main>
   )
 }
 

@@ -13,7 +13,9 @@ export function Page(props: JSX.IntrinsicElements['div']) {
 
 export function Content(props: JSX.IntrinsicElements['table']) {
   const { className, ...restProps } = props
-  return <table className={cn('w-full border-separate border-spacing-y-1', className)}  {...restProps} />
+  return (
+    <table className={cn('w-full border-separate border-spacing-y-1', className)} {...restProps} />
+  )
 }
 
 export function Tr(props: JSX.IntrinsicElements['tr']) {
@@ -28,9 +30,7 @@ export function Tr(props: JSX.IntrinsicElements['tr']) {
 
 export function Th(props: JSX.IntrinsicElements['th']) {
   const { className, ...restProps } = props
-  return (
-    <th className={cn('px-3 text-left whitespace-nowrap', className)} {...restProps} />
-  )
+  return <th className={cn('px-3 text-left whitespace-nowrap', className)} {...restProps} />
 }
 
 export function Td(

@@ -63,7 +63,7 @@ export function Item(props: SelectPrimitive.SelectItemProps & React.RefAttribute
     <SelectPrimitive.Item
       className={cn(
         'flex w-48 cursor-pointer justify-between px-4 py-3 text-lg',
-        'hover:bg-[rgba(255,255,255,0.075)] data-[state=checked]:bg-[rgba(255,255,255,0.075)]',
+        'hover:bg-[rgba(255,255,255,0.075)] data-[state=checked]:bg-[rgba(255,255,255,0.075)]'
       )}
       {...restProps}
     >
