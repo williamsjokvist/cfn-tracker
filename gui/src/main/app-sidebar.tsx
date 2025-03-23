@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link, useLocation } from 'react-router-dom'
 import { Icon } from '@iconify/react'
 import { useAnimate } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
@@ -7,7 +8,6 @@ import { cn } from '@/helpers/cn'
 
 import { ConfigContext } from './config'
 import { AppTitleBar } from './app-titlebar'
-import { Link, useLocation } from 'react-router-dom'
 
 export function AppSidebar() {
   const [cfg] = React.useContext(ConfigContext)

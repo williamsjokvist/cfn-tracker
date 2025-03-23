@@ -8,7 +8,7 @@ import { GetSessions, GetSessionsStatistics } from '@cmd/CommandHandler'
 import type { model } from '@model'
 
 import { useErrorPopup } from '@/main/error-popup'
-import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/ui/hover-card'
+import * as HoverCard from '@/ui/hover-card'
 import * as Page from '@/ui/page'
 import { Button } from '@/ui/button'
 import { cn } from '@/helpers/cn'
@@ -106,8 +106,8 @@ export function SessionsListPage() {
             >
               <span className='text-center text-xl font-bold'>{day}</span>
               {sessionsByDay[day].reverse().map(s => (
-                <HoverCard key={s.id} openDelay={250}>
-                  <HoverCardTrigger>
+                <HoverCard.Root key={s.id} openDelay={250}>
+                  <HoverCard.Trigger>
                     <Button
                       className='mb-1 w-full justify-between! gap-2 rounded-xl px-[6px]! py-0! pt-[2px]! text-xl'
                       onClick={() => navigate(`/sessions/${s.id}/matches`)}
@@ -120,8 +120,8 @@ export function SessionsListPage() {
                       </span>
                       <span className='text-base font-light'>{s.userName}</span>
                     </Button>
-                  </HoverCardTrigger>
-                  <HoverCardContent
+                  </HoverCard.Trigger>
+                  <HoverCard.Content
                     side='bottom'
                     className={cn(
                       'overflow-hidden p-4 text-white',
@@ -151,8 +151,8 @@ export function SessionsListPage() {
                         </>
                       )}
                     </dl>
-                  </HoverCardContent>
-                </HoverCard>
+                  </HoverCard.Content>
+                </HoverCard.Root>
               ))}
             </div>
           ))}
