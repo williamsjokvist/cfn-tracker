@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/fs"
-	"log"
+	"log/slog"
 	"net/http"
 	"strings"
 
@@ -34,10 +34,10 @@ func NewBrowserSourceServer(matchChan chan model.Match) *BrowserSourceServer {
 func (b *BrowserSourceServer) Start(ctx context.Context, cfg *config.BuildConfig) {
 	go func() {
 		for match := range b.matchChan {
-			log.Println("[BS EVENT] new match played")
+			slog.Info("browser source: match received", slog.Any("replay_id", match.ReplayID))
 			matchJson, err := json.Marshal(match)
 			if err != nil {
-				log.Println("browser src: failed to marshal match data")
+				slog.Error("browser source: marshal match data", slog.Any("error", err))
 			}
 			b.lastMatch = matchJson
 			for _, sse := range b.sseChans {
@@ -48,7 +48,7 @@ func (b *BrowserSourceServer) Start(ctx context.Context, cfg *config.BuildConfig
 		}
 	}()
 
-	log.Println("Starting browser source server")
+	slog.Debug("launching browser source server")
 
 	http.HandleFunc("/", b.handleRoot)
 	http.HandleFunc("GET /stream", b.handleStream)
@@ -59,7 +59,7 @@ func (b *BrowserSourceServer) Start(ctx context.Context, cfg *config.BuildConfig
 	http.Handle("/themes/", http.StripPrefix("/themes/", fs))
 
 	if err := http.ListenAndServe(fmt.Sprintf(":%d", cfg.BrowserSourcePort), nil); err != nil {
-		log.Println("failed to launch browser source server", err)
+		slog.Error("browser source: launch server", slog.Any("error", err))
 	}
 }
 
@@ -101,7 +101,7 @@ func (b *BrowserSourceServer) handleTheme(w http.ResponseWriter, req *http.Reque
 		w.WriteHeader(http.StatusOK)
 		_, err := w.Write(css)
 		if err != nil {
-			log.Println("failed to write browser source css")
+			slog.Error("browser source: send css", slog.Any("error", err))
 		}
 	}
 }
@@ -115,7 +115,7 @@ func (b *BrowserSourceServer) handleRoot(w http.ResponseWriter, _ *http.Request)
 		w.WriteHeader(http.StatusOK)
 		_, err := w.Write(html)
 		if err != nil {
-			log.Println("failed to write browser source html")
+			slog.Error("browser source: send html", slog.Any("error", err))
 		}
 	}
 }

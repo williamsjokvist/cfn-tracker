@@ -3,7 +3,7 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"log"
+	"log/slog"
 	"time"
 
 	"github.com/williamsjokvist/cfn-tracker/pkg/config"
@@ -62,7 +62,7 @@ func (ch *TrackingHandler) SetEventEmitter(eventEmitter EventEmitFn) {
 }
 
 func (ch *TrackingHandler) StartTracking(userCode string, restore bool) error {
-	log.Printf(`Starting tracking for %s, restoring = %v`, userCode, restore)
+	slog.Info("started tracking", slog.String("user_code", userCode), slog.Bool("restoring", restore))
 
 	ctx, cancel := context.WithCancel(context.Background())
 	ch.cancelPolling = cancel
@@ -139,7 +139,7 @@ func (ch *TrackingHandler) StartTracking(userCode string, restore bool) error {
 	}
 
 	go func() {
-		log.Println("polling")
+		slog.Info("polling")
 		match, err := ch.gameTracker.Poll(ctx, session)
 		if err != nil {
 			cancel()
@@ -149,7 +149,7 @@ func (ch *TrackingHandler) StartTracking(userCode string, restore bool) error {
 		for {
 			select {
 			case <-ch.forcePollChan:
-				log.Println("forced poll")
+				slog.Info("forced poll")
 				match, err := ch.gameTracker.Poll(ctx, session)
 				if err != nil {
 					cancel()
@@ -157,7 +157,7 @@ func (ch *TrackingHandler) StartTracking(userCode string, restore bool) error {
 				}
 				onNewMatch(match)
 			case <-ticker.C:
-				log.Println("polling")
+				slog.Info("polling")
 				match, err := ch.gameTracker.Poll(ctx, session)
 				if err != nil {
 					cancel()
@@ -179,15 +179,15 @@ func (ch *TrackingHandler) StartTracking(userCode string, restore bool) error {
 		session.Matches = append([]*model.Match{&match}, session.Matches...)
 
 		if err := ch.sqlDb.UpdateSession(ctx, session); err != nil {
-			log.Println("failed to update session:", err)
+			slog.Error("update session:", slog.Any("error", err))
 			break
 		}
 		if err := ch.sqlDb.SaveMatch(ctx, match); err != nil {
-			log.Println("failed to save match to database:", err)
+			slog.Error("save match to database", slog.Any("error", err))
 			break
 		}
 		if err := ch.txtDb.SaveMatch(match); err != nil {
-			log.Println("failed to save to text files:", err)
+			slog.Error("save to text files:", slog.Any("error", err))
 			break
 		}
 	}

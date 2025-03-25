@@ -2,7 +2,7 @@ package browser
 
 import (
 	"fmt"
-	"log"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"strings"
@@ -20,7 +20,7 @@ type Browser struct {
 }
 
 func NewBrowser(headless bool) (*Browser, error) {
-	log.Println(`Setting up browser`)
+	slog.Debug("setting up browser")
 
 	userHomeDir, err := os.UserCacheDir()
 	if err != nil {
@@ -35,7 +35,7 @@ func NewBrowser(headless bool) (*Browser, error) {
 		return nil, fmt.Errorf("launch temp browser: %w", err)
 	}
 
-	log.Println("Browser connecting to", u)
+	slog.Debug("browser connecting to", slog.Any("url", u))
 	browser := rod.New().ControlURL(u)
 	err = browser.Connect()
 	if err != nil {

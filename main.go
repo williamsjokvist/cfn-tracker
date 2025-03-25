@@ -75,7 +75,7 @@ func init() {
 
 	err := godotenv.Load(".env")
 	if err != nil {
-		log.Println(fmt.Errorf("missing .env file: %w", err))
+		slog.Error("missing env file", slog.Any("error", err))
 		cfg = config.BuildConfig{
 			AppVersion:        appVersion,
 			Headless:          isProduction == "true",
@@ -103,7 +103,8 @@ func main() {
 		if appBrowser != nil {
 			appBrowser.Page.Browser().Close()
 		}
-		log.Println("close with error", err)
+		slog.Error("closing with error", slog.Any("error", err))
+
 		if err := wails.Run(&options.App{
 			Title:                    "CFN Tracker - Error",
 			Width:                    400,
@@ -132,7 +133,7 @@ func main() {
 				}),
 			},
 		}); err != nil {
-			log.Println("launch error app")
+			slog.Error("display error window", slog.Any("error", err))
 		}
 	}
 	appBrowser, err := browser.NewBrowser(cfg.Headless)
@@ -229,15 +230,15 @@ func main() {
 		},
 		OnDomReady: func(ctx context.Context) {
 			onSecondInstanceLaunch = func(secondInstanceData options.SecondInstanceData) {
-				log.Println("user opened second instance", strings.Join(secondInstanceData.Args, ","))
-				log.Println("user opened second from", secondInstanceData.WorkingDirectory)
+				slog.Warn("user opened second instance", slog.Any("args", strings.Join(secondInstanceData.Args, ",")))
+				slog.Warn("user opened second from", slog.Any("working_directory", secondInstanceData.WorkingDirectory))
 				runtime.WindowUnminimise(ctx)
 				runtime.Show(ctx)
 				go runtime.EventsEmit(ctx, "launchArgs", secondInstanceData.Args)
 			}
 
 			trackingHandler.SetEventEmitter(func(eventName string, optionalData ...interface{}) {
-				log.Println("[FE EVENT]", eventName, optionalData)
+				slog.Info("[FE]", slog.String("event", eventName), slog.Any("data", optionalData))
 				runtime.EventsEmit(ctx, eventName, optionalData...)
 			})
 		},
@@ -272,7 +273,7 @@ func main() {
 
 func handleAutoUpdate(versionStr string) {
 	deleteOldExe := func() {
-		slog.Info("Deleting old exe...")
+		slog.Info("deleting old exe...")
 		currentExePath, err := os.Executable()
 		if err != nil {
 			slog.Error(fmt.Sprintf("get current exe path: %v", err))
@@ -326,7 +327,6 @@ func handleAutoUpdate(versionStr string) {
 
 		}
 	} else {
-		slog.Info("checking for updates...")
 		err := update.HandleAutoUpdateTo(versionStr)
 		if err != nil {
 			slog.Error(fmt.Sprintf("update to latest version: %v", err))
