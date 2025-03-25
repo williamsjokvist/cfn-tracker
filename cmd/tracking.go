@@ -62,7 +62,7 @@ func (ch *TrackingHandler) SetEventEmitter(eventEmitter EventEmitFn) {
 }
 
 func (ch *TrackingHandler) StartTracking(userCode string, restore bool) error {
-	slog.Info("started tracking %s, restoring = %v", userCode, restore)
+	slog.Info("started tracking", slog.String("user_code", userCode), slog.Bool("restoring", restore))
 
 	ctx, cancel := context.WithCancel(context.Background())
 	ch.cancelPolling = cancel
