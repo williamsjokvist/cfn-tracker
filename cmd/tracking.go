@@ -61,48 +61,71 @@ func (ch *TrackingHandler) SetEventEmitter(eventEmitter EventEmitFn) {
 	ch.eventEmitter = eventEmitter
 }
 
-func (ch *TrackingHandler) StartTracking(userCode string, restore bool) error {
-	slog.Info("started tracking %s, restoring = %v", userCode, restore)
+func (ch *TrackingHandler) CreateSession(userCode string, restore bool) (*model.Session, error) {
+	ctx := context.Background()
 
-	ctx, cancel := context.WithCancel(context.Background())
-	ch.cancelPolling = cancel
+	user, err := ch.gameTracker.GetUser(ctx, userCode)
+	if err != nil {
+		return nil, model.WrapError(model.ErrGetUser, err)
+	}
+	if err := ch.sqlDb.SaveUser(ctx, *user); err != nil {
+		return nil, model.WrapError(model.ErrSaveUser, err)
+	}
 
 	var session *model.Session
 	if restore {
 		sesh, err := ch.sqlDb.GetLatestSession(ctx, userCode)
 		if err != nil {
-			return model.WrapError(model.ErrGetLatestSession, err)
+			return nil, model.WrapError(model.ErrGetLatestSession, err)
 		}
 		session = sesh
 	} else {
 		sesh, err := ch.sqlDb.CreateSession(ctx, userCode)
 		if err != nil {
-			return model.WrapError(model.ErrCreateSession, err)
+			return nil, model.WrapError(model.ErrCreateSession, err)
 		}
 		session = sesh
 	}
-	if session == nil {
-		return model.ErrCreateSession
-	}
 
-	user, err := ch.gameTracker.GetUser(ctx, userCode)
-	if err != nil {
-		return model.WrapError(model.ErrGetUser, err)
-	}
-	if err := ch.sqlDb.SaveUser(ctx, *user); err != nil {
-		return model.WrapError(model.ErrSaveUser, err)
-	}
 	session.LP = user.LP
 	session.MR = user.MR
 	session.UserName = user.DisplayName
+	if err := ch.sqlDb.UpdateSession(ctx, session); err != nil {
+		slog.Error("update session:", slog.Any("error", err))
+	}
+	return session, nil
+}
 
-	ch.eventEmitter("match", model.Match{
-		UserName:  session.UserName,
-		LP:        session.LP,
-		MR:        session.MR,
-		SessionId: session.Id,
-		UserId:    session.UserId,
-	})
+func (ch *TrackingHandler) StartTracking(sessionId string) error {
+	slog.Info("started tracking", slog.String("session_id", sessionId))
+
+	ctx, cancel := context.WithCancel(context.Background())
+	ch.cancelPolling = cancel
+
+	session, err := ch.sqlDb.GetSession(ctx, sessionId)
+	if err != nil {
+		return model.WrapError(model.ErrCreateSession, err)
+	}
+
+	// update the ui with the latest match
+	// or with the user's base stats
+	if len(session.Matches) > 0 {
+		match := *session.Matches[0]
+		ch.eventEmitter("match", match)
+		for _, mc := range ch.matchChans {
+			if mc != nil {
+				mc <- match
+			}
+		}
+	} else {
+		ch.eventEmitter("match", model.Match{
+			UserName:  session.UserName,
+			LP:        session.LP,
+			MR:        session.MR,
+			SessionId: session.Id,
+			UserId:    session.UserId,
+		})
+	}
 
 	ticker := time.NewTicker(30 * time.Second)
 	ch.forcePollChan = make(chan struct{})
@@ -115,7 +138,6 @@ func (ch *TrackingHandler) StartTracking(userCode string, restore bool) error {
 	}()
 
 	matchChan := make(chan model.Match)
-
 	onNewMatch := func(match *model.Match) {
 		if match == nil {
 			return
@@ -124,16 +146,6 @@ func (ch *TrackingHandler) StartTracking(userCode string, restore bool) error {
 		for _, mc := range ch.matchChans {
 			if mc != nil {
 				mc <- *match
-			}
-		}
-	}
-
-	if len(session.Matches) > 0 {
-		match := *session.Matches[0]
-		ch.eventEmitter("match", match)
-		for _, mc := range ch.matchChans {
-			if mc != nil {
-				mc <- match
 			}
 		}
 	}
