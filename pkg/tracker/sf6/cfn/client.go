@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
+	"log/slog"
 	"math/rand"
 	"strconv"
 	"strings"
@@ -32,27 +32,27 @@ func NewClient(browser *browser.Browser) *Client {
 
 func (c *Client) GetBattleLog(ctx context.Context, cfn string) (*BattleLog, error) {
 	page := c.browser.Page.Context(ctx)
-	err := page.Navigate(fmt.Sprintf(`https://www.streetfighter.com/6/buckler/profile/%s/battlelog/rank`, cfn))
+	err := page.Navigate(fmt.Sprintf("https://www.streetfighter.com/6/buckler/profile/%s/battlelog/rank", cfn))
 	if err != nil {
-		return nil, fmt.Errorf(`navigate to cfn: %w`, err)
+		return nil, fmt.Errorf("navigate to cfn: %w", err)
 	}
 	err = page.WaitLoad()
 	if err != nil {
-		return nil, fmt.Errorf(`wait for cfn to load: %w`, err)
+		return nil, fmt.Errorf("wait for cfn to load: %w", err)
 	}
-	nextData, err := page.Element(`#__NEXT_DATA__`)
+	nextData, err := page.Element("#__NEXT_DATA__")
 	if err != nil {
-		return nil, fmt.Errorf(`get next_data element: %w`, err)
+		return nil, fmt.Errorf("get next_data element: %w", err)
 	}
 	body, err := nextData.Text()
 	if err != nil {
-		return nil, fmt.Errorf(`get next_data json: %w`, err)
+		return nil, fmt.Errorf("get next_data json: %w", err)
 	}
 
 	var profilePage ProfilePage
 	err = json.Unmarshal([]byte(body), &profilePage)
 	if err != nil {
-		return nil, fmt.Errorf(`unmarshal battle log: %w`, err)
+		return nil, fmt.Errorf("unmarshal battle log: %w", err)
 	}
 
 	bl := &profilePage.Props.PageProps
@@ -73,39 +73,38 @@ func (c *Client) Authenticate(ctx context.Context, email string, password string
 
 	defer func() {
 		if r := recover(); r != nil {
-			log.Println(`Recovered from panic: `, r)
-			statChan <- *status.WithError(fmt.Errorf(`panic: %v`, r))
+			slog.Error("panic recover when authenticating to cfn", r)
+			statChan <- *status.WithError(fmt.Errorf("fatal error: %v", r))
 		}
 	}()
 
-	if strings.Contains(page.MustInfo().URL, `buckler`) {
+	if strings.Contains(page.MustInfo().URL, "buckler") {
 		statChan <- *status.WithProgress(100)
 		return
 	}
 
 	if email == "" || password == "" {
-		statChan <- *status.WithError(errors.New("missing credentials"))
+		statChan <- *status.WithError(errors.New("missing cfn credentials"))
 		return
 	}
 
-	log.Println(`Logging in`)
-	page.MustNavigate(`https://cid.capcom.com/ja/login/?guidedBy=web`).MustWaitLoad().MustWaitIdle()
+	slog.Debug("logging into cfn")
+	page.MustNavigate("https://cid.capcom.com/ja/login/?guidedBy=web").MustWaitLoad().MustWaitIdle()
 	statChan <- *status.WithProgress(10)
 
-	log.Print("Checking if already authed")
-	if strings.Contains(page.MustInfo().URL, `cid.capcom.com/ja/mypage`) {
-		log.Print("User already authed")
+	if strings.Contains(page.MustInfo().URL, "cid.capcom.com/ja/mypage") {
+		slog.Debug("cfn: user already authed")
 		statChan <- *status.WithProgress(100)
 		return
 	}
-	log.Print("Not authed, continuing with auth process")
+	slog.Debug("cfn: user is not authed, continuing with auth process")
 
 	// Bypass age check
-	if strings.Contains(page.MustInfo().URL, `agecheck`) {
-		page.MustElement(`#country`).MustSelect(COUNTRIES[rand.Intn(len(COUNTRIES))])
-		page.MustElement(`#birthYear`).MustSelect(strconv.Itoa(rand.Intn(1999-1970) + 1970))
-		page.MustElement(`#birthMonth`).MustSelect(strconv.Itoa(rand.Intn(12-1) + 1))
-		page.MustElement(`#birthDay`).MustSelect(strconv.Itoa(rand.Intn(28-1) + 1))
+	if strings.Contains(page.MustInfo().URL, "agecheck") {
+		page.MustElement("#country").MustSelect(COUNTRIES[rand.Intn(len(COUNTRIES))])
+		page.MustElement("#birthYear").MustSelect(strconv.Itoa(rand.Intn(1999-1970) + 1970))
+		page.MustElement("#birthMonth").MustSelect(strconv.Itoa(rand.Intn(12-1) + 1))
+		page.MustElement("#birthDay").MustSelect(strconv.Itoa(rand.Intn(28-1) + 1))
 		page.MustElement(`form button[type="submit"]`).MustClick()
 		page.MustWaitLoad().MustWaitRequestIdle()
 	}
@@ -121,19 +120,19 @@ func (c *Client) Authenticate(ctx context.Context, email string, password string
 	var secondsWaited time.Duration = 0
 	for {
 		// Break out if we are no longer on Auth0 (redirected to CFN)
-		if !strings.Contains(page.MustInfo().URL, `auth.cid.capcom.com`) {
+		if !strings.Contains(page.MustInfo().URL, "auth.cid.capcom.com") {
 			break
 		}
 
 		time.Sleep(time.Second)
 		secondsWaited += time.Second
-		log.Println(`Waiting for gateway to pass...`, secondsWaited)
+		slog.Debug("bypassing cfn auth gateway...", slog.Float64("seconds_waited", secondsWaited.Seconds()))
 	}
 	statChan <- *status.WithProgress(65)
 
-	page.MustNavigate(`https://www.streetfighter.com/6/buckler/auth/loginep?redirect_url=/`)
+	page.MustNavigate("https://www.streetfighter.com/6/buckler/auth/loginep?redirect_url=/")
 	page.MustWaitLoad().MustWaitRequestIdle()
 
 	statChan <- *status.WithProgress(100)
-	log.Println(`Authentication passed`)
+	slog.Info("passed cfn auth")
 }

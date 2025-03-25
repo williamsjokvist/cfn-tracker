@@ -4,7 +4,7 @@ import (
 	"embed"
 	"errors"
 	"fmt"
-	"log"
+	"log/slog"
 	"os"
 	"path/filepath"
 
@@ -52,6 +52,8 @@ func getDataSource() string {
 }
 
 func migrateSchema(nSteps *int) error {
+	slog.Debug("starting db migrations", slog.Any("steps", nSteps))
+
 	db, err := sqlx.Open("sqlite", getDataSource())
 	if err != nil {
 		return fmt.Errorf("open sqlite connection: %w", err)
@@ -91,6 +93,6 @@ func migrateSchema(nSteps *int) error {
 		return fmt.Errorf("apply migrations: %w", err)
 	}
 
-	log.Println("Successfully applied db migrations")
+	slog.Debug("applied db migrations")
 	return nil
 }
