@@ -12,6 +12,7 @@ import (
 
 type SessionStorage interface {
 	CreateSession(ctx context.Context, userId string) error
+	GetSession(ctx context.Context, sessionId string) (*model.Session, error)
 	GetSessions(ctx context.Context, userId string, date string, limit uint8, offset uint16) ([]*model.Session, error)
 	GetSessionsStatistics(ctx context.Context, userId string) (*model.SessionsStatistics, error)
 	UpdateSession(ctx context.Context, session *model.Session) error
@@ -49,6 +50,22 @@ func (s *Storage) CreateSession(ctx context.Context, userId string) (*model.Sess
 	}
 
 	return &sesh, nil
+}
+
+func (s *Storage) GetSession(ctx context.Context, sessionId string) (*model.Session, error) {
+	query, args, err := sqlx.In(`
+		SELECT * FROM sessions
+		WHERE id = (?)
+		LIMIT 1
+	`, sessionId)
+	if err != nil {
+		return nil, fmt.Errorf("prepare get user clause: %w", err)
+	}
+	var session *model.Session
+	if err := s.db.GetContext(ctx, session, query, args...); err != nil {
+		return nil, fmt.Errorf("get session: %w", err)
+	}
+	return session, nil
 }
 
 type monthlySessionCount struct {
