@@ -57,156 +57,146 @@ func NewTrackingHandler(
 	}
 }
 
-func (ch *TrackingHandler) SetEventEmitter(eventEmitter EventEmitFn) {
-	ch.eventEmitter = eventEmitter
+func (t *TrackingHandler) SetEventEmitter(eventEmitter EventEmitFn) {
+	t.eventEmitter = eventEmitter
 }
 
-func (ch *TrackingHandler) StartTracking(userCode string, restore bool) error {
-	slog.Info("started tracking", slog.String("user_code", userCode), slog.Bool("restoring", restore))
-
+func (t *TrackingHandler) StartTracking(userCode string, restore bool) error {
 	ctx, cancel := context.WithCancel(context.Background())
-	ch.cancelPolling = cancel
+	t.cancelPolling = cancel
 
-	var session *model.Session
-	if restore {
-		sesh, err := ch.sqlDb.GetLatestSession(ctx, userCode)
-		if err != nil {
-			return model.WrapError(model.ErrGetLatestSession, err)
-		}
-		session = sesh
-	} else {
-		sesh, err := ch.sqlDb.CreateSession(ctx, userCode)
-		if err != nil {
-			return model.WrapError(model.ErrCreateSession, err)
-		}
-		session = sesh
-	}
-	if session == nil {
-		return model.ErrCreateSession
-	}
-
-	user, err := ch.gameTracker.GetUser(ctx, userCode)
+	session, err := t.makeSession(ctx, userCode, restore)
 	if err != nil {
-		return model.WrapError(model.ErrGetUser, err)
+		return model.WrapError(model.ErrCreateSession, err)
 	}
-	if err := ch.sqlDb.SaveUser(ctx, *user); err != nil {
-		return model.WrapError(model.ErrSaveUser, err)
-	}
-	session.LP = user.LP
-	session.MR = user.MR
-	session.UserName = user.DisplayName
 
-	ch.eventEmitter("match", model.Match{
-		UserName:  session.UserName,
-		LP:        session.LP,
-		MR:        session.MR,
-		SessionId: session.Id,
-		UserId:    session.UserId,
-	})
+	slog.Info("started tracking", slog.Int("session_id", int(session.Id)))
+
+	// update the ui with the latest match
+	// or with the user's base stats
+	var initMatch *model.Match
+	if len(session.Matches) > 0 {
+		initMatch = session.Matches[0]
+	} else {
+		initMatch = &model.Match{
+			UserName:  session.UserName,
+			LP:        session.EndingLP,
+			MR:        session.EndingMR,
+			SessionId: session.Id,
+			UserId:    session.UserId,
+		}
+	}
+	t.onNewMatch(ctx, initMatch, true)
 
 	ticker := time.NewTicker(30 * time.Second)
-	ch.forcePollChan = make(chan struct{})
+	t.forcePollChan = make(chan struct{})
 	defer func() {
-		ch.eventEmitter("stopped-tracking")
+		t.eventEmitter("stopped-tracking")
 		ticker.Stop()
 		cancel()
-		close(ch.forcePollChan)
-		ch.forcePollChan = nil
+		close(t.forcePollChan)
+		t.forcePollChan = nil
 	}()
-
-	matchChan := make(chan model.Match)
-
-	onNewMatch := func(match *model.Match) {
-		if match == nil {
-			return
-		}
-		matchChan <- *match
-		for _, mc := range ch.matchChans {
-			if mc != nil {
-				mc <- *match
-			}
-		}
-	}
-
-	if len(session.Matches) > 0 {
-		match := *session.Matches[0]
-		ch.eventEmitter("match", match)
-		for _, mc := range ch.matchChans {
-			if mc != nil {
-				mc <- match
-			}
-		}
-	}
 
 	go func() {
 		slog.Info("polling")
-		match, err := ch.gameTracker.Poll(ctx, session)
+		match, err := t.gameTracker.Poll(ctx, session)
 		if err != nil {
 			cancel()
 			return
 		}
-		onNewMatch(match)
+		t.onNewMatch(ctx, match, false)
 		for {
 			select {
-			case <-ch.forcePollChan:
+			case <-t.forcePollChan:
 				slog.Info("forced poll")
-				match, err := ch.gameTracker.Poll(ctx, session)
+				match, err := t.gameTracker.Poll(ctx, session)
 				if err != nil {
 					cancel()
 					return
 				}
-				onNewMatch(match)
+				t.onNewMatch(ctx, match, false)
 			case <-ticker.C:
 				slog.Info("polling")
-				match, err := ch.gameTracker.Poll(ctx, session)
+				match, err := t.gameTracker.Poll(ctx, session)
 				if err != nil {
 					cancel()
 					return
 				}
-				onNewMatch(match)
+				t.onNewMatch(ctx, match, false)
 			case <-ctx.Done():
-				close(matchChan)
 				return
 			}
 		}
 	}()
 
-	for match := range matchChan {
-		ch.eventEmitter("match", match)
-
-		session.LP = match.LP
-		session.MR = match.MR
-		session.Matches = append([]*model.Match{&match}, session.Matches...)
-
-		if err := ch.sqlDb.UpdateSession(ctx, session); err != nil {
-			slog.Error("update session:", slog.Any("error", err))
-			break
-		}
-		if err := ch.sqlDb.SaveMatch(ctx, match); err != nil {
-			slog.Error("save match to database", slog.Any("error", err))
-			break
-		}
-		if err := ch.txtDb.SaveMatch(match); err != nil {
-			slog.Error("save to text files:", slog.Any("error", err))
-			break
-		}
-	}
 	return nil
 }
 
-func (ch *TrackingHandler) StopTracking() {
-	ch.cancelPolling()
+func (t *TrackingHandler) onNewMatch(ctx context.Context, match *model.Match, dry bool) {
+	if match == nil {
+		return
+	}
+	t.eventEmitter("match")
+	for _, mc := range t.matchChans {
+		if mc != nil {
+			mc <- *match
+		}
+	}
+	if dry {
+		return
+	}
+
+	if err := t.sqlDb.SaveMatch(ctx, *match); err != nil {
+		slog.Error("save match to database", slog.Any("error", err))
+		return
+	}
+	if err := t.txtDb.SaveMatch(*match); err != nil {
+		slog.Error("save to text files:", slog.Any("error", err))
+		return
+	}
 }
 
-func (ch *TrackingHandler) SelectGame(game model.GameType) error {
+func (t *TrackingHandler) makeSession(ctx context.Context, userCode string, restore bool) (*model.Session, error) {
+	user, err := t.gameTracker.GetUser(ctx, userCode)
+	if err != nil {
+		return nil, model.WrapError(model.ErrGetUser, err)
+	}
+	if err := t.sqlDb.SaveUser(ctx, *user); err != nil {
+		return nil, model.WrapError(model.ErrSaveUser, err)
+	}
+
+	var session *model.Session
+	if restore {
+		sesh, err := t.sqlDb.GetLatestSession(ctx, userCode)
+		if err != nil {
+			return nil, model.WrapError(model.ErrGetLatestSession, err)
+		}
+		session = sesh
+	} else {
+		sesh, err := t.sqlDb.CreateSession(ctx, userCode)
+		if err != nil {
+			return nil, model.WrapError(model.ErrCreateSession, err)
+		}
+		session = sesh
+	}
+	session.UserName = user.DisplayName
+	return session, nil
+}
+
+func (t *TrackingHandler) StopTracking() {
+	t.cancelPolling()
+}
+
+func (t *TrackingHandler) SelectGame(game model.GameType) error {
 	var username, password string
 	switch game {
 	case model.GameTypeT8:
-		ch.gameTracker = t8.NewT8Tracker(ch.wavuClient)
+		t.gameTracker = t8.NewT8Tracker(t.wavuClient)
 	case model.GameTypeSF6:
-		ch.gameTracker = sf6.NewSF6Tracker(ch.cfnClient)
-		username = ch.cfg.CapIDEmail
-		password = ch.cfg.CapIDPassword
+		t.gameTracker = sf6.NewSF6Tracker(t.cfnClient)
+		username = t.cfg.CapIDEmail
+		password = t.cfg.CapIDPassword
 	default:
 		return model.WrapError(model.ErrSelectGame, fmt.Errorf("game does not exist"))
 	}
@@ -214,13 +204,13 @@ func (ch *TrackingHandler) SelectGame(game model.GameType) error {
 	authChan := make(chan tracker.AuthStatus)
 	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
-	go ch.gameTracker.Authenticate(ctx, username, password, authChan)
+	go t.gameTracker.Authenticate(ctx, username, password, authChan)
 	for status := range authChan {
 		if status.Err != nil {
 			return model.WrapError(model.ErrAuth, status.Err)
 		}
 
-		ch.eventEmitter("auth-progress", status.Progress)
+		t.eventEmitter("auth-progress", status.Progress)
 
 		if status.Progress >= 100 {
 			close(authChan)
@@ -230,8 +220,8 @@ func (ch *TrackingHandler) SelectGame(game model.GameType) error {
 	return nil
 }
 
-func (ch *TrackingHandler) ForcePoll() {
-	if ch.forcePollChan != nil {
-		ch.forcePollChan <- struct{}{}
+func (t *TrackingHandler) ForcePoll() {
+	if t.forcePollChan != nil {
+		t.forcePollChan <- struct{}{}
 	}
 }

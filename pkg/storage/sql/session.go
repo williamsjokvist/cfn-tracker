@@ -12,9 +12,9 @@ import (
 
 type SessionStorage interface {
 	CreateSession(ctx context.Context, userId string) error
+	GetSession(ctx context.Context, sessionId string) (*model.Session, error)
 	GetSessions(ctx context.Context, userId string, date string, limit uint8, offset uint16) ([]*model.Session, error)
 	GetSessionsStatistics(ctx context.Context, userId string) (*model.SessionsStatistics, error)
-	UpdateSession(ctx context.Context, session *model.Session) error
 }
 
 func (s *Storage) CreateSession(ctx context.Context, userId string) (*model.Session, error) {
@@ -97,6 +97,48 @@ func (s *Storage) GetSessionsStatistics(ctx context.Context, userId string) (*mo
 	}, nil
 }
 
+func (s *Storage) GetSession(ctx context.Context, sessionId string) (*model.Session, error){
+	query, args, err := sqlx.In(`
+		SELECT
+			s.id,
+	    s.created_at,
+	    u.display_name AS user_name,
+	    s.user_id,
+
+	    COUNT(IIF(m.victory, 1, NULL)) AS matches_won,
+	    COUNT(IIF(m.victory = false, 1, NULL)) AS matches_lost,
+	    (100 * COUNT(IIF(m.victory, 1, NULL)) / COUNT(*)) AS win_rate,
+
+	    m.lp AS starting_lp,
+	    IIF(m.lp != MAX(m.lp), MAX(m.lp), MIN(m.lp)) AS ending_lp,
+	    (MAX(m.lp) - MIN(m.lp)) AS lp_gain,
+
+	    m.mr AS starting_mr,
+	    IIF(m.mr != MAX(m.mr), MAX(m.mr), MIN(m.mr)) AS ending_mr,
+	    (MAX(m.mr) - MIN(m.mr)) AS mr_gain
+		FROM sessions AS s
+			JOIN users u ON u.code = s.user_id
+			JOIN matches m on s.id = m.session_id
+		WHERE s.session_id = (?)
+		GROUP BY s.id
+		ORDER BY s.id DESC
+`, sessionId)
+	if err != nil {
+		return nil, fmt.Errorf("prepare get sessions query: %w", err)
+	}
+	var session *model.Session
+	err = s.db.SelectContext(ctx, &session, query, args...)
+	if err != nil {
+		return nil, fmt.Errorf("excute get session query: %w", err)
+	}
+	matches, err := s.GetMatches(ctx, session.Id, session.UserId, 0, 0)
+	if err != nil {
+		return nil, fmt.Errorf("get matches by session: %w", err)
+	}
+	session.Matches = matches
+	return session, nil
+}
+
 func (s *Storage) GetSessions(ctx context.Context, userId string, date string, limit uint8, offset uint16) ([]*model.Session, error) {
 	pagination := ``
 	if limit != 0 || offset != 0 {
@@ -119,20 +161,24 @@ func (s *Storage) GetSessions(ctx context.Context, userId string, date string, l
 	query, args, err := sqlx.In(fmt.Sprintf(`
 		SELECT
 			s.id,
-			s.created_at,
-			u.display_name as user_name,
-			s.user_id,
-			COUNT(IIF(m.victory, 1, NULL)) as matches_won,
-			COUNT(IIF(m.victory = false, 1, NULL)) as matches_lost,
-			m.lp as starting_lp,
-			s.lp as ending_lp,
-			(s.lp - m.lp) as lp_gain,
-			m.mr as starting_mr,
-			s.mr as ending_mr,
-			(s.mr - m.mr) as mr_gain
-		FROM sessions as s
-		JOIN users u on u.code = s.user_id
-		JOIN matches m on s.id = m.session_id
+	    s.created_at,
+	    u.display_name AS user_name,
+	    s.user_id,
+
+	    COUNT(IIF(m.victory, 1, NULL)) AS matches_won,
+	    COUNT(IIF(m.victory = false, 1, NULL)) AS matches_lost,
+	    (100 * COUNT(IIF(m.victory, 1, NULL)) / COUNT(*)) AS win_rate,
+
+	    m.lp AS starting_lp,
+	    IIF(m.lp != MAX(m.lp), MAX(m.lp), MIN(m.lp)) AS ending_lp,
+	    (MAX(m.lp) - MIN(m.lp)) AS lp_gain,
+
+	    m.mr AS starting_mr,
+	    IIF(m.mr != MAX(m.mr), MAX(m.mr), MIN(m.mr)) AS ending_mr,
+	    (MAX(m.mr) - MIN(m.mr)) AS mr_gain
+		FROM sessions AS s
+			JOIN users u ON u.code = s.user_id
+			JOIN matches m on s.id = m.session_id
 		%s
 		GROUP BY s.id
 		ORDER BY s.id DESC
@@ -147,21 +193,6 @@ func (s *Storage) GetSessions(ctx context.Context, userId string, date string, l
 		return nil, fmt.Errorf("excute get sessions query: %w", err)
 	}
 	return sessions, nil
-}
-
-func (s *Storage) UpdateSession(ctx context.Context, session *model.Session) error {
-	query := `
-		UPDATE sessions
-		SET
-			lp = :lp,
-			mr = :mr
-		WHERE id = :id
-	`
-	_, err := s.db.NamedExecContext(ctx, query, session)
-	if err != nil {
-		return fmt.Errorf("excute query: %w", err)
-	}
-	return nil
 }
 
 func (s *Storage) GetLatestSession(ctx context.Context, userId string) (*model.Session, error) {

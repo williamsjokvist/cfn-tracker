@@ -123,11 +123,11 @@ func main() {
 							Error: err.Error(),
 						}
 						if err := tmpl.Execute(&b, params); err != nil {
-							log.Println("write error template: ", err)
+							slog.Error("write error template: ", slog.Any("error", err))
 						}
 						_, err := w.Write(b.Bytes())
 						if err != nil {
-							log.Println("write error page: ", err)
+							slog.Error("write error page: ", slog.Any("error", err))
 						}
 					})
 				}),
@@ -276,7 +276,7 @@ func handleAutoUpdate(versionStr string) {
 		slog.Info("deleting old exe...")
 		currentExePath, err := os.Executable()
 		if err != nil {
-			slog.Error(fmt.Sprintf("get current exe path: %v", err))
+			slog.Error("get current exe path", slog.Any("error", err))
 		}
 
 		err = os.Remove(currentExePath + ".old")
@@ -305,12 +305,12 @@ func handleAutoUpdate(versionStr string) {
 			// an error.
 			p, err := os.FindProcess(prevInstancePid)
 			if err != nil {
-				slog.Warn(fmt.Sprintf("failed (err received) to find previous instance process, it's probably shut down...: %v'", err))
+				slog.Warn("failed to find previous instance process, it's probably shut down...", slog.Any("error", err))
 				deleteOldExe()
 				break
 			}
 			if p == nil {
-				slog.Info("find previous instance process, it's probably shut down...'")
+				slog.Info("find previous instance process, it's probably shut down...")
 				deleteOldExe()
 				break
 			}
