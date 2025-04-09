@@ -61,9 +61,103 @@ func (t *TrackingHandler) SetEventEmitter(eventEmitter EventEmitFn) {
 	t.eventEmitter = eventEmitter
 }
 
-func (t *TrackingHandler) CreateSession(userCode string, restore bool) (*model.Session, error) {
-	ctx := context.Background()
+func (t *TrackingHandler) StartTracking(userCode string, restore bool) error {
+	ctx, cancel := context.WithCancel(context.Background())
+	t.cancelPolling = cancel
 
+	session, err := t.makeSession(ctx, userCode, restore)
+	if err != nil {
+		return model.WrapError(model.ErrCreateSession, err)
+	}
+
+	slog.Info("started tracking", slog.Int("session_id", int(session.Id)))
+
+	// update the ui with the latest match
+	// or with the user's base stats
+	var initMatch *model.Match
+	if len(session.Matches) > 0 {
+		initMatch = session.Matches[0]
+	} else {
+		initMatch = &model.Match{
+			UserName:  session.UserName,
+			LP:        session.EndingLP,
+			MR:        session.EndingMR,
+			SessionId: session.Id,
+			UserId:    session.UserId,
+		}
+	}
+	t.onNewMatch(ctx, initMatch, true)
+
+	ticker := time.NewTicker(30 * time.Second)
+	t.forcePollChan = make(chan struct{})
+	defer func() {
+		t.eventEmitter("stopped-tracking")
+		ticker.Stop()
+		cancel()
+		close(t.forcePollChan)
+		t.forcePollChan = nil
+	}()
+
+	go func() {
+		slog.Info("polling")
+		match, err := t.gameTracker.Poll(ctx, session)
+		if err != nil {
+			cancel()
+			return
+		}
+		t.onNewMatch(ctx, match, false)
+		for {
+			select {
+			case <-t.forcePollChan:
+				slog.Info("forced poll")
+				match, err := t.gameTracker.Poll(ctx, session)
+				if err != nil {
+					cancel()
+					return
+				}
+				t.onNewMatch(ctx, match, false)
+			case <-ticker.C:
+				slog.Info("polling")
+				match, err := t.gameTracker.Poll(ctx, session)
+				if err != nil {
+					cancel()
+					return
+				}
+				t.onNewMatch(ctx, match, false)
+			case <-ctx.Done():
+				return
+			}
+		}
+	}()
+
+	return nil
+}
+
+func (t *TrackingHandler) onNewMatch(ctx context.Context, match *model.Match, dry bool) {
+	if match == nil {
+		return
+	}
+	t.eventEmitter("match")
+	for _, mc := range t.matchChans {
+		if mc != nil {
+			mc <- *match
+		}
+	}
+	if dry {
+		return
+	}
+
+	if err := t.sqlDb.SaveMatch(ctx, *match); err != nil {
+		slog.Error("save match to database", slog.Any("error", err))
+		return
+	}
+	if err := t.txtDb.SaveMatch(*match); err != nil {
+		slog.Error("save to text files:", slog.Any("error", err))
+		return
+	}
+}
+
+func (t *TrackingHandler) makeSession(ctx context.Context, userCode string, restore bool) (*model.Session, error) {
 	user, err := t.gameTracker.GetUser(ctx, userCode)
 	if err != nil {
 		return nil, model.WrapError(model.ErrGetUser, err)
@@ -86,118 +180,8 @@ func (t *TrackingHandler) CreateSession(userCode string, restore bool) (*model.S
 		}
 		session = sesh
 	}
-
-	session.LP = user.LP
-	session.MR = user.MR
 	session.UserName = user.DisplayName
-	if err := t.sqlDb.UpdateSession(ctx, session); err != nil {
-		slog.Error("update session:", slog.Any("error", err))
-	}
 	return session, nil
-}
-
-func (t *TrackingHandler) StartTracking(sessionId string) error {
-	slog.Info("started tracking", slog.String("session_id", sessionId))
-
-	ctx, cancel := context.WithCancel(context.Background())
-	t.cancelPolling = cancel
-
-	session, err := t.sqlDb.GetSession(ctx, sessionId)
-	if err != nil {
-		return model.WrapError(model.ErrCreateSession, err)
-	}
-
-	// update the ui with the latest match
-	// or with the user's base stats
-	var initMatch *model.Match
-	if len(session.Matches) > 0 {
-		initMatch = session.Matches[0]
-	} else {
-		initMatch = &model.Match{
-			UserName:  session.UserName,
-			LP:        session.LP,
-			MR:        session.MR,
-			SessionId: session.Id,
-			UserId:    session.UserId,
-		}
-	}
-	t.onNewMatch(ctx, session, initMatch, true)
-
-	ticker := time.NewTicker(30 * time.Second)
-	t.forcePollChan = make(chan struct{})
-	defer func() {
-		t.eventEmitter("stopped-tracking")
-		ticker.Stop()
-		cancel()
-		close(t.forcePollChan)
-		t.forcePollChan = nil
-	}()
-
-	go func() {
-		slog.Info("polling")
-		match, err := t.gameTracker.Poll(ctx, session)
-		if err != nil {
-			cancel()
-			return
-		}
-		t.onNewMatch(ctx, session, match, false)
-		for {
-			select {
-			case <-t.forcePollChan:
-				slog.Info("forced poll")
-				match, err := t.gameTracker.Poll(ctx, session)
-				if err != nil {
-					cancel()
-					return
-				}
-				t.onNewMatch(ctx, session, match, false)
-			case <-ticker.C:
-				slog.Info("polling")
-				match, err := t.gameTracker.Poll(ctx, session)
-				if err != nil {
-					cancel()
-					return
-				}
-				t.onNewMatch(ctx, session, match, false)
-			case <-ctx.Done():
-				return
-			}
-		}
-	}()
-
-	return nil
-}
-
-func (t *TrackingHandler) onNewMatch(ctx context.Context, session *model.Session, match *model.Match, dry bool) {
-	if match == nil {
-		return
-	}
-	t.eventEmitter("match", *match)
-	for _, mc := range t.matchChans {
-		if mc != nil {
-			mc <- *match
-		}
-	}
-	if dry {
-		return
-	}
-
-	session.LP = match.LP
-	session.MR = match.MR
-	session.Matches = append([]*model.Match{match}, session.Matches...)
-
-	if err := t.sqlDb.UpdateSession(ctx, session); err != nil {
-		slog.Error("update session:", slog.Any("error", err))
-		return
-	}
-	if err := t.sqlDb.SaveMatch(ctx, *match); err != nil {
-		slog.Error("save match to database", slog.Any("error", err))
-		return
-	}
-	if err := t.txtDb.SaveMatch(*match); err != nil {
-		slog.Error("save to text files:", slog.Any("error", err))
-		return
-	}
 }
 
 func (t *TrackingHandler) StopTracking() {
