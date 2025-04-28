@@ -49,8 +49,8 @@ export function TrackingLiveUpdater() {
         <dl className='flex w-full items-center justify-between whitespace-nowrap'>
           <SmallStat text='CFN' value={userName} />
           <div className='flex justify-between gap-8'>
-            {lp !== 0 && <SmallStat text='LP' value={`${lp == -1 ? t('placement') : lp}`} />}
-            {mr !== 0 && <SmallStat text='MR' value={`${mr == -1 ? t('placement') : mr}`} />}
+            {lp != 0 && <SmallStat text='LP' value={`${lp == -1 ? t('placement') : lp}`} />}
+            {mr != 0 && <SmallStat text='MR' value={`${mr == -1 ? t('placement') : mr}`} />}
           </div>
         </dl>
         <div className='flex h-[calc(100%-32px)] flex-1 pt-3 pb-5'>
@@ -65,10 +65,10 @@ export function TrackingLiveUpdater() {
                 <BigStat text={t('winStreak')} value={winStreak} />
               </div>
               <div className='flex justify-between gap-2'>
-                {lpGain > 0 && (
+                {lpGain != 0 && (
                   <BigStat text={t('lpGain')} value={`${lpGain > 0 ? `+` : ``}${lpGain}`} />
                 )}
-                {mrGain > 0 && (
+                {mrGain != 0 && (
                   <BigStat text={t('mrGain')} value={`${mrGain > 0 ? `+` : ``}${mrGain}`} />
                 )}
               </div>
