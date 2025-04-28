@@ -3,11 +3,13 @@ import Icon from "astro-icon"
 ---
 
 <script>
+/*
   function removeNonUserAgentDownloads() {
     const isWindows = window.navigator.userAgent.indexOf("Win") != -1
     const isMacOS = window.navigator.userAgent.indexOf("Mac") != -1
 
     // in case of unsupported OS, do not remove any link
+
     if (!(isMacOS || isWindows)) {
       return
     } else if (!isMacOS) {
@@ -16,9 +18,12 @@ import Icon from "astro-icon"
     } else if (!isWindows) {
       document.getElementById("windows-download").remove()
     }
+
+    document.getElementById("mac-download-arm").remove()
+    document.getElementById("mac-download-intel").remove()
   }
 
-  document.addEventListener("astro:page-load", removeNonUserAgentDownloads)
+  document.addEventListener("astro:page-load", removeNonUserAgentDownloads) */
 </script>
 
 <a
@@ -29,7 +34,7 @@ import Icon from "astro-icon"
   <Icon name="mdi:microsoft-windows" class="w-8 h-8" />
   <span>Download</span>
 </a>
-<a
+{/*<a
   id="mac-download-arm"
   href="https://github.com/williamsjokvist/cfn-tracker/releases/download/v5.0.0/cfn-tracker-darwin-arm64.zip"
   class="link-card mac my-1 inline-flex gap-2 justify-between items-center rounded-full px-6 py-4 text-2xl"
@@ -50,7 +55,7 @@ import Icon from "astro-icon"
     <Icon name="simple-icons:intel" class="relative bottom-4 w-14 h-8" />
   </div>
   <span class="w-full">Download</span>
-</a>
+</a>*/}
 
 <style lang="sass">
   .link-card
