@@ -138,7 +138,7 @@ export function SessionsListPage() {
                         <dt>{t('losses')}</dt>
                         <dd>{s.matchesLost}</dd>
                       </div>
-                      {s.lpGain != 0 && s.mrGain != 0 && (
+                      {/*s.lpGain != 0 && s.mrGain != 0 && (
                         <>
                           <div className='flex justify-between gap-2'>
                             <dt>{t('mrGain')}</dt>
@@ -149,7 +149,7 @@ export function SessionsListPage() {
                             <dd>{s.lpGain}</dd>
                           </div>
                         </>
-                      )}
+                      )*/}
                     </dl>
                   </HoverCard.Content>
                 </HoverCard.Root>
