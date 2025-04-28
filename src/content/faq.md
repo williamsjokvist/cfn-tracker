@@ -9,10 +9,10 @@ Yes absolutely! If you do, [DM me on Twitter](https://twitter.com/GreenSoap_). I
 ## Can I use this for my own without streaming?
 Yes! Quite a few people have also told me that peeking at their stats, during or after they play has helped them improve.
 
-## Why remove Mac version
+## Why remove Mac version?
 There are many issues releasing apps on Mac, so I spared myself the headache of supporting it. You can still download it [here](https://github.com/williamsjokvist/cfn-tracker/releases/download/v5.0.0/cfn-tracker-darwin-arm64.zip) and try to get it to work, or build from source which works fine.
 
-## What is the future of CFN tracker
+## What is the future of CFN Tracker?
 Adding more statistics overall, especially related to sessions, character and player matchups over time
 
 ## How do I report bugs?
