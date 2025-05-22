@@ -73,9 +73,7 @@ export function TrackingForm() {
             onChange={e => setPlayerIdInput(e.target.value)}
             className='block w-full border-0 border-b-2 border-b-[rgba(255,255,255,0.275)] bg-transparent px-4 pt-4 pr-12 pb-3 text-lg text-gray-300 outline-hidden transition-colors hover:border-white hover:text-white focus:border-white focus:ring-transparent focus:ring-offset-transparent focus:outline-none'
             type='text'
-            placeholder={
-              game === model.GameType.STREET_FIGHTER_6 ? t('cfnName') : t('tekkenId')
-            }
+            placeholder={game === model.GameType.STREET_FIGHTER_6 ? t('cfnName') : t('tekkenId')}
             autoCapitalize='off'
             autoComplete='off'
             autoCorrect='off'
