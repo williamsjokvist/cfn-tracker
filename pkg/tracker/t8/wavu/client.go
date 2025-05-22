@@ -55,7 +55,7 @@ func (c *Client) getReplays(ctx context.Context) ([]Replay, error) {
 	}
 
 	var replays []Replay
-	if err = json.Unmarshal(data, replays); err != nil {
+	if err = json.Unmarshal(data, &replays); err != nil {
 		return nil, fmt.Errorf("unmarshal replays: %w", err)
 	}
 	return replays, nil
