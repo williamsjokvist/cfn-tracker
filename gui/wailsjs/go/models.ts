@@ -70,6 +70,7 @@ export namespace model {
 	    changelog: string;
 	    startTracking: string;
 	    cfnName: string;
+	    tekkenId: string;
 	    start: string;
 	    opponent: string;
 	    character: string;
@@ -84,6 +85,7 @@ export namespace model {
 	    stop: string;
 	    files: string;
 	    enterCfnName: string;
+	    enterTekkenId: string;
 	    result: string;
 	    replayId: string;
 	    copy: string;
@@ -188,6 +190,7 @@ export namespace model {
 	        this.changelog = source["changelog"];
 	        this.startTracking = source["startTracking"];
 	        this.cfnName = source["cfnName"];
+	        this.tekkenId = source["tekkenId"];
 	        this.start = source["start"];
 	        this.opponent = source["opponent"];
 	        this.character = source["character"];
@@ -202,6 +205,7 @@ export namespace model {
 	        this.stop = source["stop"];
 	        this.files = source["files"];
 	        this.enterCfnName = source["enterCfnName"];
+	        this.enterTekkenId = source["enterTekkenId"];
 	        this.result = source["result"];
 	        this.replayId = source["replayId"];
 	        this.copy = source["copy"];

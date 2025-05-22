@@ -23,20 +23,12 @@ func NewT8Tracker(wavuClient wavu.WavuClient) *T8Tracker {
 }
 
 func (t *T8Tracker) GetUser(ctx context.Context, polarisId string) (*model.User, error) {
-	lastReplay, err := t.wavuClient.GetLastReplay(ctx, polarisId)
+	userName, err := t.wavuClient.GetUserName(ctx, polarisId)
 	if err != nil {
-		return nil, fmt.Errorf("get last replay: %w", err)
-	}
-	name := polarisId
-	if lastReplay != nil {
-		if lastReplay.P1PolarisId == polarisId {
-			name = lastReplay.P1Name
-		} else {
-			name = lastReplay.P2Name
-		}
+		return nil, fmt.Errorf("get user info: %w", err)
 	}
 	return &model.User{
-		DisplayName: name,
+		DisplayName: userName,
 		Code:        polarisId,
 	}, nil
 }
