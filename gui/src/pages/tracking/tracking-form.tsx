@@ -11,11 +11,15 @@ import { Checkbox } from '@/ui/checkbox'
 import * as Page from '@/ui/page'
 
 import { model } from '@model'
+import { AuthMachineContext } from '@/state/auth-machine'
+import { useSelector } from '@xstate/react'
 
 export function TrackingForm() {
   const { t } = useTranslation()
   const users = (useLoaderData() ?? []) as model.User[]
   const trackingActor = TrackingMachineContext.useActorRef()
+  const authActor = AuthMachineContext.useActorRef()
+  const game = useSelector(authActor, ({ context }) => context.game)
 
   const playerIdInputRef = React.useRef<HTMLInputElement>(null)
   const restoreRef = React.useRef<HTMLInputElement>(null)
@@ -60,14 +64,16 @@ export function TrackingForm() {
         className='relative flex h-full w-full flex-col gap-5 justify-self-center overflow-x-visible overflow-y-scroll px-56 pt-12 pb-4'
         onSubmit={onSubmit}
       >
-        <h3 className='text-lg'>{t('enterCfnName')}</h3>
+        <h3 className='text-lg'>
+          {game === model.GameType.STREET_FIGHTER_6 ? t('enterCfnName') : t('enterTekkenId')}
+        </h3>
         <div className='relative'>
           <input
             ref={playerIdInputRef}
             onChange={e => setPlayerIdInput(e.target.value)}
             className='block w-full border-0 border-b-2 border-b-[rgba(255,255,255,0.275)] bg-transparent px-4 pt-4 pr-12 pb-3 text-lg text-gray-300 outline-hidden transition-colors hover:border-white hover:text-white focus:border-white focus:ring-transparent focus:ring-offset-transparent focus:outline-none'
             type='text'
-            placeholder={t('cfnName')!}
+            placeholder={game === model.GameType.STREET_FIGHTER_6 ? t('cfnName') : t('tekkenId')}
             autoCapitalize='off'
             autoComplete='off'
             autoCorrect='off'

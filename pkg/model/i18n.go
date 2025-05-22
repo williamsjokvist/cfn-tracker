@@ -11,6 +11,7 @@ type Localization struct {
 	Changelog                string `json:"changelog"`
 	StartTracking            string `json:"startTracking"`
 	CFNName                  string `json:"cfnName"`
+	TekkenId                 string `json:"tekkenId"`
 	Start                    string `json:"start"`
 	Opponent                 string `json:"opponent"`
 	Character                string `json:"character"`
@@ -25,6 +26,7 @@ type Localization struct {
 	Stop                     string `json:"stop"`
 	Files                    string `json:"files"`
 	EnterCfnName             string `json:"enterCfnName"`
+	EnterTekkenId            string `json:"enterTekkenId"`
 	Result                   string `json:"result"`
 	ReplayId                 string `json:"replayId"`
 	Copy                     string `json:"copy"`

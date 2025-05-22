@@ -7,11 +7,15 @@ import (
 	"io"
 	"net/http"
 	"slices"
+	"strings"
 	"time"
+
+	"github.com/PuerkitoBio/goquery"
 )
 
 type WavuClient interface {
 	GetLastReplay(ctx context.Context, polarisId string) (*Replay, error)
+	GetUserName(ctx context.Context, polarisId string) (string, error)
 }
 
 type Client struct {
@@ -62,11 +66,41 @@ func (c *Client) GetLastReplay(ctx context.Context, polarisId string) (*Replay, 
 	if err != nil {
 		return nil, fmt.Errorf("get replays: %w", err)
 	}
-	playerReplays := slices.DeleteFunc(replays, func(r Replay) bool {
-		return !(r.P1PolarisId == polarisId || r.P2PolarisId == polarisId)
+	index := slices.IndexFunc(replays, func(r Replay) bool {
+		return r.P1PolarisId == polarisId || r.P2PolarisId == polarisId
 	})
-	if len(playerReplays) == 0 {
+	if index == -1 {
 		return nil, nil
 	}
-	return &playerReplays[0], nil
+
+	return &replays[index], nil
+}
+
+func (c *Client) GetUserName(ctx context.Context, polarisId string) (string, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, fmt.Sprintf("https://wank.wavu.wiki/player/%s", polarisId), nil)
+	if err != nil {
+		return "", fmt.Errorf("make http request: %w", err)
+	}
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return "", fmt.Errorf("call wavu: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("player does not exist")
+	}
+
+	doc, err := goquery.NewDocumentFromReader(resp.Body)
+	if err != nil {
+		return "", fmt.Errorf("read wavu html: %w", err)
+	}
+
+	title := doc.Find("head > title").Text()
+
+	if strings.Contains(strings.ToLower(title), "error") {
+		return "", fmt.Errorf("player does not exist")
+	}
+
+	return doc.Find(".player-meta .name").Text(), nil
 }
