@@ -1,8 +1,8 @@
 package cmd_test
 
 import (
-	"fmt"
 	"log"
+	"log/slog"
 	"os"
 	"testing"
 
@@ -52,7 +52,7 @@ func TestMain(m *testing.M) {
 		nil,
 	)
 	testSuite.trackingHandler.SetEventEmitter(func(eventName string, optionalData ...interface{}) {
-		log.Println(fmt.Sprintf("[EVENT] %s", eventName), optionalData[0])
+		slog.Info("[FE]", slog.String("event", eventName), slog.Any("data", optionalData))
 	})
 	os.Exit(m.Run())
 }

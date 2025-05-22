@@ -43,6 +43,7 @@ func (t *SF6Tracker) Poll(ctx context.Context, session *model.Session) (*model.M
 	if bl == nil || len(bl.ReplayList) == 0 {
 		return nil, nil
 	}
+
 	lastReplay := bl.ReplayList[0]
 	var prevMatch model.Match
 	if len(session.Matches) > 0 {
@@ -61,16 +62,6 @@ func (t *SF6Tracker) Poll(ctx context.Context, session *model.Session) (*model.M
 		opponent = lastReplay.Player1Info
 	}
 	victory := !isVictory(opponent.RoundResults)
-	wins := prevMatch.Wins
-	losses := prevMatch.Losses
-	winStreak := prevMatch.WinStreak
-	if victory {
-		wins++
-		winStreak++
-	} else {
-		losses++
-		winStreak = 0
-	}
 
 	return &model.Match{
 		Character:         bl.GetCharacter(),
@@ -82,14 +73,14 @@ func (t *SF6Tracker) Poll(ctx context.Context, session *model.Session) (*model.M
 		OpponentLeague:    getLeagueFromLP(opponent.LeaguePoint),
 		OpponentMR:        opponent.MasterRating,
 		Victory:           victory,
-		Wins:              wins,
-		Losses:            losses,
-		WinStreak:         winStreak,
+		WinStreak: func() int {
+			if victory {
+				return prevMatch.WinStreak + 1
+			}
+			return 0
+		}(),
 		Date:              time.Now().Format(`2006-01-02`),
 		Time:              time.Now().Format(`15:04`),
-		LPGain:            prevMatch.LPGain + bl.GetLP() - session.LP,
-		MRGain:            prevMatch.MRGain + bl.GetMR() - session.MR,
-		WinRate:           int((float64(wins) / float64(wins+losses)) * 100),
 		UserId:            session.UserId,
 		UserName:          session.UserName,
 		SessionId:         session.Id,
