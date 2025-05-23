@@ -14,7 +14,7 @@ import (
 )
 
 type WavuClient interface {
-	GetLastReplay(ctx context.Context, polarisId string) (*Replay, error)
+	GetLastReplay(ctx context.Context, polarisId string) (Replay, error)
 	GetUserName(ctx context.Context, polarisId string) (string, error)
 }
 
@@ -61,19 +61,19 @@ func (c *Client) getReplays(ctx context.Context) ([]Replay, error) {
 	return replays, nil
 }
 
-func (c *Client) GetLastReplay(ctx context.Context, polarisId string) (*Replay, error) {
+func (c *Client) GetLastReplay(ctx context.Context, polarisId string) (Replay, error) {
 	replays, err := c.getReplays(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("get replays: %w", err)
+		return Replay{}, fmt.Errorf("get replays: %w", err)
 	}
 	index := slices.IndexFunc(replays, func(r Replay) bool {
 		return r.P1PolarisId == polarisId || r.P2PolarisId == polarisId
 	})
 	if index == -1 {
-		return nil, nil
+		return Replay{}, nil
 	}
 
-	return &replays[index], nil
+	return replays[index], nil
 }
 
 func (c *Client) GetUserName(ctx context.Context, polarisId string) (string, error) {

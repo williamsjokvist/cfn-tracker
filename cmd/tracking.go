@@ -61,21 +61,29 @@ func (ch *TrackingHandler) SetEventEmitter(eventEmitter EventEmitFn) {
 	ch.eventEmitter = eventEmitter
 }
 
-func (ch *TrackingHandler) StartTracking(userCode string, restore bool) error {
-	slog.Info("started tracking", slog.String("user_code", userCode), slog.Bool("restoring", restore))
+func (ch *TrackingHandler) StartTracking(userCodeInput string, restore bool) error {
+	slog.Info("started tracking", slog.String("user_code", userCodeInput), slog.Bool("restoring", restore))
 
 	ctx, cancel := context.WithCancel(context.Background())
 	ch.cancelPolling = cancel
 
+	user, err := ch.gameTracker.GetUser(ctx, userCodeInput)
+	if err != nil {
+		return model.WrapError(model.ErrGetUser, err)
+	}
+	if err := ch.sqlDb.SaveUser(ctx, *user); err != nil {
+		return model.WrapError(model.ErrSaveUser, err)
+	}
+
 	var session *model.Session
 	if restore {
-		sesh, err := ch.sqlDb.GetLatestSession(ctx, userCode)
+		sesh, err := ch.sqlDb.GetLatestSession(ctx, user.Code)
 		if err != nil {
 			return model.WrapError(model.ErrGetLatestSession, err)
 		}
 		session = sesh
 	} else {
-		sesh, err := ch.sqlDb.CreateSession(ctx, userCode)
+		sesh, err := ch.sqlDb.CreateSession(ctx, user.Code)
 		if err != nil {
 			return model.WrapError(model.ErrCreateSession, err)
 		}
@@ -85,13 +93,6 @@ func (ch *TrackingHandler) StartTracking(userCode string, restore bool) error {
 		return model.ErrCreateSession
 	}
 
-	user, err := ch.gameTracker.GetUser(ctx, userCode)
-	if err != nil {
-		return model.WrapError(model.ErrGetUser, err)
-	}
-	if err := ch.sqlDb.SaveUser(ctx, *user); err != nil {
-		return model.WrapError(model.ErrSaveUser, err)
-	}
 	session.LP = user.LP
 	session.MR = user.MR
 	session.UserName = user.DisplayName

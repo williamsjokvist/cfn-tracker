@@ -3,6 +3,7 @@ package t8
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/williamsjokvist/cfn-tracker/pkg/model"
@@ -23,13 +24,14 @@ func NewT8Tracker(wavuClient wavu.WavuClient) *T8Tracker {
 }
 
 func (t *T8Tracker) GetUser(ctx context.Context, polarisId string) (*model.User, error) {
-	userName, err := t.wavuClient.GetUserName(ctx, polarisId)
+	parsedId := strings.Replace(polarisId, "-", "", -1)
+	userName, err := t.wavuClient.GetUserName(ctx, parsedId)
 	if err != nil {
 		return nil, fmt.Errorf("get user info: %w", err)
 	}
 	return &model.User{
 		DisplayName: userName,
-		Code:        polarisId,
+		Code:        parsedId,
 	}, nil
 }
 
