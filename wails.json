@@ -11,6 +11,9 @@
   "frontend:dir": "./gui",
   "obfuscated": false,
   "author": {
-    "name": "greensoap"
+    "name": "William Sjökvist"
+  },
+  "info": {
+    "productVersion": "5.0.1"
   }
 }
