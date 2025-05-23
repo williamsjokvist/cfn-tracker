@@ -21,7 +21,7 @@ tasks:
   build:
     internal: true
     vars:
-      ldflags: -X 'main.isProduction="true"' -X 'main.appVersion=${APP_VERSION}' -X 'main.capIDEmail=${CAP_ID_EMAIL}' -X 'main.capIDPassword=${CAP_ID_PASSWORD}'
+      ldflags: -X 'main.isProduction="true"' -X 'main.capIDEmail=${CAP_ID_EMAIL}' -X 'main.capIDPassword=${CAP_ID_PASSWORD}'
     cmds:
       - cmd: GOOS={{.GOOS}} GOARCH={{.GOARCH}} wails build -ldflags="{{.ldflags}}"
 

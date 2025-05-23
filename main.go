@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"embed"
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"log"
@@ -44,7 +45,6 @@ import (
 var (
 	capIDEmail    string = ""
 	capIDPassword string = ""
-	appVersion    string = ""
 	isProduction  string = ""
 )
 
@@ -53,6 +53,9 @@ var assets embed.FS
 
 //go:embed gui/error/error.html
 var errorTmpl []byte
+
+//go:embed wails.json
+var wailsJson []byte
 
 var cfg config.BuildConfig
 var logFile *os.File
@@ -68,16 +71,28 @@ func logToFile() {
 	log.SetFlags(log.Ldate | log.LstdFlags | log.Lshortfile)
 }
 
+type WailsJson struct {
+	Info WailsJsonInfo `json:"info"`
+}
+
+type WailsJsonInfo struct {
+	ProductVersion string `json:"productVersion"`
+}
+
 func init() {
+	var wailsCfg WailsJson
+	if err := json.Unmarshal(wailsJson, &wailsCfg); err != nil {
+		log.Fatalf("parse project config: %v", err)
+	}
+
 	if isProduction == "true" {
 		logToFile()
 	}
 
-	err := godotenv.Load(".env")
-	if err != nil {
+	if err := godotenv.Load(".env"); err != nil {
 		slog.Error("missing env file", slog.Any("error", err))
 		cfg = config.BuildConfig{
-			AppVersion:        appVersion,
+			AppVersion:        wailsCfg.Info.ProductVersion,
 			Headless:          isProduction == "true",
 			CapIDEmail:        capIDEmail,
 			CapIDPassword:     capIDPassword,
@@ -85,10 +100,10 @@ func init() {
 		}
 		return
 	}
-	err = envconfig.Process("", &cfg)
-	if err != nil {
+	if err := envconfig.Process("", &cfg); err != nil {
 		log.Fatalf("process envconfig: %v", err)
 	}
+	cfg.AppVersion = wailsCfg.Info.ProductVersion
 }
 
 func main() {
