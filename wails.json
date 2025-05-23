@@ -15,5 +15,10 @@
   },
   "info": {
     "productVersion": "5.0.1"
+  },
+  "bindings": {
+    "ts_generation": {
+      "outputType": "interfaces"
+    }
   }
 }
