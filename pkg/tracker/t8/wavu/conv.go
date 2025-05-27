@@ -16,7 +16,7 @@ func ConvRankToName(rank Rank) string {
 	return name
 }
 
-// todo: might be inaccurate
+// source: https://github.com/ewgf-gg/ewgfgg-backend/blob/main/src/main/resources/tekken_enums.json
 var characterNames = map[uint8]string{
 	0:   "Paul",
 	1:   "Law",
@@ -45,13 +45,15 @@ var characterNames = map[uint8]string{
 	24:  "Panda",
 	28:  "Zafina",
 	29:  "Leroy",
-	30:  "Victor",
 	32:  "Jun",
-	33:  "Heihachi",
+	33:  "Reina",
 	34:  "Azucena",
 	35:  "Victor",
 	36:  "Raven",
+	38:  "Eddy",
+	39:  "Lidia",
 	40:  "Heihachi",
+	41:  "Clive",
 	116: "Practice Dummy",
 	117: "Angel Jin",
 	118: "True Devil Kazuya",
