@@ -16,7 +16,7 @@
     "@radix-ui/react-select": "^2.0.0",
     "@radix-ui/react-switch": "^1.0.3",
     "@tailwindcss/vite": "^4.0.15",
-    "@xstate/react": "^5.0.0",
+    "@xstate/react": "^6.0.0",
     "country-flag-icons": "^1.5.9",
     "framer-motion": "^12.5.0",
     "i18next": "^25.0.2",
