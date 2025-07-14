@@ -54,6 +54,8 @@ var characterNames = map[uint8]string{
 	39:  "Lidia",
 	40:  "Heihachi",
 	41:  "Clive",
+	42:  "Anna",
+	43:  "Fahkumram",
 	116: "Practice Dummy",
 	117: "Angel Jin",
 	118: "True Devil Kazuya",
