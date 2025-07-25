@@ -3,13 +3,13 @@ on:
   workflow_dispatch:
     inputs:
       draft:
-        description: 'Create a draft release'
+        description: 'Draft'
         required: false
         default: true
         type: boolean
 
       version:
-        description: 'Version of the release (semantic)'
+        description: 'Semantic version of the release (w/o v prefix)'
         required: true
         type: string
 
@@ -18,7 +18,7 @@ permissions:
   pull-requests: write
 
 jobs:
-  build-and-draft-release:
+  build-and-release:
     runs-on: windows-2025
 
     steps:
@@ -83,4 +83,4 @@ jobs:
           assignees: williamsjokvist
           labels: |
             versioning
-            automated
+            auto
