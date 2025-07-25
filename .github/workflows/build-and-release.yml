@@ -30,6 +30,9 @@ jobs:
           go-version-file: 'go.mod'
           cache-dependency-path: 'go.sum'
 
+      - name: Install wails
+        run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
+
       - uses: arduino/setup-task@v2
         with:
           version: 3.x
