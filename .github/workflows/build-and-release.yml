@@ -36,7 +36,7 @@ jobs:
 
       - name: Set version in app config
         run: |
-          $json = Get-Content -Raw -Path -Depth 10 "wails.json" | ConvertFrom-Json
+          $json = Get-Content -Raw -Path "wails.json" | ConvertFrom-Json -Depth 10
           $json.info.productVersion = ${{ inputs.version }}
           $json | ConvertTo-Json -Depth 10 | Set-Content -Path "wails.json"
         shell: pwsh
