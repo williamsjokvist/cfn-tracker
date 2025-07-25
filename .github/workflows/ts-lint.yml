@@ -19,6 +19,6 @@ jobs:
           key: ${{ runner.os }}-${{ hashFiles('bun.lockb') }}
         if: steps.cache-deps.outputs.cache-hit != 'true'
       - run: bun install
-        if: steps.cache-deps.outputs.cache-hit != 'true'
+
       - run: bun tsc
       - run: bun format:check

@@ -1,0 +1,85 @@
+name: Create GitHub Release
+on:
+  workflow_dispatch:
+    inputs:
+      draft:
+        description: 'Draft'
+        required: false
+        default: true
+        type: boolean
+
+      version:
+        description: 'Semantic version of the release (w/o v prefix)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  build-and-release:
+    runs-on: windows-2025
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v1
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: 'go.mod'
+          cache-dependency-path: 'go.sum'
+
+      - uses: arduino/setup-task@v2
+        with:
+          version: 3.x
+
+      - name: Set version in app config
+        run: |
+          $json = Get-Content -Raw -Path "wails.json" | ConvertFrom-Json -Depth 10
+          $json.info.productVersion = ${{ inputs.version }}
+          $json | ConvertTo-Json -Depth 10 | Set-Content -Path "wails.json"
+        shell: pwsh
+
+      - name: Build
+        run: task build:windows-amd64 -- -o 'CFN Tracker.exe'
+        env:
+          CAP_ID_EMAIL: ${{ secrets.CAP_ID_EMAIL }}
+          CAP_ID_PASSWORD: ${{ secrets.CAP_ID_PASSWORD }}
+          IS_PRODUCTION: true
+
+      - name: Zip build
+        run: |
+          tar -a -c -f 'cfn-tracker-windows-amd64.zip' -C './build/bin' 'CFN Tracker.exe'
+      - name: Commit app config
+        run: |
+          git checkout -b chore/bump-version-${{ inputs.version }}
+          git add .
+          git config --global user.name 'dependabot[bot]'
+          git config --global user.email 'dependabot[bot]@users.noreply.github.com'
+          git commit -m "chore: bump app config version to ${{ inputs.version }} (automatic)"
+          git push
+
+      - name: Create draft release
+        uses: softprops/action-gh-release@v2
+        with:
+          token: ${{ secrets.PAT }}
+          name: v${{ inputs.version }}
+          draft: ${{ inputs.draft }}
+          generate_release_notes: true
+          fail_on_unmatched_files: true
+          files: |
+            cfn-tracker-windows-amd64.zip
+
+      - name: Create PR to commit bumped config version
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.PAT }}
+          body: |
+            Bump app config version to ${{ inputs.version }}
+          title: "chore: bump app config version to ${{ inputs.version }} (automatic)"
+          draft: false
+          assignees: williamsjokvist
+          labels: |
+            versioning
+            auto
