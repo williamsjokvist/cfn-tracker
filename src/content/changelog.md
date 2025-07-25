@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.0.2](https://github.com/williamsjokvist/cfn-tracker/tree/v5.0.2)
+## Fixed
+- App crashing on inputting a Tekken ID without a recent match
+- Allow inputting dashes in Tekken ID, like shown in-game
+- Character name mapping for Lidia, Clive, Anna and Fahkumram
+
+## [5.0.1](https://github.com/williamsjokvist/cfn-tracker/tree/v5.0.1)
+## Fixed
+- App crashing on bad Tekken ID input
+- Adjusted text message on Tekken ID input to no longer say "CFN Code"
+
 ## [5.0.0](https://github.com/williamsjokvist/cfn-tracker/tree/v5.0.0)
 
 ## Added
