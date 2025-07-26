@@ -81,6 +81,11 @@ const matches = [
   import { gsap, Power2 } from "../lib/gsap";
 
   document.addEventListener("astro:page-load", () => {
+    // respect users’ prefers-reduced-motion setting
+    const prefersReducedMotion = window
+      .matchMedia("(prefers-reduced-motion: reduce)")
+      .matches;
+
     const features = document.querySelectorAll("#features>*");
     if (features.length === 0) {
       return;
@@ -92,7 +97,9 @@ const matches = [
         translateY: 50,
         duration: 2,
         ease: Power2.easeInOut,
+        immediateRender: prefersReducedMotion,
         scrollTrigger: {
+          disabled: prefersReducedMotion,
           scroller: document.body,
           trigger: feature,
           start: "center bottom",
@@ -106,6 +113,7 @@ const matches = [
           duration: 3,
           ease: Power2.easeOut,
           scrollTrigger: {
+            disabled: prefersReducedMotion,
             scroller: document.body,
             trigger: feature,
             start: "center bottom",
@@ -114,7 +122,7 @@ const matches = [
         });
       }
     }
-  })
+  });
 </script>
 <section
   id="features"
