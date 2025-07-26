@@ -83,21 +83,12 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const { data: prs } = await github.rest.pulls.list({
+            const { data: pr } = await github.rest.pulls.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
+              title: 'chore: bump app config version to ${{ inputs.version }} (automatic)',
               head: 'chore/bump-version-${{ inputs.version }}',
               base: 'master',
-              state: 'open'
+              body: 'Bump app config version to ${{ inputs.version }}'
             });
-            if (prs.length === 0) {
-              const { data: pr } = await github.rest.pulls.create({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                title: 'chore: bump app config version to ${{ inputs.version }} (automatic)',
-                head: 'chore/bump-version-${{ inputs.version }}',
-                base: 'master',
-                body: 'Bump app config version to ${{ inputs.version }}'
-              });
-              core.info(`PR created: ${pr.html_url}`);
-            }
+            core.info(`Version bump PR created: ${pr.html_url}`);
