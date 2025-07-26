@@ -22,13 +22,12 @@ go.work
 
 results
 
-/gui/wailsjs/**/**/*.js
-/gui/wailsjs/**/**/*.json
+/app/gui/wailsjs/**/**/*.js
+/app/gui/wailsjs/**/**/*.json
 
-gui/dist/*
-!gui/dist
-!gui/dist/.gitkeep
-
+/app/gui/dist/*
+!/app/gui/dist
+!/app/gui/dist/.gitkeep
 
 node_modules
 

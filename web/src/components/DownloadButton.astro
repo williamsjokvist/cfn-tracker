@@ -1,0 +1,77 @@
+---
+import Icon from "astro-icon"
+---
+
+<script>
+/*
+  function removeNonUserAgentDownloads() {
+    const isWindows = window.navigator.userAgent.indexOf("Win") != -1
+    const isMacOS = window.navigator.userAgent.indexOf("Mac") != -1
+
+    // in case of unsupported OS, do not remove any link
+
+    if (!(isMacOS || isWindows)) {
+      return
+    } else if (!isMacOS) {
+      document.getElementById("mac-download-arm").remove()
+      document.getElementById("mac-download-intel").remove()
+    } else if (!isWindows) {
+      document.getElementById("windows-download").remove()
+    }
+
+    document.getElementById("mac-download-arm").remove()
+    document.getElementById("mac-download-intel").remove()
+  }
+
+  document.addEventListener("astro:page-load", removeNonUserAgentDownloads) */
+</script>
+
+<a
+  id="windows-download"
+  href="https://github.com/williamsjokvist/cfn-tracker/releases/download/v5.0.2/cfn-tracker-windows-amd64.zip"
+  class="link-card windows my-1 inline-flex gap-2 justify-between items-center rounded-full px-6 py-4 text-2xl"
+>
+  <Icon name="mdi:microsoft-windows" class="w-8 h-8" />
+  <span>Download</span>
+</a>
+{/*<a
+  id="mac-download-arm"
+  href="https://github.com/williamsjokvist/cfn-tracker/releases/download/v5.0.0/cfn-tracker-darwin-arm64.zip"
+  class="link-card mac my-1 inline-flex gap-2 justify-between items-center rounded-full px-6 py-4 text-2xl"
+>
+  <div class="grid justify-items-center h-8">
+    <Icon name="mdi:apple" class="relative bottom-2 w-8 h-8" />
+    <Icon name="simple-icons:arm" class="relative bottom-4 w-14 h-8" />
+  </div>
+  <span class="w-full">Download</span>
+</a>
+<a
+  id="mac-download-intel"
+  href="https://github.com/williamsjokvist/cfn-tracker/releases/download/v4.1.0/cfn-tracker-darwin-amd64.zip"
+  class="link-card mac my-1 inline-flex gap-2 justify-between items-center rounded-full px-6 py-4 text-2xl"
+>
+  <div class="grid justify-items-center h-8">
+    <Icon name="mdi:apple" class="relative bottom-2 w-8 h-8" />
+    <Icon name="simple-icons:intel" class="relative bottom-4 w-14 h-8" />
+  </div>
+  <span class="w-full">Download</span>
+</a>*/}
+
+<style lang="sass">
+  .link-card
+    text-decoration: none
+    backdrop-filter: blur(12px)
+    background-image: var(--accent-gradient)
+    background-size: 400%
+    background-position: 100%
+    transition: background-position 0.6s cubic-bezier(0.22, 1, 0.36, 1)
+
+  .link-card:is(:hover, :focus-within)
+    background-position: 0
+
+  .windows
+    --accent-gradient: linear-gradient(45deg,rgb(124, 58, 237), #627ada 30%, rgba(115, 115, 115, 0.125) 60%)
+
+  .mac
+    --accent-gradient: linear-gradient(45deg, #eb3349, #dd2476 30%, rgba(115, 115, 115, 0.125) 60%)
+</style>

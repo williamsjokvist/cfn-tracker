@@ -11,14 +11,17 @@ permissions:
 jobs:
   go-lint:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
         with:
-          go-version-file: 'go.mod'
-          cache-dependency-path: 'go.sum'
+          go-version-file: 'app/go.mod'
+          cache-dependency-path: 'app/go.sum'
+
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v6
         with:
           version: latest
           install-mode: "goinstall"
+          working-directory: app

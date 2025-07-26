@@ -2,14 +2,15 @@ name: Lint typescript
 on:
   pull_request:
     paths:
-      - "**.ts"
-      - "**.tsx"
+      - "app/gui/**"
+
 jobs:
   ts-lint:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./gui
+        working-directory: ./app/gui
+
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v1

@@ -1,0 +1,52 @@
+---
+const { position, label } = Astro.props;
+
+---
+
+<span
+  role="tooltip"
+  aria-label={label}
+  class=`
+    relative
+    flex
+    justify-center
+
+    after:content-[attr(aria-label)] 
+    after:invisible
+    after:pointer-events-none
+    after:opacity-0
+    after:transition-all
+    after:absolute
+    after:whitespace-nowrap
+    after:text-center
+    after:bg-[rgba(20,17,114,.39)]
+    after:backdrop-blur
+    after:text-[#f85961]
+
+    ${position == 'above' ? 'after:top-[-42px]' : 'after:bottom-[-42px]'}
+
+    after:rounded-md
+    after:px-3
+    after:py-1
+    hover:after:visible
+    hover:after:opacity-100
+    
+    before:content-['']
+    before:absolute
+
+    before:invisible
+    before:pointer-events-none
+    before:opacity-0
+    before:transition-all
+    hover:before:visible
+    hover:before:opacity-100
+
+    ${position == 'above' ? 'before:border-t-[rgba(20,17,114,.39)]' : 'before:border-b-[rgba(20,17,114,.39)]'} 
+    ${position == 'above' ? 'before:top-[-10px]' : 'before:bottom-[-10px]'} 
+
+    before:border-transparent
+    before:border-8
+    before:border-solid`
+>
+  <slot />
+</span>
