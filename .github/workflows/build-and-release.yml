@@ -81,7 +81,6 @@ jobs:
       - name: Create PR with bumped app config version
         uses: actions/github-script@v7
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const { data: pr } = await github.rest.pulls.create({
               owner: context.repo.owner,
