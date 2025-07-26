@@ -58,15 +58,6 @@ jobs:
       - name: Zip build
         run: tar -a -c -f 'cfn-tracker-windows-amd64.zip' -C './build/bin' 'CFN Tracker.exe'
 
-      - name: Commit app config
-        run: |
-          git checkout -b chore/bump-version-${{ inputs.version }}
-          git add wails.json
-          git config user.email 'github-actions[bot]@users.noreply.github.com'
-          git config user.name 'github-actions[bot]'
-          git commit -m "chore: bump app config version to ${{ inputs.version }} (automatic)"
-          git push --set-upstream origin chore/bump-version-${{ inputs.version }}
-
       - name: Create draft release
         uses: softprops/action-gh-release@v2
         with:
@@ -78,6 +69,15 @@ jobs:
           files: |
             cfn-tracker-windows-amd64.zip
 
+      - name: Commit app config
+        run: |
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git config user.name 'github-actions[bot]'
+          git add wails.json
+          git checkout -b chore/bump-version-${{ inputs.version }}
+          git commit -m "chore: bump app config version to ${{ inputs.version }} (automatic)"
+          git push --set-upstream origin chore/bump-version-${{ inputs.version }}
+
       - name: Create PR to commit bumped config version
         uses: peter-evans/create-pull-request@v7
         with:
@@ -88,6 +88,7 @@ jobs:
             Bump app config version to ${{ inputs.version }}
           title: "chore: bump app config version to ${{ inputs.version }} (automatic)"
           draft: false
+          author: github-actions[bot] <github-actions[bot]@users.noreply.github.com>
           assignees: williamsjokvist
           labels: |
             versioning
