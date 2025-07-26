@@ -42,7 +42,7 @@ jobs:
           $json = Get-Content -Raw -Path "wails.json" | ConvertFrom-Json
           $json.info.productVersion = "${{ inputs.version }}"
           $json | ConvertTo-Json -Depth 10 | Set-Content -Path "wails.json"
-          echo $json
+          echo $json.info
         shell: pwsh
 
       - name: Build
