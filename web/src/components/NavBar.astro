@@ -1,5 +1,5 @@
 ---
-import WithTooltip from "./WithTooltip.astro";
+import Tooltip from "./Tooltip.astro";
 import Icon from "astro-icon";
 
 const NavItems = [
@@ -106,7 +106,7 @@ const NavItems = [
   </nav>
 
   <div id="socials-container" class="flex right-0 top-full absolute sm:relative mt-2 mr-2 sm:mt-0 sm:mr-0 items-center gap-1 sm:gap-1 md:gap-2 lg:gap-6">
-    <WithTooltip label="Twitter">
+    <Tooltip label="Twitter">
       <a
         class="flex gap-4 bg-[#310a65] hover:bg-[#601099] transition-colors p-3 rounded-full"
         href="https://twitter.com/greensoap_"
@@ -125,9 +125,9 @@ const NavItems = [
           ></path></svg
         >
       </a>
-    </WithTooltip>
+    </Tooltip>
 
-    <WithTooltip label="Source">
+    <Tooltip label="Source">
       <a
         class="flex gap-4 bg-[#310a65] hover:bg-[#601099] transition-colors p-[.625rem] md:p-3 rounded-full"
         href="https://github.com/williamsjokvist/cfn-tracker/"
@@ -147,6 +147,6 @@ const NavItems = [
           ></path>
         </svg>
       </a>
-    </WithTooltip>
+    </Tooltip>
   </div>
 </header>
