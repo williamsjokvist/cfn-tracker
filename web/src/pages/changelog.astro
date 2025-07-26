@@ -1,31 +1,33 @@
 ---
-import { Content } from '../content/gettingstarted.mdx';
-import Layout from '../layouts/Layout.astro';
+import { Content } from '../content/changelog.md';
+import Layout from '../components/Layout.astro';
 ---
 <script>
-  import { gsap, Power3 } from "../lib/gsap";
+  import { gsap, Power2 } from "../lib/gsap";
+
   document.addEventListener("astro:page-load", () => {
-    gsap.from("#getting-started > *", {
+    gsap.from("#changelog-container > *", {
       autoAlpha: 0,
       translateY: 20,
       duration: .75,
-      ease: Power3.easeInOut,
+      ease: Power2.easeInOut,
       stagger: 0.125,
       delay: 0.5
     });
   })
 </script>
 
-<Layout title="CFN Tracker - Getting Started">
-  <div id="getting-started" class="prose lg:prose-lg prose-invert mx-auto px-4 mt-20">
+<Layout title="CFN Tracker - Changelog">
+  <div id="changelog-container" class="prose lg:prose-lg prose-invert mx-auto px-4 mt-20">
     <Content />
   </div>
 </Layout>
 
 <style lang="sass">
-  body 
+  body
     background: linear-gradient(0deg, rgb(25 16 34) 0%, #000 100%)
-  #getting-started
+
+  #changelog-container
     opacity: 0
     animation: fadeIn 1s forwards ease-out
     animation-delay: 500ms
