@@ -3,9 +3,6 @@ on:
   pull_request:
     paths:
       - "app/gui/**"
-permissions:
-  contents: read
-  checks: write
 
 jobs:
   ts-lint:

@@ -11,9 +11,6 @@ permissions:
 jobs:
   go-lint:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./app
 
     steps:
       - uses: actions/checkout@v4
@@ -27,3 +24,4 @@ jobs:
         with:
           version: latest
           install-mode: "goinstall"
+          working-directory: app
