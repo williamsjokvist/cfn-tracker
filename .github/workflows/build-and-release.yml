@@ -57,10 +57,11 @@ jobs:
 
       - name: Commit app config
         run: |
-          git checkout master
+          git switch master --discard-changes
           git add wails.json
           git config user.email 'github-actions[bot]@users.noreply.github.com'
           git config user.name 'github-actions[bot]'
+          git checkout -b chore/bump-version-${{ inputs.version }}
           git commit -m "chore: bump app config version to ${{ inputs.version }} (automatic)"
           git push --set-upstream origin chore/bump-version-${{ inputs.version }}
 
