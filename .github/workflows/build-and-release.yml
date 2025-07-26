@@ -23,6 +23,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: master
+
       - uses: oven-sh/setup-bun@v1
 
       - uses: actions/setup-go@v5
@@ -39,9 +42,10 @@ jobs:
 
       - name: Set version in app config
         run: |
-          $json = Get-Content -Raw -Path "wails.json" | ConvertFrom-Json -Depth 10
-          $json.info.productVersion = ${{ inputs.version }}
+          $json = Get-Content -Raw -Path "wails.json" | ConvertFrom-Json
+          $json.info.productVersion = "${{ inputs.version }}"
           $json | ConvertTo-Json -Depth 10 | Set-Content -Path "wails.json"
+          echo $json.info
         shell: pwsh
 
       - name: Build
@@ -52,16 +56,15 @@ jobs:
           IS_PRODUCTION: true
 
       - name: Zip build
-        run: |
-          tar -a -c -f 'cfn-tracker-windows-amd64.zip' -C './build/bin' 'CFN Tracker.exe'
+        run: tar -a -c -f 'cfn-tracker-windows-amd64.zip' -C './build/bin' 'CFN Tracker.exe'
+
       - name: Commit app config
         run: |
-          git checkout -b chore/bump-version-${{ inputs.version }}
-          git add .
-          git config --global user.name 'dependabot[bot]'
-          git config --global user.email 'dependabot[bot]@users.noreply.github.com'
+          git add wails.json
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git config user.name 'github-actions[bot]'
           git commit -m "chore: bump app config version to ${{ inputs.version }} (automatic)"
-          git push
+          git push --set-upstream origin chore/bump-version-${{ inputs.version }}
 
       - name: Create draft release
         uses: softprops/action-gh-release@v2
@@ -78,6 +81,8 @@ jobs:
         uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.PAT }}
+          branch: chore/bump-version-${{ inputs.version }}
+          base: master
           body: |
             Bump app config version to ${{ inputs.version }}
           title: "chore: bump app config version to ${{ inputs.version }} (automatic)"
