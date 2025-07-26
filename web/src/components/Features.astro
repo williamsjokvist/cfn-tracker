@@ -99,7 +99,6 @@ const matches = [
         ease: Power2.easeInOut,
         immediateRender: prefersReducedMotion,
         scrollTrigger: {
-          disabled: prefersReducedMotion,
           scroller: document.body,
           trigger: feature,
           start: "center bottom",
@@ -112,8 +111,8 @@ const matches = [
           translateY: 50,
           duration: 3,
           ease: Power2.easeOut,
+          immediateRender: prefersReducedMotion,
           scrollTrigger: {
-            disabled: prefersReducedMotion,
             scroller: document.body,
             trigger: feature,
             start: "center bottom",
@@ -287,17 +286,6 @@ const matches = [
         own with CSS!
       </p>
     </header>
-    <!-- <img
-      class="w-full max-w-[750px]"
-      src="https://raw.githubusercontent.com/williamsjokvist/cfn-tracker/github-pages/public/themes.png"
-      alt="Screenshot of the theme select"
-    /> -->
-    <!--
-    <img
-      class="w-full max-w-[750px]"
-      src="https://raw.githubusercontent.com/williamsjokvist/cfn-tracker/github-pages/public/stats.png"
-      alt="Screenshot of the stats select"
-    /> -->
   </section>
 </section>
 
