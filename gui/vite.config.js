@@ -11,11 +11,11 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      '@': '/src',
-      '@@': '/wailsjs',
-      "@runtime": path.join("/", "wailsjs", "runtime", "runtime.js"),
-      "@model": path.join("/", "wailsjs", "go", "models.ts"),
-      "@cmd": path.join("/", "wailsjs", "go", "cmd"),
+      '@': path.resolve(process.cwd(), 'src'),
+      '@@': path.resolve(process.cwd(), 'wailsjs'),
+      "@runtime": path.resolve(process.cwd(), "wailsjs", "runtime", "runtime.js"),
+      "@model": path.resolve(process.cwd(), "wailsjs", "go", "models.ts"),
+      "@cmd": path.resolve(process.cwd(), "wailsjs", "go", "cmd"),
     },
   },
   build: {
