@@ -78,18 +78,28 @@ jobs:
           git commit -m "chore: bump app config version to ${{ inputs.version }} (automatic)"
           git push --set-upstream origin chore/bump-version-${{ inputs.version }}
 
-      - name: Create PR to commit bumped config version
-        uses: peter-evans/create-pull-request@v7
+      - name: Create PR with bumped app config version
+        uses: actions/github-script@v7
         with:
-          token: ${{ secrets.PAT }}
-          branch: chore/bump-version-${{ inputs.version }}
-          base: master
-          body: |
-            Bump app config version to ${{ inputs.version }}
-          title: "chore: bump app config version to ${{ inputs.version }} (automatic)"
-          draft: false
-          author: github-actions[bot] <github-actions[bot]@users.noreply.github.com>
-          assignees: williamsjokvist
-          labels: |
-            versioning
-            auto
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { data: prs } = await github.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              head: chore/bump-version-${{ inputs.version }},
+              base: master,
+              state: 'open'
+            });
+            if (prs.length > 0) {
+              core.info(`A pull request already exists: ${prs[0].html_url}`);
+              return;
+            }
+            const { data: pr } = await github.pulls.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: "chore: bump app config version to ${{ inputs.version }} (automatic)",
+              head: chore/bump-version-${{ inputs.version }},
+              base: master,
+              body: pr_body
+            });
+            core.info(`PR created: ${pr.html_url}`);
