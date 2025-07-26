@@ -58,14 +58,6 @@ jobs:
       - name: Zip build
         run: tar -a -c -f 'cfn-tracker-windows-amd64.zip' -C './build/bin' 'CFN Tracker.exe'
 
-      - name: Commit app config
-        run: |
-          git add wails.json
-          git config user.email 'github-actions[bot]@users.noreply.github.com'
-          git config user.name 'github-actions[bot]'
-          git commit -m "chore: bump app config version to ${{ inputs.version }} (automatic)"
-          git push --set-upstream origin chore/bump-version-${{ inputs.version }}
-
       - name: Create draft release
         uses: softprops/action-gh-release@v2
         with:
@@ -77,17 +69,26 @@ jobs:
           files: |
             cfn-tracker-windows-amd64.zip
 
-      - name: Create PR to commit bumped config version
-        uses: peter-evans/create-pull-request@v7
+      - name: Commit app config
+        run: |
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git config user.name 'github-actions[bot]'
+          git checkout -b chore/bump-version-${{ inputs.version }}
+          git add wails.json
+          git commit -m "chore: bump app config version to ${{ inputs.version }} (automatic)"
+          git push origin chore/bump-version-${{ inputs.version }}
+
+      - name: Create PR with bumped app config version
+        uses: actions/github-script@v7
         with:
-          token: ${{ secrets.PAT }}
-          branch: chore/bump-version-${{ inputs.version }}
-          base: master
-          body: |
-            Bump app config version to ${{ inputs.version }}
-          title: "chore: bump app config version to ${{ inputs.version }} (automatic)"
-          draft: false
-          assignees: williamsjokvist
-          labels: |
-            versioning
-            auto
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { data: pr } = await github.rest.pulls.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: 'chore: bump app config version to ${{ inputs.version }} (automatic)',
+              head: 'chore/bump-version-${{ inputs.version }}',
+              base: 'master',
+              body: 'Bump app config version to ${{ inputs.version }}'
+            });
+            core.info(`Version bump PR created: ${pr.html_url}`);
