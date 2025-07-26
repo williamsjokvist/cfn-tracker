@@ -1,10 +1,5 @@
 export namespace model {
 	
-	export enum ThemeName {
-	    DEFAULT = "default",
-	    ENTH = "enth",
-	    TEKKEN = "tekken",
-	}
 	export enum GameType {
 	    STREET_FIGHTER_6 = "sf6",
 	    TEKKEN_8 = "t8",
@@ -28,6 +23,11 @@ export namespace model {
 	    errCreateSession = "errCreateSession",
 	    errOpenResultsDirectory = "errOpenResultsDirectory",
 	    errReadThemeCSS = "errReadThemeCSS",
+	}
+	export enum ThemeName {
+	    DEFAULT = "default",
+	    ENTH = "enth",
+	    TEKKEN = "tekken",
 	}
 	export interface FGCTrackerError {
 	    localizationKey: ErrorLocalizationKey;

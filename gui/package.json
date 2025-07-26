@@ -3,11 +3,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "vite build --config .config/vite.config.js",
-    "format": "prettier src --config .config/prettier.config.js --write",
-    "format:check": "prettier --config .config/prettier.config.js src --check",
+    "build": "vite build",
+    "format": "prettier src --write",
+    "format:check": "prettier src --check",
     "tsc": "tsc --project . --noEmit",
-    "dev": "vite --config .config/vite.config.js"
+    "dev": "vite"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.0.4",
