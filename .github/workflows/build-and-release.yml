@@ -52,8 +52,8 @@ jobs:
           IS_PRODUCTION: true
 
       - name: Zip build
-        run: |
-          tar -a -c -f 'cfn-tracker-windows-amd64.zip' -C './build/bin' 'CFN Tracker.exe'
+        run: tar -a -c -f 'cfn-tracker-windows-amd64.zip' -C './build/bin' 'CFN Tracker.exe'
+
       - name: Commit app config
         run: |
           git checkout -b chore/bump-version-${{ inputs.version }}
