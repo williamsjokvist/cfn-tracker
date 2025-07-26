@@ -3,7 +3,7 @@ name: 'Dependabot: Update bun.lockb'
 on:
   pull_request:
     paths:
-      - "gui/package.json"
+      - "app/gui/package.json"
 
 permissions:
   contents: write
@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./gui
+        working-directory: ./app/gui
     steps:
       - uses: oven-sh/setup-bun@v1
       - uses: actions/checkout@v4
