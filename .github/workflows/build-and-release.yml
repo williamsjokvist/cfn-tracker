@@ -86,7 +86,7 @@ jobs:
             const { data: prs } = await github.pulls.list({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              head: chore/bump-version-${{ inputs.version }},
+              head: "chore/bump-version-${{ inputs.version }}",
               base: master,
               state: 'open'
             });
@@ -98,8 +98,8 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               title: "chore: bump app config version to ${{ inputs.version }} (automatic)",
-              head: chore/bump-version-${{ inputs.version }},
+              head: "chore/bump-version-${{ inputs.version }}",
               base: master,
-              body: pr_body
+              body: Bump app config version to ${{ inputs.version }}
             });
             core.info(`PR created: ${pr.html_url}`);
