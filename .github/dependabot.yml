@@ -1,0 +1,38 @@
+version: 2
+updates:
+  - package-ecosystem: "gomod"
+    directory: "/"
+    allow:
+    - dependency-type: "direct"
+    schedule:
+      interval: "weekly"
+      day: "thursday"
+    target-branch: "master"
+    commit-message:
+      prefix: "chore(deps)"
+    groups:
+      go:
+        dependency-type: production
+        applies-to: version-updates
+      go-sec:
+        dependency-type: production
+        applies-to: security-updates
+
+  - package-ecosystem: "npm"
+    directory: "/gui"
+    allow:
+    - dependency-type: "direct"
+    schedule:
+      interval: "weekly"
+      day: "thursday"
+    target-branch: "master"
+    commit-message:
+      prefix: "chore(deps)"
+    versioning-strategy: "increase-if-necessary"
+    groups:
+      bun:
+        dependency-type: production
+        applies-to: version-updates
+      bun-sec:
+        dependency-type: production
+        applies-to: security-updates

@@ -1,0 +1,24 @@
+name: Lint typescript
+on:
+  pull_request:
+    paths:
+      - "**.ts"
+      - "**.tsx"
+jobs:
+  ts-lint:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./gui
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v1
+      - uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-${{ hashFiles('bun.lockb') }}
+        if: steps.cache-deps.outputs.cache-hit != 'true'
+      - run: bun install
+
+      - run: bun tsc
+      - run: bun format:check

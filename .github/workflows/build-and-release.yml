@@ -1,0 +1,93 @@
+name: Create GitHub Release
+on:
+  workflow_dispatch:
+    inputs:
+      draft:
+        description: 'Draft'
+        required: false
+        default: true
+        type: boolean
+
+      version:
+        description: 'Semantic version of the release (w/o v prefix)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  build-and-release:
+    runs-on: windows-2025
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: master
+
+      - uses: oven-sh/setup-bun@v1
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: 'go.mod'
+          cache-dependency-path: 'go.sum'
+
+      - name: Install wails
+        run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
+
+      - uses: arduino/setup-task@v2
+        with:
+          version: 3.x
+
+      - name: Set version in app config
+        run: |
+          $json = Get-Content -Raw -Path "wails.json" | ConvertFrom-Json
+          $json.info.productVersion = "${{ inputs.version }}"
+          $json | ConvertTo-Json -Depth 10 | Set-Content -Path "wails.json"
+          echo $json.info
+        shell: pwsh
+
+      - name: Build
+        run: task build:windows-amd64 -- -o 'CFN Tracker.exe'
+        env:
+          CAP_ID_EMAIL: ${{ secrets.CAP_ID_EMAIL }}
+          CAP_ID_PASSWORD: ${{ secrets.CAP_ID_PASSWORD }}
+          IS_PRODUCTION: true
+
+      - name: Zip build
+        run: tar -a -c -f 'cfn-tracker-windows-amd64.zip' -C './build/bin' 'CFN Tracker.exe'
+
+      - name: Create draft release
+        uses: softprops/action-gh-release@v2
+        with:
+          token: ${{ secrets.PAT }}
+          name: v${{ inputs.version }}
+          draft: ${{ inputs.draft }}
+          generate_release_notes: true
+          fail_on_unmatched_files: true
+          files: |
+            cfn-tracker-windows-amd64.zip
+
+      - name: Commit app config
+        run: |
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git config user.name 'github-actions[bot]'
+          git checkout -b chore/bump-version-${{ inputs.version }}
+          git add wails.json
+          git commit -m "chore: bump app config version to ${{ inputs.version }} (automatic)"
+          git push origin chore/bump-version-${{ inputs.version }}
+
+      - name: Create PR with bumped app config version
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: pr } = await github.rest.pulls.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: 'chore: bump app config version to ${{ inputs.version }} (automatic)',
+              head: 'chore/bump-version-${{ inputs.version }}',
+              base: 'master',
+              body: 'Bump app config version to ${{ inputs.version }}'
+            });
+            core.info(`Version bump PR created: ${pr.html_url}`);

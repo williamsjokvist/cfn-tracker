@@ -1,0 +1,37 @@
+@import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap");
+
+body {
+  background: #1e283c;
+}
+
+.stat-list {
+  font-family: "Bebas Neue", Helvetica;
+  font-size: 2rem;
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  line-height: 18px;
+  white-space: nowrap;
+  margin-bottom: 8px;
+  clip-path: polygon(5% 5%, 100% 0%, 95% 95%, 0% 100%);
+}
+
+.stat-title, .stat-value {
+  padding: 20px 25px;
+  width: 100%;
+}
+
+.stat-title {
+  color: #66e6ff;
+  background: #25394b;
+  text-align: right;
+}
+
+.stat-value {
+  color: #fff;
+  background: #161e2d;
+  text-transform: capitalize;
+  text-align: left;
+}

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CFN Tracker - Error</title>
+    <link rel="stylesheet" href="https://unpkg.com/xp.css" />
+    <style>
+      body {
+        color: black;
+        margin: 0;
+      }
+      .icon {
+        height: 50px;
+      }
+      .title-bar {
+        border-radius: 0;
+      }
+      #error {
+        font-size: 24px;
+      }
+      p::first-letter {
+        text-transform: uppercase;
+      }
+      button {
+        cursor: pointer;
+      }
+      .title-bar-text, .window-body {
+        font-family: "Pixelated MS Sans Serif", Arial;
+      }
+      .title-bar-text {
+        user-select: none;
+        cursor: default;
+        pointer-events: none;
+      }
+      
+      ::selection { background: transparent; }
+    </style>
+    <script defer>
+      document.addEventListener("DOMContentLoaded", () => {
+        document.getElementById("report-btn").addEventListener("click", () => {
+          window.runtime.BrowserOpenURL("https://github.com/williamsjokvist/cfn-tracker")
+          setTimeout(() => {
+            window.runtime.Quit()
+          }, 500)
+        })
+
+        const closeBtns = document.getElementsByClassName("close-btn")
+        for (const btn of closeBtns) {
+          btn.addEventListener("click", window.runtime.Quit)
+        }
+      })
+    </script>
+  </head>
+  <body class="window">
+    <header class="title-bar" style="--wails-draggable: drag">
+      <div class="title-bar-text">
+        A fatal error occured when launching CFN Tracker
+      </div>
+      <div class="title-bar-controls">
+        <button aria-label="Close" class="close-btn"></button>
+      </div>
+    </header>
+    <div class="window-body" style="height: 101px">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <img class="icon" src="https://raw.githubusercontent.com/williamsjokvist/cfn-tracker/master/gui/error/icon.png" />
+        <p>{{.Error}}</p>
+      </div>
+      <section class="field-row" style="justify-content: flex-end; margin-top: 25px;">
+        <button class="close-btn">OK</button>
+        <button id="report-btn">Report</button>
+      </section>
+    </div>
+    <audio autoplay>
+      <source src="https://raw.githubusercontent.com/williamsjokvist/cfn-tracker/master/gui/error/sound.mp3" type="audio/mpeg">
+    </audio> 
+  </body>
+</html>

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CFN Tracker v4</title>
+    <style>
+      * { margin: 0 }
+    </style>
+    <link id="theme-css" href="/themes/default.css" rel="stylesheet" />
+    <script defer>
+      const statDictionaryEN = {
+        "cfn": "CFN",
+        "userCode": "User Code",
+        "character": "Character",
+        "lp": "LP",
+        "mr": "MR",
+        "lpGain": "LP Gain",
+        "mrGain": "MR Gain",
+        "result": "Result",
+        "date": "Date",
+        "timestamp": "Time",
+        "winRate": "Win Rate",
+        "wins": "Wins",
+        "losses": "Losses",
+        "winStreak": "Win Streak",
+        "opponent": "Opponent",
+        "opponentCharacter": "Opponent Character",
+        "opponentLP": "Opponent LP",
+        "opponentMR": "Opponent MR",
+        "opponentLeague": "Opponent League",
+        "totalWins": "Total Wins",
+        "totalLosses": "Total Losses",
+        "totalMatches": "Total Matches",
+      }
+
+      function formatStat(stat) {
+        return statDictionaryEN[stat]
+      }
+
+      function formatValue(stat, value) {
+        let v = value
+        switch (stat) {
+          case "result":
+            v = value ? "W" : "L";
+            break
+          case "winRate":
+            v = `${value}%`
+            break;
+          case "lpGain", "mrGain":
+            if (value > 0) v = `+${value}`
+            break
+        }
+
+        return v
+      }
+
+      function main() {
+        const searchParams = new URLSearchParams(window.location.search);
+
+        // apply theme
+        const cssEl = document.getElementById("theme-css")
+        cssEl.setAttribute("href", `/themes/${searchParams.get("theme") ?? "default"}.css`)
+
+        // create elements for stats
+        const statContainer = document.getElementsByClassName("stat-list")[0]
+
+        const statElements = {}
+        for (const [stat, value] of searchParams) {
+          if (value != "true") continue;
+
+          const el = document.createElement("div")
+          el.classList.add("stat-item")
+          el.setAttribute("data-stat", stat)
+          el.innerHTML = `<dt class='stat-title'>${formatStat(stat)}</dt><dd class='stat-value'/>`
+          statContainer.appendChild(el)
+
+          statElements[stat] = document.querySelector(`.stat-item[data-stat="${stat}"] .stat-value`)
+        }
+
+        // create listener
+        const src = new EventSource("/stream");
+        src.addEventListener("open", _ => console.log("The connection has been established"));
+        src.addEventListener("error", _ => console.log("An error occurred while attempting to connect"));
+        src.addEventListener("message", (e) => {
+          const match = JSON.parse(e.data);
+          console.log("New match played: ", match);
+
+          for (const [stat, value] of Object.entries(match)) {
+            const el = statElements[stat]
+            if (el !== undefined) {
+              el.innerHTML = formatValue(stat, value)
+            }
+          }
+        })
+      }
+
+      document.addEventListener("DOMContentLoaded", main);
+    </script>
+  </head>
+  <body>
+    <dl class="stat-list"></dl>
+  </body>
+</html>

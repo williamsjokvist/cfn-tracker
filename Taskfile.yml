@@ -1,0 +1,62 @@
+version: "3"
+
+dotenv: [".env"]
+
+tasks:
+  dev:
+    desc: Run the dev server without generating bindings, hot reloading, go mod sync
+    cmds:
+      - wails dev -skipbindings -noreload -nosyncgomod -nogorebuild
+
+  dev-hard:
+    desc: Run the dev server with codegen, reloading and go mod sync
+    cmds:
+      - wails dev -forcebuild
+
+  bind:
+    desc: Generate go->ts bindings
+    cmds:
+      - wails generate module
+
+  build:
+    internal: true
+    vars:
+      ldflags: -X 'main.isProduction="true"' -X 'main.capIDEmail=${CAP_ID_EMAIL}' -X 'main.capIDPassword=${CAP_ID_PASSWORD}'
+    cmds:
+      - cmd: GOOS={{.GOOS}} GOARCH={{.GOARCH}} wails build -ldflags="{{.ldflags}}" {{.CLI_ARGS}}
+
+  build:windows-amd64:
+    desc: Build for Linux (x86)
+    cmds:
+      - task: build
+        vars: { GOOS: windows, GOARCH: amd64 }
+
+  build:windows-arm64:
+    desc: Build for Windows (arm)
+    cmds:
+      - task: build
+        vars: { GOOS: windows, GOARCH: arm64 }
+
+  build:linux-amd64:
+    desc: Build for Linux (x86)
+    cmds:
+      - task: build
+        vars: { GOOS: linux, GOARCH: amd64 }
+
+  build:linux-arm64:
+    desc: Build for Linux (arm)
+    cmds:
+      - task: build
+        vars: { GOOS: linux, GOARCH: arm64 }
+
+  build:mac-amd64:
+    desc: Build for Mac (x86)
+    cmds:
+      - task: build
+        vars: { GOOS: darwin, GOARCH: amd64 }
+
+  build:mac-arm64:
+    desc: Build for Mac (arm)
+    cmds:
+      - task: build
+        vars: { GOOS: darwin, GOARCH: arm64 }

@@ -1,0 +1,24 @@
+{
+  "$schema": "https://wails.io/schemas/config.v2.json",
+  "name": "CFN Tracker",
+  "outputfilename": "CFN Tracker",
+  "frontend:install": "bun install",
+  "frontend:build": "bunx --bun bun run build",
+  "frontend:dev:watcher": "bunx --bun bun run dev",
+  "frontend:dev:serverUrl": "auto",
+  "assetdir": "./gui/dist",
+  "build:dir": "./build",
+  "frontend:dir": "./gui",
+  "obfuscated": false,
+  "author": {
+    "name": "William Sjökvist"
+  },
+  "info": {
+    "productVersion": "5.0.2"
+  },
+  "bindings": {
+    "ts_generation": {
+      "outputType": "interfaces"
+    }
+  }
+}

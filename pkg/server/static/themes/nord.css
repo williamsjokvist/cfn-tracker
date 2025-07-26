@@ -1,0 +1,36 @@
+@import url("https://fonts.googleapis.com/css2?family=Caesar+Dressing&display=swap");
+
+body {
+  background: #2e3440; /* Doesn't matter, the bg is removed in OBS anyway */
+}
+
+/* Stat list container */
+.stat-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  max-width: 816px;
+
+  font-family: "Caesar Dressing", "Trebuchet MS"; /* Any font installed on the system works */
+  font-size: 2rem;
+}
+
+/* Stat box container */
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0.75rem;
+  white-space: nowrap;
+  background: #4c566a;
+}
+
+/* Stat title (Wins, Losses, Win Rate, LP Gain etc.) */
+.stat-title {
+  color: #eceff4;
+}
+
+/* Stat value */
+.stat-value {
+  color: #88c0d0;
+}
