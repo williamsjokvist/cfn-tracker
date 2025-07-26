@@ -2,8 +2,7 @@ name: Lint typescript
 on:
   pull_request:
     paths:
-      - /app/gui
-
+      - "app/gui/**"
 permissions:
   contents: read
   checks: write
