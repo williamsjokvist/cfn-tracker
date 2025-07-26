@@ -58,11 +58,11 @@ jobs:
       - name: Commit app config
         run: |
           git checkout -b chore/bump-version-${{ inputs.version }}
-          git add .
+          git add wails.json
           git config --global user.name 'dependabot[bot]'
           git config --global user.email 'dependabot[bot]@users.noreply.github.com'
           git commit -m "chore: bump app config version to ${{ inputs.version }} (automatic)"
-          git push
+          git push --set-upstream origin chore/bump-version-${{ inputs.version }}
 
       - name: Create draft release
         uses: softprops/action-gh-release@v2
