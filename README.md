@@ -4,7 +4,7 @@
   </br>
   </br>
   <h1>CFN Tracker</h1>
-  Track any Street Fighter 6 or V CFN profile's live matches. </br>
+  Track any Street Fighter 6 or Tekken 8 user's live matches.</br>
   Check the <a href="https://cfn.williamsjokvist.se/">website</a> to get started.
 </div>
 
@@ -14,7 +14,7 @@
 - Real-time match tracking
 - Storing match logs and statistics
 - Support for displaying live stats to OBS via Browser Source and Text Labels
-- Support for both SF6 and SFV
+- Support for both SF6 and Tekken 8
 - Ability to create own OBS Browser theme with CSS
 
   [Streamer showcase](SHOWCASE.md)
@@ -26,8 +26,8 @@ Contributions are welcome, take a look at the [issues](https://github.com/willia
 
 1. Install dependencies
     - [Wails](https://wails.io/docs/gettingstarted/installation)
-    - [Task](https://taskfile.dev/) - optional, but recommended
     - [Bun](https://bun.sh/)
+    - [Task](https://taskfile.dev/) - optional, but recommended
 
 2. Create a `.env` in the project's root based on [example.env](https://github.com/williamsjokvist/cfn-tracker/blob/master/example.env)
 
