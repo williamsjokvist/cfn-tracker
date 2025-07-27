@@ -1,7 +1,7 @@
 version: 2
 updates:
   - package-ecosystem: "gomod"
-    directory: "/"
+    directory: "/app"
     allow:
     - dependency-type: "direct"
     schedule:
@@ -19,7 +19,7 @@ updates:
         applies-to: security-updates
 
   - package-ecosystem: "npm"
-    directory: "/gui"
+    directory: "/app/gui"
     allow:
     - dependency-type: "direct"
     schedule:
