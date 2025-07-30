@@ -29,6 +29,6 @@ Contributions are welcome, take a look at the [issues](https://github.com/willia
     - [Bun](https://bun.sh/)
     - [Task](https://taskfile.dev/) - optional, but recommended
 
-2. Create a `.env` in the project's root based on [example.env](https://github.com/williamsjokvist/cfn-tracker/blob/master/example.env)
+2. Required environment variables are found in [example.env](https://github.com/williamsjokvist/cfn-tracker/blob/master/app/example.env)
 
 3. Run `task --list` to view the list of commands
