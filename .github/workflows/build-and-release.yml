@@ -56,7 +56,6 @@ jobs:
         env:
           CAP_ID_EMAIL: ${{ secrets.CAP_ID_EMAIL }}
           CAP_ID_PASSWORD: ${{ secrets.CAP_ID_PASSWORD }}
-          IS_PRODUCTION: true
 
       - name: Zip build
         run: tar -a -c -f 'cfn-tracker-windows-amd64.zip' -C './build/bin' 'CFN Tracker.exe'

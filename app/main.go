@@ -42,7 +42,8 @@ import (
 	"github.com/williamsjokvist/cfn-tracker/pkg/update/github"
 )
 
-var (
+// linker flags
+const (
 	capIDEmail    string = ""
 	capIDPassword string = ""
 	isProduction  string = ""
@@ -59,6 +60,8 @@ var wailsJson []byte
 
 var cfg config.BuildConfig
 var logFile *os.File
+
+var appBrowser *browser.Browser
 
 func logToFile() {
 	file, err := os.OpenFile("cfn-tracker.log", os.O_APPEND|os.O_RDWR|os.O_CREATE, 0644)
@@ -106,6 +109,44 @@ func init() {
 	cfg.AppVersion = wailsCfg.Info.ProductVersion
 }
 
+func closeWithError(err error) {
+	if appBrowser != nil {
+		appBrowser.Page.Browser().Close()
+	}
+	slog.Error("closing with error", slog.Any("error", err))
+
+	if err := wails.Run(&options.App{
+		Title:                    "CFN Tracker - Error",
+		Width:                    400,
+		Height:                   148,
+		DisableResize:            true,
+		Frameless:                true,
+		EnableDefaultContextMenu: false,
+		AssetServer: &assetserver.Options{
+			Middleware: assetserver.ChainMiddleware(func(next http.Handler) http.Handler {
+				return http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+					var b bytes.Buffer
+					tmpl := template.Must(template.New("errorPage").Parse(string(errorTmpl)))
+					params := struct {
+						Error string
+					}{
+						Error: err.Error(),
+					}
+					if err := tmpl.Execute(&b, params); err != nil {
+						slog.Error("write error template", slog.Any("error", err))
+					}
+					_, err := w.Write(b.Bytes())
+					if err != nil {
+						slog.Error("write error page", slog.Any("error", err))
+					}
+				})
+			}),
+		},
+	}); err != nil {
+		slog.Error("display error window", slog.Any("error", err))
+	}
+}
+
 func main() {
 	defer func() {
 		if logFile != nil {
@@ -113,44 +154,6 @@ func main() {
 		}
 	}()
 
-	var appBrowser *browser.Browser
-	closeWithError := func(err error) {
-		if appBrowser != nil {
-			appBrowser.Page.Browser().Close()
-		}
-		slog.Error("closing with error", slog.Any("error", err))
-
-		if err := wails.Run(&options.App{
-			Title:                    "CFN Tracker - Error",
-			Width:                    400,
-			Height:                   148,
-			DisableResize:            true,
-			Frameless:                true,
-			EnableDefaultContextMenu: false,
-			AssetServer: &assetserver.Options{
-				Middleware: assetserver.ChainMiddleware(func(next http.Handler) http.Handler {
-					return http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
-						var b bytes.Buffer
-						tmpl := template.Must(template.New("errorPage").Parse(string(errorTmpl)))
-						params := struct {
-							Error string
-						}{
-							Error: err.Error(),
-						}
-						if err := tmpl.Execute(&b, params); err != nil {
-							log.Println("write error template: ", err)
-						}
-						_, err := w.Write(b.Bytes())
-						if err != nil {
-							log.Println("write error page: ", err)
-						}
-					})
-				}),
-			},
-		}); err != nil {
-			slog.Error("display error window", slog.Any("error", err))
-		}
-	}
 	appBrowser, err := browser.NewBrowser(cfg.Headless)
 	if err != nil {
 		closeWithError(fmt.Errorf("launch browser: %w", err))
@@ -240,7 +243,7 @@ func main() {
 			TitleBar: mac.TitleBarHiddenInset(),
 			About: &mac.AboutInfo{
 				Title:   fmt.Sprintf("CFN Tracker v%s", appVersion),
-				Message: fmt.Sprintf("CFN Tracker version %s © 2023 William Sjökvist <william.sjokvist@gmail.com>", appVersion),
+				Message: fmt.Sprintf("CFN Tracker version %s © 2025 William Sjökvist <william.sjokvist@gmail.com>", appVersion),
 			},
 		},
 		OnDomReady: func(ctx context.Context) {
