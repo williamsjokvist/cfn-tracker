@@ -93,7 +93,6 @@ func init() {
 	}
 
 	if err := godotenv.Load(".env"); err != nil {
-		slog.Error("missing env file", slog.Any("error", err))
 		cfg = config.BuildConfig{
 			AppVersion:        wailsCfg.Info.ProductVersion,
 			Headless:          isProduction == "true",
@@ -145,6 +144,7 @@ func closeWithError(err error) {
 	}); err != nil {
 		slog.Error("display error window", slog.Any("error", err))
 	}
+	os.Exit(1)
 }
 
 func main() {
@@ -157,7 +157,6 @@ func main() {
 	appBrowser, err := browser.NewBrowser(cfg.Headless)
 	if err != nil {
 		closeWithError(fmt.Errorf("launch browser: %w", err))
-		return
 	}
 
 	githubClient := github.NewClient()
@@ -165,13 +164,11 @@ func main() {
 	appVersion, err := version.NewVersion(cfg.AppVersion)
 	if err != nil {
 		closeWithError(fmt.Errorf("parse app version: %w", err))
-		return
 	}
 	lastRelease, err := githubClient.GetLastRelease()
 	if err != nil {
 		// maybe shouldn't close the app on this
 		closeWithError(fmt.Errorf("parse latest app version: %w", err))
-		return
 	}
 	newUpdateAvailable := appVersion.LessThan(lastRelease.Version)
 	if newUpdateAvailable {
@@ -182,17 +179,14 @@ func main() {
 	sqlDb, err := sql.NewStorage(false)
 	if err != nil {
 		closeWithError(fmt.Errorf("initalize database: %w", err))
-		return
 	}
 	noSqlDb, err := cfgDb.NewStorage()
 	if err != nil {
 		closeWithError(fmt.Errorf("initalize app config: %w", err))
-		return
 	}
 	txtDb, err := txt.NewStorage()
 	if err != nil {
 		closeWithError(fmt.Errorf("initalize text store: %w", err))
-		return
 	}
 
 	browserSrcMatchChan := make(chan model.Match, 1)
