@@ -1,6 +1,35 @@
 ---
+import { marked } from 'marked';
 import { Content } from '../content/changelog.md';
 import Layout from '../components/Layout.astro';
+
+interface Release {
+  html_url: string
+  published_at: string
+  name: string
+  body: string
+}
+
+const res = await fetch('https://api.github.com/repos/williamsjokvist/cfn-tracker/releases')
+
+if (!res.ok) {
+  throw new Error(`Failed to fetch releases: ${res.status} ${res.statusText}`)
+}
+
+let releases: Release[]
+try {
+  releases = await res.json()
+} catch (error) {
+  throw new Error(`Failed to parse releases JSON: ${error.message}`)
+}
+
+// include v1 which didn't have a gh release
+releases.push({
+  html_url: 'https://github.com/williamsjokvist/cfn-tracker/tree/458774bf59df5854b7ba6365a0f0b3cfc74bc52f',
+  published_at: '2019-09-07',
+  name: 'v1.0.0',
+  body: '',
+})
 ---
 <script>
   import { gsap, Power2 } from "../lib/gsap";
@@ -20,6 +49,15 @@ import Layout from '../components/Layout.astro';
 <Layout title="CFN Tracker - Changelog">
   <div id="changelog-container" class="prose lg:prose-lg prose-invert mx-auto px-4 mt-20">
     <Content />
+    {releases.map(({ body, html_url, name, published_at }) => (
+      <>
+        <h2>
+          <a href={html_url} class='font-semibold'>{name}</a>
+          - <time class="font-normal" datetime={published_at}>{new Date(published_at).toLocaleDateString('sv-SE')}</time>
+        </h2>
+        <div set:html={marked.parse(body)} />
+      </>
+    ))}
   </div>
 </Layout>
 
