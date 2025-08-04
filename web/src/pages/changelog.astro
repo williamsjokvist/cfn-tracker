@@ -52,7 +52,7 @@ releases.push({
     {releases.map(({ body, html_url, name, published_at }) => (
       <>
         <h2>
-          <a href={html_url} class='font-semibold'>{name}</a>
+          <a href={html_url} class='font-semibold' target="_blank">{name}</a>
           - <time class="font-normal" datetime={published_at}>{new Date(published_at).toLocaleDateString('sv-SE')}</time>
         </h2>
         <div set:html={marked.parse(body)} />
