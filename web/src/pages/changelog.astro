@@ -12,7 +12,16 @@ interface Release {
 
 const res = await fetch('https://api.github.com/repos/williamsjokvist/cfn-tracker/releases')
 
-const releases: Release[] = await res.json()
+if (!res.ok) {
+  throw new Error(`Failed to fetch releases: ${res.status} ${res.statusText}`)
+}
+
+let releases: Release[]
+try {
+  releases = await res.json()
+} catch (error) {
+  throw new Error(`Failed to parse releases JSON: ${error.message}`)
+}
 
 // include v1 which didn't have a gh release
 releases.push({
