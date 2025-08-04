@@ -5,6 +5,10 @@ on:
     branches: [ master ]
     paths:
     - web/**
+
+  release:
+    types: [released]
+
   workflow_dispatch:
 
 permissions:
