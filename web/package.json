@@ -12,7 +12,7 @@
   "dependencies": {
     "@astrojs/mdx": "^2.0.2",
     "@astrojs/tailwind": "^5.0.4",
-    "astro": "^4.0.7",
+    "astro": "^5.14.4",
     "astro-icon": "^0.8.2",
     "gsap": "^3.12.4",
     "marked": "^16.1.2",
