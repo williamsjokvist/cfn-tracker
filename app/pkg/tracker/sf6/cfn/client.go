@@ -263,163 +263,39 @@ func (c *Client) CompareBattleStats(current *BattleStats, topPlayers []*BattleSt
 	if len(topPlayers) == 0 {
 		return nil, errors.New("topPlayers list is empty")
 	}
-	out := &BattleStatsComparison{}
-	out.CorneredTime.Current = current.CorneredTime
-	out.CornerTime.Current = current.CornerTime
-	out.RankMatchPlayCount.Current = current.RankMatchPlayCount
-	out.DriveImpact.Current = current.DriveImpact
-	out.DriveParry.Current = current.DriveParry
-	out.JustParry.Current = current.JustParry
-	out.ThrowTech.Current = current.ThrowTech
-	out.PunishCounter.Current = current.PunishCounter
-	out.GaugeRateCA.Current = current.GaugeRateCA
-	out.GaugeRateDriveArts.Current = current.GaugeRateDriveArts
-	out.GaugeRateDriveGuard.Current = current.GaugeRateDriveGuard
-	out.GaugeRateDriveImpact.Current = current.GaugeRateDriveImpact
-	out.GaugeRateDriveOther.Current = current.GaugeRateDriveOther
-	out.GaugeRateDriveReversal.Current = current.GaugeRateDriveReversal
-	out.GaugeRateDriveRushFromCancel.Current = current.GaugeRateDriveRushFromCancel
-	out.GaugeRateDriveRushFromParry.Current = current.GaugeRateDriveRushFromParry
-	out.GaugeRateSaLv1.Current = current.GaugeRateSaLv1
-	out.GaugeRateSaLv2.Current = current.GaugeRateSaLv2
-	out.GaugeRateSaLv3.Current = current.GaugeRateSaLv3
-	var corneredTimes []float64
-	var cornerTimes []float64
-	var rankMatchCounts []int
-	var driveImpacts []float64
-	var driveParries []float64
-	var justParries []float64
-	var throwTeches []float64
-	var punishCounters []float64
-	var gaugeRateCAs []float64
-	var gaugeRateDriveArts []float64
-	var gaugeRateDriveGuards []float64
-	var gaugeRateDriveImpacts []float64
-	var gaugeRateDriveOthers []float64
-	var gaugeRateDriveReversals []float64
-	var gaugeRateDriveRushFromCancels []float64
-	var gaugeRateDriveRushFromParries []float64
-	var gaugeRateSaLv1s []float64
-	var gaugeRateSaLv2s []float64
-	var gaugeRateSaLv3s []float64
-	for _, p := range topPlayers {
-		if p == nil {
-			continue
+	out := NewBattleStatsComparison()
+
+	for _, m := range battleStatsFloatMetrics {
+		metric := m.Metric(out)
+		metric.Current = m.Get(current) * m.Scale
+
+		values := make([]float64, 0, len(topPlayers))
+		for _, p := range topPlayers {
+			if p == nil {
+				continue
+			}
+			values = append(values, m.Get(p)*m.Scale)
 		}
-		corneredTimes = append(corneredTimes, p.CorneredTime)
-		cornerTimes = append(cornerTimes, p.CornerTime)
-		rankMatchCounts = append(rankMatchCounts, p.RankMatchPlayCount)
-		driveImpacts = append(driveImpacts, p.DriveImpact)
-		driveParries = append(driveParries, p.DriveParry)
-		justParries = append(justParries, p.JustParry)
-		throwTeches = append(throwTeches, p.ThrowTech)
-		punishCounters = append(punishCounters, p.PunishCounter)
-		gaugeRateCAs = append(gaugeRateCAs, p.GaugeRateCA)
-		gaugeRateDriveArts = append(gaugeRateDriveArts, p.GaugeRateDriveArts)
-		gaugeRateDriveGuards = append(gaugeRateDriveGuards, p.GaugeRateDriveGuard)
-		gaugeRateDriveImpacts = append(gaugeRateDriveImpacts, p.GaugeRateDriveImpact)
-		gaugeRateDriveOthers = append(gaugeRateDriveOthers, p.GaugeRateDriveOther)
-		gaugeRateDriveReversals = append(gaugeRateDriveReversals, p.GaugeRateDriveReversal)
-		gaugeRateDriveRushFromCancels = append(gaugeRateDriveRushFromCancels, p.GaugeRateDriveRushFromCancel)
-		gaugeRateDriveRushFromParries = append(gaugeRateDriveRushFromParries, p.GaugeRateDriveRushFromParry)
-		gaugeRateSaLv1s = append(gaugeRateSaLv1s, p.GaugeRateSaLv1)
-		gaugeRateSaLv2s = append(gaugeRateSaLv2s, p.GaugeRateSaLv2)
-		gaugeRateSaLv3s = append(gaugeRateSaLv3s, p.GaugeRateSaLv3)
+		if len(values) > 0 {
+			metric.TopPlayers.Min, metric.TopPlayers.Max, metric.TopPlayers.Avg = CalcStatsFloat(values)
+		}
 	}
-	if len(corneredTimes) > 0 {
-		out.CorneredTime.TopPlayers.Min, out.CorneredTime.TopPlayers.Max, out.CorneredTime.TopPlayers.Avg = calcStats(corneredTimes)
+
+	for _, m := range battleStatsIntMetrics {
+		metric := m.Metric(out)
+		metric.Current = m.Get(current)
+
+		values := make([]int, 0, len(topPlayers))
+		for _, p := range topPlayers {
+			if p == nil {
+				continue
+			}
+			values = append(values, m.Get(p))
+		}
+		if len(values) > 0 {
+			metric.TopPlayers.Min, metric.TopPlayers.Max, metric.TopPlayers.Avg = CalcStatsInt(values)
+		}
 	}
-	if len(cornerTimes) > 0 {
-		out.CornerTime.TopPlayers.Min, out.CornerTime.TopPlayers.Max, out.CornerTime.TopPlayers.Avg = calcStats(cornerTimes)
-	}
-	if len(rankMatchCounts) > 0 {
-		out.RankMatchPlayCount.TopPlayers.Min, out.RankMatchPlayCount.TopPlayers.Max, out.RankMatchPlayCount.TopPlayers.Avg = calcStatsInt(rankMatchCounts)
-	}
-	if len(driveImpacts) > 0 {
-		out.DriveImpact.TopPlayers.Min, out.DriveImpact.TopPlayers.Max, out.DriveImpact.TopPlayers.Avg = calcStats(driveImpacts)
-	}
-	if len(driveParries) > 0 {
-		out.DriveParry.TopPlayers.Min, out.DriveParry.TopPlayers.Max, out.DriveParry.TopPlayers.Avg = calcStats(driveParries)
-	}
-	if len(justParries) > 0 {
-		out.JustParry.TopPlayers.Min, out.JustParry.TopPlayers.Max, out.JustParry.TopPlayers.Avg = calcStats(justParries)
-	}
-	if len(throwTeches) > 0 {
-		out.ThrowTech.TopPlayers.Min, out.ThrowTech.TopPlayers.Max, out.ThrowTech.TopPlayers.Avg = calcStats(throwTeches)
-	}
-	if len(punishCounters) > 0 {
-		out.PunishCounter.TopPlayers.Min, out.PunishCounter.TopPlayers.Max, out.PunishCounter.TopPlayers.Avg = calcStats(punishCounters)
-	}
-	if len(gaugeRateCAs) > 0 {
-		out.GaugeRateCA.TopPlayers.Min, out.GaugeRateCA.TopPlayers.Max, out.GaugeRateCA.TopPlayers.Avg = calcStats(gaugeRateCAs)
-	}
-	if len(gaugeRateDriveArts) > 0 {
-		out.GaugeRateDriveArts.TopPlayers.Min, out.GaugeRateDriveArts.TopPlayers.Max, out.GaugeRateDriveArts.TopPlayers.Avg = calcStats(gaugeRateDriveArts)
-	}
-	if len(gaugeRateDriveGuards) > 0 {
-		out.GaugeRateDriveGuard.TopPlayers.Min, out.GaugeRateDriveGuard.TopPlayers.Max, out.GaugeRateDriveGuard.TopPlayers.Avg = calcStats(gaugeRateDriveGuards)
-	}
-	if len(gaugeRateDriveImpacts) > 0 {
-		out.GaugeRateDriveImpact.TopPlayers.Min, out.GaugeRateDriveImpact.TopPlayers.Max, out.GaugeRateDriveImpact.TopPlayers.Avg = calcStats(gaugeRateDriveImpacts)
-	}
-	if len(gaugeRateDriveOthers) > 0 {
-		out.GaugeRateDriveOther.TopPlayers.Min, out.GaugeRateDriveOther.TopPlayers.Max, out.GaugeRateDriveOther.TopPlayers.Avg = calcStats(gaugeRateDriveOthers)
-	}
-	if len(gaugeRateDriveReversals) > 0 {
-		out.GaugeRateDriveReversal.TopPlayers.Min, out.GaugeRateDriveReversal.TopPlayers.Max, out.GaugeRateDriveReversal.TopPlayers.Avg = calcStats(gaugeRateDriveReversals)
-	}
-	if len(gaugeRateDriveRushFromCancels) > 0 {
-		out.GaugeRateDriveRushFromCancel.TopPlayers.Min, out.GaugeRateDriveRushFromCancel.TopPlayers.Max, out.GaugeRateDriveRushFromCancel.TopPlayers.Avg = calcStats(gaugeRateDriveRushFromCancels)
-	}
-	if len(gaugeRateDriveRushFromParries) > 0 {
-		out.GaugeRateDriveRushFromParry.TopPlayers.Min, out.GaugeRateDriveRushFromParry.TopPlayers.Max, out.GaugeRateDriveRushFromParry.TopPlayers.Avg = calcStats(gaugeRateDriveRushFromParries)
-	}
-	if len(gaugeRateSaLv1s) > 0 {
-		out.GaugeRateSaLv1.TopPlayers.Min, out.GaugeRateSaLv1.TopPlayers.Max, out.GaugeRateSaLv1.TopPlayers.Avg = calcStats(gaugeRateSaLv1s)
-	}
-	if len(gaugeRateSaLv2s) > 0 {
-		out.GaugeRateSaLv2.TopPlayers.Min, out.GaugeRateSaLv2.TopPlayers.Max, out.GaugeRateSaLv2.TopPlayers.Avg = calcStats(gaugeRateSaLv2s)
-	}
-	if len(gaugeRateSaLv3s) > 0 {
-		out.GaugeRateSaLv3.TopPlayers.Min, out.GaugeRateSaLv3.TopPlayers.Max, out.GaugeRateSaLv3.TopPlayers.Avg = calcStats(gaugeRateSaLv3s)
-	}
+
 	return out, nil
-}
-
-func calcStats(values []float64) (min, max, avg float64) {
-	if len(values) == 0 {
-		return 0, 0, 0
-	}
-	min, max = values[0], values[0]
-	sum := 0.0
-	for _, v := range values {
-		if v < min {
-			min = v
-		}
-		if v > max {
-			max = v
-		}
-		sum += v
-	}
-	avg = sum / float64(len(values))
-	return min, max, avg
-}
-
-func calcStatsInt(values []int) (min, max int, avg float64) {
-	if len(values) == 0 {
-		return 0, 0, 0
-	}
-	min, max = values[0], values[0]
-	sum := 0
-	for _, v := range values {
-		if v < min {
-			min = v
-		}
-		if v > max {
-			max = v
-		}
-		sum += v
-	}
-	avg = float64(sum) / float64(len(values))
-	return min, max, avg
 }

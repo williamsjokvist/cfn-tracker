@@ -73,9 +73,9 @@ type PlayerInfo struct {
 
 type MasterRatingRanking struct {
 	RankingFighterList []MasterRankingPlayer `json:"ranking_fighter_list"`
-	MyRankingInfo     *struct {
+	MyRankingInfo      *struct {
 		FighterBannerInfo *struct {
-			FavoriteCharacterName   string `json:"favorite_character_name"`
+			FavoriteCharacterName     string `json:"favorite_character_name"`
 			FavoriteCharacterToolName string `json:"favorite_character_tool_name"`
 		} `json:"fighter_banner_info"`
 	} `json:"my_ranking_info"`
@@ -313,437 +313,74 @@ type Replay struct {
 type PlayPage struct {
 	Props struct {
 		PageProps PlayData `json:"pageProps"`
-		NSsp      bool     `json:"__N_SSP"`
 	} `json:"props"`
-	Page  string `json:"page"`
-	Query struct {
-		Sid string `json:"sid"`
-	} `json:"query"`
-	BuildID       string   `json:"buildId"`
-	AssetPrefix   string   `json:"assetPrefix"`
-	IsFallback    bool     `json:"isFallback"`
-	Gssp          bool     `json:"gssp"`
-	Locale        string   `json:"locale"`
-	Locales       []string `json:"locales"`
-	DefaultLocale string   `json:"defaultLocale"`
-	ScriptLoader  []any    `json:"scriptLoader"`
+}
+
+type FighterBannerInfo struct {
+	FavoriteCharacterName       string                      `json:"favorite_character_name"`
+	FavoriteCharacterLeagueInfo FavoriteCharacterLeagueInfo `json:"favorite_character_league_info"`
+}
+
+type FavoriteCharacterLeagueInfo struct {
+	LeaguePoint  int `json:"league_point"`
+	MasterRating int `json:"master_rating"`
 }
 
 type Play struct {
-	BaseInfo                      BaseInfo                        `json:"base_info"`
-	BattleStats                   BattleStats                     `json:"battle_stats"`
-	CharacterLeagueInfos          []CharacterLeagueInfo          `json:"character_league_infos"`
-	CharacterPlayPointInfos       []CharacterPlayPointInfo       `json:"character_play_point_infos"`
-	CharacterWinRates             []CharacterWinRate             `json:"character_win_rates"`
-	CharacterWinRatesByRivalCharacter []CharacterWinRatesByRivalCharacter `json:"character_win_rates_by_rival_character"`
-	CurrentSeasonID               int                             `json:"current_season_id"`
-	SeasonIDs                     []int                           `json:"season_ids"`
+	BattleStats          BattleStats `json:"battle_stats"`
+	CurrentSeasonID      int         `json:"current_season_id"`
+	CharacterLeagueInfos []any       `json:"character_league_infos"`
+}
+
+type Common struct {
+	StatusCode int `json:"statusCode"`
 }
 
 type PlayData struct {
-	FighterBannerInfo struct {
-		AllowCrossPlay              bool `json:"allow_cross_play"`
-		BattleInputType             int  `json:"battle_input_type"`
-		CustomRoomInviteSetting     int  `json:"custom_room_invite_setting"`
-		EnjoyTotalPoint             int  `json:"enjoy_total_point"`
-		FavoriteCharacterID         int  `json:"favorite_character_id"`
-		FavoriteCharacterLeagueInfo struct {
-			LeaguePoint         int `json:"league_point"`
-			LeagueRank          int `json:"league_rank"`
-			MasterLeague        int `json:"master_league"`
-			MasterRating        int `json:"master_rating"`
-			MasterRatingRanking int `json:"master_rating_ranking"`
-			LeagueRankInfo      struct {
-				LeagueRankName   string `json:"league_rank_name"`
-				LeagueRankNumber int    `json:"league_rank_number"`
-			} `json:"league_rank_info"`
-		} `json:"favorite_character_league_info"`
-		FavoriteCharacterPlayPoint struct {
-			BattleHub      int `json:"battle_hub"`
-			FightingGround int `json:"fighting_ground"`
-			WorldTour      int `json:"world_tour"`
-		} `json:"favorite_character_play_point"`
-		FriendRequestFlag bool `json:"friend_request_flag"`
-		Friendship        int  `json:"friendship"`
-		HomeID            int  `json:"home_id"`
-		InsideRank        int  `json:"inside_rank"`
-		IsBeginner        bool `json:"is_beginner"`
-		IsCircleInvite    bool `json:"is_circle_invite"`
-		IsCircleMember    bool `json:"is_circle_member"`
-		LastPlayAt        int  `json:"last_play_at"`
-		MainCircle        struct {
-			CircleID   string `json:"circle_id"`
-			CircleName string `json:"circle_name"`
-			DataExist  bool   `json:"data_exist"`
-			Emblem     struct {
-				EmblemBase                       int  `json:"emblem_base"`
-				EmblemBaseColor                  int  `json:"emblem_base_color"`
-				EmblemFrame                      int  `json:"emblem_frame"`
-				EmblemFrameColor                 int  `json:"emblem_frame_color"`
-				EmblemPattern                    int  `json:"emblem_pattern"`
-				EmblemPatternColor               int  `json:"emblem_pattern_color"`
-				EmblemPatternHorizontalInversion bool `json:"emblem_pattern_horizontal_inversion"`
-				EmblemPatternVerticalInversion   bool `json:"emblem_pattern_vertical_inversion"`
-				EmblemProcessing                 int  `json:"emblem_processing"`
-				EmblemSymbol1                    int  `json:"emblem_symbol1"`
-				EmblemSymbol1Clipping            bool `json:"emblem_symbol1_clipping"`
-				EmblemSymbol1Color               int  `json:"emblem_symbol1_color"`
-				EmblemSymbol1HorizontalInversion bool `json:"emblem_symbol1_horizontal_inversion"`
-				EmblemSymbol1VerticalInversion   bool `json:"emblem_symbol1_vertical_inversion"`
-				EmblemSymbol2                    int  `json:"emblem_symbol2"`
-				EmblemSymbol2Clipping            bool `json:"emblem_symbol2_clipping"`
-				EmblemSymbol2Color               int  `json:"emblem_symbol2_color"`
-				EmblemSymbol2HorizontalInversion bool `json:"emblem_symbol2_horizontal_inversion"`
-				EmblemSymbol2VerticalInversion   bool `json:"emblem_symbol2_vertical_inversion"`
-			} `json:"emblem"`
-			Leader struct {
-				FighterID  string `json:"fighter_id"`
-				PlatformID int    `json:"platform_id"`
-				ShortID    int    `json:"short_id"`
-			} `json:"leader"`
-		} `json:"main_circle"`
-		MaxContentPlayTime struct {
-			ContentType int `json:"content_type"`
-			PlayTime    int `json:"play_time"`
-		} `json:"max_content_play_time"`
-		MobileLinkage    bool `json:"mobile_linkage"`
-		OnlineStatusInfo struct {
-			BattlehubAdmissionRestriction              int    `json:"battlehub_admission_restriction"`
-			BattlehubForBeginner                       bool   `json:"battlehub_for_beginner"`
-			BattlehubID                                string `json:"battlehub_id"`
-			BattlehubPlatformID                        int    `json:"battlehub_platform_id"`
-			BattlehubRegionID                          int    `json:"battlehub_region_id"`
-			BattlehubServerNo                          int    `json:"battlehub_server_no"`
-			CustomRoomMasterShortID                    int    `json:"custom_room_master_short_id"`
-			CustomRoomPlatformID                       int    `json:"custom_room_platform_id"`
-			CustomRoomPublishSetting                   int    `json:"custom_room_publish_setting"`
-			CustomRoomRegionID                         int    `json:"custom_room_region_id"`
-			CustomRoomRequiredNetworkConnectionQuality int    `json:"custom_room_required_network_connection_quality"`
-			CustomRoomRequiredPassCode                 bool   `json:"custom_room_required_pass_code"`
-			CustomRoomRoomID                           string `json:"custom_room_room_id"`
-			OnlineStatus                               int    `json:"online_status"`
-			OnlineStatusData                           struct {
-				OnlineStatusName string `json:"online_status_name"`
-				OnlineStatusType int    `json:"online_status_type"`
-			} `json:"online_status_data"`
-			BattlehubRegionName       string `json:"battlehub_region_name"`
-			BattlehubFormatedServerNo string `json:"battlehub_formated_server_no"`
-		} `json:"online_status_info"`
-		PersonalInfo struct {
-			FighterID        string `json:"fighter_id"`
-			PlatformID       int    `json:"platform_id"`
-			ShortID          int64  `json:"short_id"`
-			PlatformName     string `json:"platform_name"`
-			PlatformToolName string `json:"platform_tool_name"`
-		} `json:"personal_info"`
-		PlayTimeZone struct {
-			EndHour     int `json:"end_hour"`
-			EndMinute   int `json:"end_minute"`
-			StartHour   int `json:"start_hour"`
-			StartMinute int `json:"start_minute"`
-		} `json:"play_time_zone"`
-		ProfileComment struct {
-			ProfileTagID     int    `json:"profile_tag_id"`
-			TagOptionID      int    `json:"tag_option_id"`
-			ProfileTagName   string `json:"profile_tag_name"`
-			ProfileTagOption string `json:"profile_tag_option"`
-		} `json:"profile_comment"`
-		TitlePlate                int    `json:"title_plate"`
-		HomeName                  string `json:"home_name"`
-		FavoriteCharacterName     string `json:"favorite_character_name"`
-		FavoriteCharacterAlpha    string `json:"favorite_character_alpha"`
-		FavoriteCharacterToolName string `json:"favorite_character_tool_name"`
-		TitleData                 struct {
-			TitleDataID        int    `json:"title_data_id"`
-			TitleDataGradeID   int    `json:"title_data_grade_id"`
-			TitleDataGradeName string `json:"title_data_grade_name"`
-			TitleDataPlateID   int    `json:"title_data_plate_id"`
-			TitleDataPlateName string `json:"title_data_plate_name"`
-			TitleDataVal       string `json:"title_data_val"`
-		} `json:"title_data"`
-		IsMyData bool `json:"is_my_data"`
-	} `json:"fighter_banner_info"`
-	Play                          Play                             `json:"play"`
-	Common                        struct {
-		StatusCode int  `json:"statusCode"`
-		IsError    bool `json:"isError"`
-		LoginUser  struct {
-			PlatformID int    `json:"platformId"`
-			ShortID    int64  `json:"shortId"`
-			FighterID  string `json:"fighterId"`
-			Flg        bool   `json:"flg"`
-			RegionID   int    `json:"regionId"`
-		} `json:"loginUser"`
-		AppEnv string `json:"appEnv"`
-	} `json:"common"`
-	Lang string `json:"__lang"`
-}
-
-type BaseInfo struct {
-	ContentPlayTimeList []ContentPlayTime `json:"content_play_time_list"`
-	EnjoyFightPoint     int               `json:"enjoy_fight_point"`
-	EnjoyTotalPoint     int               `json:"enjoy_total_point"`
-	EnjoyUserPoint      int               `json:"enjoy_user_point"`
-}
-
-type ContentPlayTime struct {
-	ContentType     int    `json:"content_type"`
-	PlayTime        int    `json:"play_time"`
-	ContentTypeName string `json:"content_type_name"`
+	FighterBannerInfo FighterBannerInfo `json:"fighter_banner_info"`
+	Play              Play              `json:"play"`
+	Common            Common            `json:"common"`
 }
 
 type BattleStats struct {
-	BattleHubMatchPlayCount              int     `json:"battle_hub_match_play_count"`
-	CasualMatchPlayCount                 int     `json:"casual_match_play_count"`
-	CornerTime                           float64 `json:"corner_time"`
-	CorneredTime                         float64 `json:"cornered_time"`
-	CustomRoomMatchPlayCount              int     `json:"custom_room_match_play_count"`
-	DriveImpact                          float64 `json:"drive_impact"`
-	DriveImpactToDriveImpact             float64 `json:"drive_impact_to_drive_impact"`
-	DriveParry                           float64 `json:"drive_parry"`
-	DriveReversal                        float64 `json:"drive_reversal"`
-	GaugeRateCA                          float64 `json:"gauge_rate_ca"`
-	GaugeRateDriveArts                   float64 `json:"gauge_rate_drive_arts"`
-	GaugeRateDriveGuard                  float64 `json:"gauge_rate_drive_guard"`
-	GaugeRateDriveImpact                 float64 `json:"gauge_rate_drive_impact"`
-	GaugeRateDriveOther                  float64 `json:"gauge_rate_drive_other"`
-	GaugeRateDriveReversal               float64 `json:"gauge_rate_drive_reversal"`
-	GaugeRateDriveRushFromCancel         float64 `json:"gauge_rate_drive_rush_from_cancel"`
-	GaugeRateDriveRushFromParry          float64 `json:"gauge_rate_drive_rush_from_parry"`
-	GaugeRateSaLv1                       float64 `json:"gauge_rate_sa_lv1"`
-	GaugeRateSaLv2                       float64 `json:"gauge_rate_sa_lv2"`
-	GaugeRateSaLv3                       float64 `json:"gauge_rate_sa_lv3"`
-	JustParry                            float64 `json:"just_parry"`
-	PunishCounter                        float64 `json:"punish_counter"`
-	RankMatchPlayCount                   int     `json:"rank_match_play_count"`
-	ReceivedDriveImpact                  float64 `json:"received_drive_impact"`
-	ReceivedDriveImpactToDriveImpact     float64 `json:"received_drive_impact_to_drive_impact"`
-	ReceivedPunishCounter                float64 `json:"received_punish_counter"`
-	ReceivedStun                         float64 `json:"received_stun"`
-	ReceivedThrowCount                   float64 `json:"received_throw_count"`
-	ReceivedThrowDriveParry              float64 `json:"received_throw_drive_parry"`
-	RivalAiAchievedChallengeCount         int     `json:"rival_ai_achieved_challenge_count"`
-	RivalAiHighestLeagueRank             int     `json:"rival_ai_highest_league_rank"`
-	Stun                                 float64 `json:"stun"`
-	TargetClearCount                     int     `json:"target_clear_count"`
-	ThrowCount                           float64 `json:"throw_count"`
-	ThrowDriveParry                      float64 `json:"throw_drive_parry"`
-	ThrowTech                            float64 `json:"throw_tech"`
-	TotalAllCharacterPlayPoint           int     `json:"total_all_character_play_point"`
-	RivalAiHighestLeagueRankTxt          string  `json:"rival_ai_highest_league_rank_txt"`
-}
-
-type BattleStatsComparison struct {
-	CorneredTime struct {
-		Current    float64
-		TopPlayers struct {
-			Min float64
-			Max float64
-			Avg float64
-		}
-	}
-	CornerTime struct {
-		Current    float64
-		TopPlayers struct {
-			Min float64
-			Max float64
-			Avg float64
-		}
-	}
-	RankMatchPlayCount struct {
-		Current    int
-		TopPlayers struct {
-			Min int
-			Max int
-			Avg float64
-		}
-	}
-	DriveImpact struct {
-		Current    float64
-		TopPlayers struct {
-			Min float64
-			Max float64
-			Avg float64
-		}
-	}
-	DriveParry struct {
-		Current    float64
-		TopPlayers struct {
-			Min float64
-			Max float64
-			Avg float64
-		}
-	}
-	JustParry struct {
-		Current    float64
-		TopPlayers struct {
-			Min float64
-			Max float64
-			Avg float64
-		}
-	}
-	ThrowTech struct {
-		Current    float64
-		TopPlayers struct {
-			Min float64
-			Max float64
-			Avg float64
-		}
-	}
-	PunishCounter struct {
-		Current    float64
-		TopPlayers struct {
-			Min float64
-			Max float64
-			Avg float64
-		}
-	}
-	GaugeRateCA struct {
-		Current    float64
-		TopPlayers struct {
-			Min float64
-			Max float64
-			Avg float64
-		}
-	}
-	GaugeRateDriveArts struct {
-		Current    float64
-		TopPlayers struct {
-			Min float64
-			Max float64
-			Avg float64
-		}
-	}
-	GaugeRateDriveGuard struct {
-		Current    float64
-		TopPlayers struct {
-			Min float64
-			Max float64
-			Avg float64
-		}
-	}
-	GaugeRateDriveImpact struct {
-		Current    float64
-		TopPlayers struct {
-			Min float64
-			Max float64
-			Avg float64
-		}
-	}
-	GaugeRateDriveOther struct {
-		Current    float64
-		TopPlayers struct {
-			Min float64
-			Max float64
-			Avg float64
-		}
-	}
-	GaugeRateDriveReversal struct {
-		Current    float64
-		TopPlayers struct {
-			Min float64
-			Max float64
-			Avg float64
-		}
-	}
-	GaugeRateDriveRushFromCancel struct {
-		Current    float64
-		TopPlayers struct {
-			Min float64
-			Max float64
-			Avg float64
-		}
-	}
-	GaugeRateDriveRushFromParry struct {
-		Current    float64
-		TopPlayers struct {
-			Min float64
-			Max float64
-			Avg float64
-		}
-	}
-	GaugeRateSaLv1 struct {
-		Current    float64
-		TopPlayers struct {
-			Min float64
-			Max float64
-			Avg float64
-		}
-	}
-	GaugeRateSaLv2 struct {
-		Current    float64
-		TopPlayers struct {
-			Min float64
-			Max float64
-			Avg float64
-		}
-	}
-	GaugeRateSaLv3 struct {
-		Current    float64
-		TopPlayers struct {
-			Min float64
-			Max float64
-			Avg float64
-		}
-	}
-}
-
-type CharacterLeagueInfo struct {
-	CharacterID    int        `json:"character_id"`
-	IsPlayed       bool       `json:"is_played"`
-	LeagueInfo     LeagueInfo `json:"league_info"`
-	CharacterName  string     `json:"character_name"`
-	CharacterAlpha string     `json:"character_alpha"`
-	CharacterToolName string  `json:"character_tool_name"`
-	CharacterSort  int        `json:"character_sort"`
-}
-
-type LeagueInfo struct {
-	LeaguePoint         int `json:"league_point"`
-	LeagueRank          int `json:"league_rank"`
-	MasterLeague        int `json:"master_league"`
-	MasterRating        int `json:"master_rating"`
-	MasterRatingRanking int `json:"master_rating_ranking"`
-}
-
-type CharacterPlayPointInfo struct {
-	CharacterID    int      `json:"character_id"`
-	PlayPoint      PlayPoint `json:"play_point"`
-	CharacterName  string   `json:"character_name"`
-	CharacterAlpha string   `json:"character_alpha"`
-	CharacterToolName string `json:"character_tool_name"`
-	CharacterSort  int      `json:"character_sort"`
-}
-
-type PlayPoint struct {
-	BattleHub      int `json:"battle_hub"`
-	FightingGround int `json:"fighting_ground"`
-	WorldTour      int `json:"world_tour"`
-}
-
-type CharacterWinRate struct {
-	BattleCount      int    `json:"battle_count"`
-	CharacterID      int    `json:"character_id"`
-	WinCount         int    `json:"win_count"`
-	CharacterName    string `json:"character_name"`
-	CharacterAlpha   string `json:"character_alpha"`
-	CharacterToolName string `json:"character_tool_name"`
-	CharacterSort    int    `json:"character_sort"`
-}
-
-type CharacterWinRatesByRivalCharacter struct {
-	CharacterID            int                    `json:"character_id"`
-	RivalCharacterWinRates []RivalCharacterWinRate `json:"rival_character_win_rates"`
-}
-
-type RivalCharacterWinRate struct {
-	BattleCount            int    `json:"battle_count"`
-	RivalCharacterID       int    `json:"rival_character_id"`
-	WinCount               int    `json:"win_count"`
-	RivalCharacterName     string `json:"rival_character_name"`
-	RivalCharacterAlpha    string `json:"rival_character_alpha"`
-	RivalCharacterToolName string `json:"rival_character_tool_name"`
-	RivalCharacterSort     int    `json:"rival_character_sort"`
+	BattleHubMatchPlayCount          int     `json:"battle_hub_match_play_count"`
+	CasualMatchPlayCount             int     `json:"casual_match_play_count"`
+	CornerTime                       float64 `json:"corner_time"`
+	CorneredTime                     float64 `json:"cornered_time"`
+	CustomRoomMatchPlayCount         int     `json:"custom_room_match_play_count"`
+	DriveImpact                      float64 `json:"drive_impact"`
+	DriveImpactToDriveImpact         float64 `json:"drive_impact_to_drive_impact"`
+	DriveParry                       float64 `json:"drive_parry"`
+	DriveReversal                    float64 `json:"drive_reversal"`
+	GaugeRateCA                      float64 `json:"gauge_rate_ca"`
+	GaugeRateDriveArts               float64 `json:"gauge_rate_drive_arts"`
+	GaugeRateDriveGuard              float64 `json:"gauge_rate_drive_guard"`
+	GaugeRateDriveImpact             float64 `json:"gauge_rate_drive_impact"`
+	GaugeRateDriveOther              float64 `json:"gauge_rate_drive_other"`
+	GaugeRateDriveReversal           float64 `json:"gauge_rate_drive_reversal"`
+	GaugeRateDriveRushFromCancel     float64 `json:"gauge_rate_drive_rush_from_cancel"`
+	GaugeRateDriveRushFromParry      float64 `json:"gauge_rate_drive_rush_from_parry"`
+	GaugeRateSaLv1                   float64 `json:"gauge_rate_sa_lv1"`
+	GaugeRateSaLv2                   float64 `json:"gauge_rate_sa_lv2"`
+	GaugeRateSaLv3                   float64 `json:"gauge_rate_sa_lv3"`
+	JustParry                        float64 `json:"just_parry"`
+	PunishCounter                    float64 `json:"punish_counter"`
+	RankMatchPlayCount               int     `json:"rank_match_play_count"`
+	ReceivedDriveImpact              float64 `json:"received_drive_impact"`
+	ReceivedDriveImpactToDriveImpact float64 `json:"received_drive_impact_to_drive_impact"`
+	ReceivedPunishCounter            float64 `json:"received_punish_counter"`
+	ReceivedStun                     float64 `json:"received_stun"`
+	ReceivedThrowCount               float64 `json:"received_throw_count"`
+	ReceivedThrowDriveParry          float64 `json:"received_throw_drive_parry"`
+	RivalAiAchievedChallengeCount    int     `json:"rival_ai_achieved_challenge_count"`
+	RivalAiHighestLeagueRank         int     `json:"rival_ai_highest_league_rank"`
+	Stun                             float64 `json:"stun"`
+	TargetClearCount                 int     `json:"target_clear_count"`
+	ThrowCount                       float64 `json:"throw_count"`
+	ThrowDriveParry                  float64 `json:"throw_drive_parry"`
+	ThrowTech                        float64 `json:"throw_tech"`
+	TotalAllCharacterPlayPoint       int     `json:"total_all_character_play_point"`
+	RivalAiHighestLeagueRankTxt      string  `json:"rival_ai_highest_league_rank_txt"`
 }
 
 type SearchResult struct {
