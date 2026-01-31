@@ -1,6 +1,7 @@
 package browser
 
 import (
+	"errors"
 	"fmt"
 	"log/slog"
 	"os"
@@ -17,6 +18,42 @@ import (
 type Browser struct {
 	Page         *rod.Page
 	HijackRouter *rod.HijackRouter
+}
+
+func (b *Browser) NewTab() (*Browser, func(), error) {
+	if b == nil || b.Page == nil {
+		return nil, func() {}, errors.New("browser not initialized")
+	}
+
+	page := stealth.MustPage(b.Page.Browser())
+	router := page.HijackRequests()
+	router.MustAdd(`*`, func(ctx *rod.Hijack) {
+		if ctx.Request.Type() == proto.NetworkResourceTypeImage ||
+			ctx.Request.Type() == proto.NetworkResourceTypeFont {
+			ctx.Response.Fail(proto.NetworkErrorReasonBlockedByClient)
+			return
+		}
+
+		if !strings.Contains(ctx.Request.URL().Hostname(), `steam`) &&
+			ctx.Request.Type() == proto.NetworkResourceTypeStylesheet {
+			ctx.Response.Fail(proto.NetworkErrorReasonBlockedByClient)
+			return
+		}
+
+		ctx.ContinueRequest(&proto.FetchContinueRequest{})
+	})
+
+	go router.Run()
+
+	cleanup := func() {
+		_ = router.Stop()
+		_ = page.Close()
+	}
+
+	return &Browser{
+		Page:         page,
+		HijackRouter: router,
+	}, cleanup, nil
 }
 
 func NewBrowser(headless bool) (*Browser, error) {

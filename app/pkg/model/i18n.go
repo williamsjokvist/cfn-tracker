@@ -6,6 +6,7 @@ type Localization struct {
 	About                    string `json:"about"`
 	Settings                 string `json:"settings"`
 	Tracking                 string `json:"tracking"`
+	SF6Comparison            string `json:"sf6Comparison"`
 	History                  string `json:"history"`
 	Language                 string `json:"language"`
 	Changelog                string `json:"changelog"`

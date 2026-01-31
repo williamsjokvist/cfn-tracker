@@ -18,6 +18,10 @@ import (
 
 type CFNClient interface {
 	GetBattleLog(ctx context.Context, cfn string) (*BattleLog, error)
+	GetPlayData(ctx context.Context, cfn string) (*PlayData, error)
+	GetCurrentCharacter(ctx context.Context) (string, error)
+	GetTopMRPlayersByCharacter(ctx context.Context, characterID string) ([]MasterRankingPlayer, error)
+	CompareBattleStats(current *BattleStats, topPlayers []*BattleStats) (*BattleStatsComparison, error)
 	Authenticate(ctx context.Context, email string, password string, statChan chan tracker.AuthStatus)
 }
 
@@ -29,6 +33,17 @@ var _ CFNClient = (*Client)(nil)
 
 func NewClient(browser *browser.Browser) *Client {
 	return &Client{browser}
+}
+
+func (c *Client) NewTabClient() (*Client, func(), error) {
+	if c == nil || c.browser == nil {
+		return nil, func() {}, errors.New("browser not initialized")
+	}
+	tabBrowser, cleanup, err := c.browser.NewTab()
+	if err != nil {
+		return nil, func() {}, err
+	}
+	return NewClient(tabBrowser), cleanup, nil
 }
 
 func (c *Client) GetBattleLog(ctx context.Context, cfn string) (*BattleLog, error) {

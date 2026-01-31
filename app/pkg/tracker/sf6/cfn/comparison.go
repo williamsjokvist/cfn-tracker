@@ -25,6 +25,7 @@ type IntMetricComparison struct {
 }
 
 type BattleStatsFloatMetric struct {
+	Key   string
 	Name  string
 	Unit  string
 	Scale float64
@@ -33,6 +34,7 @@ type BattleStatsFloatMetric struct {
 }
 
 type BattleStatsIntMetric struct {
+	Key   string
 	Name  string
 	Unit  string
 	Metric func(*BattleStatsComparison) *IntMetricComparison
@@ -80,46 +82,46 @@ type BattleStatsComparison struct {
 }
 
 var battleStatsFloatMetrics = []BattleStatsFloatMetric{
-	{Name: "Cornered Time", Metric: func(c *BattleStatsComparison) *FloatMetricComparison { return &c.CorneredTime }, Unit: "%", Scale: 1, Get: func(s *BattleStats) float64 { return s.CorneredTime }},
-	{Name: "Corner Time", Metric: func(c *BattleStatsComparison) *FloatMetricComparison { return &c.CornerTime }, Unit: "%", Scale: 1, Get: func(s *BattleStats) float64 { return s.CornerTime }},
-	{Name: "Drive Impact", Metric: func(c *BattleStatsComparison) *FloatMetricComparison { return &c.DriveImpact }, Unit: "%", Scale: 1, Get: func(s *BattleStats) float64 { return s.DriveImpact }},
-	{Name: "Drive Impact (DI vs DI)", Metric: func(c *BattleStatsComparison) *FloatMetricComparison { return &c.DriveImpactToDriveImpact }, Unit: "%", Scale: 1, Get: func(s *BattleStats) float64 { return s.DriveImpactToDriveImpact }},
-	{Name: "Drive Parry", Metric: func(c *BattleStatsComparison) *FloatMetricComparison { return &c.DriveParry }, Unit: "%", Scale: 1, Get: func(s *BattleStats) float64 { return s.DriveParry }},
-	{Name: "Drive Reversal", Metric: func(c *BattleStatsComparison) *FloatMetricComparison { return &c.DriveReversal }, Unit: "%", Scale: 1, Get: func(s *BattleStats) float64 { return s.DriveReversal }},
-	{Name: "Just Parry", Metric: func(c *BattleStatsComparison) *FloatMetricComparison { return &c.JustParry }, Unit: "%", Scale: 1, Get: func(s *BattleStats) float64 { return s.JustParry }},
-	{Name: "Punish Counter", Metric: func(c *BattleStatsComparison) *FloatMetricComparison { return &c.PunishCounter }, Unit: "%", Scale: 1, Get: func(s *BattleStats) float64 { return s.PunishCounter }},
-	{Name: "Throw Count", Metric: func(c *BattleStatsComparison) *FloatMetricComparison { return &c.ThrowCount }, Unit: "%", Scale: 1, Get: func(s *BattleStats) float64 { return s.ThrowCount }},
-	{Name: "Throw (vs Drive Parry)", Metric: func(c *BattleStatsComparison) *FloatMetricComparison { return &c.ThrowDriveParry }, Unit: "%", Scale: 1, Get: func(s *BattleStats) float64 { return s.ThrowDriveParry }},
-	{Name: "Throw Tech", Metric: func(c *BattleStatsComparison) *FloatMetricComparison { return &c.ThrowTech }, Unit: "%", Scale: 1, Get: func(s *BattleStats) float64 { return s.ThrowTech }},
-	{Name: "Stun", Metric: func(c *BattleStatsComparison) *FloatMetricComparison { return &c.Stun }, Unit: "%", Scale: 1, Get: func(s *BattleStats) float64 { return s.Stun }},
-	{Name: "Received Drive Impact", Metric: func(c *BattleStatsComparison) *FloatMetricComparison { return &c.ReceivedDriveImpact }, Unit: "%", Scale: 1, Get: func(s *BattleStats) float64 { return s.ReceivedDriveImpact }},
-	{Name: "Received DI (DI vs DI)", Metric: func(c *BattleStatsComparison) *FloatMetricComparison { return &c.ReceivedDriveImpactToDriveImpact }, Unit: "%", Scale: 1, Get: func(s *BattleStats) float64 { return s.ReceivedDriveImpactToDriveImpact }},
-	{Name: "Received Punish Counter", Metric: func(c *BattleStatsComparison) *FloatMetricComparison { return &c.ReceivedPunishCounter }, Unit: "%", Scale: 1, Get: func(s *BattleStats) float64 { return s.ReceivedPunishCounter }},
-	{Name: "Received Stun", Metric: func(c *BattleStatsComparison) *FloatMetricComparison { return &c.ReceivedStun }, Unit: "%", Scale: 1, Get: func(s *BattleStats) float64 { return s.ReceivedStun }},
-	{Name: "Received Throw Count", Metric: func(c *BattleStatsComparison) *FloatMetricComparison { return &c.ReceivedThrowCount }, Unit: "%", Scale: 1, Get: func(s *BattleStats) float64 { return s.ReceivedThrowCount }},
-	{Name: "Received Throw (vs Drive Parry)", Metric: func(c *BattleStatsComparison) *FloatMetricComparison { return &c.ReceivedThrowDriveParry }, Unit: "%", Scale: 1, Get: func(s *BattleStats) float64 { return s.ReceivedThrowDriveParry }},
-	{Name: "Gauge Rate (CA)", Metric: func(c *BattleStatsComparison) *FloatMetricComparison { return &c.GaugeRateCA }, Unit: "%", Scale: 100, Get: func(s *BattleStats) float64 { return s.GaugeRateCA }},
-	{Name: "Gauge Rate (Drive Arts)", Metric: func(c *BattleStatsComparison) *FloatMetricComparison { return &c.GaugeRateDriveArts }, Unit: "%", Scale: 100, Get: func(s *BattleStats) float64 { return s.GaugeRateDriveArts }},
-	{Name: "Gauge Rate (Drive Guard)", Metric: func(c *BattleStatsComparison) *FloatMetricComparison { return &c.GaugeRateDriveGuard }, Unit: "%", Scale: 100, Get: func(s *BattleStats) float64 { return s.GaugeRateDriveGuard }},
-	{Name: "Gauge Rate (Drive Impact)", Metric: func(c *BattleStatsComparison) *FloatMetricComparison { return &c.GaugeRateDriveImpact }, Unit: "%", Scale: 100, Get: func(s *BattleStats) float64 { return s.GaugeRateDriveImpact }},
-	{Name: "Gauge Rate (Drive Other)", Metric: func(c *BattleStatsComparison) *FloatMetricComparison { return &c.GaugeRateDriveOther }, Unit: "%", Scale: 100, Get: func(s *BattleStats) float64 { return s.GaugeRateDriveOther }},
-	{Name: "Gauge Rate (Drive Reversal)", Metric: func(c *BattleStatsComparison) *FloatMetricComparison { return &c.GaugeRateDriveReversal }, Unit: "%", Scale: 100, Get: func(s *BattleStats) float64 { return s.GaugeRateDriveReversal }},
-	{Name: "Gauge Rate (DR from Cancel)", Metric: func(c *BattleStatsComparison) *FloatMetricComparison { return &c.GaugeRateDriveRushFromCancel }, Unit: "%", Scale: 100, Get: func(s *BattleStats) float64 { return s.GaugeRateDriveRushFromCancel }},
-	{Name: "Gauge Rate (DR from Parry)", Metric: func(c *BattleStatsComparison) *FloatMetricComparison { return &c.GaugeRateDriveRushFromParry }, Unit: "%", Scale: 100, Get: func(s *BattleStats) float64 { return s.GaugeRateDriveRushFromParry }},
-	{Name: "Gauge Rate (SA Lv1)", Metric: func(c *BattleStatsComparison) *FloatMetricComparison { return &c.GaugeRateSaLv1 }, Unit: "%", Scale: 100, Get: func(s *BattleStats) float64 { return s.GaugeRateSaLv1 }},
-	{Name: "Gauge Rate (SA Lv2)", Metric: func(c *BattleStatsComparison) *FloatMetricComparison { return &c.GaugeRateSaLv2 }, Unit: "%", Scale: 100, Get: func(s *BattleStats) float64 { return s.GaugeRateSaLv2 }},
-	{Name: "Gauge Rate (SA Lv3)", Metric: func(c *BattleStatsComparison) *FloatMetricComparison { return &c.GaugeRateSaLv3 }, Unit: "%", Scale: 100, Get: func(s *BattleStats) float64 { return s.GaugeRateSaLv3 }},
+	{Key: "corneredTime", Name: "Cornered Time", Metric: func(c *BattleStatsComparison) *FloatMetricComparison { return &c.CorneredTime }, Unit: "%", Scale: 1, Get: func(s *BattleStats) float64 { return s.CorneredTime }},
+	{Key: "cornerTime", Name: "Corner Time", Metric: func(c *BattleStatsComparison) *FloatMetricComparison { return &c.CornerTime }, Unit: "%", Scale: 1, Get: func(s *BattleStats) float64 { return s.CornerTime }},
+	{Key: "driveImpact", Name: "Drive Impact", Metric: func(c *BattleStatsComparison) *FloatMetricComparison { return &c.DriveImpact }, Unit: "%", Scale: 1, Get: func(s *BattleStats) float64 { return s.DriveImpact }},
+	{Key: "driveImpactToDriveImpact", Name: "Drive Impact (DI vs DI)", Metric: func(c *BattleStatsComparison) *FloatMetricComparison { return &c.DriveImpactToDriveImpact }, Unit: "%", Scale: 1, Get: func(s *BattleStats) float64 { return s.DriveImpactToDriveImpact }},
+	{Key: "driveParry", Name: "Drive Parry", Metric: func(c *BattleStatsComparison) *FloatMetricComparison { return &c.DriveParry }, Unit: "%", Scale: 1, Get: func(s *BattleStats) float64 { return s.DriveParry }},
+	{Key: "driveReversal", Name: "Drive Reversal", Metric: func(c *BattleStatsComparison) *FloatMetricComparison { return &c.DriveReversal }, Unit: "%", Scale: 1, Get: func(s *BattleStats) float64 { return s.DriveReversal }},
+	{Key: "justParry", Name: "Just Parry", Metric: func(c *BattleStatsComparison) *FloatMetricComparison { return &c.JustParry }, Unit: "%", Scale: 1, Get: func(s *BattleStats) float64 { return s.JustParry }},
+	{Key: "punishCounter", Name: "Punish Counter", Metric: func(c *BattleStatsComparison) *FloatMetricComparison { return &c.PunishCounter }, Unit: "%", Scale: 1, Get: func(s *BattleStats) float64 { return s.PunishCounter }},
+	{Key: "throwCount", Name: "Throw Count", Metric: func(c *BattleStatsComparison) *FloatMetricComparison { return &c.ThrowCount }, Unit: "%", Scale: 1, Get: func(s *BattleStats) float64 { return s.ThrowCount }},
+	{Key: "throwDriveParry", Name: "Throw (vs Drive Parry)", Metric: func(c *BattleStatsComparison) *FloatMetricComparison { return &c.ThrowDriveParry }, Unit: "%", Scale: 1, Get: func(s *BattleStats) float64 { return s.ThrowDriveParry }},
+	{Key: "throwTech", Name: "Throw Tech", Metric: func(c *BattleStatsComparison) *FloatMetricComparison { return &c.ThrowTech }, Unit: "%", Scale: 1, Get: func(s *BattleStats) float64 { return s.ThrowTech }},
+	{Key: "stun", Name: "Stun", Metric: func(c *BattleStatsComparison) *FloatMetricComparison { return &c.Stun }, Unit: "%", Scale: 1, Get: func(s *BattleStats) float64 { return s.Stun }},
+	{Key: "receivedDriveImpact", Name: "Received Drive Impact", Metric: func(c *BattleStatsComparison) *FloatMetricComparison { return &c.ReceivedDriveImpact }, Unit: "%", Scale: 1, Get: func(s *BattleStats) float64 { return s.ReceivedDriveImpact }},
+	{Key: "receivedDriveImpactToDriveImpact", Name: "Received DI (DI vs DI)", Metric: func(c *BattleStatsComparison) *FloatMetricComparison { return &c.ReceivedDriveImpactToDriveImpact }, Unit: "%", Scale: 1, Get: func(s *BattleStats) float64 { return s.ReceivedDriveImpactToDriveImpact }},
+	{Key: "receivedPunishCounter", Name: "Received Punish Counter", Metric: func(c *BattleStatsComparison) *FloatMetricComparison { return &c.ReceivedPunishCounter }, Unit: "%", Scale: 1, Get: func(s *BattleStats) float64 { return s.ReceivedPunishCounter }},
+	{Key: "receivedStun", Name: "Received Stun", Metric: func(c *BattleStatsComparison) *FloatMetricComparison { return &c.ReceivedStun }, Unit: "%", Scale: 1, Get: func(s *BattleStats) float64 { return s.ReceivedStun }},
+	{Key: "receivedThrowCount", Name: "Received Throw Count", Metric: func(c *BattleStatsComparison) *FloatMetricComparison { return &c.ReceivedThrowCount }, Unit: "%", Scale: 1, Get: func(s *BattleStats) float64 { return s.ReceivedThrowCount }},
+	{Key: "receivedThrowDriveParry", Name: "Received Throw (vs Drive Parry)", Metric: func(c *BattleStatsComparison) *FloatMetricComparison { return &c.ReceivedThrowDriveParry }, Unit: "%", Scale: 1, Get: func(s *BattleStats) float64 { return s.ReceivedThrowDriveParry }},
+	{Key: "gaugeRateCA", Name: "Gauge Rate (CA)", Metric: func(c *BattleStatsComparison) *FloatMetricComparison { return &c.GaugeRateCA }, Unit: "%", Scale: 100, Get: func(s *BattleStats) float64 { return s.GaugeRateCA }},
+	{Key: "gaugeRateDriveArts", Name: "Gauge Rate (Drive Arts)", Metric: func(c *BattleStatsComparison) *FloatMetricComparison { return &c.GaugeRateDriveArts }, Unit: "%", Scale: 100, Get: func(s *BattleStats) float64 { return s.GaugeRateDriveArts }},
+	{Key: "gaugeRateDriveGuard", Name: "Gauge Rate (Drive Guard)", Metric: func(c *BattleStatsComparison) *FloatMetricComparison { return &c.GaugeRateDriveGuard }, Unit: "%", Scale: 100, Get: func(s *BattleStats) float64 { return s.GaugeRateDriveGuard }},
+	{Key: "gaugeRateDriveImpact", Name: "Gauge Rate (Drive Impact)", Metric: func(c *BattleStatsComparison) *FloatMetricComparison { return &c.GaugeRateDriveImpact }, Unit: "%", Scale: 100, Get: func(s *BattleStats) float64 { return s.GaugeRateDriveImpact }},
+	{Key: "gaugeRateDriveOther", Name: "Gauge Rate (Drive Other)", Metric: func(c *BattleStatsComparison) *FloatMetricComparison { return &c.GaugeRateDriveOther }, Unit: "%", Scale: 100, Get: func(s *BattleStats) float64 { return s.GaugeRateDriveOther }},
+	{Key: "gaugeRateDriveReversal", Name: "Gauge Rate (Drive Reversal)", Metric: func(c *BattleStatsComparison) *FloatMetricComparison { return &c.GaugeRateDriveReversal }, Unit: "%", Scale: 100, Get: func(s *BattleStats) float64 { return s.GaugeRateDriveReversal }},
+	{Key: "gaugeRateDriveRushFromCancel", Name: "Gauge Rate (DR from Cancel)", Metric: func(c *BattleStatsComparison) *FloatMetricComparison { return &c.GaugeRateDriveRushFromCancel }, Unit: "%", Scale: 100, Get: func(s *BattleStats) float64 { return s.GaugeRateDriveRushFromCancel }},
+	{Key: "gaugeRateDriveRushFromParry", Name: "Gauge Rate (DR from Parry)", Metric: func(c *BattleStatsComparison) *FloatMetricComparison { return &c.GaugeRateDriveRushFromParry }, Unit: "%", Scale: 100, Get: func(s *BattleStats) float64 { return s.GaugeRateDriveRushFromParry }},
+	{Key: "gaugeRateSaLv1", Name: "Gauge Rate (SA Lv1)", Metric: func(c *BattleStatsComparison) *FloatMetricComparison { return &c.GaugeRateSaLv1 }, Unit: "%", Scale: 100, Get: func(s *BattleStats) float64 { return s.GaugeRateSaLv1 }},
+	{Key: "gaugeRateSaLv2", Name: "Gauge Rate (SA Lv2)", Metric: func(c *BattleStatsComparison) *FloatMetricComparison { return &c.GaugeRateSaLv2 }, Unit: "%", Scale: 100, Get: func(s *BattleStats) float64 { return s.GaugeRateSaLv2 }},
+	{Key: "gaugeRateSaLv3", Name: "Gauge Rate (SA Lv3)", Metric: func(c *BattleStatsComparison) *FloatMetricComparison { return &c.GaugeRateSaLv3 }, Unit: "%", Scale: 100, Get: func(s *BattleStats) float64 { return s.GaugeRateSaLv3 }},
 }
 
 var battleStatsIntMetrics = []BattleStatsIntMetric{
-	{Name: "Battle Hub Match Play Count", Metric: func(c *BattleStatsComparison) *IntMetricComparison { return &c.BattleHubMatchPlayCount }, Unit: "matches", Get: func(s *BattleStats) int { return s.BattleHubMatchPlayCount }},
-	{Name: "Casual Match Play Count", Metric: func(c *BattleStatsComparison) *IntMetricComparison { return &c.CasualMatchPlayCount }, Unit: "matches", Get: func(s *BattleStats) int { return s.CasualMatchPlayCount }},
-	{Name: "Custom Room Match Play Count", Metric: func(c *BattleStatsComparison) *IntMetricComparison { return &c.CustomRoomMatchPlayCount }, Unit: "matches", Get: func(s *BattleStats) int { return s.CustomRoomMatchPlayCount }},
-	{Name: "Rank Match Play Count", Metric: func(c *BattleStatsComparison) *IntMetricComparison { return &c.RankMatchPlayCount }, Unit: "matches", Get: func(s *BattleStats) int { return s.RankMatchPlayCount }},
-	{Name: "Target Clear Count", Metric: func(c *BattleStatsComparison) *IntMetricComparison { return &c.TargetClearCount }, Unit: "count", Get: func(s *BattleStats) int { return s.TargetClearCount }},
-	{Name: "Total All Character Play Point", Metric: func(c *BattleStatsComparison) *IntMetricComparison { return &c.TotalAllCharacterPlayPoint }, Unit: "pt", Get: func(s *BattleStats) int { return s.TotalAllCharacterPlayPoint }},
-	{Name: "Rival AI Achieved Challenge Count", Metric: func(c *BattleStatsComparison) *IntMetricComparison { return &c.RivalAiAchievedChallengeCount }, Unit: "count", Get: func(s *BattleStats) int { return s.RivalAiAchievedChallengeCount }},
-	{Name: "Rival AI Highest League Rank", Metric: func(c *BattleStatsComparison) *IntMetricComparison { return &c.RivalAiHighestLeagueRank }, Unit: "rank", Get: func(s *BattleStats) int { return s.RivalAiHighestLeagueRank }},
+	{Key: "battleHubMatchPlayCount", Name: "Battle Hub Match Play Count", Metric: func(c *BattleStatsComparison) *IntMetricComparison { return &c.BattleHubMatchPlayCount }, Unit: "matches", Get: func(s *BattleStats) int { return s.BattleHubMatchPlayCount }},
+	{Key: "casualMatchPlayCount", Name: "Casual Match Play Count", Metric: func(c *BattleStatsComparison) *IntMetricComparison { return &c.CasualMatchPlayCount }, Unit: "matches", Get: func(s *BattleStats) int { return s.CasualMatchPlayCount }},
+	{Key: "customRoomMatchPlayCount", Name: "Custom Room Match Play Count", Metric: func(c *BattleStatsComparison) *IntMetricComparison { return &c.CustomRoomMatchPlayCount }, Unit: "matches", Get: func(s *BattleStats) int { return s.CustomRoomMatchPlayCount }},
+	{Key: "rankMatchPlayCount", Name: "Rank Match Play Count", Metric: func(c *BattleStatsComparison) *IntMetricComparison { return &c.RankMatchPlayCount }, Unit: "matches", Get: func(s *BattleStats) int { return s.RankMatchPlayCount }},
+	{Key: "targetClearCount", Name: "Target Clear Count", Metric: func(c *BattleStatsComparison) *IntMetricComparison { return &c.TargetClearCount }, Unit: "count", Get: func(s *BattleStats) int { return s.TargetClearCount }},
+	{Key: "totalAllCharacterPlayPoint", Name: "Total All Character Play Point", Metric: func(c *BattleStatsComparison) *IntMetricComparison { return &c.TotalAllCharacterPlayPoint }, Unit: "pt", Get: func(s *BattleStats) int { return s.TotalAllCharacterPlayPoint }},
+	{Key: "rivalAiAchievedChallengeCount", Name: "Rival AI Achieved Challenge Count", Metric: func(c *BattleStatsComparison) *IntMetricComparison { return &c.RivalAiAchievedChallengeCount }, Unit: "count", Get: func(s *BattleStats) int { return s.RivalAiAchievedChallengeCount }},
+	{Key: "rivalAiHighestLeagueRank", Name: "Rival AI Highest League Rank", Metric: func(c *BattleStatsComparison) *IntMetricComparison { return &c.RivalAiHighestLeagueRank }, Unit: "rank", Get: func(s *BattleStats) int { return s.RivalAiHighestLeagueRank }},
 }
 
 func NewBattleStatsComparison() *BattleStatsComparison {

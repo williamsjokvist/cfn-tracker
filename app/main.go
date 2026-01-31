@@ -197,15 +197,18 @@ func main() {
 		txtDb,
 		&cfg,
 	)
+
+	cfnClient := cfn.NewClient(appBrowser)
 	trackingHandler := cmd.NewTrackingHandler(
 		wavu.NewClient(),
-		cfn.NewClient(appBrowser),
+		cfnClient,
 		sqlDb,
 		noSqlDb,
 		txtDb,
 		&cfg,
 		browserSrcMatchChan,
 	)
+	sf6ComparisonHandler := cmd.NewSF6ComparisonHandler(cfnClient)
 
 	browserSrcServer := server.NewBrowserSourceServer(browserSrcMatchChan)
 
@@ -271,6 +274,7 @@ func main() {
 		Bind: []interface{}{
 			cmdHandler,
 			trackingHandler,
+			sf6ComparisonHandler,
 		},
 		EnumBind: []interface{}{
 			model.AllThemes,
