@@ -25,7 +25,6 @@ export function SF6ComparisonPage() {
   const setError = useErrorPopup()
 
   const [userCode, setUserCode] = React.useState('')
-  const [topN, setTopN] = React.useState(5)
   const [loading, setLoading] = React.useState(false)
   const [report, setReport] = React.useState<model.SF6BattleStatsComparisonReport | null>(null)
 
@@ -52,7 +51,7 @@ export function SF6ComparisonPage() {
     }
     setLoading(true)
     try {
-      const res = await GetSF6BattleStatsComparison(userCode, topN)
+      const res = await GetSF6BattleStatsComparison(userCode)
       setReport(res)
     } catch (e) {
       setError(e as unknown as model.FGCTrackerError)
@@ -90,20 +89,6 @@ export function SF6ComparisonPage() {
                   autoSave='off'
                 />
               </div>
-              <div className='flex flex-col gap-2'>
-                <label className='text-base text-white/80'>Top N</label>
-                <select
-                  value={topN}
-                  onChange={e => setTopN(Number(e.target.value))}
-                  className='w-[110px] rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-white outline-none focus:border-white/25'
-                >
-                  {Array.from({ length: 10 }).map((_, i) => (
-                    <option key={i + 1} value={i + 1}>
-                      {i + 1}
-                    </option>
-                  ))}
-                </select>
-              </div>
               <Button
                 disabled={!userCode || loading}
                 onClick={fetchComparison}
@@ -121,8 +106,8 @@ export function SF6ComparisonPage() {
                   <span className='text-lg font-semibold text-white'>{report.characterName}</span>
                 </div>
                 <div className='flex flex-col text-right leading-tight'>
-                  <span className='text-base text-white/70'>Top N</span>
-                  <span className='text-lg font-semibold text-white'>{report.topN}</span>
+                  <span className='text-base text-white/70'>Top Players</span>
+                  <span className='text-lg font-semibold text-white'>Top {report.topN} Players</span>
                 </div>
               </div>
             )}

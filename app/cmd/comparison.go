@@ -19,16 +19,11 @@ func NewSF6ComparisonHandler(cfnClient cfn.CFNClient) *ComparisonHandler {
 	}
 }
 
-func (h *ComparisonHandler) GetSF6BattleStatsComparison(userCode string, topN int) (*model.SF6BattleStatsComparisonReport, error) {
+func (h *ComparisonHandler) GetSF6BattleStatsComparison(userCode string) (*model.SF6BattleStatsComparisonReport, error) {
 	if userCode == "" {
 		return nil, fmt.Errorf("userCode is empty")
 	}
-	if topN <= 0 {
-		topN = 5
-	}
-	if topN > 10 {
-		topN = 10
-	}
+	const topN = 5
 
 	baseClient, ok := h.cfnClient.(*cfn.Client)
 	if !ok {
