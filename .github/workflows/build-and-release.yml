@@ -33,8 +33,8 @@ jobs:
 
       - uses: actions/setup-go@v5
         with:
-          go-version-file: 'go.mod'
-          cache-dependency-path: 'go.sum'
+          go-version-file: 'app/go.mod'
+          cache-dependency-path: 'app/go.sum'
 
       - name: Install wails
         run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
@@ -69,7 +69,7 @@ jobs:
           generate_release_notes: true
           fail_on_unmatched_files: true
           files: |
-            cfn-tracker-windows-amd64.zip
+            app/cfn-tracker-windows-amd64.zip
 
       - name: Commit app config
         run: |
