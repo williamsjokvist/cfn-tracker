@@ -34,7 +34,16 @@ func (s *Storage) SaveMatch(match model.Match) error {
 		parsedValue := ""
 		switch value.Kind() {
 		case reflect.Int:
-			parsedValue = strconv.FormatInt(value.Int(), 10)
+			n := value.Int()
+			parsedValue = strconv.FormatInt(n, 10)
+			switch t.Field(i).Tag.Get("txt") {
+			case "gain":
+				if n > 0 {
+					parsedValue = "+" + parsedValue
+				}
+			case "pct":
+				parsedValue = parsedValue + "%"
+			}
 		case reflect.Uint16:
 			parsedValue = strconv.FormatUint(value.Uint(), 10)
 		case reflect.String, reflect.Bool:

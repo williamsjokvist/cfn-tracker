@@ -39,7 +39,7 @@ resource.syso
 *.log
 
 .astro
-
+.idea/
 .vite/
 
 CFN Tracker*
