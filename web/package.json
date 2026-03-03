@@ -19,6 +19,12 @@
     "tailwindcss": "^3.2.7"
   },
   "devDependencies": {
+    "@iconify-json/akar-icons": "^1.2.7",
+    "@iconify-json/clarity": "^1.2.4",
+    "@iconify-json/fluent": "^1.2.40",
+    "@iconify-json/ion": "^1.2.6",
+    "@iconify-json/mdi": "^1.2.3",
+    "@iconify-json/ri": "^1.2.10",
     "@tailwindcss/typography": "^0.5.10",
     "@types/gsap": "^3.0.0",
     "sass": "^1.69.5"
