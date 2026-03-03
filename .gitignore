@@ -30,6 +30,7 @@ results
 !/app/gui/dist/.gitkeep
 
 node_modules
+dist/
 
 resource.syso
 
