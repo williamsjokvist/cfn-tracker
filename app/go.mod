@@ -11,7 +11,7 @@ require (
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/joho/godotenv v1.5.1
 	github.com/kelseyhightower/envconfig v1.4.0
-	github.com/samber/lo v1.52.0
+	github.com/samber/lo v1.53.0
 	github.com/wailsapp/wails/v2 v2.11.0
 	gopkg.in/ini.v1 v1.67.1
 	modernc.org/sqlite v1.46.1
