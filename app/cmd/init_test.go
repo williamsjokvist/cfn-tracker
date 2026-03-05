@@ -2,7 +2,6 @@ package cmd_test
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"os"
 	"testing"
@@ -61,9 +60,9 @@ func TestMain(m *testing.M) {
 	)
 	testSuite.trackingHandler.SetEventEmitter(func(eventName string, optionalData ...interface{}) {
 		if len(optionalData) > 0 {
-			log.Println(fmt.Sprintf("[EVENT] %s", eventName), optionalData[0])
+			log.Printf("[EVENT] %s %v\n", eventName, optionalData[0])
 		} else {
-			log.Println(fmt.Sprintf("[EVENT] %s", eventName))
+			log.Printf("[EVENT] %s\n", eventName)
 		}
 	})
 	os.Exit(m.Run())
