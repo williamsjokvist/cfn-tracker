@@ -135,4 +135,5 @@ func (c *Client) Authenticate(ctx context.Context, email string, password string
 
 	statChan <- *status.WithProgress(100)
 	slog.Info("passed cfn auth")
+	close(statChan)
 }

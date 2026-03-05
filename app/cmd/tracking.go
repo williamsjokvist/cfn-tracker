@@ -75,9 +75,6 @@ func (ch *TrackingHandler) Tick(ctx context.Context, session *model.Session) (*m
 	if match == nil {
 		return nil, nil
 	}
-	if ch.eventEmitter != nil {
-		ch.eventEmitter("match", *match)
-	}
 	session.LP = match.LP
 	session.MR = match.MR
 	session.Matches = append([]*model.Match{match}, session.Matches...)
@@ -94,6 +91,9 @@ func (ch *TrackingHandler) Tick(ctx context.Context, session *model.Session) (*m
 			slog.Error("save to text files:", slog.Any("error", err))
 			return match, fmt.Errorf("save txt: %w", err)
 		}
+	}
+	if ch.eventEmitter != nil {
+		ch.eventEmitter("match", *match)
 	}
 	return match, nil
 }
@@ -236,10 +236,6 @@ func (ch *TrackingHandler) SelectGame(game model.GameType) error {
 				return model.WrapError(model.ErrAuth, status.Err)
 			}
 			ch.eventEmitter("auth-progress", status.Progress)
-			if status.Progress >= 100 {
-				close(authChan)
-				break
-			}
 		}
 	} else {
 		ch.eventEmitter("auth-progress", 100)
