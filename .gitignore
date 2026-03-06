@@ -30,6 +30,7 @@ results
 !/app/gui/dist/.gitkeep
 
 node_modules
+dist/
 
 resource.syso
 
@@ -39,7 +40,7 @@ resource.syso
 *.log
 
 .astro
-
+.idea/
 .vite/
 
 CFN Tracker*

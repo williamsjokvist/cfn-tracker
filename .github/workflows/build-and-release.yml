@@ -3,13 +3,13 @@ on:
   workflow_dispatch:
     inputs:
       draft:
-        description: 'Draft'
+        description: "Draft"
         required: false
         default: true
         type: boolean
 
       version:
-        description: 'Semantic version of the release (w/o v prefix)'
+        description: "Semantic version of the release (w/o v prefix)"
         required: true
         type: string
 
@@ -33,8 +33,8 @@ jobs:
 
       - uses: actions/setup-go@v5
         with:
-          go-version-file: 'go.mod'
-          cache-dependency-path: 'go.sum'
+          go-version-file: "app/go.mod"
+          cache-dependency-path: "app/go.sum"
 
       - name: Install wails
         run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
@@ -64,12 +64,12 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           token: ${{ secrets.PAT }}
-          name: v${{ inputs.version }}
+          tag_name: v${{ inputs.version }}
           draft: ${{ inputs.draft }}
           generate_release_notes: true
           fail_on_unmatched_files: true
           files: |
-            cfn-tracker-windows-amd64.zip
+            app/cfn-tracker-windows-amd64.zip
 
       - name: Commit app config
         run: |

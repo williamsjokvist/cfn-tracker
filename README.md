@@ -1,4 +1,4 @@
-<img src="build/appicon.png" height="200px" height="200px" align="right" />
+<img src="app/build/appicon.png" height="200px" height="200px" align="right" />
 
 <div align="left">
   </br>
