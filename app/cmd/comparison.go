@@ -98,7 +98,6 @@ func (h *ComparisonHandler) GetSF6BattleStatsComparison(userCode string) (*model
 		metric := m.Metric(comparison)
 		metrics = append(metrics, model.SF6BattleStatsMetric{
 			Key:     m.Key,
-			Name:    m.Name,
 			Unit:    metric.Unit,
 			Kind:    "int",
 			Current: float64(metric.Current),
@@ -111,7 +110,6 @@ func (h *ComparisonHandler) GetSF6BattleStatsComparison(userCode string) (*model
 		metric := m.Metric(comparison)
 		metrics = append(metrics, model.SF6BattleStatsMetric{
 			Key:     m.Key,
-			Name:    m.Name,
 			Unit:    metric.Unit,
 			Kind:    "float",
 			Current: metric.Current,

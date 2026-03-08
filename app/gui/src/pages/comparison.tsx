@@ -127,7 +127,7 @@ export function SF6ComparisonPage() {
                     {metrics.map(m => (
                       <Table.Tr key={m.key}>
                         <Table.Td className='whitespace-normal leading-tight'>
-                          <span className='text-white'>{m.name}</span>
+                          <span className='text-white'>{m.key}</span>
                           {m.kind === 'int' && m.unit && (
                             <span className='ml-2 text-xs text-white/60'>({m.unit})</span>
                           )}
