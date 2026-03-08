@@ -79,12 +79,12 @@ export function SF6ComparisonPage() {
           <>
             <div className='flex flex-wrap items-end justify-between gap-3'>
               <div className='flex flex-col gap-2'>
-                <label className='text-base text-white/80'>{t('cfnName')}</label>
+                <label className='text-base text-white/80'>{t('userCodeLabel')}</label>
                 <input
                   value={userCode}
                   onChange={e => setUserCode(e.target.value)}
                   className='w-full max-w-[320px] rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-white outline-none focus:border-white/25'
-                  placeholder={t('enterCfnName')}
+                  placeholder={t('enterUserCode')}
                   autoCapitalize='off'
                   autoComplete='off'
                   autoCorrect='off'

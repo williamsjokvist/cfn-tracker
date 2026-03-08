@@ -28,6 +28,8 @@ type Localization struct {
 	Files                    string `json:"files"`
 	EnterCfnName             string `json:"enterCfnName"`
 	EnterTekkenId            string `json:"enterTekkenId"`
+	EnterUserCode            string `json:"enterUserCode"`
+	UserCodeLabel            string `json:"userCodeLabel"`
 	Result                   string `json:"result"`
 	ReplayId                 string `json:"replayId"`
 	Copy                     string `json:"copy"`

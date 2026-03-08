@@ -26,6 +26,8 @@
   "files": "ファイル",
   "enterCfnName": "CFN名を入力してください",
   "enterTekkenId": "Tekken IDを入力してください",
+  "enterUserCode": "CFNユーザーコードを入力してください",
+  "userCodeLabel": "CFNユーザーコード",
   "result": "結果",
   "replayId": "リプレイ",
   "copy": "コピー",

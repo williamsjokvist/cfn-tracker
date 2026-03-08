@@ -66,6 +66,8 @@ export namespace model {
 	    files: string;
 	    enterCfnName: string;
 	    enterTekkenId: string;
+	    enterUserCode: string;
+	    userCodeLabel: string;
 	    result: string;
 	    replayId: string;
 	    copy: string;

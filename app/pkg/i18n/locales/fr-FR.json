@@ -26,6 +26,8 @@
   "files": "Des dossiers",
   "enterCfnName": "Entrez votre nom CFN",
   "enterTekkenId": "Entrez votre Tekken ID",
+  "enterUserCode": "Entrez votre code utilisateur CFN",
+  "userCodeLabel": "Code utilisateur CFN",
   "result": "Dossier",
   "replayId": "Rejouer ID",
   "copy": "Copie",
