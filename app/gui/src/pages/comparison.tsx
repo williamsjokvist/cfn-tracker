@@ -49,6 +49,8 @@ export function SF6ComparisonPage() {
     if (!userCode) {
       return
     }
+    setReport(null)
+    setError(null as unknown as model.FGCTrackerError)
     setLoading(true)
     try {
       const res = await GetSF6BattleStatsComparison(userCode)
