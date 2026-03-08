@@ -97,25 +97,27 @@ func (h *ComparisonHandler) GetSF6BattleStatsComparison(userCode string) (*model
 	for _, m := range cfn.BattleStatsIntMetrics() {
 		metric := m.Metric(comparison)
 		metrics = append(metrics, model.SF6BattleStatsMetric{
-			Key:     m.Key,
-			Unit:    metric.Unit,
-			Kind:    "int",
-			Current: float64(metric.Current),
-			TopAvg:  metric.TopPlayers.Avg,
-			TopMin:  float64(metric.TopPlayers.Min),
-			TopMax:  float64(metric.TopPlayers.Max),
+			Key:      m.Key,
+			Unit:     metric.Unit,
+			Kind:     "int",
+			Polarity: cfn.MetricPolarity(m.Key),
+			Current:  float64(metric.Current),
+			TopAvg:   metric.TopPlayers.Avg,
+			TopMin:   float64(metric.TopPlayers.Min),
+			TopMax:   float64(metric.TopPlayers.Max),
 		})
 	}
 	for _, m := range cfn.BattleStatsFloatMetrics() {
 		metric := m.Metric(comparison)
 		metrics = append(metrics, model.SF6BattleStatsMetric{
-			Key:     m.Key,
-			Unit:    metric.Unit,
-			Kind:    "float",
-			Current: metric.Current,
-			TopAvg:  metric.TopPlayers.Avg,
-			TopMin:  metric.TopPlayers.Min,
-			TopMax:  metric.TopPlayers.Max,
+			Key:      m.Key,
+			Unit:     metric.Unit,
+			Kind:     "float",
+			Polarity: cfn.MetricPolarity(m.Key),
+			Current:  metric.Current,
+			TopAvg:   metric.TopPlayers.Avg,
+			TopMin:   metric.TopPlayers.Min,
+			TopMax:   metric.TopPlayers.Max,
 		})
 	}
 

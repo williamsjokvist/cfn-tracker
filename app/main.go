@@ -173,7 +173,6 @@ func main() {
 	newUpdateAvailable := appVersion.LessThan(lastRelease.Version)
 	if newUpdateAvailable {
 		handleAutoUpdate(lastRelease.Version.Original())
-		return
 	}
 
 	sqlDb, err := sql.NewStorage(false)

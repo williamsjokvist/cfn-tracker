@@ -190,6 +190,7 @@ export namespace model {
 	    name: string;
 	    unit: string;
 	    kind: string;
+	    polarity: number;
 	    current: number;
 	    topAvg: number;
 	    topMin: number;

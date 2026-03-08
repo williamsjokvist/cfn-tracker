@@ -126,31 +126,34 @@ export function SF6ComparisonPage() {
                     </Table.Tr>
                   </thead>
                   <tbody>
-                    {metrics.map(m => (
-                      <Table.Tr key={m.key}>
-                        <Table.Td className='whitespace-normal leading-tight'>
-                          <span className='text-white'>{m.key}</span>
-                          {m.kind === 'int' && m.unit && (
-                            <span className='ml-2 text-xs text-white/60'>({m.unit})</span>
-                          )}
-                        </Table.Td>
-                        <Table.Td className='text-right font-semibold tabular-nums'>
-                          {formatValue(m, m.current)}
-                        </Table.Td>
-                        <Table.Td className='text-right tabular-nums'>
-                          {formatValue(m, m.topAvg)}
-                        </Table.Td>
-                        <Table.Td
-                          className={cn(
-                            'text-right font-semibold tabular-nums',
-                            m.delta > 0 ? 'text-green-300' : '',
-                            m.delta < 0 ? 'text-red-300' : ''
-                          )}
-                        >
-                          {formatDelta(m, m.delta)}
-                        </Table.Td>
-                      </Table.Tr>
-                    ))}
+                    {metrics.map(m => {
+                      const effective = (m.polarity ?? 1) * m.delta
+                      return (
+                        <Table.Tr key={m.key}>
+                          <Table.Td className='whitespace-normal leading-tight'>
+                            <span className='text-white'>{m.key}</span>
+                            {m.kind === 'int' && m.unit && (
+                              <span className='ml-2 text-xs text-white/60'>({m.unit})</span>
+                            )}
+                          </Table.Td>
+                          <Table.Td className='text-right font-semibold tabular-nums'>
+                            {formatValue(m, m.current)}
+                          </Table.Td>
+                          <Table.Td className='text-right tabular-nums'>
+                            {formatValue(m, m.topAvg)}
+                          </Table.Td>
+                          <Table.Td
+                            className={cn(
+                              'text-right font-semibold tabular-nums',
+                              effective > 0 ? 'text-green-300' : '',
+                              effective < 0 ? 'text-red-300' : ''
+                            )}
+                          >
+                            {formatDelta(m, m.delta)}
+                          </Table.Td>
+                        </Table.Tr>
+                      )
+                    })}
                   </tbody>
                 </Table.Content>
               </div>

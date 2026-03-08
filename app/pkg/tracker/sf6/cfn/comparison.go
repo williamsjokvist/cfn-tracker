@@ -135,6 +135,19 @@ func NewBattleStatsComparison() *BattleStatsComparison {
 	return out
 }
 
+var metricPolarity = map[string]int{
+	"corneredTime": -1,
+	"receivedStun": -1,
+	"receivedDriveImpact": -1,
+}
+
+func MetricPolarity(key string) int {
+	if p, ok := metricPolarity[key]; ok {
+		return p
+	}
+	return 1
+}
+
 func BattleStatsFloatMetrics() []BattleStatsFloatMetric {
 	out := make([]BattleStatsFloatMetric, len(battleStatsFloatMetrics))
 	copy(out, battleStatsFloatMetrics)
