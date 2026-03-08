@@ -205,18 +205,10 @@ func (c *Client) GetTopMRPlayersByCharacter(ctx context.Context, characterID str
 	if err != nil {
 		return nil, err
 	}
-	const topN = 10
-	out := make([]MasterRankingPlayer, 0, topN)
-	for i, p := range mr.RankingFighterList {
-		if i >= topN {
-			break
-		}
-		out = append(out, p)
-	}
-	if len(out) == 0 {
+	if len(mr.RankingFighterList) == 0 {
 		return nil, fmt.Errorf("ranking_fighter_list was empty")
 	}
-	return out, nil
+	return mr.RankingFighterList, nil
 }
 
 func (c *Client) getMasterRanking(ctx context.Context, characterID string) (*MasterRatingRanking, error) {
