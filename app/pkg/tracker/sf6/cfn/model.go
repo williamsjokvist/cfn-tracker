@@ -1,6 +1,9 @@
 package cfn
 
-import "strconv"
+import (
+	"fmt"
+	"strconv"
+)
 
 type PlayerInfo struct {
 	AllowCrossPlay  bool `json:"allow_cross_play"`
@@ -66,6 +69,39 @@ type PlayerInfo struct {
 		TitleDataVal       string `json:"title_data_val"`
 	} `json:"title_data"`
 	BattleInputTypeName string `json:"battle_input_type_name"`
+}
+
+type MasterRatingRanking struct {
+	RankingFighterList []MasterRankingPlayer `json:"ranking_fighter_list"`
+	MyRankingInfo      *struct {
+		FighterBannerInfo *struct {
+			FavoriteCharacterName     string `json:"favorite_character_name"`
+			FavoriteCharacterToolName string `json:"favorite_character_tool_name"`
+		} `json:"fighter_banner_info"`
+	} `json:"my_ranking_info"`
+}
+
+type MasterRankingPlayer struct {
+	FighterBannerInfo *struct {
+		PersonalInfo *struct {
+			FighterID string `json:"fighter_id"`
+			ShortID   int64  `json:"short_id"`
+		} `json:"personal_info"`
+	} `json:"fighter_banner_info"`
+}
+
+func (m MasterRankingPlayer) CFN() (string, error) {
+	if m.FighterBannerInfo != nil && m.FighterBannerInfo.PersonalInfo != nil && m.FighterBannerInfo.PersonalInfo.FighterID != "" {
+		return m.FighterBannerInfo.PersonalInfo.FighterID, nil
+	}
+	return "", fmt.Errorf("fighter_id not found in ranking player")
+}
+
+func (m MasterRankingPlayer) ProfileID() (string, error) {
+	if m.FighterBannerInfo != nil && m.FighterBannerInfo.PersonalInfo != nil && m.FighterBannerInfo.PersonalInfo.ShortID != 0 {
+		return strconv.FormatInt(m.FighterBannerInfo.PersonalInfo.ShortID, 10), nil
+	}
+	return "", fmt.Errorf("short_id not found in ranking player")
 }
 
 type ProfilePage struct {
@@ -273,6 +309,80 @@ type Replay struct {
 	ReplayBattleTypeName    string     `json:"replay_battle_type_name"`
 	ReplayBattleSubTypeName string     `json:"replay_battle_sub_type_name"`
 }
+
+type PlayPage struct {
+	Props struct {
+		PageProps PlayData `json:"pageProps"`
+	} `json:"props"`
+}
+
+type FighterBannerInfo struct {
+	FavoriteCharacterName       string                      `json:"favorite_character_name"`
+	FavoriteCharacterLeagueInfo FavoriteCharacterLeagueInfo `json:"favorite_character_league_info"`
+}
+
+type FavoriteCharacterLeagueInfo struct {
+	LeaguePoint  int `json:"league_point"`
+	MasterRating int `json:"master_rating"`
+}
+
+type Play struct {
+	BattleStats          BattleStats `json:"battle_stats"`
+	CurrentSeasonID      int         `json:"current_season_id"`
+	CharacterLeagueInfos []any       `json:"character_league_infos"`
+}
+
+type Common struct {
+	StatusCode int `json:"statusCode"`
+}
+
+type PlayData struct {
+	FighterBannerInfo FighterBannerInfo `json:"fighter_banner_info"`
+	Play              Play              `json:"play"`
+	Common            Common            `json:"common"`
+}
+
+type BattleStats struct {
+	BattleHubMatchPlayCount          int     `json:"battle_hub_match_play_count"`
+	CasualMatchPlayCount             int     `json:"casual_match_play_count"`
+	CornerTime                       float64 `json:"corner_time"`
+	CorneredTime                     float64 `json:"cornered_time"`
+	CustomRoomMatchPlayCount         int     `json:"custom_room_match_play_count"`
+	DriveImpact                      float64 `json:"drive_impact"`
+	DriveImpactToDriveImpact         float64 `json:"drive_impact_to_drive_impact"`
+	DriveParry                       float64 `json:"drive_parry"`
+	DriveReversal                    float64 `json:"drive_reversal"`
+	GaugeRateCA                      float64 `json:"gauge_rate_ca"`
+	GaugeRateDriveArts               float64 `json:"gauge_rate_drive_arts"`
+	GaugeRateDriveGuard              float64 `json:"gauge_rate_drive_guard"`
+	GaugeRateDriveImpact             float64 `json:"gauge_rate_drive_impact"`
+	GaugeRateDriveOther              float64 `json:"gauge_rate_drive_other"`
+	GaugeRateDriveReversal           float64 `json:"gauge_rate_drive_reversal"`
+	GaugeRateDriveRushFromCancel     float64 `json:"gauge_rate_drive_rush_from_cancel"`
+	GaugeRateDriveRushFromParry      float64 `json:"gauge_rate_drive_rush_from_parry"`
+	GaugeRateSaLv1                   float64 `json:"gauge_rate_sa_lv1"`
+	GaugeRateSaLv2                   float64 `json:"gauge_rate_sa_lv2"`
+	GaugeRateSaLv3                   float64 `json:"gauge_rate_sa_lv3"`
+	JustParry                        float64 `json:"just_parry"`
+	PunishCounter                    float64 `json:"punish_counter"`
+	RankMatchPlayCount               int     `json:"rank_match_play_count"`
+	ReceivedDriveImpact              float64 `json:"received_drive_impact"`
+	ReceivedDriveImpactToDriveImpact float64 `json:"received_drive_impact_to_drive_impact"`
+	ReceivedPunishCounter            float64 `json:"received_punish_counter"`
+	ReceivedStun                     float64 `json:"received_stun"`
+	ReceivedThrowCount               float64 `json:"received_throw_count"`
+	ReceivedThrowDriveParry          float64 `json:"received_throw_drive_parry"`
+	RivalAiAchievedChallengeCount    int     `json:"rival_ai_achieved_challenge_count"`
+	RivalAiHighestLeagueRank         int     `json:"rival_ai_highest_league_rank"`
+	Stun                             float64 `json:"stun"`
+	TargetClearCount                 int     `json:"target_clear_count"`
+	ThrowCount                       float64 `json:"throw_count"`
+	ThrowDriveParry                  float64 `json:"throw_drive_parry"`
+	ThrowTech                        float64 `json:"throw_tech"`
+	TotalAllCharacterPlayPoint       int     `json:"total_all_character_play_point"`
+	RivalAiHighestLeagueRankTxt      string  `json:"rival_ai_highest_league_rank_txt"`
+}
+
 type SearchResult struct {
 	AssetPrefix   string   `json:"assetPrefix"`
 	BuildID       string   `json:"buildId"`

@@ -5,6 +5,7 @@ import { OutputPage } from '@/pages/output'
 import { MatchesListPage } from '@/pages/matches'
 import { SessionsListPage } from '@/pages/sessions'
 import { TrackingPage } from '@/pages/tracking'
+import { SF6ComparisonPage } from '@/pages/comparison'
 
 import { AppWrapper } from './app-wrapper'
 import { AppErrorBoundary, PageErrorBoundary } from './app-error'
@@ -31,6 +32,10 @@ const router = createHashRouter([
           {
             element: <OutputPage />,
             path: '/output'
+          },
+          {
+            element: <SF6ComparisonPage />,
+            path: '/sf6-comparison'
           },
           {
             element: <SettingsPage />,

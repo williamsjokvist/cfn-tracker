@@ -6,6 +6,7 @@ type Localization struct {
 	About                    string `json:"about"`
 	Settings                 string `json:"settings"`
 	Tracking                 string `json:"tracking"`
+	SF6Comparison            string `json:"sf6Comparison"`
 	History                  string `json:"history"`
 	Language                 string `json:"language"`
 	Changelog                string `json:"changelog"`
@@ -27,6 +28,14 @@ type Localization struct {
 	Files                    string `json:"files"`
 	EnterCfnName             string `json:"enterCfnName"`
 	EnterTekkenId            string `json:"enterTekkenId"`
+	EnterUserCode            string `json:"enterUserCode"`
+	UserCodeLabel            string `json:"userCodeLabel"`
+	TopPlayers               string `json:"topPlayers"`
+	TopNPlayers              string `json:"topNPlayers"`
+	ComparisonMetric         string `json:"comparisonMetric"`
+	ComparisonYou            string `json:"comparisonYou"`
+	ComparisonTopAvg         string `json:"comparisonTopAvg"`
+	ComparisonDelta          string `json:"comparisonDelta"`
 	Result                   string `json:"result"`
 	ReplayId                 string `json:"replayId"`
 	Copy                     string `json:"copy"`

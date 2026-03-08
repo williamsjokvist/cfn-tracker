@@ -1,6 +1,7 @@
 package browser
 
 import (
+	"errors"
 	"fmt"
 	"log/slog"
 	"os"
@@ -17,6 +18,46 @@ import (
 type Browser struct {
 	Page         *rod.Page
 	HijackRouter *rod.HijackRouter
+}
+
+func setupHijack(page *rod.Page) *rod.HijackRouter {
+	router := page.HijackRequests()
+	router.MustAdd(`*`, hijackHandler)
+	go router.Run()
+	return router
+}
+
+func hijackHandler(ctx *rod.Hijack) {
+	if ctx.Request.Type() == proto.NetworkResourceTypeImage ||
+		ctx.Request.Type() == proto.NetworkResourceTypeFont {
+		ctx.Response.Fail(proto.NetworkErrorReasonBlockedByClient)
+		return
+	}
+	if !strings.Contains(ctx.Request.URL().Hostname(), `steam`) &&
+		ctx.Request.Type() == proto.NetworkResourceTypeStylesheet {
+		ctx.Response.Fail(proto.NetworkErrorReasonBlockedByClient)
+		return
+	}
+	ctx.ContinueRequest(&proto.FetchContinueRequest{})
+}
+
+func (b *Browser) NewTab() (*Browser, func(), error) {
+	if b == nil || b.Page == nil {
+		return nil, func() {}, errors.New("browser not initialized")
+	}
+	page, err := stealth.Page(b.Page.Browser())
+	if err != nil {
+		return nil, func() {}, fmt.Errorf("create stealth page: %w", err)
+	}
+	router := setupHijack(page)
+	cleanup := func() {
+		_ = router.Stop()
+		_ = page.Close()
+	}
+	return &Browser{
+		Page:         page,
+		HijackRouter: router,
+	}, cleanup, nil
 }
 
 func NewBrowser(headless bool) (*Browser, error) {
@@ -41,28 +82,11 @@ func NewBrowser(headless bool) (*Browser, error) {
 	if err != nil {
 		return nil, fmt.Errorf("connect to browser: %w", err)
 	}
-	page := stealth.MustPage(browser)
-
-	router := page.HijackRequests()
-	// Block the browser from fetching unnecessary resources
-	router.MustAdd(`*`, func(ctx *rod.Hijack) {
-		if ctx.Request.Type() == proto.NetworkResourceTypeImage ||
-			ctx.Request.Type() == proto.NetworkResourceTypeFont {
-			ctx.Response.Fail(proto.NetworkErrorReasonBlockedByClient)
-			return
-		}
-
-		if !strings.Contains(ctx.Request.URL().Hostname(), `steam`) &&
-			ctx.Request.Type() == proto.NetworkResourceTypeStylesheet {
-			ctx.Response.Fail(proto.NetworkErrorReasonBlockedByClient)
-			return
-		}
-
-		ctx.ContinueRequest(&proto.FetchContinueRequest{})
-	})
-
-	go router.Run()
-
+	page, err := stealth.Page(browser)
+	if err != nil {
+		return nil, fmt.Errorf("create stealth page: %w", err)
+	}
+	router := setupHijack(page)
 	return &Browser{
 		Page:         page,
 		HijackRouter: router,

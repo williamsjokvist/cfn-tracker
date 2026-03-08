@@ -37,7 +37,7 @@ jobs:
           cache-dependency-path: "app/go.sum"
 
       - name: Install wails
-        run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
+        run: go install github.com/wailsapp/wails/v2/cmd/wails@v2.11.0
 
       - uses: arduino/setup-task@v2
         with:
