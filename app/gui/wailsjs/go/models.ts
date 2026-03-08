@@ -68,6 +68,12 @@ export namespace model {
 	    enterTekkenId: string;
 	    enterUserCode: string;
 	    userCodeLabel: string;
+	    topPlayers: string;
+	    topNPlayers: string;
+	    comparisonMetric: string;
+	    comparisonYou: string;
+	    comparisonTopAvg: string;
+	    comparisonDelta: string;
 	    result: string;
 	    replayId: string;
 	    copy: string;

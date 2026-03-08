@@ -108,8 +108,8 @@ export function SF6ComparisonPage() {
                   <span className='text-lg font-semibold text-white'>{report.characterName}</span>
                 </div>
                 <div className='flex flex-col text-right leading-tight'>
-                  <span className='text-base text-white/70'>Top Players</span>
-                  <span className='text-lg font-semibold text-white'>Top {report.topN} Players</span>
+                  <span className='text-base text-white/70'>{t('topPlayers')}</span>
+                  <span className='text-lg font-semibold text-white'>{t('topNPlayers', { count: report.topN })}</span>
                 </div>
               </div>
             )}
@@ -119,10 +119,10 @@ export function SF6ComparisonPage() {
                 <Table.Content className='border-separate border-spacing-y-1'>
                   <thead>
                     <Table.Tr>
-                      <Table.Th className='w-[52%]'>Metric</Table.Th>
-                      <Table.Th className='w-[16%] text-right'>You</Table.Th>
-                      <Table.Th className='w-[16%] text-right'>Top Avg</Table.Th>
-                      <Table.Th className='w-[16%] text-right'>Δ</Table.Th>
+                      <Table.Th className='w-[52%]'>{t('comparisonMetric')}</Table.Th>
+                      <Table.Th className='w-[16%] text-right'>{t('comparisonYou')}</Table.Th>
+                      <Table.Th className='w-[16%] text-right'>{t('comparisonTopAvg')}</Table.Th>
+                      <Table.Th className='w-[16%] text-right'>{t('comparisonDelta')}</Table.Th>
                     </Table.Tr>
                   </thead>
                   <tbody>

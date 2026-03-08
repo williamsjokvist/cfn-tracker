@@ -30,6 +30,12 @@ type Localization struct {
 	EnterTekkenId            string `json:"enterTekkenId"`
 	EnterUserCode            string `json:"enterUserCode"`
 	UserCodeLabel            string `json:"userCodeLabel"`
+	TopPlayers               string `json:"topPlayers"`
+	TopNPlayers              string `json:"topNPlayers"`
+	ComparisonMetric         string `json:"comparisonMetric"`
+	ComparisonYou            string `json:"comparisonYou"`
+	ComparisonTopAvg         string `json:"comparisonTopAvg"`
+	ComparisonDelta          string `json:"comparisonDelta"`
 	Result                   string `json:"result"`
 	ReplayId                 string `json:"replayId"`
 	Copy                     string `json:"copy"`
