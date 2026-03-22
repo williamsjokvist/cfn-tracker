@@ -273,7 +273,7 @@ func (c *Client) CompareBattleStats(current *BattleStats, topPlayers []*BattleSt
 		metric := m.Metric(out)
 		metric.Current = m.Get(current) * m.Scale
 
-		values := make([]float64, 0, len(topPlayers))
+		var values []float64
 		for _, p := range topPlayers {
 			if p == nil {
 				continue
