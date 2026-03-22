@@ -318,6 +318,7 @@ type PlayPage struct {
 
 type FighterBannerInfo struct {
 	FavoriteCharacterName       string                      `json:"favorite_character_name"`
+	FavoriteCharacterToolName   string                      `json:"favorite_character_tool_name"`
 	FavoriteCharacterLeagueInfo FavoriteCharacterLeagueInfo `json:"favorite_character_league_info"`
 }
 

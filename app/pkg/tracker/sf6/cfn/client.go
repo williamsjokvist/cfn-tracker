@@ -19,7 +19,7 @@ import (
 type CFNClient interface {
 	GetBattleLog(ctx context.Context, cfn string) (*BattleLog, error)
 	GetPlayData(ctx context.Context, cfn string) (*PlayData, error)
-	GetCurrentCharacter(ctx context.Context) (string, error)
+	GetCurrentCharacter(ctx context.Context, cfn string) (string, error)
 	GetTopMRPlayersByCharacter(ctx context.Context, characterID string) ([]MasterRankingPlayer, error)
 	CompareBattleStats(current *BattleStats, topPlayers []*BattleStats) (*BattleStatsComparison, error)
 	Authenticate(ctx context.Context, email string, password string, statChan chan tracker.AuthStatus)
@@ -185,15 +185,12 @@ func (c *Client) GetPlayData(ctx context.Context, cfn string) (*PlayData, error)
 	return play, nil
 }
 
-func (c *Client) GetCurrentCharacter(ctx context.Context) (string, error) {
-	mr, err := c.getMasterRanking(ctx, "ryu")
+func (c *Client) GetCurrentCharacter(ctx context.Context, cfn string) (string, error) {
+	play, err := c.GetPlayData(ctx, cfn)
 	if err != nil {
-		return "", fmt.Errorf("get master ranking: %w", err)
+		return "", fmt.Errorf("get play data: %w", err)
 	}
-	if mr.MyRankingInfo == nil || mr.MyRankingInfo.FighterBannerInfo == nil {
-		return "", errors.New("my_ranking_info or fighter_banner_info missing")
-	}
-	toolName := mr.MyRankingInfo.FighterBannerInfo.FavoriteCharacterToolName
+	toolName := play.FighterBannerInfo.FavoriteCharacterToolName
 	if toolName == "" {
 		return "", errors.New("favorite_character_tool_name empty (not logged in?)")
 	}
