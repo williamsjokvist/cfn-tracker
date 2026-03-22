@@ -50,6 +50,10 @@ const NavItems = [
     href: 'tracking'
   },
   {
+    icons: ['mdi:compare-horizontal', 'mdi:compare-horizontal'],
+    href: 'sf6-comparison'
+  },
+  {
     icons: ['ion:document-text-outline', 'ion:document-text'],
     href: 'sessions'
   },
@@ -72,6 +76,7 @@ function Nav() {
     <nav>
       {NavItems.map(({ href, icons }) => {
         const selected = location.pathname.includes(href)
+        const labelKey = href === 'sf6-comparison' ? 'sf6Comparison' : href
         return (
           <Link
             key={href}
@@ -92,7 +97,7 @@ function Nav() {
                 icon={selected ? icons[1] : icons[0]}
                 className='text-highlight mr-1 h-7 w-10 transition-colors'
               />
-              <span>{t(href)}</span>
+              <span>{t(labelKey)}</span>
             </div>
             {!cfg.sidebar && (
               <Icon

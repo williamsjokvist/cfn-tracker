@@ -1,5 +1,10 @@
 export namespace model {
 	
+	export enum ThemeName {
+	    DEFAULT = "default",
+	    ENTH = "enth",
+	    TEKKEN = "tekken",
+	}
 	export enum GameType {
 	    STREET_FIGHTER_6 = "sf6",
 	    TEKKEN_8 = "t8",
@@ -24,11 +29,6 @@ export namespace model {
 	    errOpenResultsDirectory = "errOpenResultsDirectory",
 	    errReadThemeCSS = "errReadThemeCSS",
 	}
-	export enum ThemeName {
-	    DEFAULT = "default",
-	    ENTH = "enth",
-	    TEKKEN = "tekken",
-	}
 	export interface FGCTrackerError {
 	    localizationKey: ErrorLocalizationKey;
 	    message: string;
@@ -44,6 +44,7 @@ export namespace model {
 	    about: string;
 	    settings: string;
 	    tracking: string;
+	    sf6Comparison: string;
 	    history: string;
 	    language: string;
 	    changelog: string;
@@ -65,6 +66,14 @@ export namespace model {
 	    files: string;
 	    enterCfnName: string;
 	    enterTekkenId: string;
+	    enterUserCode: string;
+	    userCodeLabel: string;
+	    topPlayers: string;
+	    topNPlayers: string;
+	    comparisonMetric: string;
+	    comparisonYou: string;
+	    comparisonTopAvg: string;
+	    comparisonDelta: string;
 	    result: string;
 	    replayId: string;
 	    copy: string;
@@ -176,6 +185,25 @@ export namespace model {
 	    losses: number;
 	    winRate: number;
 	}
+	export interface SF6BattleStatsMetric {
+	    key: string;
+	    name: string;
+	    unit: string;
+	    kind: string;
+	    polarity: number;
+	    current: number;
+	    topAvg: number;
+	    topMin: number;
+	    topMax: number;
+	}
+	export interface SF6BattleStatsComparisonReport {
+	    userCode: string;
+	    characterName: string;
+	    characterToolName: string;
+	    topN: number;
+	    metrics: SF6BattleStatsMetric[];
+	}
+	
 	export interface Session {
 	    id: number;
 	    userId: string;
