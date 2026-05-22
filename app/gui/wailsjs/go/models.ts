@@ -1,28 +1,28 @@
 export namespace model {
 	
+	export enum ErrorLocalizationKey {
+	    errAuth = "errAuth",
+	    errCheckForUpdate = "errCheckForUpdate",
+	    errCreateSession = "errCreateSession",
+	    errGetGuiConfig = "errGetGuiConfig",
+	    errGetLatestSession = "errGetLatestSession",
+	    errGetMatches = "errGetMatches",
+	    errGetSessionStatistics = "errGetSessionStatistics",
+	    errGetSessions = "errGetSessions",
+	    errGetTranslations = "errGetTranslations",
+	    errGetUser = "errGetUser",
+	    errOpenResultsDirectory = "errOpenResultsDirectory",
+	    errReadThemeCSS = "errReadThemeCSS",
+	    errSaveLocale = "errSaveLocale",
+	    errSaveSidebar = "errSaveSidebar",
+	    errSaveTheme = "errSaveTheme",
+	    errSaveUser = "errSaveUser",
+	    errSelectGame = "errSelectGame",
+	    errUnknown = "errUnknown",
+	}
 	export enum GameType {
 	    STREET_FIGHTER_6 = "sf6",
 	    TEKKEN_8 = "t8",
-	}
-	export enum ErrorLocalizationKey {
-	    errUnknown = "errUnknown",
-	    errSelectGame = "errSelectGame",
-	    errAuth = "errAuth",
-	    errGetLatestSession = "errGetLatestSession",
-	    errGetUser = "errGetUser",
-	    errGetMatches = "errGetMatches",
-	    errSaveLocale = "errSaveLocale",
-	    errCheckForUpdate = "errCheckForUpdate",
-	    errGetGuiConfig = "errGetGuiConfig",
-	    errSaveTheme = "errSaveTheme",
-	    errSaveUser = "errSaveUser",
-	    errSaveSidebar = "errSaveSidebar",
-	    errGetSessions = "errGetSessions",
-	    errGetTranslations = "errGetTranslations",
-	    errGetSessionStatistics = "errGetSessionStatistics",
-	    errCreateSession = "errCreateSession",
-	    errOpenResultsDirectory = "errOpenResultsDirectory",
-	    errReadThemeCSS = "errReadThemeCSS",
 	}
 	export enum ThemeName {
 	    DEFAULT = "default",

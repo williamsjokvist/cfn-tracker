@@ -19,6 +19,6 @@ export default defineConfig({
     },
   },
   build: {
-    target: 'ESNext',
+    target: 'esnext',
   },
 })
