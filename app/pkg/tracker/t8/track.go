@@ -102,7 +102,3 @@ func (t *T8Tracker) Poll(ctx context.Context, session *model.Session) (*model.Ma
 		Time:              battleAt.Format("15:04"),
 	}, nil
 }
-
-func (t *T8Tracker) Authenticate(ctx context.Context, email string, password string, statChan chan tracker.AuthStatus) {
-	statChan <- tracker.AuthStatus{Progress: 100, Err: nil}
-}

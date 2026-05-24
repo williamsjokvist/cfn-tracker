@@ -15,6 +15,7 @@ type SF6Tracker struct {
 }
 
 var _ tracker.GameTracker = (*SF6Tracker)(nil)
+var _ tracker.Authenticator = (*SF6Tracker)(nil)
 
 func NewSF6Tracker(cfnClient cfn.CFNClient) *SF6Tracker {
 	return &SF6Tracker{

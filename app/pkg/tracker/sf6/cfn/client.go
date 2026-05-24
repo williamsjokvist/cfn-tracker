@@ -64,6 +64,7 @@ func (c *Client) GetBattleLog(ctx context.Context, cfn string) (*BattleLog, erro
 
 func (c *Client) Authenticate(ctx context.Context, email string, password string, statChan chan tracker.AuthStatus) {
 	status := &tracker.AuthStatus{Progress: 0, Err: nil}
+	defer close(statChan)
 	if c.browser == nil {
 		statChan <- *status.WithError(fmt.Errorf("browser not initialized"))
 		return

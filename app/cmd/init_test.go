@@ -1,19 +1,26 @@
 package cmd_test
 
 import (
-	"fmt"
+	"context"
 	"log"
 	"os"
 	"testing"
 
 	"github.com/williamsjokvist/cfn-tracker/cmd"
 	"github.com/williamsjokvist/cfn-tracker/pkg/config"
+	"github.com/williamsjokvist/cfn-tracker/pkg/model"
 	cfgDb "github.com/williamsjokvist/cfn-tracker/pkg/storage/config"
 	"github.com/williamsjokvist/cfn-tracker/pkg/storage/sql"
 	"github.com/williamsjokvist/cfn-tracker/pkg/storage/txt"
+	"github.com/williamsjokvist/cfn-tracker/pkg/tracker"
 	"github.com/williamsjokvist/cfn-tracker/pkg/tracker/sf6/cfn"
 	"github.com/williamsjokvist/cfn-tracker/pkg/tracker/t8/wavu"
 )
+
+type eventRecord struct {
+	Name string
+	Data []interface{}
+}
 
 var testSuite = struct {
 	trackingHandler *cmd.TrackingHandler
@@ -52,7 +59,48 @@ func TestMain(m *testing.M) {
 		nil,
 	)
 	testSuite.trackingHandler.SetEventEmitter(func(eventName string, optionalData ...interface{}) {
-		log.Println(fmt.Sprintf("[EVENT] %s", eventName), optionalData[0])
+		if len(optionalData) > 0 {
+			log.Printf("[EVENT] %s %v\n", eventName, optionalData[0])
+		} else {
+			log.Printf("[EVENT] %s\n", eventName)
+		}
 	})
 	os.Exit(m.Run())
+}
+
+func setupTrackingTest(t *testing.T, mockResults ...tracker.MockPollResult) (*cmd.TrackingHandler, *sql.Storage, *model.Session, *[]eventRecord) {
+	t.Helper()
+	sqlDb, err := sql.NewStorage(true)
+	if err != nil {
+		t.Fatalf("create in-memory storage: %v", err)
+	}
+	t.Cleanup(func() { sqlDb.DB().Close() })
+
+	ctx := context.Background()
+
+	user := &model.User{DisplayName: "TestPlayer", Code: "test-user-123"}
+	if err := sqlDb.SaveUser(ctx, *user); err != nil {
+		t.Fatalf("save user: %v", err)
+	}
+
+	session, err := sqlDb.CreateSession(ctx, user.Code)
+	if err != nil {
+		t.Fatalf("create session: %v", err)
+	}
+	session.UserName = user.DisplayName
+	session.LP = 1000
+	session.MR = 0
+
+	mock := tracker.NewMockGameTracker(user, mockResults...)
+
+	events := &[]eventRecord{}
+
+	cfg := &config.BuildConfig{}
+	handler := cmd.NewTrackingHandler(nil, nil, sqlDb, nil, nil, cfg)
+	handler.SetGameTracker(mock)
+	handler.SetEventEmitter(func(eventName string, optionalData ...interface{}) {
+		*events = append(*events, eventRecord{Name: eventName, Data: optionalData})
+	})
+
+	return handler, sqlDb, session, events
 }

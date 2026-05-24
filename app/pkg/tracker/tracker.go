@@ -9,6 +9,9 @@ import (
 type GameTracker interface {
 	GetUser(ctx context.Context, userId string) (*model.User, error)
 	Poll(ctx context.Context, session *model.Session) (*model.Match, error)
+}
+
+type Authenticator interface {
 	Authenticate(ctx context.Context, email string, password string, statusChan chan AuthStatus)
 }
 
