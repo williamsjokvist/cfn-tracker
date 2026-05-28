@@ -13,8 +13,8 @@ require (
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/samber/lo v1.53.0
 	github.com/wailsapp/wails/v2 v2.12.0
-	gopkg.in/ini.v1 v1.67.1
-	modernc.org/sqlite v1.48.1
+	gopkg.in/ini.v1 v1.67.2
+	modernc.org/sqlite v1.50.1
 )
 
 require (
@@ -54,7 +54,7 @@ require (
 	golang.org/x/net v0.52.0 // indirect
 	golang.org/x/sys v0.42.0 // indirect
 	golang.org/x/text v0.35.0 // indirect
-	modernc.org/libc v1.70.0 // indirect
+	modernc.org/libc v1.72.3 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.11.0 // indirect
 )
