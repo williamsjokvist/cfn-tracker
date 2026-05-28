@@ -21,7 +21,7 @@
     "framer-motion": "^12.5.0",
     "i18next": "^26.0.3",
     "i18next-browser-languagedetector": "^8.0.0",
-    "i18next-http-backend": "^3.0.1",
+    "i18next-http-backend": "^4.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-i18next": "^17.0.2",
