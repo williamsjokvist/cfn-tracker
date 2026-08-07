@@ -2,6 +2,8 @@ export namespace model {
 	
 	export enum ErrorLocalizationKey {
 	    errAuth = "errAuth",
+	    errAuthManualTimeout = "errAuthManualTimeout",
+	    errAuthNeedsHeadful = "errAuthNeedsHeadful",
 	    errCheckForUpdate = "errCheckForUpdate",
 	    errCreateSession = "errCreateSession",
 	    errGetGuiConfig = "errGetGuiConfig",
@@ -152,6 +154,10 @@ export namespace model {
 	    errCreateSession: string;
 	    errOpenResultsDirectory: string;
 	    errReadThemeCSS: string;
+	    authSolveCaptcha: string;
+	    authNeedsHeadful: string;
+	    errAuthNeedsHeadful: string;
+	    errAuthManualTimeout: string;
 	}
 	export interface Match {
 	    userId: string;

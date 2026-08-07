@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log/slog"
 	"math/rand"
+	"net/url"
 	"strconv"
 	"strings"
 	"time"
@@ -24,6 +25,12 @@ type CFNClient interface {
 type Client struct {
 	browser *browser.Browser
 }
+
+const (
+	authGatewayWaitHeadless = 30 * time.Second
+	authGatewayWaitManual   = 5 * time.Minute
+	authGatewayPollInterval = time.Second
+)
 
 var _ CFNClient = (*Client)(nil)
 
@@ -69,6 +76,8 @@ func (c *Client) Authenticate(ctx context.Context, email string, password string
 		statChan <- *status.WithError(fmt.Errorf("browser not initialized"))
 		return
 	}
+	c.browser.SetAssetBlocking(false)
+	defer c.browser.SetAssetBlocking(true)
 
 	page := c.browser.Page.Context(ctx)
 
@@ -118,17 +127,41 @@ func (c *Client) Authenticate(ctx context.Context, email string, password string
 	statChan <- *status.WithProgress(50)
 
 	// Wait for redirection
-	var secondsWaited time.Duration = 0
+	waitLimit := authGatewayWaitManual
+	actionKey := "authSolveCaptcha"
+	timeoutErr := model.ErrAuthManualTimeout
+	if c.browser.Headless {
+		waitLimit = authGatewayWaitHeadless
+		actionKey = "authNeedsHeadful"
+		timeoutErr = model.ErrAuthNeedsHeadful
+	}
+	deadline := time.Now().Add(waitLimit)
 	for {
 		// Break out if we are no longer on Auth0 (redirected to CFN)
-		if !strings.Contains(page.MustInfo().URL, "auth.cid.capcom.com") {
+		currentURL := page.MustInfo().URL
+		if !strings.Contains(currentURL, "auth.cid.capcom.com") {
 			break
 		}
-
-		time.Sleep(time.Second)
-		secondsWaited += time.Second
-		slog.Debug("bypassing cfn auth gateway...", slog.Float64("seconds_waited", secondsWaited.Seconds()))
+		remaining := time.Until(deadline)
+		if remaining <= 0 {
+			slog.Info("cfn auth gateway wait timed out", slog.String("url", urlWithoutQuery(currentURL)))
+			statChan <- *status.WithError(timeoutErr)
+			return
+		}
+		secondsLeft := int((remaining + time.Second - 1) / time.Second)
+		select {
+		case statChan <- *status.WithAction(actionKey, secondsLeft):
+		case <-ctx.Done():
+			return
+		}
+		slog.Info("waiting for cfn auth gateway", slog.Int("seconds_left", secondsLeft))
+		select {
+		case <-ctx.Done():
+			return
+		case <-time.After(authGatewayPollInterval):
+		}
 	}
+	status.Action = nil
 	statChan <- *status.WithProgress(65)
 
 	page.MustNavigate("https://www.streetfighter.com/6/buckler/auth/loginep?redirect_url=/")
@@ -136,4 +169,14 @@ func (c *Client) Authenticate(ctx context.Context, email string, password string
 
 	statChan <- *status.WithProgress(100)
 	slog.Info("passed cfn auth")
+}
+
+func urlWithoutQuery(rawURL string) string {
+	parsed, err := url.Parse(rawURL)
+	if err != nil {
+		return "unparseable URL"
+	}
+	parsed.RawQuery = ""
+	parsed.Fragment = ""
+	return parsed.String()
 }
