@@ -114,8 +114,17 @@ type Localization struct {
 	ErrCreateSession         string `json:"errCreateSession"`
 	ErrOpenResultsDirectory  string `json:"errOpenResultsDirectory"`
 	ErrReadThemeCSS          string `json:"errReadThemeCSS"`
-	AuthSolveCaptcha         string `json:"authSolveCaptcha"`
-	AuthNeedsHeadful         string `json:"authNeedsHeadful"`
-	ErrAuthNeedsHeadful      string `json:"errAuthNeedsHeadful"`
-	ErrAuthManualTimeout     string `json:"errAuthManualTimeout"`
+	// 再試行まわり。翻訳はこの構造体を経由して配信されるため、
+	// ロケールJSONに書いてもここに宣言が無いと黙って捨てられ、
+	// 画面にはキー名がそのまま出る。
+	Retrying             string `json:"retrying"`
+	RetryingDetail       string `json:"retryingDetail"`
+	Reconnected          string `json:"reconnected"`
+	ErrNetwork           string `json:"errNetwork"`
+	ErrThrottled         string `json:"errThrottled"`
+	ErrStructureChanged  string `json:"errStructureChanged"`
+	AuthSolveCaptcha     string `json:"authSolveCaptcha"`
+	AuthNeedsHeadful     string `json:"authNeedsHeadful"`
+	ErrAuthNeedsHeadful  string `json:"errAuthNeedsHeadful"`
+	ErrAuthManualTimeout string `json:"errAuthManualTimeout"`
 }
