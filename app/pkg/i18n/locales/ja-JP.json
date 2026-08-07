@@ -119,6 +119,7 @@
   "errThrottled": "アクセスが制限されています",
   "errStructureChanged": "サイトの構造が変わった可能性があります",
   "authSolveCaptcha": "別ウィンドウのブラウザで画像認証を解いてください（残り {{seconds}} 秒）",
+  "authOpeningBrowser": "画像認証が必要です。ブラウザを表示して開き直しています…",
   "authNeedsHeadful": "画像認証が表示されました。ヘッドレスのままでは操作できません",
   "errAuthNeedsHeadful": "画像認証が必要です。`.env` の HEADLESS を false にして起動し直し、ブラウザ画面で認証を完了してください",
   "errAuthManualTimeout": "画像認証が時間内に完了しませんでした。もう一度お試しください"
