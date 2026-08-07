@@ -49,8 +49,18 @@ export function TrackingPage() {
 
   switch (trackingState) {
     case 'cfnForm':
-      return <TrackingForm />
+      return (
+        <>
+          {trackingError && (
+            <div className='mx-6 mt-3 rounded-lg bg-red-500/20 px-4 py-2 text-red-100'>
+              {t(trackingError.localizationKey)}
+            </div>
+          )}
+          <TrackingForm />
+        </>
+      )
     case 'tracking':
+    case 'retrying':
       return <TrackingLiveUpdater />
     case 'loading':
     default:

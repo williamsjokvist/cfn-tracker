@@ -9,6 +9,8 @@ import (
 	"log/slog"
 	"net/http"
 	"strings"
+	"sync"
+	"time"
 
 	"github.com/williamsjokvist/cfn-tracker/pkg/config"
 	"github.com/williamsjokvist/cfn-tracker/pkg/model"
@@ -19,15 +21,18 @@ var staticFs embed.FS
 
 type BrowserSourceServer struct {
 	matchChan chan model.Match
-	sseChans  []chan []byte
+	mu        sync.Mutex
+	sseChans  map[chan []byte]struct{}
 	lastMatch []byte
 }
+
+var heartbeatInterval = 15 * time.Second
 
 func NewBrowserSourceServer(matchChan chan model.Match) *BrowserSourceServer {
 	return &BrowserSourceServer{
 		matchChan: matchChan,
 		lastMatch: nil,
-		sseChans:  make([]chan []byte, 0, 2),
+		sseChans:  make(map[chan []byte]struct{}),
 	}
 }
 
@@ -39,12 +44,15 @@ func (b *BrowserSourceServer) Start(ctx context.Context, cfg *config.BuildConfig
 			if err != nil {
 				slog.Error("browser source: marshal match data", slog.Any("error", err))
 			}
+			b.mu.Lock()
 			b.lastMatch = matchJson
-			for _, sse := range b.sseChans {
-				if sse != nil {
-					sse <- matchJson
+			for sse := range b.sseChans {
+				select {
+				case sse <- matchJson:
+				default:
 				}
 			}
+			b.mu.Unlock()
 		}
 	}()
 
@@ -63,7 +71,7 @@ func (b *BrowserSourceServer) Start(ctx context.Context, cfg *config.BuildConfig
 	}
 }
 
-func (b *BrowserSourceServer) handleStream(w http.ResponseWriter, _ *http.Request) {
+func (b *BrowserSourceServer) handleStream(w http.ResponseWriter, req *http.Request) {
 	flusher, ok := w.(http.Flusher)
 	if !ok {
 		http.Error(w, "SSE not supported", http.StatusInternalServerError)
@@ -74,19 +82,42 @@ func (b *BrowserSourceServer) handleStream(w http.ResponseWriter, _ *http.Reques
 	w.Header().Set("Cache-Control", "no-cache")
 	w.Header().Set("Connection", "keep-alive")
 
-	if b.lastMatch != nil {
-		fmt.Fprint(w, "event: message\n\n")
-		fmt.Fprintf(w, "data: %s\n\n", b.lastMatch)
+	b.mu.Lock()
+	lastMatch := append([]byte(nil), b.lastMatch...)
+	b.mu.Unlock()
+	if lastMatch != nil {
+		if _, err := fmt.Fprintf(w, "event: message\n\ndata: %s\n\n", lastMatch); err != nil {
+			return
+		}
 		flusher.Flush()
 	}
 
 	sseChan := make(chan []byte, 1)
-	defer close(sseChan)
-	b.sseChans = append(b.sseChans, sseChan)
-	for match := range sseChan {
-		fmt.Fprint(w, "event: message\n\n")
-		fmt.Fprintf(w, "data: %s\n\n", match)
-		flusher.Flush()
+	b.mu.Lock()
+	b.sseChans[sseChan] = struct{}{}
+	b.mu.Unlock()
+	defer func() {
+		b.mu.Lock()
+		delete(b.sseChans, sseChan)
+		b.mu.Unlock()
+	}()
+	heartbeat := time.NewTicker(heartbeatInterval)
+	defer heartbeat.Stop()
+	for {
+		select {
+		case match := <-sseChan:
+			if _, err := fmt.Fprintf(w, "event: message\n\ndata: %s\n\n", match); err != nil {
+				return
+			}
+			flusher.Flush()
+		case <-heartbeat.C:
+			if _, err := fmt.Fprint(w, ": keep-alive\n\n"); err != nil {
+				return
+			}
+			flusher.Flush()
+		case <-req.Context().Done():
+			return
+		}
 	}
 }
 
