@@ -161,6 +161,7 @@ export namespace model {
 	    errThrottled: string;
 	    errStructureChanged: string;
 	    authSolveCaptcha: string;
+	    authOpeningBrowser: string;
 	    authNeedsHeadful: string;
 	    errAuthNeedsHeadful: string;
 	    errAuthManualTimeout: string;

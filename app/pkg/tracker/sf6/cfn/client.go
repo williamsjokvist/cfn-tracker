@@ -27,9 +27,17 @@ type Client struct {
 }
 
 const (
-	authGatewayWaitHeadless = 30 * time.Second
+	authGatewayGrace        = 5 * time.Second
 	authGatewayWaitManual   = 5 * time.Minute
 	authGatewayPollInterval = time.Second
+)
+
+type loginResult int
+
+const (
+	loginOK loginResult = iota
+	loginNeedsHuman
+	loginFailed
 )
 
 var _ CFNClient = (*Client)(nil)
@@ -79,23 +87,52 @@ func (c *Client) Authenticate(ctx context.Context, email string, password string
 	c.browser.SetAssetBlocking(false)
 	defer c.browser.SetAssetBlocking(true)
 
+	result, err := c.attemptLogin(ctx, email, password, statChan)
+	if shouldEscalateToHeadful(result, c.browser.Headless) {
+		statChan <- tracker.AuthStatus{Action: &tracker.AuthAction{LocalizationKey: "authOpeningBrowser"}}
+		if relaunchErr := c.browser.Relaunch(false); relaunchErr != nil {
+			statChan <- *status.WithError(model.ErrAuthNeedsHeadful)
+			return
+		}
+		c.browser.SetAssetBlocking(false)
+		result, err = c.attemptLogin(ctx, email, password, statChan)
+	}
+
+	if shouldReturnToHeadless(c.browser.PreferHeadless, c.browser.Headless) {
+		if relaunchErr := c.browser.Relaunch(true); relaunchErr != nil {
+			slog.Warn("failed to return browser to headless", slog.Any("error", relaunchErr))
+		}
+	}
+
+	if result != loginOK {
+		if err == nil {
+			err = model.ErrAuthNeedsHeadful
+		}
+		statChan <- *status.WithError(err)
+	}
+}
+
+func (c *Client) attemptLogin(ctx context.Context, email string, password string,
+	statChan chan tracker.AuthStatus,
+) (result loginResult, err error) {
+	status := &tracker.AuthStatus{Progress: 0, Err: nil}
 	page := c.browser.Page.Context(ctx)
 
 	defer func() {
 		if r := recover(); r != nil {
-			slog.Error("panic recover when authenticating to cfn", r)
-			statChan <- *status.WithError(fmt.Errorf("fatal error: %v", r))
+			slog.Error("panic recover when authenticating to cfn", slog.Any("panic", r))
+			result = loginFailed
+			err = fmt.Errorf("fatal error: %v", r)
 		}
 	}()
 
 	if strings.Contains(page.MustInfo().URL, "buckler") {
 		statChan <- *status.WithProgress(100)
-		return
+		return loginOK, nil
 	}
 
 	if email == "" || password == "" {
-		statChan <- *status.WithError(errors.New("missing cfn credentials"))
-		return
+		return loginFailed, errors.New("missing cfn credentials")
 	}
 
 	slog.Debug("logging into cfn")
@@ -105,7 +142,7 @@ func (c *Client) Authenticate(ctx context.Context, email string, password string
 	if strings.Contains(page.MustInfo().URL, "cid.capcom.com/ja/mypage") {
 		slog.Debug("cfn: user already authed")
 		statChan <- *status.WithProgress(100)
-		return
+		return loginOK, nil
 	}
 	slog.Debug("cfn: user is not authed, continuing with auth process")
 
@@ -128,12 +165,8 @@ func (c *Client) Authenticate(ctx context.Context, email string, password string
 
 	// Wait for redirection
 	waitLimit := authGatewayWaitManual
-	actionKey := "authSolveCaptcha"
-	timeoutErr := model.ErrAuthManualTimeout
 	if c.browser.Headless {
-		waitLimit = authGatewayWaitHeadless
-		actionKey = "authNeedsHeadful"
-		timeoutErr = model.ErrAuthNeedsHeadful
+		waitLimit = authGatewayGrace
 	}
 	deadline := time.Now().Add(waitLimit)
 	for {
@@ -145,19 +178,29 @@ func (c *Client) Authenticate(ctx context.Context, email string, password string
 		remaining := time.Until(deadline)
 		if remaining <= 0 {
 			slog.Info("cfn auth gateway wait timed out", slog.String("url", urlWithoutQuery(currentURL)))
-			statChan <- *status.WithError(timeoutErr)
-			return
+			if c.browser.Headless {
+				return loginNeedsHuman, nil
+			}
+			return loginFailed, model.ErrAuthManualTimeout
+		}
+		if c.browser.Headless {
+			select {
+			case <-ctx.Done():
+				return loginFailed, ctx.Err()
+			case <-time.After(authGatewayPollInterval):
+			}
+			continue
 		}
 		secondsLeft := int((remaining + time.Second - 1) / time.Second)
 		select {
-		case statChan <- *status.WithAction(actionKey, secondsLeft):
+		case statChan <- *status.WithAction("authSolveCaptcha", secondsLeft):
 		case <-ctx.Done():
-			return
+			return loginFailed, ctx.Err()
 		}
 		slog.Info("waiting for cfn auth gateway", slog.Int("seconds_left", secondsLeft))
 		select {
 		case <-ctx.Done():
-			return
+			return loginFailed, ctx.Err()
 		case <-time.After(authGatewayPollInterval):
 		}
 	}
@@ -169,6 +212,19 @@ func (c *Client) Authenticate(ctx context.Context, email string, password string
 
 	statChan <- *status.WithProgress(100)
 	slog.Info("passed cfn auth")
+	return loginOK, nil
+}
+
+// shouldEscalateToHeadful reports whether authentication should be retried in
+// a visible browser.
+func shouldEscalateToHeadful(result loginResult, headless bool) bool {
+	return result == loginNeedsHuman && headless
+}
+
+// shouldReturnToHeadless reports whether the browser should return to the
+// user-configured headless mode.
+func shouldReturnToHeadless(preferHeadless, headless bool) bool {
+	return preferHeadless && !headless
 }
 
 func urlWithoutQuery(rawURL string) string {

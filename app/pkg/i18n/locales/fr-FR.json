@@ -119,6 +119,7 @@
   "errThrottled": "Accès limité",
   "errStructureChanged": "La structure du site a peut-être changé",
   "authSolveCaptcha": "Veuillez résoudre la vérification par image dans la fenêtre séparée du navigateur ({{seconds}} secondes restantes)",
+  "authOpeningBrowser": "Vérification requise — réouverture du navigateur pour vous permettre de la terminer",
   "authNeedsHeadful": "Une vérification par image est affichée. Elle ne peut pas être effectuée en mode sans interface graphique",
   "errAuthNeedsHeadful": "Une vérification par image est requise. Définissez HEADLESS sur false dans .env, redémarrez, puis terminez la vérification dans la fenêtre du navigateur",
   "errAuthManualTimeout": "La vérification par image n'a pas été terminée à temps. Veuillez réessayer"

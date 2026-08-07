@@ -124,6 +124,7 @@ type Localization struct {
 	ErrThrottled         string `json:"errThrottled"`
 	ErrStructureChanged  string `json:"errStructureChanged"`
 	AuthSolveCaptcha     string `json:"authSolveCaptcha"`
+	AuthOpeningBrowser   string `json:"authOpeningBrowser"`
 	AuthNeedsHeadful     string `json:"authNeedsHeadful"`
 	ErrAuthNeedsHeadful  string `json:"errAuthNeedsHeadful"`
 	ErrAuthManualTimeout string `json:"errAuthManualTimeout"`
