@@ -111,5 +111,11 @@
   "errGetSessionStatistics": "échec d'obtention des statistiques de session",
   "errCreateSession": "échec de création de session",
   "errOpenResultsDirectory": "échec de l'ouverture du répertoire des résultats",
-  "errReadThemeCSS": "échec de la lecture du thème"
+  "errReadThemeCSS": "échec de la lecture du thème",
+  "retrying": "Nouvelle tentative",
+  "retryingDetail": "Nouvelle tentative ({{attempt}}) — prochain essai dans {{seconds}} s",
+  "reconnected": "Connexion rétablie",
+  "errNetwork": "Erreur réseau",
+  "errThrottled": "Accès limité",
+  "errStructureChanged": "La structure du site a peut-être changé"
 }

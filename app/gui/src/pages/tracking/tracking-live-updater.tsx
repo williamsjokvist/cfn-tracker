@@ -10,6 +10,7 @@ import { Button } from '@/ui/button'
 import { Tooltip } from '@/ui/tooltip'
 import * as Page from '@/ui/page'
 import { type LocalizationKey } from '@/main/i18n'
+import { TrackingStatusBanner } from './tracking-status-banner'
 
 export function TrackingLiveUpdater() {
   const { t } = useTranslation()
@@ -40,6 +41,7 @@ export function TrackingLiveUpdater() {
         <Page.Title>{t('tracking')}</Page.Title>
         <Page.LoadingIcon />
       </Page.Header>
+      <TrackingStatusBanner />
       <motion.section
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}

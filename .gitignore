@@ -45,3 +45,11 @@ resource.syso
 
 CFN Tracker*
 cfn-tracker*
+
+# ビルド成果物・作業用
+/build-baseline/
+app/build/bin/
+.env
+
+# codex delegation scratch
+.codex_*

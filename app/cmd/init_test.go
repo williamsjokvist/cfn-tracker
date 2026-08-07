@@ -52,7 +52,7 @@ func TestMain(m *testing.M) {
 		nil,
 	)
 	testSuite.trackingHandler.SetEventEmitter(func(eventName string, optionalData ...interface{}) {
-		log.Println(fmt.Sprintf("[EVENT] %s", eventName), optionalData[0])
+		log.Println(fmt.Sprintf("[EVENT] %s", eventName), optionalData)
 	})
 	os.Exit(m.Run())
 }

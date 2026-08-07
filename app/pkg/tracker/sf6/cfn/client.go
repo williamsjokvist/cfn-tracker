@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/williamsjokvist/cfn-tracker/pkg/browser"
+	"github.com/williamsjokvist/cfn-tracker/pkg/model"
 	"github.com/williamsjokvist/cfn-tracker/pkg/tracker"
 )
 
@@ -52,12 +53,12 @@ func (c *Client) GetBattleLog(ctx context.Context, cfn string) (*BattleLog, erro
 	var profilePage ProfilePage
 	err = json.Unmarshal([]byte(body), &profilePage)
 	if err != nil {
-		return nil, fmt.Errorf("unmarshal battle log: %w", err)
+		return nil, &model.ParseError{Op: "unmarshal battle log", Err: err}
 	}
 
 	bl := &profilePage.Props.PageProps
 	if bl.Common.StatusCode != 200 {
-		return nil, fmt.Errorf("fetch battle log, received status code %v", bl.Common.StatusCode)
+		return nil, &model.HTTPStatusError{Op: "fetch battle log", StatusCode: bl.Common.StatusCode}
 	}
 	return bl, nil
 }

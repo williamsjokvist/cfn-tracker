@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/williamsjokvist/cfn-tracker/pkg/model"
 )
 
 type WavuClient interface {
@@ -56,7 +57,7 @@ func (c *Client) getReplays(ctx context.Context) ([]Replay, error) {
 
 	var replays []Replay
 	if err = json.Unmarshal(data, &replays); err != nil {
-		return nil, fmt.Errorf("unmarshal replays: %w", err)
+		return nil, &model.ParseError{Op: "unmarshal replays", Err: err}
 	}
 	return replays, nil
 }
@@ -88,12 +89,12 @@ func (c *Client) GetUserName(ctx context.Context, polarisId string) (string, err
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("player does not exist")
+		return "", &model.HTTPStatusError{Op: "fetch player", StatusCode: resp.StatusCode}
 	}
 
 	doc, err := goquery.NewDocumentFromReader(resp.Body)
 	if err != nil {
-		return "", fmt.Errorf("read wavu html: %w", err)
+		return "", &model.ParseError{Op: "read wavu html", Err: err}
 	}
 
 	title := doc.Find("head > title").Text()
