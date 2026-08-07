@@ -43,7 +43,13 @@ import (
 )
 
 // linker flags
-const (
+//
+// var であって const ではない点が重要。`go build -ldflags "-X main.xxx=..."` は
+// var しか書き換えられず、const に対しては**エラーも警告も出さずに無視される**。
+// 以前ここが const だったため、Taskfile が渡している
+// -X 'main.isProduction="true"' / -X 'main.capIDEmail=...' はすべて無効で、
+// production ビルドでもログファイルが作られず、認証情報の埋め込みも効いていなかった。
+var (
 	capIDEmail    string = ""
 	capIDPassword string = ""
 	isProduction  string = ""
