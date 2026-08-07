@@ -6,6 +6,34 @@
     <title>CFN Tracker v4</title>
     <style>
       * { margin: 0 }
+
+      /* 表示項目が未指定のときだけ出る案内。テーマCSSに依存せず読めるよう
+         自前で背景と文字色を持たせる。正しいリンクを使えば描画されないので、
+         配信画面に出ることはない。 */
+      #setup-hint {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 0.75em;
+        box-sizing: border-box;
+        padding: clamp(1rem, 5vw, 3rem);
+        background: rgba(20, 6, 30, 0.88);
+        color: #f4eaff;
+        font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+        font-size: clamp(0.9rem, 2.2vw, 1.1rem);
+        line-height: 1.6;
+      }
+      #setup-hint h1 { font-size: 1.5em; }
+      #setup-hint code,
+      #setup-hint .example {
+        font-family: ui-monospace, Consolas, monospace;
+        background: rgba(255, 255, 255, 0.12);
+        border-radius: 0.3em;
+        padding: 0.15em 0.4em;
+      }
+      #setup-hint .example { align-self: flex-start; word-break: break-all; }
     </style>
     <link id="theme-css" href="/themes/default.css" rel="stylesheet" />
     <script defer>
@@ -55,6 +83,21 @@
         return v
       }
 
+      function showSetupHint() {
+        const hint = document.createElement("div")
+        hint.setAttribute("id", "setup-hint")
+        hint.innerHTML = [
+          "<h1>No stats selected</h1>",
+          "<p>This page only shows the stats listed in the link's query string,",
+          "so opening <code>/</code> on its own renders nothing.</p>",
+          "<p>In CFN Tracker, open <b>Output</b>, tick the stats you want,",
+          "then press <b>Copy browser source link</b> and use that URL here",
+          "and in your OBS browser source.</p>",
+          "<p class='example'>http://localhost:4242?theme=default&amp;cfn=true&amp;lp=true</p>"
+        ].join(" ")
+        document.body.appendChild(hint)
+      }
+
       function main() {
         const searchParams = new URLSearchParams(window.location.search);
 
@@ -76,6 +119,15 @@
           statContainer.appendChild(el)
 
           statElements[stat] = document.querySelector(`.stat-item[data-stat="${stat}"] .stat-value`)
+        }
+
+        // No stats were requested, so nothing would ever be drawn. Say so instead of
+        // rendering a blank page: an empty overlay is indistinguishable from a broken one.
+        // This only shows while the source is misconfigured, so it cannot appear on stream
+        // once a proper link is used.
+        if (Object.keys(statElements).length === 0) {
+          showSetupHint()
+          return
         }
 
         // create listener
