@@ -31,6 +31,8 @@ const (
 	maxReauthAttempts  = 3
 )
 
+var selectGameTimeout = 7 * time.Minute
+
 type EventEmitFn func(eventName string, optionalData ...interface{})
 
 type RetryStatus struct {
@@ -336,19 +338,37 @@ func (ch *TrackingHandler) SelectGame(game model.GameType) error {
 		return model.WrapError(model.ErrSelectGame, fmt.Errorf("game does not exist"))
 	}
 	authChan := make(chan tracker.AuthStatus)
-	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), selectGameTimeout)
 	defer cancel()
 	go ch.gameTracker.Authenticate(ctx, username, password, authChan)
-	for status := range authChan {
-		if status.Err != nil {
-			return model.WrapError(model.ErrAuth, status.Err)
-		}
-		ch.emit("auth-progress", status.Progress)
-		if status.Progress >= 100 {
-			break
+	for {
+		select {
+		case status, ok := <-authChan:
+			if !ok {
+				return nil
+			}
+			if status.Err != nil {
+				// 既に固有のローカライズキーを持つエラーはそのまま返す。
+				// ErrAuth で包み直すと汎用の「認証失敗」文言に潰れ、
+				// 「HEADLESS を false にする」等の対処方法がユーザーに届かない。
+				var localized *model.FGCTrackerError
+				if errors.As(status.Err, &localized) {
+					return localized
+				}
+				return model.WrapError(model.ErrAuth, status.Err)
+			}
+			if status.Action != nil {
+				ch.emit("auth-action-required", *status.Action)
+				continue
+			}
+			ch.emit("auth-progress", status.Progress)
+			if status.Progress >= 100 {
+				return nil
+			}
+		case <-ctx.Done():
+			return model.WrapError(model.ErrAuth, ctx.Err())
 		}
 	}
-	return nil
 }
 
 func (ch *TrackingHandler) ForcePoll() {

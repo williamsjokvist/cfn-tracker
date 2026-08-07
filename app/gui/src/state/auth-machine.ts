@@ -11,6 +11,7 @@ type AuthMachineContextProps = {
   progress: number
   game?: model.GameType
   error: model.FGCTrackerError | null
+  action: { localizationKey: string; secondsLeft: number } | null
 }
 export const AUTH_MACHINE = setup({
   types: {
@@ -29,9 +30,13 @@ export const AUTH_MACHINE = setup({
           self.send({ type: 'finished' })
         }
       })
+      EventsOn('auth-action-required', action => {
+        self.send({ type: 'actionRequired', action })
+      })
     },
     unsubscribeToProgressEvents: () => {
       EventsOff('auth-progress')
+      EventsOff('auth-action-required')
     }
   },
   guards: {
@@ -42,7 +47,8 @@ export const AUTH_MACHINE = setup({
   initial: 'gameForm',
   context: {
     progress: 0,
-    error: null
+    error: null,
+    action: null
   },
   states: {
     gameForm: {
@@ -51,7 +57,8 @@ export const AUTH_MACHINE = setup({
           actions: [
             assign({
               game: ({ event }) => event.game,
-              error: null
+              error: null,
+              action: null
             }),
             'selectGame',
             'subscribeToProgressEvents'
@@ -69,7 +76,8 @@ export const AUTH_MACHINE = setup({
             'unsubscribeToProgressEvents',
             assign({
               progress: 0,
-              error: null
+              error: null,
+              action: null
             })
           ]
         },
@@ -80,11 +88,19 @@ export const AUTH_MACHINE = setup({
             })
           ]
         },
+        actionRequired: {
+          actions: [
+            assign({
+              action: ({ event }) => event.action
+            })
+          ]
+        },
         error: {
           actions: [
             assign({
               error: ({ event }) => event.error,
-              progress: 0
+              progress: 0,
+              action: null
             }),
             'unsubscribeToProgressEvents'
           ],

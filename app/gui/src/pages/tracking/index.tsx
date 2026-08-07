@@ -21,6 +21,7 @@ export function TrackingPage() {
   const trackingState = useSelector(trackingActor, ({ value }) => value)
 
   const authError = useSelector(authActor, ({ context }) => context.error)
+  const authAction = useSelector(authActor, ({ context }) => context.action)
   const trackingError = useSelector(trackingActor, ({ context }) => context.error)
 
   const setError = useErrorPopup()
@@ -40,9 +41,20 @@ export function TrackingPage() {
       return (
         <Page.Root>
           <Page.Header>
-            <Page.Title>{t('loading')}</Page.Title>
+            <Page.Title>
+              {authAction
+                ? t(authAction.localizationKey as 'authSolveCaptcha', {
+                    seconds: authAction.secondsLeft
+                  })
+                : t('loading')}
+            </Page.Title>
             <Page.LoadingIcon />
           </Page.Header>
+          {authAction && (
+            <div className='mx-6 mt-3 rounded-lg bg-amber-500/20 px-4 py-3 font-semibold text-amber-100'>
+              {t('authSolveCaptcha', { seconds: authAction.secondsLeft })}
+            </div>
+          )}
         </Page.Root>
       )
   }

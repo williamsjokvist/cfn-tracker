@@ -26,6 +26,8 @@ const (
 	tKeyErrCreateSession        ErrorLocalizationKey = "errCreateSession"
 	tKeyErrOpenResultsDirectory ErrorLocalizationKey = "errOpenResultsDirectory"
 	tKeyErrReadThemeCSS         ErrorLocalizationKey = "errReadThemeCSS"
+	tKeyErrAuthNeedsHeadful     ErrorLocalizationKey = "errAuthNeedsHeadful"
+	tKeyErrAuthManualTimeout    ErrorLocalizationKey = "errAuthManualTimeout"
 )
 
 var AllErrorKeys = []struct {
@@ -50,6 +52,8 @@ var AllErrorKeys = []struct {
 	{tKeyErrCreateSession, string(tKeyErrCreateSession)},
 	{tKeyErrOpenResultsDirectory, string(tKeyErrOpenResultsDirectory)},
 	{tKeyErrReadThemeCSS, string(tKeyErrReadThemeCSS)},
+	{tKeyErrAuthNeedsHeadful, string(tKeyErrAuthNeedsHeadful)},
+	{tKeyErrAuthManualTimeout, string(tKeyErrAuthManualTimeout)},
 }
 
 var (
@@ -71,6 +75,11 @@ var (
 	ErrCreateSession        = newError(tKeyErrCreateSession, errors.New("create session"))
 	ErrOpenResultsDirectory = newError(tKeyErrOpenResultsDirectory, errors.New("open results directory"))
 	ErrReadThemeCSS         = newError(tKeyErrReadThemeCSS, errors.New("read theme css"))
+
+	// 画像認証(CAPTCHA)まわり。ErrAuth で包むと汎用の「認証失敗」文言になり、
+	// 対処方法がユーザーに伝わらないため、専用のキーを持つエラーとして定義する。
+	ErrAuthNeedsHeadful  = newError(tKeyErrAuthNeedsHeadful, errors.New("captcha requires a visible browser"))
+	ErrAuthManualTimeout = newError(tKeyErrAuthManualTimeout, errors.New("manual authentication timed out"))
 )
 
 type FGCTrackerError struct {

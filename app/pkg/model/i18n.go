@@ -114,4 +114,8 @@ type Localization struct {
 	ErrCreateSession         string `json:"errCreateSession"`
 	ErrOpenResultsDirectory  string `json:"errOpenResultsDirectory"`
 	ErrReadThemeCSS          string `json:"errReadThemeCSS"`
+	AuthSolveCaptcha         string `json:"authSolveCaptcha"`
+	AuthNeedsHeadful         string `json:"authNeedsHeadful"`
+	ErrAuthNeedsHeadful      string `json:"errAuthNeedsHeadful"`
+	ErrAuthManualTimeout     string `json:"errAuthManualTimeout"`
 }

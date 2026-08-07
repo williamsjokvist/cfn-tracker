@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync/atomic"
 
 	"github.com/go-rod/rod"
 	"github.com/go-rod/rod/lib/launcher"
@@ -17,10 +18,14 @@ import (
 type Browser struct {
 	Page         *rod.Page
 	HijackRouter *rod.HijackRouter
+	Headless     bool
+	blockAssets  atomic.Bool
 }
 
 func NewBrowser(headless bool) (*Browser, error) {
 	slog.Debug("setting up browser")
+	b := &Browser{Headless: headless}
+	b.blockAssets.Store(true)
 
 	userHomeDir, err := os.UserCacheDir()
 	if err != nil {
@@ -46,14 +51,7 @@ func NewBrowser(headless bool) (*Browser, error) {
 	router := page.HijackRequests()
 	// Block the browser from fetching unnecessary resources
 	router.MustAdd(`*`, func(ctx *rod.Hijack) {
-		if ctx.Request.Type() == proto.NetworkResourceTypeImage ||
-			ctx.Request.Type() == proto.NetworkResourceTypeFont {
-			ctx.Response.Fail(proto.NetworkErrorReasonBlockedByClient)
-			return
-		}
-
-		if !strings.Contains(ctx.Request.URL().Hostname(), `steam`) &&
-			ctx.Request.Type() == proto.NetworkResourceTypeStylesheet {
+		if shouldBlockRequest(ctx.Request.Type(), ctx.Request.URL().Hostname(), b.blockAssets.Load()) {
 			ctx.Response.Fail(proto.NetworkErrorReasonBlockedByClient)
 			return
 		}
@@ -63,8 +61,22 @@ func NewBrowser(headless bool) (*Browser, error) {
 
 	go router.Run()
 
-	return &Browser{
-		Page:         page,
-		HijackRouter: router,
-	}, nil
+	b.Page = page
+	b.HijackRouter = router
+	return b, nil
+}
+
+// SetAssetBlocking は画像・フォント・CSS のブロックを切り替える。
+// 画像認証を人間が解く場面では false にする必要がある。
+func (b *Browser) SetAssetBlocking(enabled bool) {
+	b.blockAssets.Store(enabled)
+}
+
+func shouldBlockRequest(t proto.NetworkResourceType, hostname string, blocking bool) bool {
+	if !blocking {
+		return false
+	}
+	return t == proto.NetworkResourceTypeImage ||
+		t == proto.NetworkResourceTypeFont ||
+		(t == proto.NetworkResourceTypeStylesheet && !strings.Contains(hostname, "steam"))
 }
