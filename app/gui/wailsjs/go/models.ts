@@ -154,6 +154,12 @@ export namespace model {
 	    errCreateSession: string;
 	    errOpenResultsDirectory: string;
 	    errReadThemeCSS: string;
+	    retrying: string;
+	    retryingDetail: string;
+	    reconnected: string;
+	    errNetwork: string;
+	    errThrottled: string;
+	    errStructureChanged: string;
 	    authSolveCaptcha: string;
 	    authNeedsHeadful: string;
 	    errAuthNeedsHeadful: string;
