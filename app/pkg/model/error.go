@@ -28,6 +28,7 @@ const (
 	tKeyErrReadThemeCSS         ErrorLocalizationKey = "errReadThemeCSS"
 	tKeyErrAuthNeedsHeadful     ErrorLocalizationKey = "errAuthNeedsHeadful"
 	tKeyErrAuthManualTimeout    ErrorLocalizationKey = "errAuthManualTimeout"
+	tKeyErrAuthBlocked          ErrorLocalizationKey = "errAuthBlocked"
 )
 
 var AllErrorKeys = []struct {
@@ -54,6 +55,7 @@ var AllErrorKeys = []struct {
 	{tKeyErrReadThemeCSS, string(tKeyErrReadThemeCSS)},
 	{tKeyErrAuthNeedsHeadful, string(tKeyErrAuthNeedsHeadful)},
 	{tKeyErrAuthManualTimeout, string(tKeyErrAuthManualTimeout)},
+	{tKeyErrAuthBlocked, string(tKeyErrAuthBlocked)},
 }
 
 var (
@@ -80,6 +82,10 @@ var (
 	// 対処方法がユーザーに伝わらないため、専用のキーを持つエラーとして定義する。
 	ErrAuthNeedsHeadful  = newError(tKeyErrAuthNeedsHeadful, errors.New("captcha requires a visible browser"))
 	ErrAuthManualTimeout = newError(tKeyErrAuthManualTimeout, errors.New("manual authentication timed out"))
+
+	// ログイン画面そのものが出てこない場合。Cloudflare 等にアクセスを遮断されると
+	// フォームが存在しないページで待ち続けることになるため、原因が伝わる専用キーにする。
+	ErrAuthBlocked = newError(tKeyErrAuthBlocked, errors.New("login form did not appear"))
 )
 
 type FGCTrackerError struct {

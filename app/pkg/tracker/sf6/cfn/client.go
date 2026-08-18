@@ -30,6 +30,10 @@ const (
 	authGatewayGrace        = 5 * time.Second
 	authGatewayWaitManual   = 5 * time.Minute
 	authGatewayPollInterval = time.Second
+	// ヘッドレスでは Cloudflare の検証が通らないため、短く見切って表示ありへ切り替える。
+	// 表示ありでは検証の通過に実測で 18 秒程度かかるので、十分な余裕を取る。
+	loginFormTimeout       = 15 * time.Second
+	loginFormTimeoutManual = 90 * time.Second
 )
 
 type loginResult int
@@ -158,9 +162,38 @@ func (c *Client) attemptLogin(ctx context.Context, email string, password string
 	statChan <- *status.WithProgress(30)
 
 	// Submit form
-	page.MustElement(`input[name="email"]`).MustInput(email)
-	page.MustElement(`input[name="password"]`).MustInput(password)
-	page.MustElement(`button[type="submit"]`).MustClick()
+	formTimeout := loginFormTimeoutManual
+	if c.browser.Headless {
+		formTimeout = loginFormTimeout
+	}
+	statChan <- *status.WithAction("authWaitingForForm", int(formTimeout/time.Second))
+	loginPage := page.Timeout(formTimeout)
+	emailInput, elementErr := loginPage.Element(`input[name="email"]`)
+	if elementErr != nil {
+		slog.Info("cfn login form wait timed out", slog.String("url", urlWithoutQuery(page.MustInfo().URL)))
+		if c.browser.Headless {
+			return loginNeedsHuman, nil
+		}
+		return loginFailed, model.ErrAuthBlocked
+	}
+	passwordInput, elementErr := loginPage.Element(`input[name="password"]`)
+	if elementErr != nil {
+		if c.browser.Headless {
+			return loginNeedsHuman, nil
+		}
+		return loginFailed, model.ErrAuthBlocked
+	}
+	submitButton, elementErr := loginPage.Element(`button[type="submit"]`)
+	if elementErr != nil {
+		if c.browser.Headless {
+			return loginNeedsHuman, nil
+		}
+		return loginFailed, model.ErrAuthBlocked
+	}
+	status.Action = nil
+	emailInput.MustInput(email)
+	passwordInput.MustInput(password)
+	submitButton.MustClick()
 	statChan <- *status.WithProgress(50)
 
 	// Wait for redirection
