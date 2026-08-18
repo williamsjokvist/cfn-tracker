@@ -52,7 +52,9 @@ export function TrackingPage() {
           </Page.Header>
           {authAction && (
             <div className='mx-6 mt-3 rounded-lg bg-amber-500/20 px-4 py-3 font-semibold text-amber-100'>
-              {t('authSolveCaptcha', { seconds: authAction.secondsLeft })}
+              {t(authAction.localizationKey as 'authSolveCaptcha', {
+                seconds: authAction.secondsLeft
+              })}
             </div>
           )}
         </Page.Root>

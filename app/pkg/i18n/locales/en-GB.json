@@ -119,6 +119,8 @@
   "errThrottled": "Rate limited",
   "errStructureChanged": "The site structure may have changed",
   "authSolveCaptcha": "Please solve the image verification in the separate browser window ({{seconds}} seconds remaining)",
+  "authWaitingForForm": "Waiting for the login page to load ({{seconds}} seconds remaining)",
+  "errAuthBlocked": "Could not reach the login page. Access may have been blocked. Please wait a while and try again",
   "authOpeningBrowser": "Verification needed — reopening the browser so you can complete it",
   "authNeedsHeadful": "Image verification appeared. It cannot be completed in headless mode",
   "errAuthNeedsHeadful": "Image verification is required. Set HEADLESS to false in .env, restart, and complete verification in the browser window",
