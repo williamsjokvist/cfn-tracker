@@ -14,7 +14,6 @@ import (
 	"github.com/go-rod/rod/lib/launcher"
 	"github.com/go-rod/rod/lib/launcher/flags"
 	"github.com/go-rod/rod/lib/proto"
-	"github.com/go-rod/stealth"
 )
 
 // browserCleanupTimeout は、閉じたブラウザの後始末を待つ上限。
@@ -53,7 +52,12 @@ func (b *Browser) launch(headless bool) error {
 	}
 	userDataDir := filepath.Join(userHomeDir, "cfn-tracker")
 	l := launcher.New()
+	if path, found := launcher.LookPath(); found {
+		l.Bin(path)
+	}
 	l.Set(flags.UserDataDir, userDataDir)
+	l.Delete("enable-automation")
+	l.Set("disable-blink-features", "AutomationControlled")
 	l.RemoteDebuggingPort(6969)
 	u, err := l.Leakless(false).Headless(headless).Launch()
 	if err != nil {
@@ -62,28 +66,42 @@ func (b *Browser) launch(headless bool) error {
 	b.launcher = l
 
 	slog.Debug("browser connecting to", slog.Any("url", u))
-	b.rod = rod.New().ControlURL(u)
+	b.rod = rod.New().NoDefaultDevice().ControlURL(u)
 	err = b.rod.Connect()
 	if err != nil {
 		return fmt.Errorf("connect to browser: %w", err)
 	}
-	page := stealth.MustPage(b.rod)
-
-	router := page.HijackRequests()
-	// Block the browser from fetching unnecessary resources
-	router.MustAdd(`*`, func(ctx *rod.Hijack) {
-		if shouldBlockRequest(ctx.Request.Type(), ctx.Request.URL().Hostname(), b.blockAssets.Load()) {
-			ctx.Response.Fail(proto.NetworkErrorReasonBlockedByClient)
-			return
+	page := b.rod.MustPage()
+	userAgent := page.MustEval(`() => navigator.userAgent`).Str()
+	if strings.Contains(userAgent, "HeadlessChrome") {
+		userAgent = strings.ReplaceAll(userAgent, "HeadlessChrome", "Chrome")
+		if err := page.SetUserAgent(&proto.NetworkSetUserAgentOverride{UserAgent: userAgent}); err != nil {
+			return fmt.Errorf("set browser user agent: %w", err)
 		}
+	}
 
-		ctx.ContinueRequest(&proto.FetchContinueRequest{})
-	})
+	// 表示ありで起動するのは認証を通すときだけ。全リクエストを傍受する Fetch ドメインは
+	// Cloudflare のボット検知に引っかかり、認証が永久に通らなくなる（実機で確認）。
+	// 通信量の削減より認証を通せることのほうが重要なので、この間はブロックを諦める。
+	if headless {
+		router := page.HijackRequests()
+		// Block the browser from fetching unnecessary resources
+		router.MustAdd(`*`, func(ctx *rod.Hijack) {
+			if shouldBlockRequest(ctx.Request.Type(), ctx.Request.URL().Hostname(), b.blockAssets.Load()) {
+				ctx.Response.Fail(proto.NetworkErrorReasonBlockedByClient)
+				return
+			}
 
-	go router.Run()
+			ctx.ContinueRequest(&proto.FetchContinueRequest{})
+		})
+
+		go router.Run()
+		b.HijackRouter = router
+	} else {
+		b.HijackRouter = nil
+	}
 
 	b.Page = page
-	b.HijackRouter = router
 	b.Headless = headless
 	return nil
 }
