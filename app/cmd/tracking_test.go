@@ -10,6 +10,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/williamsjokvist/cfn-tracker/cmd"
 	"github.com/williamsjokvist/cfn-tracker/pkg/model"
 	"github.com/williamsjokvist/cfn-tracker/pkg/tracker"
 )
@@ -38,19 +39,24 @@ func TestTrackingSelectGame(t *testing.T) {
 }
 
 type fakeTracker struct {
-	mu    sync.Mutex
-	polls int
-	poll  func(int) (*model.Match, error)
+	mu              sync.Mutex
+	polls           int
+	poll            func(int) (*model.Match, error)
+	pollWithContext func(context.Context, int) (*model.Match, error)
 }
 
 func (f *fakeTracker) GetUser(context.Context, string) (*model.User, error) {
 	return &model.User{Code: fmt.Sprintf("test-%d", time.Now().UnixNano()), DisplayName: "test"}, nil
 }
-func (f *fakeTracker) Poll(_ context.Context, _ *model.Session) (*model.Match, error) {
+func (f *fakeTracker) Poll(ctx context.Context, _ *model.Session) (*model.Match, error) {
 	f.mu.Lock()
-	defer f.mu.Unlock()
 	f.polls++
-	return f.poll(f.polls)
+	polls := f.polls
+	f.mu.Unlock()
+	if f.pollWithContext != nil {
+		return f.pollWithContext(ctx, polls)
+	}
+	return f.poll(polls)
 }
 func (f *fakeTracker) Authenticate(_ context.Context, _, _ string, statuses chan tracker.AuthStatus) {
 	statuses <- tracker.AuthStatus{Progress: 100}
@@ -93,6 +99,62 @@ func TestPollTransientErrorRetries(t *testing.T) {
 	case <-done:
 	case <-time.After(time.Second):
 		t.Fatal("StartTracking did not stop")
+	}
+}
+
+func TestPollTimeoutRetriesWithoutTrackingErrorAndStopsOnParentCancel(t *testing.T) {
+	restoreTimeout := cmd.SetPollTimeoutForTest(50 * time.Millisecond)
+	t.Cleanup(restoreTimeout)
+
+	pollDone := make(chan int, 4)
+	fake := &fakeTracker{pollWithContext: func(ctx context.Context, n int) (*model.Match, error) {
+		<-ctx.Done()
+		if !errors.Is(ctx.Err(), context.DeadlineExceeded) && n < 2 {
+			t.Errorf("Poll context error = %v, want deadline exceeded", ctx.Err())
+		}
+		pollDone <- n
+		return nil, nil
+	}}
+	trackingError := make(chan struct{}, 1)
+	done := runTracking(t, fake, func(name string, _ ...interface{}) {
+		if name == "tracking-error" {
+			trackingError <- struct{}{}
+		}
+	})
+
+	select {
+	case n := <-pollDone:
+		if n != 1 {
+			t.Fatalf("first completed Poll call = %d, want 1", n)
+		}
+	case <-time.After(time.Second):
+		t.Fatal("first Poll context did not time out")
+	}
+	select {
+	case err := <-done:
+		t.Fatalf("tracking stopped after child timeout: %v", err)
+	default:
+	}
+	testSuite.trackingHandler.ForcePoll()
+	select {
+	case n := <-pollDone:
+		if n < 2 {
+			t.Fatalf("completed Poll calls = %d, want at least 2", n)
+		}
+	case <-time.After(time.Second):
+		t.Fatal("Poll was not retried after its context timed out")
+	}
+	select {
+	case <-trackingError:
+		t.Fatal("tracking-error was emitted for a Poll timeout")
+	default:
+	}
+
+	testSuite.trackingHandler.StopTracking()
+	select {
+	case <-done:
+	case <-time.After(time.Second):
+		t.Fatal("poll loop did not return promptly after parent cancellation")
 	}
 }
 
@@ -188,4 +250,58 @@ func TestClassifyPollError(t *testing.T) {
 			t.Errorf("ClassifyPollError(%v)=%v, want %v", tt.err, got, tt.want)
 		}
 	}
+}
+
+func TestPollTimeoutErrorRetriesAutomatically(t *testing.T) {
+	restore := cmd.SetPollTimeoutForTest(50 * time.Millisecond)
+	t.Cleanup(restore)
+
+	retries := make(chan struct{}, 4)
+	trackingError := make(chan struct{}, 1)
+	// 実際の GetBattleLog はタイムアウト時に DeadlineExceeded をラップして返す。
+	fake := &fakeTracker{pollWithContext: func(ctx context.Context, _ int) (*model.Match, error) {
+		<-ctx.Done()
+		return nil, fmt.Errorf("cfn: get battle log: %w", ctx.Err())
+	}}
+	done := runTracking(t, fake, func(name string, data ...interface{}) {
+		switch name {
+		case "tracking-retrying":
+			if len(data) > 0 {
+				if status, ok := data[0].(cmd.RetryStatus); ok && status.Reason != "errNetwork" {
+					t.Errorf("retry reason = %q, want errNetwork (transient)", status.Reason)
+				}
+			}
+			select {
+			case retries <- struct{}{}:
+			default:
+			}
+		case "tracking-error":
+			select {
+			case trackingError <- struct{}{}:
+			default:
+			}
+		}
+	})
+
+	// ForcePoll を使わず、バックオフ経由で自動的に再試行され続けることを確認する。
+	for i := 0; i < 2; i++ {
+		select {
+		case <-retries:
+		case <-time.After(8 * time.Second):
+			t.Fatal("poll loop stopped retrying after timeout errors")
+		}
+	}
+	select {
+	case <-trackingError:
+		t.Fatal("tracking-error was emitted for a Poll timeout")
+	default:
+	}
+	select {
+	case err := <-done:
+		t.Fatalf("tracking ended unexpectedly: %v", err)
+	default:
+	}
+
+	testSuite.trackingHandler.StopTracking()
+	<-done
 }

@@ -33,6 +33,10 @@ const (
 
 var selectGameTimeout = 7 * time.Minute
 
+// Poll 1回の上限。内側(battleLogTimeout=25s)より長く取り、内側が先に発火するようにする。
+// 内側が効かない経路でも poll ループが必ず戻ることを保証するための保険。
+var pollTimeout = 40 * time.Second
+
 type EventEmitFn func(eventName string, optionalData ...interface{})
 
 type RetryStatus struct {
@@ -193,7 +197,9 @@ func (ch *TrackingHandler) poll(ctx context.Context, force <-chan struct{}, sess
 	attempt, parseFailures, authAttempts := 0, 0, 0
 	wasFailing := false
 	for {
-		match, err := ch.gameTracker.Poll(ctx, session)
+		pollCtx, cancelPoll := context.WithTimeout(ctx, pollTimeout)
+		match, err := ch.gameTracker.Poll(pollCtx, session)
+		cancelPoll()
 		if err == nil {
 			if wasFailing {
 				ch.emit("tracking-recovered")

@@ -34,7 +34,15 @@ const (
 	// 表示ありでは検証の通過に実測で 18 秒程度かかるので、十分な余裕を取る。
 	loginFormTimeout       = 15 * time.Second
 	loginFormTimeoutManual = 90 * time.Second
+	// buckler のセッション確認にかける上限。ここで手間取るなら
+	// ログインフローへ進んだほうが速い。
+	bucklerSessionTimeout = 15 * time.Second
+	// ポーリング1回あたりの上限。rod は既定でタイムアウトを持たず、要素待ちは
+	// 要素が現れるまで無限に待つ。ポーリング間隔(30秒)より短く切って必ず戻す。
+	battleLogTimeout = 25 * time.Second
 )
+
+const bucklerBaseURL = "https://www.streetfighter.com/6/buckler"
 
 type loginResult int
 
@@ -51,8 +59,8 @@ func NewClient(browser *browser.Browser) *Client {
 }
 
 func (c *Client) GetBattleLog(ctx context.Context, cfn string) (*BattleLog, error) {
-	page := c.browser.Page.Context(ctx)
-	err := page.Navigate(fmt.Sprintf("https://www.streetfighter.com/6/buckler/profile/%s/battlelog/rank", cfn))
+	page := c.browser.Page.Context(ctx).Timeout(battleLogTimeout)
+	err := page.Navigate(fmt.Sprintf("%s/profile/%s/battlelog/rank", bucklerBaseURL, cfn))
 	if err != nil {
 		return nil, fmt.Errorf("navigate to cfn: %w", err)
 	}
@@ -116,6 +124,33 @@ func (c *Client) Authenticate(ctx context.Context, email string, password string
 	}
 }
 
+// hasBucklerSession は buckler にログイン済みかを、ヘッダーのログアウトリンクの有無で
+// 判定する。GetBattleLog が使うページはユーザーコードを必要とするため、それを受け取らない
+// 認証段階ではこちらを使う。判定に失敗した場合は通常のログインフローへ進むだけなので、
+// 迷ったら false に倒す。
+func (c *Client) hasBucklerSession(ctx context.Context) bool {
+	// 判定に要るのは DOM だけ。Authenticate の入口で解除されたアセットブロックを
+	// この間だけ戻し、抜けるときに呼び出し元の状態へ戻す。
+	c.browser.SetAssetBlocking(true)
+	defer c.browser.SetAssetBlocking(false)
+
+	page := c.browser.Page.Context(ctx).Timeout(bucklerSessionTimeout)
+	if err := page.Navigate(bucklerBaseURL + "/"); err != nil {
+		slog.Debug("cfn: could not reach buckler", slog.Any("error", err))
+		return false
+	}
+	if err := page.WaitLoad(); err != nil {
+		slog.Debug("cfn: buckler did not finish loading", slog.Any("error", err))
+		return false
+	}
+	// ログアウトリンクはログイン済みのときだけヘッダーに現れる（実機で確認）。
+	if _, err := page.Element(`a[href*="/auth/logout"]`); err != nil {
+		slog.Debug("cfn: buckler shows no logged-in header", slog.Any("error", err))
+		return false
+	}
+	return true
+}
+
 func (c *Client) attemptLogin(ctx context.Context, email string, password string,
 	statChan chan tracker.AuthStatus,
 ) (result loginResult, err error) {
@@ -130,7 +165,13 @@ func (c *Client) attemptLogin(ctx context.Context, email string, password string
 		}
 	}()
 
-	if strings.Contains(page.MustInfo().URL, "buckler") {
+	// Capcom ID のログインセッションは 2 日ほどで切れるが、対戦データの取得に要るのは
+	// buckler 側のセッション（別 Cookie・約 1 ヶ月有効）である。buckler が使える限り
+	// ログインは不要なので、先に実際にアクセスして確かめる。URL の文字列判定では
+	// 「buckler にいるがログアウト済み」を見抜けず、逆に buckler が生きていても
+	// Cloudflare の検証つきログイン画面へ突っ込んでしまう。
+	if c.hasBucklerSession(ctx) {
+		slog.Info("cfn: buckler session is still valid, skipping login")
 		statChan <- *status.WithProgress(100)
 		return loginOK, nil
 	}
