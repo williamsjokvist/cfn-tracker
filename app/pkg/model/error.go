@@ -110,7 +110,15 @@ func newError(key ErrorLocalizationKey, err error) *FGCTrackerError {
 }
 
 func (e *FGCTrackerError) Error() string {
-	return e.InnerError.Error()
+	// FormatError はフロントへ送る値として InnerError を設定しない。その戻り値は
+	// ログへ %v で出力される経路があるため、nil でも panic せず情報を返す。
+	if e.InnerError != nil {
+		return e.InnerError.Error()
+	}
+	if e.Message != "" {
+		return e.Message
+	}
+	return string(e.LocalizationKey)
 }
 
 func (e *FGCTrackerError) Unwrap() error {
