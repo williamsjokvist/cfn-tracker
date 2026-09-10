@@ -45,12 +45,19 @@ func NewBrowser(headless bool) (*Browser, error) {
 	return b, nil
 }
 
-func (b *Browser) launch(headless bool) error {
+func UserDataDir() (string, error) {
 	userHomeDir, err := os.UserCacheDir()
 	if err != nil {
-		return fmt.Errorf("get cache dir for browser: %w", err)
+		return "", fmt.Errorf("get cache dir for browser: %w", err)
 	}
-	userDataDir := filepath.Join(userHomeDir, "cfn-tracker")
+	return filepath.Join(userHomeDir, "cfn-tracker"), nil
+}
+
+func (b *Browser) launch(headless bool) error {
+	userDataDir, err := UserDataDir()
+	if err != nil {
+		return err
+	}
 	l := launcher.New()
 	if path, found := launcher.LookPath(); found {
 		l.Bin(path)

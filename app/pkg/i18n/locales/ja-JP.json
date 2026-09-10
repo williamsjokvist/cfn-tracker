@@ -122,7 +122,9 @@
   "authWaitingForForm": "ログイン画面の読み込みを待っています…（残り {{seconds}} 秒）",
   "errAuthBlocked": "ログイン画面を開けませんでした。アクセスが遮断された可能性があります。時間をおいて再試行してください",
   "authOpeningBrowser": "画像認証が必要です。ブラウザを表示して開き直しています…",
+  "authManualLogin": "ブラウザでログインしてください。完了したらブラウザを閉じてください。",
   "authNeedsHeadful": "画像認証が表示されました。ヘッドレスのままでは操作できません",
   "errAuthNeedsHeadful": "画像認証が必要です。`.env` の HEADLESS を false にして起動し直し、ブラウザ画面で認証を完了してください",
-  "errAuthManualTimeout": "画像認証が時間内に完了しませんでした。もう一度お試しください"
+  "errAuthManualTimeout": "画像認証が時間内に完了しませんでした。もう一度お試しください",
+  "errAuthManualLoginFailed": "ブラウザでのログインを確認できませんでした。もう一度お試しください"
 }

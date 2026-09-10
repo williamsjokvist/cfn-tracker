@@ -3,6 +3,7 @@ export namespace model {
 	export enum ErrorLocalizationKey {
 	    errAuth = "errAuth",
 	    errAuthBlocked = "errAuthBlocked",
+	    errAuthManualLoginFailed = "errAuthManualLoginFailed",
 	    errAuthManualTimeout = "errAuthManualTimeout",
 	    errAuthNeedsHeadful = "errAuthNeedsHeadful",
 	    errCheckForUpdate = "errCheckForUpdate",
@@ -164,10 +165,12 @@ export namespace model {
 	    authSolveCaptcha: string;
 	    authWaitingForForm: string;
 	    authOpeningBrowser: string;
+	    authManualLogin: string;
 	    authNeedsHeadful: string;
 	    errAuthNeedsHeadful: string;
 	    errAuthManualTimeout: string;
 	    errAuthBlocked: string;
+	    errAuthManualLoginFailed: string;
 	}
 	export interface Match {
 	    userId: string;
