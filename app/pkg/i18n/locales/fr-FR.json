@@ -122,7 +122,9 @@
   "authWaitingForForm": "En attente du chargement de la page de connexion ({{seconds}} secondes restantes)",
   "errAuthBlocked": "Impossible d'atteindre la page de connexion. L'accès a peut-être été bloqué. Veuillez patienter et réessayer",
   "authOpeningBrowser": "Vérification requise — réouverture du navigateur pour vous permettre de la terminer",
+  "authManualLogin": "Veuillez vous connecter dans le navigateur. Fermez le navigateur une fois la connexion terminée.",
   "authNeedsHeadful": "Une vérification par image est affichée. Elle ne peut pas être effectuée en mode sans interface graphique",
   "errAuthNeedsHeadful": "Une vérification par image est requise. Définissez HEADLESS sur false dans .env, redémarrez, puis terminez la vérification dans la fenêtre du navigateur",
-  "errAuthManualTimeout": "La vérification par image n'a pas été terminée à temps. Veuillez réessayer"
+  "errAuthManualTimeout": "La vérification par image n'a pas été terminée à temps. Veuillez réessayer",
+  "errAuthManualLoginFailed": "Impossible de confirmer la connexion dans le navigateur. Veuillez réessayer"
 }

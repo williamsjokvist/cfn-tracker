@@ -8,27 +8,28 @@ import (
 type ErrorLocalizationKey string
 
 const (
-	tKeyErrUnknown              ErrorLocalizationKey = "errUnknown"
-	tKeyErrSelectGame           ErrorLocalizationKey = "errSelectGame"
-	tKeyErrAuth                 ErrorLocalizationKey = "errAuth"
-	tKeyErrGetLatestSession     ErrorLocalizationKey = "errGetLatestSession"
-	tKeyErrGetUser              ErrorLocalizationKey = "errGetUser"
-	tKeyErrGetMatches           ErrorLocalizationKey = "errGetMatches"
-	tKeyErrSaveLocale           ErrorLocalizationKey = "errSaveLocale"
-	tKeyErrCheckForUpdate       ErrorLocalizationKey = "errCheckForUpdate"
-	tKeyErrGetGuiConfig         ErrorLocalizationKey = "errGetGuiConfig"
-	tKeyErrSaveTheme            ErrorLocalizationKey = "errSaveTheme"
-	tKeyErrSaveUser             ErrorLocalizationKey = "errSaveUser"
-	tKeyErrSaveSidebar          ErrorLocalizationKey = "errSaveSidebar"
-	tKeyErrGetSessions          ErrorLocalizationKey = "errGetSessions"
-	tKeyErrGetTranslations      ErrorLocalizationKey = "errGetTranslations"
-	tKeyErrGetSessionStatistics ErrorLocalizationKey = "errGetSessionStatistics"
-	tKeyErrCreateSession        ErrorLocalizationKey = "errCreateSession"
-	tKeyErrOpenResultsDirectory ErrorLocalizationKey = "errOpenResultsDirectory"
-	tKeyErrReadThemeCSS         ErrorLocalizationKey = "errReadThemeCSS"
-	tKeyErrAuthNeedsHeadful     ErrorLocalizationKey = "errAuthNeedsHeadful"
-	tKeyErrAuthManualTimeout    ErrorLocalizationKey = "errAuthManualTimeout"
-	tKeyErrAuthBlocked          ErrorLocalizationKey = "errAuthBlocked"
+	tKeyErrUnknown               ErrorLocalizationKey = "errUnknown"
+	tKeyErrSelectGame            ErrorLocalizationKey = "errSelectGame"
+	tKeyErrAuth                  ErrorLocalizationKey = "errAuth"
+	tKeyErrGetLatestSession      ErrorLocalizationKey = "errGetLatestSession"
+	tKeyErrGetUser               ErrorLocalizationKey = "errGetUser"
+	tKeyErrGetMatches            ErrorLocalizationKey = "errGetMatches"
+	tKeyErrSaveLocale            ErrorLocalizationKey = "errSaveLocale"
+	tKeyErrCheckForUpdate        ErrorLocalizationKey = "errCheckForUpdate"
+	tKeyErrGetGuiConfig          ErrorLocalizationKey = "errGetGuiConfig"
+	tKeyErrSaveTheme             ErrorLocalizationKey = "errSaveTheme"
+	tKeyErrSaveUser              ErrorLocalizationKey = "errSaveUser"
+	tKeyErrSaveSidebar           ErrorLocalizationKey = "errSaveSidebar"
+	tKeyErrGetSessions           ErrorLocalizationKey = "errGetSessions"
+	tKeyErrGetTranslations       ErrorLocalizationKey = "errGetTranslations"
+	tKeyErrGetSessionStatistics  ErrorLocalizationKey = "errGetSessionStatistics"
+	tKeyErrCreateSession         ErrorLocalizationKey = "errCreateSession"
+	tKeyErrOpenResultsDirectory  ErrorLocalizationKey = "errOpenResultsDirectory"
+	tKeyErrReadThemeCSS          ErrorLocalizationKey = "errReadThemeCSS"
+	tKeyErrAuthNeedsHeadful      ErrorLocalizationKey = "errAuthNeedsHeadful"
+	tKeyErrAuthManualTimeout     ErrorLocalizationKey = "errAuthManualTimeout"
+	tKeyErrAuthBlocked           ErrorLocalizationKey = "errAuthBlocked"
+	tKeyErrAuthManualLoginFailed ErrorLocalizationKey = "errAuthManualLoginFailed"
 )
 
 var AllErrorKeys = []struct {
@@ -56,6 +57,7 @@ var AllErrorKeys = []struct {
 	{tKeyErrAuthNeedsHeadful, string(tKeyErrAuthNeedsHeadful)},
 	{tKeyErrAuthManualTimeout, string(tKeyErrAuthManualTimeout)},
 	{tKeyErrAuthBlocked, string(tKeyErrAuthBlocked)},
+	{tKeyErrAuthManualLoginFailed, string(tKeyErrAuthManualLoginFailed)},
 }
 
 var (
@@ -85,7 +87,8 @@ var (
 
 	// ログイン画面そのものが出てこない場合。Cloudflare 等にアクセスを遮断されると
 	// フォームが存在しないページで待ち続けることになるため、原因が伝わる専用キーにする。
-	ErrAuthBlocked = newError(tKeyErrAuthBlocked, errors.New("login form did not appear"))
+	ErrAuthBlocked           = newError(tKeyErrAuthBlocked, errors.New("login form did not appear"))
+	ErrAuthManualLoginFailed = newError(tKeyErrAuthManualLoginFailed, errors.New("manual login did not establish a buckler session"))
 )
 
 type FGCTrackerError struct {

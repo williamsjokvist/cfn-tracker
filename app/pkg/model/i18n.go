@@ -117,17 +117,19 @@ type Localization struct {
 	// 再試行まわり。翻訳はこの構造体を経由して配信されるため、
 	// ロケールJSONに書いてもここに宣言が無いと黙って捨てられ、
 	// 画面にはキー名がそのまま出る。
-	Retrying             string `json:"retrying"`
-	RetryingDetail       string `json:"retryingDetail"`
-	Reconnected          string `json:"reconnected"`
-	ErrNetwork           string `json:"errNetwork"`
-	ErrThrottled         string `json:"errThrottled"`
-	ErrStructureChanged  string `json:"errStructureChanged"`
-	AuthSolveCaptcha     string `json:"authSolveCaptcha"`
-	AuthWaitingForForm   string `json:"authWaitingForForm"`
-	AuthOpeningBrowser   string `json:"authOpeningBrowser"`
-	AuthNeedsHeadful     string `json:"authNeedsHeadful"`
-	ErrAuthNeedsHeadful  string `json:"errAuthNeedsHeadful"`
-	ErrAuthManualTimeout string `json:"errAuthManualTimeout"`
-	ErrAuthBlocked       string `json:"errAuthBlocked"`
+	Retrying                 string `json:"retrying"`
+	RetryingDetail           string `json:"retryingDetail"`
+	Reconnected              string `json:"reconnected"`
+	ErrNetwork               string `json:"errNetwork"`
+	ErrThrottled             string `json:"errThrottled"`
+	ErrStructureChanged      string `json:"errStructureChanged"`
+	AuthSolveCaptcha         string `json:"authSolveCaptcha"`
+	AuthWaitingForForm       string `json:"authWaitingForForm"`
+	AuthOpeningBrowser       string `json:"authOpeningBrowser"`
+	AuthManualLogin          string `json:"authManualLogin"`
+	AuthNeedsHeadful         string `json:"authNeedsHeadful"`
+	ErrAuthNeedsHeadful      string `json:"errAuthNeedsHeadful"`
+	ErrAuthManualTimeout     string `json:"errAuthManualTimeout"`
+	ErrAuthBlocked           string `json:"errAuthBlocked"`
+	ErrAuthManualLoginFailed string `json:"errAuthManualLoginFailed"`
 }

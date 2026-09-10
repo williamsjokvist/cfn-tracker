@@ -28,12 +28,10 @@ type Client struct {
 
 const (
 	authGatewayGrace        = 5 * time.Second
-	authGatewayWaitManual   = 5 * time.Minute
 	authGatewayPollInterval = time.Second
-	// ヘッドレスでは Cloudflare の検証が通らないため、短く見切って表示ありへ切り替える。
-	// 表示ありでは検証の通過に実測で 18 秒程度かかるので、十分な余裕を取る。
-	loginFormTimeout       = 15 * time.Second
-	loginFormTimeoutManual = 90 * time.Second
+	// ヘッドレスでは Cloudflare の検証が通らないため、短く見切って手動ログインへ切り替える。
+	loginFormTimeout   = 15 * time.Second
+	manualLoginTimeout = 10 * time.Minute
 	// buckler のセッション確認にかける上限。ここで手間取るなら
 	// ログインフローへ進んだほうが速い。
 	bucklerSessionTimeout = 15 * time.Second
@@ -100,20 +98,27 @@ func (c *Client) Authenticate(ctx context.Context, email string, password string
 	defer c.browser.SetAssetBlocking(true)
 
 	result, err := c.attemptLogin(ctx, email, password, statChan)
-	if shouldEscalateToHeadful(result, c.browser.Headless) {
-		statChan <- tracker.AuthStatus{Action: &tracker.AuthAction{LocalizationKey: "authOpeningBrowser"}}
-		if relaunchErr := c.browser.Relaunch(false); relaunchErr != nil {
-			statChan <- *status.WithError(model.ErrAuthNeedsHeadful)
+	if shouldEscalateToManualLogin(result) {
+		statChan <- tracker.AuthStatus{Action: &tracker.AuthAction{LocalizationKey: "authManualLogin"}}
+		if closeErr := c.browser.Close(); closeErr != nil {
+			slog.Warn("failed to close controlled browser before manual login", slog.Any("error", closeErr))
+		}
+		manualCtx, cancel := context.WithTimeout(ctx, manualLoginTimeout)
+		manualErr := browser.LaunchManualLogin(manualCtx, bucklerBaseURL+"/ja-jp")
+		cancel()
+		if manualErr != nil {
+			slog.Info("manual login browser ended with an error", slog.Any("error", manualErr))
+		}
+		if relaunchErr := c.browser.Relaunch(c.browser.PreferHeadless); relaunchErr != nil {
+			statChan <- *status.WithError(model.ErrAuthManualLoginFailed)
 			return
 		}
-		c.browser.SetAssetBlocking(false)
-		result, err = c.attemptLogin(ctx, email, password, statChan)
-	}
-
-	if shouldReturnToHeadless(c.browser.PreferHeadless, c.browser.Headless) {
-		if relaunchErr := c.browser.Relaunch(true); relaunchErr != nil {
-			slog.Warn("failed to return browser to headless", slog.Any("error", relaunchErr))
+		if c.hasBucklerSession(ctx) {
+			statChan <- *status.WithProgress(100)
+			return
 		}
+		statChan <- *status.WithError(model.ErrAuthManualLoginFailed)
+		return
 	}
 
 	if result != loginOK {
@@ -136,16 +141,16 @@ func (c *Client) hasBucklerSession(ctx context.Context) bool {
 
 	page := c.browser.Page.Context(ctx).Timeout(bucklerSessionTimeout)
 	if err := page.Navigate(bucklerBaseURL + "/"); err != nil {
-		slog.Debug("cfn: could not reach buckler", slog.Any("error", err))
+		slog.Info("cfn: could not reach buckler", slog.Any("error", err))
 		return false
 	}
 	if err := page.WaitLoad(); err != nil {
-		slog.Debug("cfn: buckler did not finish loading", slog.Any("error", err))
+		slog.Info("cfn: buckler did not finish loading", slog.Any("error", err))
 		return false
 	}
 	// ログアウトリンクはログイン済みのときだけヘッダーに現れる（実機で確認）。
 	if _, err := page.Element(`a[href*="/auth/logout"]`); err != nil {
-		slog.Debug("cfn: buckler shows no logged-in header", slog.Any("error", err))
+		slog.Info("cfn: buckler shows no logged-in header", slog.Any("error", err))
 		return false
 	}
 	return true
@@ -203,33 +208,21 @@ func (c *Client) attemptLogin(ctx context.Context, email string, password string
 	statChan <- *status.WithProgress(30)
 
 	// Submit form
-	formTimeout := loginFormTimeoutManual
-	if c.browser.Headless {
-		formTimeout = loginFormTimeout
-	}
+	formTimeout := loginFormTimeout
 	statChan <- *status.WithAction("authWaitingForForm", int(formTimeout/time.Second))
 	loginPage := page.Timeout(formTimeout)
 	emailInput, elementErr := loginPage.Element(`input[name="email"]`)
 	if elementErr != nil {
 		slog.Info("cfn login form wait timed out", slog.String("url", urlWithoutQuery(page.MustInfo().URL)))
-		if c.browser.Headless {
-			return loginNeedsHuman, nil
-		}
-		return loginFailed, model.ErrAuthBlocked
+		return loginNeedsHuman, nil
 	}
 	passwordInput, elementErr := loginPage.Element(`input[name="password"]`)
 	if elementErr != nil {
-		if c.browser.Headless {
-			return loginNeedsHuman, nil
-		}
-		return loginFailed, model.ErrAuthBlocked
+		return loginNeedsHuman, nil
 	}
 	submitButton, elementErr := loginPage.Element(`button[type="submit"]`)
 	if elementErr != nil {
-		if c.browser.Headless {
-			return loginNeedsHuman, nil
-		}
-		return loginFailed, model.ErrAuthBlocked
+		return loginNeedsHuman, nil
 	}
 	status.Action = nil
 	emailInput.MustInput(email)
@@ -238,10 +231,7 @@ func (c *Client) attemptLogin(ctx context.Context, email string, password string
 	statChan <- *status.WithProgress(50)
 
 	// Wait for redirection
-	waitLimit := authGatewayWaitManual
-	if c.browser.Headless {
-		waitLimit = authGatewayGrace
-	}
+	waitLimit := authGatewayGrace
 	deadline := time.Now().Add(waitLimit)
 	for {
 		// Break out if we are no longer on Auth0 (redirected to CFN)
@@ -252,26 +242,8 @@ func (c *Client) attemptLogin(ctx context.Context, email string, password string
 		remaining := time.Until(deadline)
 		if remaining <= 0 {
 			slog.Info("cfn auth gateway wait timed out", slog.String("url", urlWithoutQuery(currentURL)))
-			if c.browser.Headless {
-				return loginNeedsHuman, nil
-			}
-			return loginFailed, model.ErrAuthManualTimeout
+			return loginNeedsHuman, nil
 		}
-		if c.browser.Headless {
-			select {
-			case <-ctx.Done():
-				return loginFailed, ctx.Err()
-			case <-time.After(authGatewayPollInterval):
-			}
-			continue
-		}
-		secondsLeft := int((remaining + time.Second - 1) / time.Second)
-		select {
-		case statChan <- *status.WithAction("authSolveCaptcha", secondsLeft):
-		case <-ctx.Done():
-			return loginFailed, ctx.Err()
-		}
-		slog.Info("waiting for cfn auth gateway", slog.Int("seconds_left", secondsLeft))
 		select {
 		case <-ctx.Done():
 			return loginFailed, ctx.Err()
@@ -289,16 +261,14 @@ func (c *Client) attemptLogin(ctx context.Context, email string, password string
 	return loginOK, nil
 }
 
-// shouldEscalateToHeadful reports whether authentication should be retried in
-// a visible browser.
-func shouldEscalateToHeadful(result loginResult, headless bool) bool {
-	return result == loginNeedsHuman && headless
-}
-
-// shouldReturnToHeadless reports whether the browser should return to the
-// user-configured headless mode.
-func shouldReturnToHeadless(preferHeadless, headless bool) bool {
-	return preferHeadless && !headless
+// shouldEscalateToManualLogin reports whether authentication should continue in
+// an uncontrolled browser operated by the user.
+//
+// rod の制御下では表示ありでも Cloudflare の検証を通過できない（実機で3回確認:
+// 2026-08-18 / 08-21 / 09-10）。よってヘッドレスかどうかを条件にしない。
+// フォームに到達できなければ、素の Chrome での手動ログインへ委ねる。
+func shouldEscalateToManualLogin(result loginResult) bool {
+	return result == loginNeedsHuman
 }
 
 func urlWithoutQuery(rawURL string) string {
