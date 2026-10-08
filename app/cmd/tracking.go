@@ -196,9 +196,15 @@ func (ch *TrackingHandler) poll(ctx context.Context, force <-chan struct{}, sess
 	wasFailing := false
 	for {
 		pollCtx, cancelPoll := context.WithTimeout(ctx, pollTimeout)
+		started := time.Now()
 		match, err := ch.gameTracker.Poll(pollCtx, session)
 		cancelPoll()
 		if err == nil {
+			if match != nil {
+				slog.Info("poll: new match", slog.String("replay_id", match.ReplayID), slog.Duration("took", time.Since(started)))
+			} else {
+				slog.Info("poll: no new match", slog.Duration("took", time.Since(started)))
+			}
 			if wasFailing {
 				ch.emit("tracking-recovered")
 			}
