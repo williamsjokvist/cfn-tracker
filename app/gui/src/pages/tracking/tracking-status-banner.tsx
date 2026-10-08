@@ -24,7 +24,9 @@ export function TrackingStatusBanner() {
   if (state === 'retrying' && retry) {
     return (
       <div className='mx-6 mt-3 rounded-lg bg-amber-500/20 px-4 py-2 text-amber-100' role='status'>
-        {t('retryingDetail', { attempt: retry.attempt, seconds })} —{' '}
+        {retry.nextRetryInMs > 0 && (
+          <>{t('retryingDetail', { attempt: retry.attempt, seconds })} — </>
+        )}
         {t(retry.reason as LocalizationKey)}
       </div>
     )

@@ -73,20 +73,20 @@ func (c *Client) GetBattleLog(ctx context.Context, cfn string) (*BattleLog, erro
 func (c *Client) Authenticate(ctx context.Context, statChan chan tracker.AuthStatus) {
 	status := &tracker.AuthStatus{Progress: 0, Err: nil}
 	if c.browser == nil {
-		statChan <- *status.WithError(fmt.Errorf("browser not initialized"))
+		send(ctx, statChan, *status.WithError(fmt.Errorf("browser not initialized")))
 		return
 	}
 
 	// Fetching matches only needs the buckler session (~1 month), so reuse it while valid.
 	if c.hasBucklerSession(ctx) {
 		slog.Info("cfn: buckler session is still valid, skipping login")
-		statChan <- *status.WithProgress(100)
+		send(ctx, statChan, *status.WithProgress(100))
 		return
 	}
 
 	// Chrome under rod can't pass Cloudflare's check on the Capcom ID login, so the
 	// user logs in themselves in a plain Chrome window sharing the same profile.
-	statChan <- tracker.AuthStatus{Action: &tracker.AuthAction{LocalizationKey: "authNeedRelogin"}}
+	send(ctx, statChan, tracker.AuthStatus{Action: &tracker.AuthAction{LocalizationKey: "authNeedRelogin"}})
 	if closeErr := c.browser.Close(); closeErr != nil {
 		slog.Warn("failed to close controlled browser before manual login", slog.Any("error", closeErr))
 	}
@@ -97,15 +97,24 @@ func (c *Client) Authenticate(ctx context.Context, statChan chan tracker.AuthSta
 		slog.Info("manual login browser ended with an error", slog.Any("error", manualErr))
 	}
 	if relaunchErr := c.browser.Relaunch(); relaunchErr != nil {
-		statChan <- *status.WithError(model.ErrAuthManualLoginFailed)
+		send(ctx, statChan, *status.WithError(model.ErrAuthManualLoginFailed))
 		return
 	}
 	if c.hasBucklerSession(ctx) {
 		slog.Info("passed cfn auth")
-		statChan <- *status.WithProgress(100)
+		send(ctx, statChan, *status.WithProgress(100))
 		return
 	}
-	statChan <- *status.WithError(model.ErrAuthManualLoginFailed)
+	send(ctx, statChan, *status.WithError(model.ErrAuthManualLoginFailed))
+}
+
+// send delivers a status unless ctx is done, so Authenticate can't block forever
+// once the caller has stopped listening.
+func send(ctx context.Context, statChan chan tracker.AuthStatus, status tracker.AuthStatus) {
+	select {
+	case statChan <- status:
+	case <-ctx.Done():
+	}
 }
 
 // hasBucklerSession reports whether we're logged in to buckler, based on the logout

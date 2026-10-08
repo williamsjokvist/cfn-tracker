@@ -47,6 +47,11 @@ func (b *BrowserSourceServer) Start(ctx context.Context, cfg *config.BuildConfig
 			b.mu.Lock()
 			b.lastMatch = matchJson
 			for sse := range b.sseChans {
+				// Replace a match the client hasn't read yet, so it always gets the latest.
+				select {
+				case <-sse:
+				default:
+				}
 				select {
 				case sse <- matchJson:
 				default:
@@ -82,25 +87,23 @@ func (b *BrowserSourceServer) handleStream(w http.ResponseWriter, req *http.Requ
 	w.Header().Set("Cache-Control", "no-cache")
 	w.Header().Set("Connection", "keep-alive")
 
-	b.mu.Lock()
-	lastMatch := append([]byte(nil), b.lastMatch...)
-	b.mu.Unlock()
-	if lastMatch != nil {
-		if _, err := fmt.Fprintf(w, "event: message\n\ndata: %s\n\n", lastMatch); err != nil {
-			return
-		}
-		flusher.Flush()
-	}
-
+	// Register and snapshot under one lock, so a match arriving in between isn't missed.
 	sseChan := make(chan []byte, 1)
 	b.mu.Lock()
 	b.sseChans[sseChan] = struct{}{}
+	lastMatch := append([]byte(nil), b.lastMatch...)
 	b.mu.Unlock()
 	defer func() {
 		b.mu.Lock()
 		delete(b.sseChans, sseChan)
 		b.mu.Unlock()
 	}()
+	if len(lastMatch) > 0 {
+		if _, err := fmt.Fprintf(w, "event: message\n\ndata: %s\n\n", lastMatch); err != nil {
+			return
+		}
+		flusher.Flush()
+	}
 	heartbeat := time.NewTicker(heartbeatInterval)
 	defer heartbeat.Stop()
 	for {
