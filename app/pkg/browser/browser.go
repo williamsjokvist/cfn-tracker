@@ -108,7 +108,9 @@ func (b *Browser) launch() error {
 
 func (b *Browser) closeCurrent() {
 	if b.HijackRouter != nil {
-		b.HijackRouter.Stop()
+		if err := b.HijackRouter.Stop(); err != nil {
+			slog.Warn("failed to stop request hijacking", slog.Any("error", err))
+		}
 	}
 	if b.rod != nil {
 		if err := b.rod.Close(); err != nil {

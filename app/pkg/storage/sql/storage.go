@@ -69,10 +69,6 @@ func getDataSource() string {
 	return filepath.Join(dataDir, "cfn-tracker.db")
 }
 
-func migrateSchema(nSteps *int) error {
-	return migrateSchemaAt(getDataSource(), nSteps)
-}
-
 func migrateSchemaAt(dataSource string, nSteps *int) error {
 	slog.Debug("starting db migrations", slog.Any("steps", nSteps))
 
