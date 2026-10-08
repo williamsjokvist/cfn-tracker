@@ -31,7 +31,7 @@ func authTestHandler(authenticate func(context.Context, chan tracker.AuthStatus)
 
 func TestSelectGameEmitsAuthActionRequired(t *testing.T) {
 	handler := authTestHandler(func(_ context.Context, statuses chan tracker.AuthStatus) {
-		statuses <- tracker.AuthStatus{Action: &tracker.AuthAction{LocalizationKey: "authSolveCaptcha", SecondsLeft: 42}}
+		statuses <- tracker.AuthStatus{Action: &tracker.AuthAction{LocalizationKey: "authNeedRelogin", SecondsLeft: 42}}
 		close(statuses)
 	})
 	var mu sync.Mutex
@@ -55,7 +55,7 @@ func TestSelectGameEmitsAuthActionRequired(t *testing.T) {
 func TestSelectGameReturnsOnAuthError(t *testing.T) {
 	handler := authTestHandler(func(_ context.Context, statuses chan tracker.AuthStatus) {
 		for i := 0; i < 3; i++ {
-			statuses <- tracker.AuthStatus{Action: &tracker.AuthAction{LocalizationKey: "authSolveCaptcha", SecondsLeft: 3 - i}}
+			statuses <- tracker.AuthStatus{Action: &tracker.AuthAction{LocalizationKey: "authNeedRelogin", SecondsLeft: 3 - i}}
 		}
 		statuses <- tracker.AuthStatus{Err: errors.New("manual authentication failed")}
 	})

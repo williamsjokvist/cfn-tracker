@@ -32,8 +32,3 @@ func (s *AuthStatus) WithError(err error) *AuthStatus {
 	s.Err = err
 	return s
 }
-
-func (s *AuthStatus) WithAction(key string, secondsLeft int) *AuthStatus {
-	s.Action = &AuthAction{LocalizationKey: key, SecondsLeft: secondsLeft}
-	return s
-}
