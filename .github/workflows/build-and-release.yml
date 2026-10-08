@@ -29,19 +29,9 @@ jobs:
         with:
           ref: master
 
-      - uses: oven-sh/setup-bun@v1
-
-      - uses: actions/setup-go@v5
+      - uses: jdx/mise-action@v2
         with:
-          go-version-file: "app/go.mod"
-          cache-dependency-path: "app/go.sum"
-
-      - name: Install wails
-        run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
-
-      - uses: arduino/setup-task@v2
-        with:
-          version: 3.x
+          working_directory: app
 
       - name: Set version in app config
         run: |
@@ -52,10 +42,7 @@ jobs:
         shell: pwsh
 
       - name: Build
-        run: task build:windows-amd64 -- -o 'CFN Tracker.exe'
-        env:
-          CAP_ID_EMAIL: ${{ secrets.CAP_ID_EMAIL }}
-          CAP_ID_PASSWORD: ${{ secrets.CAP_ID_PASSWORD }}
+        run: mise build-windows-amd64
 
       - name: Zip build
         run: tar -a -c -f 'cfn-tracker-windows-amd64.zip' -C './build/bin' 'CFN Tracker.exe'

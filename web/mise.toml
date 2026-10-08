@@ -1,0 +1,18 @@
+[tools]
+bun = "latest"
+
+[tasks.install]
+description = "Install dependencies"
+run = "bun install"
+
+[tasks.dev]
+description = "Run the Astro dev server"
+run = "bun run dev"
+
+[tasks.build]
+description = "Build the site"
+run = "bun run build"
+
+[tasks.preview]
+description = "Preview the built site"
+run = "bun run preview"

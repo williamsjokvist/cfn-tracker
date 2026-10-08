@@ -10,6 +10,7 @@ import { Button } from '@/ui/button'
 import { Tooltip } from '@/ui/tooltip'
 import * as Page from '@/ui/page'
 import { type LocalizationKey } from '@/main/i18n'
+import { TrackingHeader } from './tracking-header'
 
 export function TrackingLiveUpdater() {
   const { t } = useTranslation()
@@ -36,10 +37,7 @@ export function TrackingLiveUpdater() {
 
   return (
     <Page.Root>
-      <Page.Header>
-        <Page.Title>{t('tracking')}</Page.Title>
-        <Page.LoadingIcon />
-      </Page.Header>
+      <TrackingHeader />
       <motion.section
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -147,16 +145,28 @@ export function TrackingLiveUpdater() {
           </motion.div>
         </div>
         {/* TODO: fix character image for tekken 8 */}
-        <img
-          className='pointer-events-none absolute top-0 -right-20 z-[-1] h-full opacity-10 grayscale'
-          src={`https://www.streetfighter.com/6/buckler/assets/images/material/character/character_${character
-            .toLowerCase()
-            .replace(/\s/g, '')
-            .replace('.', '')}_r.png`}
-          alt={''}
-        />
+        <CharacterImage character={character} />
       </motion.section>
     </Page.Root>
+  )
+}
+
+function CharacterImage({ character }: { character: string }) {
+  const src = `https://www.streetfighter.com/6/buckler/assets/images/material/character/character_${character
+    .toLowerCase()
+    .replace(/\s/g, '')
+    .replace('.', '')}_r.png`
+  const [failedSrc, setFailedSrc] = React.useState<string>()
+  if (!character || failedSrc === src) {
+    return null
+  }
+  return (
+    <img
+      className='pointer-events-none absolute top-0 -right-20 z-[-1] h-full opacity-10 grayscale'
+      src={src}
+      alt=''
+      onError={() => setFailedSrc(src)}
+    />
   )
 }
 

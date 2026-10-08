@@ -1,3 +1,4 @@
-[tools]
-go = "1.25"
-bun = "latest"
+monorepo_root = true
+
+[monorepo]
+config_roots = ["app", "web"]

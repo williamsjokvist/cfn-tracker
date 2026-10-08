@@ -3,6 +3,7 @@ package t8
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"strings"
 	"time"
 
@@ -10,6 +11,10 @@ import (
 	"github.com/williamsjokvist/cfn-tracker/pkg/tracker"
 	"github.com/williamsjokvist/cfn-tracker/pkg/tracker/t8/wavu"
 )
+
+// Wavu only keeps recent replays, and anything older than this was most likely
+// played before tracking started.
+const maxReplayAge = 10 * time.Minute
 
 type T8Tracker struct {
 	wavuClient wavu.WavuClient
@@ -44,8 +49,17 @@ func (t *T8Tracker) Poll(ctx context.Context, session *model.Session) (*model.Ma
 	if len(session.Matches) > 0 {
 		prevMatch = *session.Matches[0]
 	}
+	if lastReplay.BattleAt == 0 {
+		slog.Info("t8: no recent replay for player", slog.String("polaris_id", session.UserId))
+		return nil, nil
+	}
 	battleAt := time.Unix(lastReplay.BattleAt, 0)
-	if time.Since(battleAt).Minutes() >= 15 || prevMatch.ReplayID == lastReplay.BattleId {
+	if time.Since(battleAt) > maxReplayAge {
+		slog.Info("t8: last replay is too old", slog.Time("battle_at", battleAt))
+		return nil, nil
+	}
+	if alreadyRecorded(prevMatch, lastReplay, battleAt) {
+		slog.Info("t8: last replay already recorded", slog.String("replay_id", lastReplay.ID()))
 		return nil, nil
 	}
 
@@ -84,7 +98,7 @@ func (t *T8Tracker) Poll(ctx context.Context, session *model.Session) (*model.Ma
 		UserId:    polarisId,
 		Opponent:  opponent,
 		Victory:   victory,
-		ReplayID:  lastReplay.BattleId,
+		ReplayID:  lastReplay.ID(),
 		Wins:      wins,
 		Losses:    losses,
 		WinStreak: winStreak,
@@ -103,6 +117,23 @@ func (t *T8Tracker) Poll(ctx context.Context, session *model.Session) (*model.Ma
 	}, nil
 }
 
-func (t *T8Tracker) Authenticate(ctx context.Context, email string, password string, statChan chan tracker.AuthStatus) {
-	statChan <- tracker.AuthStatus{Progress: 100, Err: nil}
+// Matches store their date and time to the minute, so a replay in the same
+// minute as the previous match is only told apart by its ID.
+func alreadyRecorded(prev model.Match, replay wavu.Replay, battleAt time.Time) bool {
+	if prev.Date == "" {
+		return false
+	}
+	prevAt, err := time.ParseInLocation("2006-01-02 15:04", prev.Date+" "+prev.Time, time.Local)
+	if err != nil {
+		return prev.ReplayID == replay.ID()
+	}
+	battleMinute := battleAt.Truncate(time.Minute)
+	if battleMinute.Before(prevAt) {
+		return true
+	}
+	return battleMinute.Equal(prevAt) && prev.ReplayID == replay.ID()
+}
+
+func (t *T8Tracker) Authenticate(ctx context.Context, statChan chan tracker.AuthStatus) {
+	statChan <- tracker.AuthStatus{Done: true}
 }

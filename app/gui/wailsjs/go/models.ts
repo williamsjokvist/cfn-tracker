@@ -2,6 +2,7 @@ export namespace model {
 	
 	export enum ErrorLocalizationKey {
 	    errAuth = "errAuth",
+	    errAuthManualLoginFailed = "errAuthManualLoginFailed",
 	    errCheckForUpdate = "errCheckForUpdate",
 	    errCreateSession = "errCreateSession",
 	    errGetGuiConfig = "errGetGuiConfig",
@@ -14,6 +15,7 @@ export namespace model {
 	    errOpenResultsDirectory = "errOpenResultsDirectory",
 	    errReadThemeCSS = "errReadThemeCSS",
 	    errSaveLocale = "errSaveLocale",
+	    errSaveLogFile = "errSaveLogFile",
 	    errSaveSidebar = "errSaveSidebar",
 	    errSaveTheme = "errSaveTheme",
 	    errSaveUser = "errSaveUser",
@@ -37,6 +39,7 @@ export namespace model {
 	    locale: string;
 	    theme: ThemeName;
 	    sidebar: boolean;
+	    logFile: boolean;
 	}
 	export interface Localization {
 	    appVersion: string;
@@ -76,6 +79,7 @@ export namespace model {
 	    statistics: string;
 	    date: string;
 	    minimize: string;
+	    writeLogFile: string;
 	    restoreSession: string;
 	    exportLog: string;
 	    league: string;
@@ -146,12 +150,22 @@ export namespace model {
 	    errSaveTheme: string;
 	    errSaveUser: string;
 	    errSaveSidebar: string;
+	    errSaveLogFile: string;
 	    errGetSessions: string;
 	    errGetTranslations: string;
 	    errGetSessionStatistics: string;
 	    errCreateSession: string;
 	    errOpenResultsDirectory: string;
 	    errReadThemeCSS: string;
+	    retrying: string;
+	    retryingDetail: string;
+	    reconnected: string;
+	    errNetwork: string;
+	    errThrottled: string;
+	    errStructureChanged: string;
+	    authNeedRelogin: string;
+	    authNeedReloginHint: string;
+	    errAuthManualLoginFailed: string;
 	}
 	export interface Match {
 	    userId: string;

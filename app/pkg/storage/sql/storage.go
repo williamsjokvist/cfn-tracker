@@ -23,19 +23,37 @@ type Storage struct {
 	db *sqlx.DB
 }
 
+// inMemoryDataSource is a shared-cache in-memory DB. Plain ":memory:" gives each
+// connection its own DB, so migrations wouldn't be visible to other connections.
+const inMemoryDataSource = "file:cfn-tracker-mem?mode=memory&cache=shared"
+
 func NewStorage(useInMemoryDb bool) (*Storage, error) {
-	if err := migrateSchema(nil); err != nil {
-		return nil, fmt.Errorf("perform sql migrations: %w", err)
-	}
 	dataSource := getDataSource()
 	if useInMemoryDb {
-		dataSource = ":memory:"
+		dataSource = inMemoryDataSource
 	}
 
 	db, err := sqlx.Open("sqlite", dataSource)
 	if err != nil {
 		return nil, fmt.Errorf("open sqlite connection: %w", err)
 	}
+
+	if useInMemoryDb {
+		// A shared-cache in-memory DB disappears once its last connection closes,
+		// so hold one open to survive the migration connection closing.
+		db.SetMaxOpenConns(1)
+		if err := db.Ping(); err != nil {
+			db.Close()
+			return nil, fmt.Errorf("open in-memory sqlite: %w", err)
+		}
+	}
+
+	// Migrate the data source that is actually used, not always the on-disk one.
+	if err := migrateSchemaAt(dataSource, nil); err != nil {
+		db.Close()
+		return nil, fmt.Errorf("perform sql migrations: %w", err)
+	}
+
 	return &Storage{
 		db,
 	}, nil
@@ -51,10 +69,10 @@ func getDataSource() string {
 	return filepath.Join(dataDir, "cfn-tracker.db")
 }
 
-func migrateSchema(nSteps *int) error {
+func migrateSchemaAt(dataSource string, nSteps *int) error {
 	slog.Debug("starting db migrations", slog.Any("steps", nSteps))
 
-	db, err := sqlx.Open("sqlite", getDataSource())
+	db, err := sqlx.Open("sqlite", dataSource)
 	if err != nil {
 		return fmt.Errorf("open sqlite connection: %w", err)
 	}

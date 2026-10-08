@@ -8,24 +8,26 @@ import (
 type ErrorLocalizationKey string
 
 const (
-	tKeyErrUnknown              ErrorLocalizationKey = "errUnknown"
-	tKeyErrSelectGame           ErrorLocalizationKey = "errSelectGame"
-	tKeyErrAuth                 ErrorLocalizationKey = "errAuth"
-	tKeyErrGetLatestSession     ErrorLocalizationKey = "errGetLatestSession"
-	tKeyErrGetUser              ErrorLocalizationKey = "errGetUser"
-	tKeyErrGetMatches           ErrorLocalizationKey = "errGetMatches"
-	tKeyErrSaveLocale           ErrorLocalizationKey = "errSaveLocale"
-	tKeyErrCheckForUpdate       ErrorLocalizationKey = "errCheckForUpdate"
-	tKeyErrGetGuiConfig         ErrorLocalizationKey = "errGetGuiConfig"
-	tKeyErrSaveTheme            ErrorLocalizationKey = "errSaveTheme"
-	tKeyErrSaveUser             ErrorLocalizationKey = "errSaveUser"
-	tKeyErrSaveSidebar          ErrorLocalizationKey = "errSaveSidebar"
-	tKeyErrGetSessions          ErrorLocalizationKey = "errGetSessions"
-	tKeyErrGetTranslations      ErrorLocalizationKey = "errGetTranslations"
-	tKeyErrGetSessionStatistics ErrorLocalizationKey = "errGetSessionStatistics"
-	tKeyErrCreateSession        ErrorLocalizationKey = "errCreateSession"
-	tKeyErrOpenResultsDirectory ErrorLocalizationKey = "errOpenResultsDirectory"
-	tKeyErrReadThemeCSS         ErrorLocalizationKey = "errReadThemeCSS"
+	tKeyErrUnknown               ErrorLocalizationKey = "errUnknown"
+	tKeyErrSelectGame            ErrorLocalizationKey = "errSelectGame"
+	tKeyErrAuth                  ErrorLocalizationKey = "errAuth"
+	tKeyErrGetLatestSession      ErrorLocalizationKey = "errGetLatestSession"
+	tKeyErrGetUser               ErrorLocalizationKey = "errGetUser"
+	tKeyErrGetMatches            ErrorLocalizationKey = "errGetMatches"
+	tKeyErrSaveLocale            ErrorLocalizationKey = "errSaveLocale"
+	tKeyErrCheckForUpdate        ErrorLocalizationKey = "errCheckForUpdate"
+	tKeyErrGetGuiConfig          ErrorLocalizationKey = "errGetGuiConfig"
+	tKeyErrSaveTheme             ErrorLocalizationKey = "errSaveTheme"
+	tKeyErrSaveUser              ErrorLocalizationKey = "errSaveUser"
+	tKeyErrSaveSidebar           ErrorLocalizationKey = "errSaveSidebar"
+	tKeyErrSaveLogFile           ErrorLocalizationKey = "errSaveLogFile"
+	tKeyErrGetSessions           ErrorLocalizationKey = "errGetSessions"
+	tKeyErrGetTranslations       ErrorLocalizationKey = "errGetTranslations"
+	tKeyErrGetSessionStatistics  ErrorLocalizationKey = "errGetSessionStatistics"
+	tKeyErrCreateSession         ErrorLocalizationKey = "errCreateSession"
+	tKeyErrOpenResultsDirectory  ErrorLocalizationKey = "errOpenResultsDirectory"
+	tKeyErrReadThemeCSS          ErrorLocalizationKey = "errReadThemeCSS"
+	tKeyErrAuthManualLoginFailed ErrorLocalizationKey = "errAuthManualLoginFailed"
 )
 
 var AllErrorKeys = []struct {
@@ -44,12 +46,14 @@ var AllErrorKeys = []struct {
 	{tKeyErrSaveTheme, string(tKeyErrSaveTheme)},
 	{tKeyErrSaveUser, string(tKeyErrSaveUser)},
 	{tKeyErrSaveSidebar, string(tKeyErrSaveSidebar)},
+	{tKeyErrSaveLogFile, string(tKeyErrSaveLogFile)},
 	{tKeyErrGetSessions, string(tKeyErrGetSessions)},
 	{tKeyErrGetTranslations, string(tKeyErrGetTranslations)},
 	{tKeyErrGetSessionStatistics, string(tKeyErrGetSessionStatistics)},
 	{tKeyErrCreateSession, string(tKeyErrCreateSession)},
 	{tKeyErrOpenResultsDirectory, string(tKeyErrOpenResultsDirectory)},
 	{tKeyErrReadThemeCSS, string(tKeyErrReadThemeCSS)},
+	{tKeyErrAuthManualLoginFailed, string(tKeyErrAuthManualLoginFailed)},
 }
 
 var (
@@ -65,12 +69,15 @@ var (
 	ErrSaveTheme            = newError(tKeyErrSaveTheme, errors.New("save theme"))
 	ErrSaveUser             = newError(tKeyErrSaveUser, errors.New("save user"))
 	ErrSaveSidebar          = newError(tKeyErrSaveSidebar, errors.New("save sidebar"))
+	ErrSaveLogFile          = newError(tKeyErrSaveLogFile, errors.New("save log file setting"))
 	ErrGetSessions          = newError(tKeyErrGetSessions, errors.New("get sessions"))
 	ErrGetTranslations      = newError(tKeyErrGetTranslations, errors.New("get translations"))
 	ErrGetSessionStatistics = newError(tKeyErrGetSessionStatistics, errors.New("get session statistics"))
 	ErrCreateSession        = newError(tKeyErrCreateSession, errors.New("create session"))
 	ErrOpenResultsDirectory = newError(tKeyErrOpenResultsDirectory, errors.New("open results directory"))
 	ErrReadThemeCSS         = newError(tKeyErrReadThemeCSS, errors.New("read theme css"))
+
+	ErrAuthManualLoginFailed = newError(tKeyErrAuthManualLoginFailed, errors.New("manual login did not establish a buckler session"))
 )
 
 type FGCTrackerError struct {
@@ -95,7 +102,15 @@ func newError(key ErrorLocalizationKey, err error) *FGCTrackerError {
 }
 
 func (e *FGCTrackerError) Error() string {
-	return e.InnerError.Error()
+	// FormatError leaves InnerError nil, and its result can be logged with %v,
+	// so fall back instead of panicking.
+	if e.InnerError != nil {
+		return e.InnerError.Error()
+	}
+	if e.Message != "" {
+		return e.Message
+	}
+	return string(e.LocalizationKey)
 }
 
 func (e *FGCTrackerError) Unwrap() error {

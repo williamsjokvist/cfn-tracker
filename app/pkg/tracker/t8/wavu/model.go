@@ -1,5 +1,7 @@
 package wavu
 
+import "fmt"
+
 type BattleType uint8
 
 const (
@@ -51,7 +53,6 @@ const (
 
 type Replay struct {
 	BattleAt       int64         `json:"battle_at"`
-	BattleId       string        `json:"battle_id"`
 	BattleType     BattleType    `json:"battle_type"`
 	GameVersion    uint16        `json:"game_version"`
 	P1CharaId      uint8         `json:"p1_chara_id"`
@@ -74,4 +75,10 @@ type Replay struct {
 	P2UserId       uint64        `json:"p2_user_id"`
 	StageId        uint16        `json:"stage_id"`
 	Winner         WinningPlayer `json:"winner"`
+}
+
+// ID identifies a replay. Wavu dropped battle_id from the API, and a player
+// can't be in two battles that start in the same second.
+func (r Replay) ID() string {
+	return fmt.Sprintf("%d-%s-%s", r.BattleAt, r.P1PolarisId, r.P2PolarisId)
 }

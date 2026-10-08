@@ -7,7 +7,8 @@ import { GetGuiConfig } from '@cmd/CommandHandler'
 const initialConfig: model.GUIConfig = {
   locale: 'en-GB',
   theme: model.ThemeName.DEFAULT,
-  sidebar: false
+  sidebar: false,
+  logFile: true
 }
 
 export const ConfigContext = React.createContext<

@@ -11,6 +11,7 @@ type TrackingMachineContextProps = {
   isTracking: boolean
   match: model.Match
   error: model.FGCTrackerError | null
+  retry: { attempt: number; nextRetryInMs: number; reason: string } | null
 }
 
 export const TRACKING_MACHINE = setup({
@@ -34,10 +35,16 @@ export const TRACKING_MACHINE = setup({
     subscribeToTrackingEvents: ({ self }) => {
       EventsOn('match', match => self.send({ type: 'matchPlayed', match }))
       EventsOn('stopped-tracking', () => self.send({ type: 'cease' }))
+      EventsOn('tracking-retrying', retry => self.send({ type: 'retrying', retry }))
+      EventsOn('tracking-recovered', () => self.send({ type: 'recovered' }))
+      EventsOn('tracking-error', error => self.send({ type: 'error', error }))
     },
     unsubscribeToTrackingEvents: ({ self }) => {
       EventsOff('match')
       EventsOff('stopped-tracking')
+      EventsOff('tracking-retrying')
+      EventsOff('tracking-recovered')
+      EventsOff('tracking-error')
     }
   }
 }).createMachine({
@@ -47,7 +54,8 @@ export const TRACKING_MACHINE = setup({
     error: null,
     restore: false,
     isTracking: false,
-    match: <model.Match>{}
+    match: <model.Match>{},
+    retry: null
   },
   initial: 'cfnForm',
   states: {
@@ -71,6 +79,10 @@ export const TRACKING_MACHINE = setup({
     },
     loading: {
       on: {
+        retrying: {
+          actions: assign({ retry: ({ event }) => event.retry }),
+          target: 'retrying'
+        },
         matchPlayed: {
           actions: assign({
             match: ({ event }) => event.match
@@ -91,6 +103,17 @@ export const TRACKING_MACHINE = setup({
     },
     tracking: {
       on: {
+        retrying: {
+          actions: assign({ retry: ({ event }) => event.retry }),
+          target: 'retrying'
+        },
+        error: {
+          actions: [
+            assign({ error: ({ event }) => event.error, isTracking: false, retry: null }),
+            'unsubscribeToTrackingEvents'
+          ],
+          target: 'cfnForm'
+        },
         forcePoll: {
           actions: ['forcePoll']
         },
@@ -108,6 +131,32 @@ export const TRACKING_MACHINE = setup({
           actions: assign({
             match: ({ event }) => event.match
           })
+        }
+      }
+    },
+    retrying: {
+      on: {
+        retrying: { actions: assign({ retry: ({ event }) => event.retry }) },
+        recovered: { actions: assign({ retry: null }), target: 'tracking' },
+        matchPlayed: {
+          actions: assign({ match: ({ event }) => event.match, retry: null }),
+          target: 'tracking'
+        },
+        forcePoll: { actions: ['forcePoll'] },
+        error: {
+          actions: [
+            assign({ error: ({ event }) => event.error, isTracking: false, retry: null }),
+            'unsubscribeToTrackingEvents'
+          ],
+          target: 'cfnForm'
+        },
+        cease: {
+          actions: [
+            'stopTracking',
+            'unsubscribeToTrackingEvents',
+            assign({ isTracking: false, retry: null })
+          ],
+          target: 'cfnForm'
         }
       }
     }

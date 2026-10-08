@@ -30,6 +30,7 @@ import (
 	"github.com/williamsjokvist/cfn-tracker/pkg/update"
 
 	"github.com/williamsjokvist/cfn-tracker/cmd"
+	"github.com/williamsjokvist/cfn-tracker/pkg/applog"
 	"github.com/williamsjokvist/cfn-tracker/pkg/browser"
 	"github.com/williamsjokvist/cfn-tracker/pkg/config"
 	"github.com/williamsjokvist/cfn-tracker/pkg/model"
@@ -42,13 +43,6 @@ import (
 	"github.com/williamsjokvist/cfn-tracker/pkg/update/github"
 )
 
-// linker flags
-const (
-	capIDEmail    string = ""
-	capIDPassword string = ""
-	isProduction  string = ""
-)
-
 //go:embed all:gui/dist
 var assets embed.FS
 
@@ -59,20 +53,8 @@ var errorTmpl []byte
 var wailsJson []byte
 
 var cfg config.BuildConfig
-var logFile *os.File
 
 var appBrowser *browser.Browser
-
-func logToFile() {
-	file, err := os.OpenFile("cfn-tracker.log", os.O_APPEND|os.O_RDWR|os.O_CREATE, 0644)
-	if err != nil {
-		log.Panic(err)
-	}
-
-	logFile = file
-	log.SetOutput(file)
-	log.SetFlags(log.Ldate | log.LstdFlags | log.Lshortfile)
-}
 
 type WailsJson struct {
 	Info WailsJsonInfo `json:"info"`
@@ -88,16 +70,9 @@ func init() {
 		log.Fatalf("parse project config: %v", err)
 	}
 
-	if isProduction == "true" {
-		logToFile()
-	}
-
 	if err := godotenv.Load(".env"); err != nil {
 		cfg = config.BuildConfig{
 			AppVersion:        wailsCfg.Info.ProductVersion,
-			Headless:          isProduction == "true",
-			CapIDEmail:        capIDEmail,
-			CapIDPassword:     capIDPassword,
 			BrowserSourcePort: 4242,
 		}
 		return
@@ -148,13 +123,20 @@ func closeWithError(err error) {
 }
 
 func main() {
-	defer func() {
-		if logFile != nil {
-			logFile.Close()
-		}
-	}()
+	noSqlDb, err := cfgDb.NewStorage()
+	if err != nil {
+		closeWithError(fmt.Errorf("initalize app config: %w", err))
+	}
+	runtimeCfg, err := noSqlDb.GetRuntimeConfig()
+	if err != nil {
+		closeWithError(fmt.Errorf("read app config: %w", err))
+	}
+	if err := applog.SetFileLogging(runtimeCfg.GUI.LogFile); err != nil {
+		slog.Error("enable log file", slog.Any("error", err))
+	}
+	defer applog.Close()
 
-	appBrowser, err := browser.NewBrowser(cfg.Headless)
+	appBrowser, err := browser.NewBrowser()
 	if err != nil {
 		closeWithError(fmt.Errorf("launch browser: %w", err))
 	}
@@ -179,10 +161,6 @@ func main() {
 	sqlDb, err := sql.NewStorage(false)
 	if err != nil {
 		closeWithError(fmt.Errorf("initalize database: %w", err))
-	}
-	noSqlDb, err := cfgDb.NewStorage()
-	if err != nil {
-		closeWithError(fmt.Errorf("initalize app config: %w", err))
 	}
 	txtDb, err := txt.NewStorage()
 	if err != nil {

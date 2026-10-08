@@ -9,17 +9,18 @@ import (
 type GameTracker interface {
 	GetUser(ctx context.Context, userId string) (*model.User, error)
 	Poll(ctx context.Context, session *model.Session) (*model.Match, error)
-	Authenticate(ctx context.Context, email string, password string, statusChan chan AuthStatus)
+	Authenticate(ctx context.Context, statusChan chan AuthStatus)
 }
 
 type AuthStatus struct {
-	Progress int
-	Err      error
+	Done   bool
+	Err    error
+	Action *AuthAction
 }
 
-func (s *AuthStatus) WithProgress(progress int) *AuthStatus {
-	s.Progress = progress
-	return s
+type AuthAction struct {
+	LocalizationKey string `json:"localizationKey"`
+	SecondsLeft     int    `json:"secondsLeft"`
 }
 
 func (s *AuthStatus) WithError(err error) *AuthStatus {

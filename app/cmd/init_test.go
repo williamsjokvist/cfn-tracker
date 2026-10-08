@@ -35,9 +35,6 @@ func TestMain(m *testing.M) {
 
 	cfg := config.BuildConfig{
 		AppVersion:        "4.0.0",
-		Headless:          true,
-		CapIDEmail:        "test",
-		CapIDPassword:     "test",
 		BrowserSourcePort: 4242,
 	}
 
@@ -52,7 +49,7 @@ func TestMain(m *testing.M) {
 		nil,
 	)
 	testSuite.trackingHandler.SetEventEmitter(func(eventName string, optionalData ...interface{}) {
-		log.Println(fmt.Sprintf("[EVENT] %s", eventName), optionalData[0])
+		log.Println(fmt.Sprintf("[EVENT] %s", eventName), optionalData)
 	})
 	os.Exit(m.Run())
 }

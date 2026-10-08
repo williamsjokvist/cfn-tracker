@@ -3,36 +3,64 @@ package cfn
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"log/slog"
-	"math/rand"
-	"strconv"
-	"strings"
 	"time"
 
 	"github.com/williamsjokvist/cfn-tracker/pkg/browser"
+	"github.com/williamsjokvist/cfn-tracker/pkg/model"
 	"github.com/williamsjokvist/cfn-tracker/pkg/tracker"
 )
 
 type CFNClient interface {
 	GetBattleLog(ctx context.Context, cfn string) (*BattleLog, error)
-	Authenticate(ctx context.Context, email string, password string, statChan chan tracker.AuthStatus)
+	Authenticate(ctx context.Context, statChan chan tracker.AuthStatus)
 }
 
 type Client struct {
 	browser *browser.Browser
+	auth    authBrowser
 }
+
+// Tests replace this so the manual login doesn't open Chrome or wait for a user.
+type authBrowser interface {
+	HasBucklerSession(ctx context.Context) bool
+	Close() error
+	LaunchManualLogin(ctx context.Context, url string) error
+	Relaunch() error
+}
+
+type browserAuth struct {
+	*browser.Browser
+}
+
+const (
+	manualLoginTimeout = 10 * time.Minute
+	// Upper bound for checking the buckler session; past this, logging in is faster.
+	bucklerSessionTimeout = 15 * time.Second
+	// Upper bound per poll. rod has no default timeout and waits forever for elements,
+	// so keep this below the 30s poll interval.
+	battleLogTimeout = 25 * time.Second
+)
+
+const (
+	bucklerBaseURL  = "https://www.streetfighter.com/6/buckler"
+	bucklerLoginURL = bucklerBaseURL + "/ja-jp/auth/loginep?redirect_url=/"
+)
 
 var _ CFNClient = (*Client)(nil)
 
 func NewClient(browser *browser.Browser) *Client {
-	return &Client{browser}
+	c := &Client{browser: browser}
+	if browser != nil {
+		c.auth = browserAuth{browser}
+	}
+	return c
 }
 
 func (c *Client) GetBattleLog(ctx context.Context, cfn string) (*BattleLog, error) {
-	page := c.browser.Page.Context(ctx)
-	err := page.Navigate(fmt.Sprintf("https://www.streetfighter.com/6/buckler/profile/%s/battlelog/rank", cfn))
+	page := c.browser.Page.Context(ctx).Timeout(battleLogTimeout)
+	err := page.Navigate(fmt.Sprintf("%s/profile/%s/battlelog/rank", bucklerBaseURL, cfn))
 	if err != nil {
 		return nil, fmt.Errorf("navigate to cfn: %w", err)
 	}
@@ -52,87 +80,81 @@ func (c *Client) GetBattleLog(ctx context.Context, cfn string) (*BattleLog, erro
 	var profilePage ProfilePage
 	err = json.Unmarshal([]byte(body), &profilePage)
 	if err != nil {
-		return nil, fmt.Errorf("unmarshal battle log: %w", err)
+		return nil, &model.ParseError{Op: "unmarshal battle log", Err: err}
 	}
 
 	bl := &profilePage.Props.PageProps
 	if bl.Common.StatusCode != 200 {
-		return nil, fmt.Errorf("fetch battle log, received status code %v", bl.Common.StatusCode)
+		return nil, &model.HTTPStatusError{Op: "fetch battle log", StatusCode: bl.Common.StatusCode}
 	}
 	return bl, nil
 }
 
-func (c *Client) Authenticate(ctx context.Context, email string, password string, statChan chan tracker.AuthStatus) {
-	status := &tracker.AuthStatus{Progress: 0, Err: nil}
-	if c.browser == nil {
-		statChan <- *status.WithError(fmt.Errorf("browser not initialized"))
+func (c *Client) Authenticate(ctx context.Context, statChan chan tracker.AuthStatus) {
+	status := &tracker.AuthStatus{}
+	if c.auth == nil {
+		send(ctx, statChan, *status.WithError(fmt.Errorf("browser not initialized")))
 		return
 	}
 
-	page := c.browser.Page.Context(ctx)
-
-	defer func() {
-		if r := recover(); r != nil {
-			slog.Error("panic recover when authenticating to cfn", r)
-			statChan <- *status.WithError(fmt.Errorf("fatal error: %v", r))
-		}
-	}()
-
-	if strings.Contains(page.MustInfo().URL, "buckler") {
-		statChan <- *status.WithProgress(100)
+	// Fetching matches only needs the buckler session (~1 month), so reuse it while valid.
+	if c.auth.HasBucklerSession(ctx) {
+		slog.Info("cfn: buckler session is still valid, skipping login")
+		send(ctx, statChan, tracker.AuthStatus{Done: true})
 		return
 	}
 
-	if email == "" || password == "" {
-		statChan <- *status.WithError(errors.New("missing cfn credentials"))
+	send(ctx, statChan, tracker.AuthStatus{Action: &tracker.AuthAction{LocalizationKey: "authNeedRelogin"}})
+	if closeErr := c.auth.Close(); closeErr != nil {
+		slog.Warn("failed to close controlled browser before manual login", slog.Any("error", closeErr))
+	}
+	manualCtx, cancel := context.WithTimeout(ctx, manualLoginTimeout)
+	manualErr := c.auth.LaunchManualLogin(manualCtx, bucklerLoginURL)
+	cancel()
+	if manualErr != nil {
+		slog.Info("manual login browser ended with an error", slog.Any("error", manualErr))
+	}
+	if relaunchErr := c.auth.Relaunch(); relaunchErr != nil {
+		send(ctx, statChan, *status.WithError(model.ErrAuthManualLoginFailed))
 		return
 	}
-
-	slog.Debug("logging into cfn")
-	page.MustNavigate("https://cid.capcom.com/ja/login/?guidedBy=web").MustWaitLoad().MustWaitIdle()
-	statChan <- *status.WithProgress(10)
-
-	if strings.Contains(page.MustInfo().URL, "cid.capcom.com/ja/mypage") {
-		slog.Debug("cfn: user already authed")
-		statChan <- *status.WithProgress(100)
+	if c.auth.HasBucklerSession(ctx) {
+		slog.Info("passed cfn auth")
+		send(ctx, statChan, tracker.AuthStatus{Done: true})
 		return
 	}
-	slog.Debug("cfn: user is not authed, continuing with auth process")
+	send(ctx, statChan, *status.WithError(model.ErrAuthManualLoginFailed))
+}
 
-	// Bypass age check
-	if strings.Contains(page.MustInfo().URL, "agecheck") {
-		page.MustElement("#country").MustSelect(COUNTRIES[rand.Intn(len(COUNTRIES))])
-		page.MustElement("#birthYear").MustSelect(strconv.Itoa(rand.Intn(1999-1970) + 1970))
-		page.MustElement("#birthMonth").MustSelect(strconv.Itoa(rand.Intn(12-1) + 1))
-		page.MustElement("#birthDay").MustSelect(strconv.Itoa(rand.Intn(28-1) + 1))
-		page.MustElement(`form button[type="submit"]`).MustClick()
-		page.MustWaitLoad().MustWaitRequestIdle()
+// send delivers a status unless ctx is done, so Authenticate can't block forever
+// once the caller has stopped listening.
+func send(ctx context.Context, statChan chan tracker.AuthStatus, status tracker.AuthStatus) {
+	select {
+	case statChan <- status:
+	case <-ctx.Done():
 	}
-	statChan <- *status.WithProgress(30)
+}
 
-	// Submit form
-	page.MustElement(`input[name="email"]`).MustInput(email)
-	page.MustElement(`input[name="password"]`).MustInput(password)
-	page.MustElement(`button[type="submit"]`).MustClick()
-	statChan <- *status.WithProgress(50)
+func (b browserAuth) LaunchManualLogin(ctx context.Context, url string) error {
+	return browser.LaunchManualLogin(ctx, url)
+}
 
-	// Wait for redirection
-	var secondsWaited time.Duration = 0
-	for {
-		// Break out if we are no longer on Auth0 (redirected to CFN)
-		if !strings.Contains(page.MustInfo().URL, "auth.cid.capcom.com") {
-			break
-		}
-
-		time.Sleep(time.Second)
-		secondsWaited += time.Second
-		slog.Debug("bypassing cfn auth gateway...", slog.Float64("seconds_waited", secondsWaited.Seconds()))
+// HasBucklerSession reports whether we're logged in to buckler, based on the logout
+// link in the header. Returns false when unsure, which just falls back to logging in.
+func (b browserAuth) HasBucklerSession(ctx context.Context) bool {
+	page := b.Page.Context(ctx).Timeout(bucklerSessionTimeout)
+	if err := page.Navigate(bucklerBaseURL + "/"); err != nil {
+		slog.Info("cfn: could not reach buckler", slog.Any("error", err))
+		return false
 	}
-	statChan <- *status.WithProgress(65)
-
-	page.MustNavigate("https://www.streetfighter.com/6/buckler/auth/loginep?redirect_url=/")
-	page.MustWaitLoad().MustWaitRequestIdle()
-
-	statChan <- *status.WithProgress(100)
-	slog.Info("passed cfn auth")
+	if err := page.WaitLoad(); err != nil {
+		slog.Info("cfn: buckler did not finish loading", slog.Any("error", err))
+		return false
+	}
+	// The logout link only appears in the header when logged in.
+	if _, err := page.Element(`a[href*="/auth/logout"]`); err != nil {
+		slog.Info("cfn: buckler shows no logged-in header", slog.Any("error", err))
+		return false
+	}
+	return true
 }

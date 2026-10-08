@@ -45,3 +45,6 @@ resource.syso
 
 CFN Tracker*
 cfn-tracker*
+
+app/build/bin/
+.env

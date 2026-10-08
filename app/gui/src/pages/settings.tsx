@@ -10,6 +10,7 @@ import {
   GetAppVersion,
   GetSupportedLanguages,
   SaveLocale,
+  SaveLogFile,
   SaveSidebarMinimized,
   SaveTheme
 } from '@cmd/CommandHandler'
@@ -42,6 +43,7 @@ export function SettingsPage() {
             <ThemeSelect />
             <LanguageSelect />
             <SideBarToggle />
+            <LogFileToggle />
           </div>
         </div>
         <div className='relative mx-auto grid max-w-xl gap-4 py-6'>
@@ -110,6 +112,25 @@ function SideBarToggle() {
         onCheckedChange={checked => {
           SaveSidebarMinimized(checked)
             .then(() => setCfg({ ...cfg, sidebar: checked }))
+            .catch(setError)
+        }}
+      />
+    </div>
+  )
+}
+
+function LogFileToggle() {
+  const { t } = useTranslation()
+  const setError = useErrorPopup()
+  const [cfg, setCfg] = React.useContext(ConfigContext)
+  return (
+    <div className='flex w-full justify-between'>
+      <h3 className='font-bold'>{t('writeLogFile')}</h3>
+      <Switch
+        checked={cfg.logFile}
+        onCheckedChange={checked => {
+          SaveLogFile(checked)
+            .then(() => setCfg({ ...cfg, logFile: checked }))
             .catch(setError)
         }}
       />

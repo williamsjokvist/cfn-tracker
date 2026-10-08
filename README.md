@@ -24,11 +24,5 @@ Contributions are welcome, take a look at the [issues](https://github.com/willia
 
 ## Setting up development environment
 
-1. Install dependencies
-    - [Wails](https://wails.io/docs/gettingstarted/installation)
-    - [Bun](https://bun.sh/)
-    - [Task](https://taskfile.dev/) - optional, but recommended
-
-2. Required environment variables are found in [example.env](https://github.com/williamsjokvist/cfn-tracker/blob/master/app/example.env)
-
-3. Run `task --list` to view the list of commands
+1. Install [mise](https://mise.jdx.dev/) and run `mise install`
+2. Run `mise tasks --all` to view the list of commands, e.g. `mise app:dev`, `mise app:build-windows-amd64`

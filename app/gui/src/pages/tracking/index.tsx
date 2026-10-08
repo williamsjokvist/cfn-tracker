@@ -21,6 +21,7 @@ export function TrackingPage() {
   const trackingState = useSelector(trackingActor, ({ value }) => value)
 
   const authError = useSelector(authActor, ({ context }) => context.error)
+  const authAction = useSelector(authActor, ({ context }) => context.action)
   const trackingError = useSelector(trackingActor, ({ context }) => context.error)
 
   const setError = useErrorPopup()
@@ -40,9 +41,25 @@ export function TrackingPage() {
       return (
         <Page.Root>
           <Page.Header>
-            <Page.Title>{t('loading')}</Page.Title>
-            <Page.LoadingIcon />
+            <Page.Title>
+              {authAction
+                ? t(authAction.localizationKey as 'authNeedRelogin', {
+                    seconds: authAction.secondsLeft
+                  })
+                : t('loading')}
+            </Page.Title>
+            {!authAction && <Page.LoadingIcon />}
           </Page.Header>
+          {authAction && (
+            <div className='flex flex-col items-center justify-center gap-6 px-8 text-center'>
+              <i
+                aria-label='loading'
+                className='text-highlight inline-block h-12 w-12 animate-spin rounded-full border-[4px] border-current border-t-transparent'
+                role='status'
+              />
+              <p className='max-w-sm text-white/70'>{t('authNeedReloginHint')}</p>
+            </div>
+          )}
         </Page.Root>
       )
   }
@@ -51,6 +68,7 @@ export function TrackingPage() {
     case 'cfnForm':
       return <TrackingForm />
     case 'tracking':
+    case 'retrying':
       return <TrackingLiveUpdater />
     case 'loading':
     default:
