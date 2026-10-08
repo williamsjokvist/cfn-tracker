@@ -36,8 +36,6 @@ func TestMain(m *testing.M) {
 	cfg := config.BuildConfig{
 		AppVersion:        "4.0.0",
 		Headless:          true,
-		CapIDEmail:        "test",
-		CapIDPassword:     "test",
 		BrowserSourcePort: 4242,
 	}
 

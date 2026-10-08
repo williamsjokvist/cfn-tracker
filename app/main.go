@@ -44,12 +44,8 @@ import (
 
 // linker flags
 //
-// These must be vars, not consts: -ldflags "-X main.xxx=..." silently ignores consts.
-var (
-	capIDEmail    string = ""
-	capIDPassword string = ""
-	isProduction  string = ""
-)
+// Must be a var, not a const: -ldflags "-X main.xxx=..." silently ignores consts.
+var isProduction string = ""
 
 //go:embed all:gui/dist
 var assets embed.FS
@@ -98,8 +94,6 @@ func init() {
 		cfg = config.BuildConfig{
 			AppVersion:        wailsCfg.Info.ProductVersion,
 			Headless:          isProduction == "true",
-			CapIDEmail:        capIDEmail,
-			CapIDPassword:     capIDPassword,
 			BrowserSourcePort: 4242,
 		}
 		return

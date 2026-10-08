@@ -138,6 +138,6 @@ func getLeagueFromLP(lp int) string {
 	return `Rookie`
 }
 
-func (t *SF6Tracker) Authenticate(ctx context.Context, email string, password string, statChan chan tracker.AuthStatus) {
-	t.cfnClient.Authenticate(ctx, email, password, statChan)
+func (t *SF6Tracker) Authenticate(ctx context.Context, statChan chan tracker.AuthStatus) {
+	t.cfnClient.Authenticate(ctx, statChan)
 }

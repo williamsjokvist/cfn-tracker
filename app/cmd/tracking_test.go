@@ -58,7 +58,7 @@ func (f *fakeTracker) Poll(ctx context.Context, _ *model.Session) (*model.Match,
 	}
 	return f.poll(polls)
 }
-func (f *fakeTracker) Authenticate(_ context.Context, _, _ string, statuses chan tracker.AuthStatus) {
+func (f *fakeTracker) Authenticate(_ context.Context, statuses chan tracker.AuthStatus) {
 	statuses <- tracker.AuthStatus{Progress: 100}
 }
 

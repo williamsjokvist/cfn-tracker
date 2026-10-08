@@ -21,7 +21,7 @@ func (f *authTestCFNClient) GetBattleLog(context.Context, string) (*cfn.BattleLo
 	return nil, errors.New("not used")
 }
 
-func (f *authTestCFNClient) Authenticate(ctx context.Context, _, _ string, statuses chan tracker.AuthStatus) {
+func (f *authTestCFNClient) Authenticate(ctx context.Context, statuses chan tracker.AuthStatus) {
 	f.authenticate(ctx, statuses)
 }
 
