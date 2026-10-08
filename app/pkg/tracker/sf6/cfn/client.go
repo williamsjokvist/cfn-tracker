@@ -19,6 +19,19 @@ type CFNClient interface {
 
 type Client struct {
 	browser *browser.Browser
+	auth    authBrowser
+}
+
+// Tests replace this so the manual login doesn't open Chrome or wait for a user.
+type authBrowser interface {
+	HasBucklerSession(ctx context.Context) bool
+	Close() error
+	LaunchManualLogin(ctx context.Context, url string) error
+	Relaunch() error
+}
+
+type browserAuth struct {
+	*browser.Browser
 }
 
 const (
@@ -35,7 +48,11 @@ const bucklerBaseURL = "https://www.streetfighter.com/6/buckler"
 var _ CFNClient = (*Client)(nil)
 
 func NewClient(browser *browser.Browser) *Client {
-	return &Client{browser}
+	c := &Client{browser: browser}
+	if browser != nil {
+		c.auth = browserAuth{browser}
+	}
+	return c
 }
 
 func (c *Client) GetBattleLog(ctx context.Context, cfn string) (*BattleLog, error) {
@@ -72,13 +89,13 @@ func (c *Client) GetBattleLog(ctx context.Context, cfn string) (*BattleLog, erro
 
 func (c *Client) Authenticate(ctx context.Context, statChan chan tracker.AuthStatus) {
 	status := &tracker.AuthStatus{Progress: 0, Err: nil}
-	if c.browser == nil {
+	if c.auth == nil {
 		send(ctx, statChan, *status.WithError(fmt.Errorf("browser not initialized")))
 		return
 	}
 
 	// Fetching matches only needs the buckler session (~1 month), so reuse it while valid.
-	if c.hasBucklerSession(ctx) {
+	if c.auth.HasBucklerSession(ctx) {
 		slog.Info("cfn: buckler session is still valid, skipping login")
 		send(ctx, statChan, *status.WithProgress(100))
 		return
@@ -87,20 +104,20 @@ func (c *Client) Authenticate(ctx context.Context, statChan chan tracker.AuthSta
 	// Chrome under rod can't pass Cloudflare's check on the Capcom ID login, so the
 	// user logs in themselves in a plain Chrome window sharing the same profile.
 	send(ctx, statChan, tracker.AuthStatus{Action: &tracker.AuthAction{LocalizationKey: "authNeedRelogin"}})
-	if closeErr := c.browser.Close(); closeErr != nil {
+	if closeErr := c.auth.Close(); closeErr != nil {
 		slog.Warn("failed to close controlled browser before manual login", slog.Any("error", closeErr))
 	}
 	manualCtx, cancel := context.WithTimeout(ctx, manualLoginTimeout)
-	manualErr := browser.LaunchManualLogin(manualCtx, bucklerBaseURL+"/ja-jp")
+	manualErr := c.auth.LaunchManualLogin(manualCtx, bucklerBaseURL+"/ja-jp")
 	cancel()
 	if manualErr != nil {
 		slog.Info("manual login browser ended with an error", slog.Any("error", manualErr))
 	}
-	if relaunchErr := c.browser.Relaunch(); relaunchErr != nil {
+	if relaunchErr := c.auth.Relaunch(); relaunchErr != nil {
 		send(ctx, statChan, *status.WithError(model.ErrAuthManualLoginFailed))
 		return
 	}
-	if c.hasBucklerSession(ctx) {
+	if c.auth.HasBucklerSession(ctx) {
 		slog.Info("passed cfn auth")
 		send(ctx, statChan, *status.WithProgress(100))
 		return
@@ -117,10 +134,14 @@ func send(ctx context.Context, statChan chan tracker.AuthStatus, status tracker.
 	}
 }
 
-// hasBucklerSession reports whether we're logged in to buckler, based on the logout
+func (b browserAuth) LaunchManualLogin(ctx context.Context, url string) error {
+	return browser.LaunchManualLogin(ctx, url)
+}
+
+// HasBucklerSession reports whether we're logged in to buckler, based on the logout
 // link in the header. Returns false when unsure, which just falls back to logging in.
-func (c *Client) hasBucklerSession(ctx context.Context) bool {
-	page := c.browser.Page.Context(ctx).Timeout(bucklerSessionTimeout)
+func (b browserAuth) HasBucklerSession(ctx context.Context) bool {
+	page := b.Page.Context(ctx).Timeout(bucklerSessionTimeout)
 	if err := page.Navigate(bucklerBaseURL + "/"); err != nil {
 		slog.Info("cfn: could not reach buckler", slog.Any("error", err))
 		return false
