@@ -16,12 +16,11 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"],
-      "@runtime": ["wailsjs/runtime/runtime"],
-      "@model": ["wailsjs/go/models"],
-      "@cmd/*": ["wailsjs/go/cmd/*"],
+      "@/*": ["./src/*"],
+      "@runtime": ["./wailsjs/runtime/runtime"],
+      "@model": ["./wailsjs/go/models"],
+      "@cmd/*": ["./wailsjs/go/cmd/*"],
     },
     "types": ["node"]
   },
