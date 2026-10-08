@@ -24,11 +24,8 @@ Contributions are welcome, take a look at the [issues](https://github.com/willia
 
 ## Setting up development environment
 
-1. Install dependencies
-    - [Wails](https://wails.io/docs/gettingstarted/installation)
-    - [Bun](https://bun.sh/)
-    - [Task](https://taskfile.dev/) - optional, but recommended
+1. Install [mise](https://mise.jdx.dev/) and run `mise install` to get Go, Bun and Wails
 
 2. Optional settings are in [example.env](https://github.com/williamsjokvist/cfn-tracker/blob/master/app/example.env). Copy it to `app/.env` to override the defaults
 
-3. Run `task --list` to view the list of commands
+3. Run `mise tasks` to view the list of commands
