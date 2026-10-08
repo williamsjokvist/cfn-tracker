@@ -1,0 +1,159 @@
+name: "Claude: triage and fix issues"
+
+on:
+  issues:
+    types: [opened, labeled]
+
+concurrency:
+  group: claude-issue-${{ github.event.issue.number }}
+  cancel-in-progress: false
+
+jobs:
+  triage:
+    # Only run for issues from trusted authors, or when a maintainer adds the
+    # `ai-triage` label. This keeps untrusted issue text from driving Claude.
+    if: >-
+      (github.event.action == 'opened' &&
+        contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.issue.author_association)) ||
+      (github.event.action == 'labeled' && github.event.label.name == 'ai-triage')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      id-token: write
+    outputs:
+      should_fix: ${{ fromJSON(steps.claude.outputs.structured_output).should_fix }}
+      reason: ${{ fromJSON(steps.claude.outputs.structured_output).reason }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Triage issue
+        id: claude
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            You are triaging GitHub issue #${{ github.event.issue.number }} in ${{ github.repository }}.
+            Read it with `gh issue view ${{ github.event.issue.number }} --comments`.
+
+            Explore the codebase (Go backend in `app/`, React/TypeScript GUI in `app/gui/`,
+            website in `web/`) and determine whether this is something for you to solve.
+
+            Your job is to decide if the issue is solvable by AI end-to-end, or if there
+            are outside factors that need a human. Only say should_fix = true when you
+            could implement, verify and open a PR for it entirely on your own.
+
+            should_fix = true only when ALL of these hold:
+            - It is a concrete bug or a small, well-scoped feature/improvement.
+            - The expected behaviour is clear enough that there is one reasonable fix.
+            - The root cause is in this repository's code, and the fix can be verified
+              with tests, type checks or by reading the code.
+
+            should_fix = false when ANY outside factor needs human aid, for example:
+            - Changes on Capcom's/CFN's side (API changes, outages, account or login issues).
+            - Secrets, credentials, account access, or settings outside the repo.
+            - Reproducing on the user's machine, manual testing on Windows, or game/OS specifics.
+            - Product, design or prioritisation decisions, or missing information from the reporter.
+            - Questions, support requests, duplicates, vague reports, large features or
+              risky refactors that need discussion.
+
+            When should_fix is false, set human_help_needed to the concrete things a
+            human has to do or answer before this can move forward. When it is true, set
+            it to an empty string.
+
+            Do not modify any files. Answer with the structured output only.
+          claude_args: |
+            --allowedTools "Read,Glob,Grep,Bash(gh issue view:*),Bash(gh search:*),Bash(git log:*)"
+            --json-schema '{"type":"object","properties":{"should_fix":{"type":"boolean","description":"True only if the issue is solvable by AI without any human aid"},"reason":{"type":"string","description":"One or two sentences explaining the decision"},"human_help_needed":{"type":"string","description":"Markdown bullet list of what a human must do or answer; empty if should_fix is true"}},"required":["should_fix","reason","human_help_needed"]}'
+
+      - name: Comment when human aid is needed
+        if: ${{ !fromJSON(steps.claude.outputs.structured_output).should_fix }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REASON: ${{ fromJSON(steps.claude.outputs.structured_output).reason }}
+          HUMAN_HELP: ${{ fromJSON(steps.claude.outputs.structured_output).human_help_needed }}
+        run: |
+          {
+            echo "🤖 Claude looked at this issue and decided it needs human aid, so no automatic fix was attempted."
+            echo
+            echo "**Why:** $REASON"
+            if [ -n "$HUMAN_HELP" ]; then
+              echo
+              echo "**What's needed from a human:**"
+              echo "$HUMAN_HELP"
+            fi
+            echo
+            echo 'Once that is resolved, a maintainer can add the `ai-triage` label to have Claude triage it again.'
+          } > body.md
+          gh issue comment ${{ github.event.issue.number }} --body-file body.md
+
+      - name: Label as needing human aid
+        if: ${{ !fromJSON(steps.claude.outputs.structured_output).should_fix }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh label create needs-human --color d93f0b --description "Needs human aid before Claude can fix it" --force
+          gh issue edit ${{ github.event.issue.number }} --add-label needs-human
+          # Remove ai-triage so a maintainer can re-add it later to trigger a new triage.
+          gh issue edit ${{ github.event.issue.number }} --remove-label ai-triage || true
+
+      - name: Clear needs-human label
+        if: ${{ fromJSON(steps.claude.outputs.structured_output).should_fix }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh issue edit ${{ github.event.issue.number }} --remove-label needs-human || true
+
+  fix:
+    needs: triage
+    if: needs.triage.outputs.should_fix == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: "app/go.mod"
+          cache-dependency-path: "app/go.sum"
+
+      - uses: oven-sh/setup-bun@v1
+
+      - name: Install GUI dependencies
+        working-directory: ./app/gui
+        run: bun install
+
+      - name: Fix issue and open PR
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            Fix GitHub issue #${{ github.event.issue.number }} in ${{ github.repository }}.
+            Read it with `gh issue view ${{ github.event.issue.number }} --comments`.
+
+            Triage note: ${{ needs.triage.outputs.reason }}
+
+            Steps:
+            1. Create a branch named `claude/issue-${{ github.event.issue.number }}` from master.
+            2. Implement the smallest change that fixes the issue, matching the style of the
+               surrounding code. Add or update tests when it makes sense.
+            3. Verify your change:
+               - Go (`app/`): `go build ./...` and `go test ./... -count=1`
+               - GUI (`app/gui/`): `bun tsc` and `bun format:check` (run `bun format` to fix formatting)
+            4. Commit using conventional commits (e.g. `fix(gui): ...`, `fix: ...`) and push the branch.
+            5. Open a PR against master with `gh pr create`. The body must include
+               `Closes #${{ github.event.issue.number }}`, a short summary of the change and how it was verified.
+            6. Comment on the issue with a link to the PR.
+
+            If while working you find the issue cannot be fixed safely, do not open a PR;
+            comment on the issue explaining why instead.
+          claude_args: |
+            --max-turns 60
+            --allowedTools "Read,Edit,Write,Glob,Grep,Bash(git:*),Bash(gh issue view:*),Bash(gh issue comment:*),Bash(gh pr create:*),Bash(gh pr view:*),Bash(go:*),Bash(gofmt:*),Bash(bun:*)"
