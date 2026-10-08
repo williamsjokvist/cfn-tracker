@@ -120,6 +120,7 @@
   "errNetwork": "通信に失敗しました",
   "errThrottled": "アクセスが制限されています",
   "errStructureChanged": "サイトの構造が変わった可能性があります",
-  "authNeedRelogin": "再ログインが必要です：Capcom のセッションが無いか期限切れです。開いた Chrome ウィンドウでログインし、終わったら閉じてください。",
+  "authNeedRelogin": "ログイン待ち",
+  "authNeedReloginHint": "開いた Chrome ウィンドウで Capcom にログインし、終わったら閉じてください。",
   "errAuthManualLoginFailed": "ブラウザでのログインを確認できませんでした。もう一度お試しください"
 }

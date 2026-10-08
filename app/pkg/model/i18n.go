@@ -125,5 +125,6 @@ type Localization struct {
 	ErrThrottled             string `json:"errThrottled"`
 	ErrStructureChanged      string `json:"errStructureChanged"`
 	AuthNeedRelogin          string `json:"authNeedRelogin"`
+	AuthNeedReloginHint      string `json:"authNeedReloginHint"`
 	ErrAuthManualLoginFailed string `json:"errAuthManualLoginFailed"`
 }

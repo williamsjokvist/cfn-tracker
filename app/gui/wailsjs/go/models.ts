@@ -164,6 +164,7 @@ export namespace model {
 	    errThrottled: string;
 	    errStructureChanged: string;
 	    authNeedRelogin: string;
+	    authNeedReloginHint: string;
 	    errAuthManualLoginFailed: string;
 	}
 	export interface Match {

@@ -48,13 +48,16 @@ export function TrackingPage() {
                   })
                 : t('loading')}
             </Page.Title>
-            <Page.LoadingIcon />
+            {!authAction && <Page.LoadingIcon />}
           </Page.Header>
           {authAction && (
-            <div className='mx-6 mt-3 rounded-lg bg-amber-500/20 px-4 py-3 font-semibold text-amber-100'>
-              {t(authAction.localizationKey as 'authNeedRelogin', {
-                seconds: authAction.secondsLeft
-              })}
+            <div className='flex flex-col items-center justify-center gap-6 px-8 text-center'>
+              <i
+                aria-label='loading'
+                className='text-highlight inline-block h-12 w-12 animate-spin rounded-full border-[4px] border-current border-t-transparent'
+                role='status'
+              />
+              <p className='max-w-sm text-white/70'>{t('authNeedReloginHint')}</p>
             </div>
           )}
         </Page.Root>

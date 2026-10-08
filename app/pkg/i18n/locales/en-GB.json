@@ -120,6 +120,7 @@
   "errNetwork": "Network error",
   "errThrottled": "Rate limited",
   "errStructureChanged": "The site structure may have changed",
-  "authNeedRelogin": "Login needed: your Capcom session is missing or has expired. Log in in the Chrome window that opened, then close it.",
+  "authNeedRelogin": "Waiting for login",
+  "authNeedReloginHint": "Log in to Capcom in the Chrome window that opened, then close it.",
   "errAuthManualLoginFailed": "Could not confirm the browser login. Please try again"
 }

@@ -120,6 +120,7 @@
   "errNetwork": "Erreur réseau",
   "errThrottled": "Accès limité",
   "errStructureChanged": "La structure du site a peut-être changé",
-  "authNeedRelogin": "Connexion requise : votre session Capcom est absente ou a expiré. Connectez-vous dans la fenêtre Chrome qui s'est ouverte, puis fermez-la.",
+  "authNeedRelogin": "En attente de connexion",
+  "authNeedReloginHint": "Connectez-vous à Capcom dans la fenêtre Chrome qui s'est ouverte, puis fermez-la.",
   "errAuthManualLoginFailed": "Impossible de confirmer la connexion dans le navigateur. Veuillez réessayer"
 }
