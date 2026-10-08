@@ -12,18 +12,17 @@ import (
 )
 
 var (
-	// 起動直後に終了したかを見極める猶予。既存インスタンスへ引き渡された Chrome は
-	// 1 秒以内に終了するので、これだけ生きていれば起動できたと見なしてよい。
+	// Grace period to detect an immediate exit. Chrome hands off to an existing
+	// instance and exits within a second, so surviving this long means it started.
 	manualLoginStartupWindow = 3 * time.Second
-	// プロファイルのロックが解放されるのを待つ間隔と、諦めるまでの試行回数。
+	// Delay between attempts while waiting for the profile lock, and how many attempts.
 	manualLoginRetryInterval = 2 * time.Second
 	manualLoginStartAttempts = 4
 )
 
-// errManualLoginProfileLocked は、起動した Chrome が即座に終了したことを表す。
-// UserDataDir は排他で、rod が残した Chromium などが掴んだままだと、新しいプロセスは
-// 起動を既存インスタンスへ引き渡して自分は終了する。実機でアプリ終了後に Chromium が
-// 7 プロセス残っていた例がある（2026-09-10）。
+// errManualLoginProfileLocked means the launched Chrome exited immediately. The
+// UserDataDir is exclusive, so if a leftover rod Chromium still holds it, the new
+// process hands off to that instance and exits.
 var errManualLoginProfileLocked = errors.New("manual login browser exited immediately; the user data directory may still be locked")
 
 type manualLoginProcess interface {
@@ -40,9 +39,9 @@ var startManualLoginProcess = func(ctx context.Context, chromePath string, args 
 	return cmd, nil
 }
 
-// LaunchManualLogin は CDP を使わない素の Chrome を起動し、ユーザーがログインを
-// 完了してブラウザを閉じるまで待つ。rod 経由の Chrome では Cloudflare の検証を
-// 通過できないため、ここでは launcher を使わず、デバッグポートも開かない。
+// LaunchManualLogin starts a plain Chrome without CDP and waits until the user has
+// logged in and closed it. Chrome driven by rod can't pass Cloudflare's check, so no
+// launcher or debugging port is used here.
 func LaunchManualLogin(ctx context.Context, url string) error {
 	chromePath, found := findChromeForManualLogin()
 	if !found {
@@ -53,8 +52,8 @@ func LaunchManualLogin(ctx context.Context, url string) error {
 		return err
 	}
 
-	// 直前まで rod が使っていたプロファイルはすぐには解放されないことがある。
-	// ロックは数秒で消えるのが普通なので、諦める前に間を置いて何度か試す。
+	// The profile rod just used may not be released right away. The lock usually
+	// clears within seconds, so retry a few times before giving up.
 	var lastErr error
 	for attempt := 1; attempt <= manualLoginStartAttempts; attempt++ {
 		if attempt > 1 {
@@ -75,7 +74,7 @@ func LaunchManualLogin(ctx context.Context, url string) error {
 	return lastErr
 }
 
-// runManualLoginBrowser は素の Chrome を1回起動し、閉じられるまで待つ。
+// runManualLoginBrowser starts plain Chrome once and waits for it to be closed.
 func runManualLoginBrowser(ctx context.Context, chromePath, dir, url string) error {
 	process, err := startManualLoginProcess(ctx, chromePath, "--user-data-dir="+dir, url)
 	if err != nil {

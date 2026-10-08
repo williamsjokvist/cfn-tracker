@@ -25,7 +25,7 @@ func ReplaceManualLoginProcessForTest(
 	}
 }
 
-// SetManualLoginTimingForTest は再試行の待ち時間をテスト用に縮める。
+// SetManualLoginTimingForTest shortens the retry delays for tests.
 func SetManualLoginTimingForTest(attempts int, interval, startupWindow time.Duration) func() {
 	originalAttempts := manualLoginStartAttempts
 	originalInterval := manualLoginRetryInterval

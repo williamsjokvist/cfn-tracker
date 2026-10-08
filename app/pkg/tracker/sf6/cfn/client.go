@@ -29,14 +29,13 @@ type Client struct {
 const (
 	authGatewayGrace        = 5 * time.Second
 	authGatewayPollInterval = time.Second
-	// ヘッドレスでは Cloudflare の検証が通らないため、短く見切って手動ログインへ切り替える。
+	// Cloudflare's check never passes headless, so give up quickly and switch to manual login.
 	loginFormTimeout   = 15 * time.Second
 	manualLoginTimeout = 10 * time.Minute
-	// buckler のセッション確認にかける上限。ここで手間取るなら
-	// ログインフローへ進んだほうが速い。
+	// Upper bound for checking the buckler session; past this, logging in is faster.
 	bucklerSessionTimeout = 15 * time.Second
-	// ポーリング1回あたりの上限。rod は既定でタイムアウトを持たず、要素待ちは
-	// 要素が現れるまで無限に待つ。ポーリング間隔(30秒)より短く切って必ず戻す。
+	// Upper bound per poll. rod has no default timeout and waits forever for elements,
+	// so keep this below the 30s poll interval.
 	battleLogTimeout = 25 * time.Second
 )
 
@@ -129,13 +128,11 @@ func (c *Client) Authenticate(ctx context.Context, email string, password string
 	}
 }
 
-// hasBucklerSession は buckler にログイン済みかを、ヘッダーのログアウトリンクの有無で
-// 判定する。GetBattleLog が使うページはユーザーコードを必要とするため、それを受け取らない
-// 認証段階ではこちらを使う。判定に失敗した場合は通常のログインフローへ進むだけなので、
-// 迷ったら false に倒す。
+// hasBucklerSession reports whether we're logged in to buckler, based on the logout
+// link in the header. Returns false when unsure, which just falls back to logging in.
 func (c *Client) hasBucklerSession(ctx context.Context) bool {
-	// 判定に要るのは DOM だけ。Authenticate の入口で解除されたアセットブロックを
-	// この間だけ戻し、抜けるときに呼び出し元の状態へ戻す。
+	// Only the DOM is needed, so re-enable asset blocking for this check and restore
+	// the caller's setting afterwards.
 	c.browser.SetAssetBlocking(true)
 	defer c.browser.SetAssetBlocking(false)
 
@@ -148,7 +145,7 @@ func (c *Client) hasBucklerSession(ctx context.Context) bool {
 		slog.Info("cfn: buckler did not finish loading", slog.Any("error", err))
 		return false
 	}
-	// ログアウトリンクはログイン済みのときだけヘッダーに現れる（実機で確認）。
+	// The logout link only appears in the header when logged in.
 	if _, err := page.Element(`a[href*="/auth/logout"]`); err != nil {
 		slog.Info("cfn: buckler shows no logged-in header", slog.Any("error", err))
 		return false
@@ -170,11 +167,9 @@ func (c *Client) attemptLogin(ctx context.Context, email string, password string
 		}
 	}()
 
-	// Capcom ID のログインセッションは 2 日ほどで切れるが、対戦データの取得に要るのは
-	// buckler 側のセッション（別 Cookie・約 1 ヶ月有効）である。buckler が使える限り
-	// ログインは不要なので、先に実際にアクセスして確かめる。URL の文字列判定では
-	// 「buckler にいるがログアウト済み」を見抜けず、逆に buckler が生きていても
-	// Cloudflare の検証つきログイン画面へ突っ込んでしまう。
+	// The Capcom ID session expires after ~2 days, but fetching matches only needs the
+	// buckler session (separate cookie, ~1 month). Check buckler first and skip login
+	// while it's still valid.
 	if c.hasBucklerSession(ctx) {
 		slog.Info("cfn: buckler session is still valid, skipping login")
 		statChan <- *status.WithProgress(100)
@@ -264,9 +259,8 @@ func (c *Client) attemptLogin(ctx context.Context, email string, password string
 // shouldEscalateToManualLogin reports whether authentication should continue in
 // an uncontrolled browser operated by the user.
 //
-// rod の制御下では表示ありでも Cloudflare の検証を通過できない（実機で3回確認:
-// 2026-08-18 / 08-21 / 09-10）。よってヘッドレスかどうかを条件にしない。
-// フォームに到達できなければ、素の Chrome での手動ログインへ委ねる。
+// Chrome under rod can't pass Cloudflare's check even when headful, so regardless of
+// headless mode, fall back to a manual login in plain Chrome if the form isn't reached.
 func shouldEscalateToManualLogin(result loginResult) bool {
 	return result == loginNeedsHuman
 }

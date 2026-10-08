@@ -9,9 +9,8 @@ import (
 	"github.com/williamsjokvist/cfn-tracker/pkg/model"
 )
 
-// ロケールJSONと model.Localization の宣言がずれると、翻訳は「黙って空文字」になり、
-// 画面にはキー名がそのまま出る。ビルドもテストも通ってしまい実機でしか気づけないため、
-// ここで機械的に塞ぐ。
+// If the locale JSON and model.Localization drift apart, translations silently become
+// empty and the raw key shows in the UI. Nothing else catches it, so check it here.
 func TestLocalesMatchLocalizationStruct(t *testing.T) {
 	languages, err := GetSupportedLanguages()
 	if err != nil {
@@ -42,13 +41,13 @@ func TestLocalesMatchLocalizationStruct(t *testing.T) {
 				t.Fatalf("unmarshal locale json: %v", err)
 			}
 
-			// JSON にあるが構造体に宣言が無い → 読み込まれず黙って捨てられる
+			// In JSON but not in the struct: silently dropped
 			for key := range keys {
 				if _, ok := declared[key]; !ok {
 					t.Errorf("locale key %q is not declared in model.Localization; it would be silently dropped", key)
 				}
 			}
-			// 構造体にあるが JSON に無い → 空文字が画面に出る
+			// In the struct but not in JSON: shows as empty
 			for key := range declared {
 				if _, ok := keys[key]; !ok {
 					t.Errorf("model.Localization declares %q but %s.json does not define it", key, lang)

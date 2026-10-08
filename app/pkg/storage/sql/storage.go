@@ -23,8 +23,8 @@ type Storage struct {
 	db *sqlx.DB
 }
 
-// inMemoryDataSource は共有キャッシュのメモリDB。素の ":memory:" は接続ごとに
-// 別々のDBになるため、マイグレーションを適用しても別接続からは見えない。
+// inMemoryDataSource is a shared-cache in-memory DB. Plain ":memory:" gives each
+// connection its own DB, so migrations wouldn't be visible to other connections.
 const inMemoryDataSource = "file:cfn-tracker-mem?mode=memory&cache=shared"
 
 func NewStorage(useInMemoryDb bool) (*Storage, error) {
@@ -39,8 +39,8 @@ func NewStorage(useInMemoryDb bool) (*Storage, error) {
 	}
 
 	if useInMemoryDb {
-		// 共有キャッシュのメモリDBは接続が1本も無くなった時点で消滅する。
-		// マイグレーション用の接続が閉じても消えないよう、ここで1本張って保持する。
+		// A shared-cache in-memory DB disappears once its last connection closes,
+		// so hold one open to survive the migration connection closing.
 		db.SetMaxOpenConns(1)
 		if err := db.Ping(); err != nil {
 			db.Close()
@@ -48,9 +48,7 @@ func NewStorage(useInMemoryDb bool) (*Storage, error) {
 		}
 	}
 
-	// マイグレーションは実際に使うデータソースへ適用する。
-	// 以前はメモリDB指定時もディスク側だけを移行しており、返されるハンドルには
-	// テーブルが1つも無かった（テストからDBを触れなかった原因）。
+	// Migrate the data source that is actually used, not always the on-disk one.
 	if err := migrateSchemaAt(dataSource, nil); err != nil {
 		db.Close()
 		return nil, fmt.Errorf("perform sql migrations: %w", err)
