@@ -107,8 +107,8 @@ func TestAuthenticateWaitsForManualLogin(t *testing.T) {
 	statuses := authenticate(t, f)
 
 	assertCalls(t, f, "session", "close", "manual-login", "relaunch", "session")
-	if gotURL != bucklerBaseURL+"/ja-jp" {
-		t.Fatalf("manual login url = %q, want %q", gotURL, bucklerBaseURL+"/ja-jp")
+	if gotURL != bucklerLoginURL {
+		t.Fatalf("manual login url = %q, want %q", gotURL, bucklerLoginURL)
 	}
 	if !hasDeadline {
 		t.Fatal("manual login context has no deadline")

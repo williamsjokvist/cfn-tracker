@@ -43,7 +43,10 @@ const (
 	battleLogTimeout = 25 * time.Second
 )
 
-const bucklerBaseURL = "https://www.streetfighter.com/6/buckler"
+const (
+	bucklerBaseURL  = "https://www.streetfighter.com/6/buckler"
+	bucklerLoginURL = bucklerBaseURL + "/ja-jp/auth/loginep?redirect_url=/"
+)
 
 var _ CFNClient = (*Client)(nil)
 
@@ -108,7 +111,7 @@ func (c *Client) Authenticate(ctx context.Context, statChan chan tracker.AuthSta
 		slog.Warn("failed to close controlled browser before manual login", slog.Any("error", closeErr))
 	}
 	manualCtx, cancel := context.WithTimeout(ctx, manualLoginTimeout)
-	manualErr := c.auth.LaunchManualLogin(manualCtx, bucklerBaseURL+"/ja-jp")
+	manualErr := c.auth.LaunchManualLogin(manualCtx, bucklerLoginURL)
 	cancel()
 	if manualErr != nil {
 		slog.Info("manual login browser ended with an error", slog.Any("error", manualErr))
