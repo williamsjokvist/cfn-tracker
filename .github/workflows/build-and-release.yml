@@ -42,7 +42,7 @@ jobs:
         shell: pwsh
 
       - name: Build
-        run: mise build:windows-amd64
+        run: mise build-windows-amd64
 
       - name: Zip build
         run: tar -a -c -f 'cfn-tracker-windows-amd64.zip' -C './build/bin' 'CFN Tracker.exe'

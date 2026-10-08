@@ -1,4 +1,5 @@
 [tools]
+bun = "latest"
 go = "1.25"
 "go:github.com/wailsapp/wails/v2/cmd/wails" = "2.12.0"
 
