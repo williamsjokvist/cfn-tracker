@@ -145,16 +145,28 @@ export function TrackingLiveUpdater() {
           </motion.div>
         </div>
         {/* TODO: fix character image for tekken 8 */}
-        <img
-          className='pointer-events-none absolute top-0 -right-20 z-[-1] h-full opacity-10 grayscale'
-          src={`https://www.streetfighter.com/6/buckler/assets/images/material/character/character_${character
-            .toLowerCase()
-            .replace(/\s/g, '')
-            .replace('.', '')}_r.png`}
-          alt={''}
-        />
+        <CharacterImage character={character} />
       </motion.section>
     </Page.Root>
+  )
+}
+
+function CharacterImage({ character }: { character: string }) {
+  const src = `https://www.streetfighter.com/6/buckler/assets/images/material/character/character_${character
+    .toLowerCase()
+    .replace(/\s/g, '')
+    .replace('.', '')}_r.png`
+  const [failedSrc, setFailedSrc] = React.useState<string>()
+  if (!character || failedSrc === src) {
+    return null
+  }
+  return (
+    <img
+      className='pointer-events-none absolute top-0 -right-20 z-[-1] h-full opacity-10 grayscale'
+      src={src}
+      alt=''
+      onError={() => setFailedSrc(src)}
+    />
   )
 }
 
