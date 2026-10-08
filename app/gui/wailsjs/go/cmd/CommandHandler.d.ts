@@ -26,6 +26,8 @@ export function OpenResultsDirectory():Promise<void>;
 
 export function SaveLocale(arg1:string):Promise<void>;
 
+export function SaveLogFile(arg1:boolean):Promise<void>;
+
 export function SaveSidebarMinimized(arg1:boolean):Promise<void>;
 
 export function SaveTheme(arg1:model.ThemeName):Promise<void>;
