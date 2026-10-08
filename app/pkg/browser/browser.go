@@ -7,7 +7,6 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
-	"sync/atomic"
 	"time"
 
 	"github.com/go-rod/rod"
@@ -20,25 +19,21 @@ import (
 // After that we move on, since a stuck authentication is worse than a leaked process.
 const browserCleanupTimeout = 5 * time.Second
 
+// Browser is the headless Chrome used to read buckler with the saved session.
+// Logging in happens separately, in a plain Chrome window (see LaunchManualLogin).
 type Browser struct {
 	Page         *rod.Page
 	HijackRouter *rod.HijackRouter
-	Headless     bool
-	// PreferHeadless is the user-configured default mode. The browser returns to
-	// this mode after it is temporarily made visible for image verification.
-	PreferHeadless bool
 
-	mu          sync.Mutex
-	blockAssets atomic.Bool
-	launcher    *launcher.Launcher
-	rod         *rod.Browser
+	mu       sync.Mutex
+	launcher *launcher.Launcher
+	rod      *rod.Browser
 }
 
-func NewBrowser(headless bool) (*Browser, error) {
+func NewBrowser() (*Browser, error) {
 	slog.Debug("setting up browser")
-	b := &Browser{Headless: headless, PreferHeadless: headless}
-	b.blockAssets.Store(true)
-	if err := b.launch(headless); err != nil {
+	b := &Browser{}
+	if err := b.launch(); err != nil {
 		b.closeCurrent()
 		return nil, err
 	}
@@ -53,7 +48,7 @@ func UserDataDir() (string, error) {
 	return filepath.Join(userHomeDir, "cfn-tracker"), nil
 }
 
-func (b *Browser) launch(headless bool) error {
+func (b *Browser) launch() error {
 	userDataDir, err := UserDataDir()
 	if err != nil {
 		return err
@@ -66,7 +61,7 @@ func (b *Browser) launch(headless bool) error {
 	l.Delete("enable-automation")
 	l.Set("disable-blink-features", "AutomationControlled")
 	l.RemoteDebuggingPort(6969)
-	u, err := l.Leakless(false).Headless(headless).Launch()
+	u, err := l.Leakless(false).Headless(true).Launch()
 	if err != nil {
 		return fmt.Errorf("launch temp browser: %w", err)
 	}
@@ -87,28 +82,20 @@ func (b *Browser) launch(headless bool) error {
 		}
 	}
 
-	// A headful browser is only launched to authenticate. Hijacking every request via
-	// the Fetch domain trips Cloudflare's bot detection, so skip asset blocking here.
-	if headless {
-		router := page.HijackRequests()
-		// Block the browser from fetching unnecessary resources
-		router.MustAdd(`*`, func(ctx *rod.Hijack) {
-			if shouldBlockRequest(ctx.Request.Type(), ctx.Request.URL().Hostname(), b.blockAssets.Load()) {
-				ctx.Response.Fail(proto.NetworkErrorReasonBlockedByClient)
-				return
-			}
+	router := page.HijackRequests()
+	// Block the browser from fetching unnecessary resources
+	router.MustAdd(`*`, func(ctx *rod.Hijack) {
+		if shouldBlockRequest(ctx.Request.Type(), ctx.Request.URL().Hostname()) {
+			ctx.Response.Fail(proto.NetworkErrorReasonBlockedByClient)
+			return
+		}
 
-			ctx.ContinueRequest(&proto.FetchContinueRequest{})
-		})
+		ctx.ContinueRequest(&proto.FetchContinueRequest{})
+	})
 
-		go router.Run()
-		b.HijackRouter = router
-	} else {
-		b.HijackRouter = nil
-	}
-
+	go router.Run()
+	b.HijackRouter = router
 	b.Page = page
-	b.Headless = headless
 	return nil
 }
 
@@ -123,8 +110,8 @@ func (b *Browser) closeCurrent() {
 	}
 	if b.launcher != nil {
 		// Cleanup removes its configured UserDataDir. Clear that flag first so the
-		// login profile survives — deleting it would force image verification on
-		// every launch.
+		// login profile survives — deleting it would force a new login on every
+		// launch.
 		b.launcher.Delete(flags.UserDataDir)
 
 		// Cleanup blocks on <-l.exit, which is only closed once Chromium has
@@ -151,10 +138,10 @@ func (b *Browser) closeCurrent() {
 	b.launcher = nil
 }
 
-// Relaunch replaces the current browser in the requested mode. It must only be
-// called during authentication, before tracking starts; relaunching while
-// polling would invalidate a Page being used by GetBattleLog.
-func (b *Browser) Relaunch(headless bool) error {
+// Relaunch replaces the current browser. It must only be called during
+// authentication, before tracking starts; relaunching while polling would
+// invalidate a Page being used by GetBattleLog.
+func (b *Browser) Relaunch() error {
 	b.mu.Lock()
 	defer b.mu.Unlock()
 
@@ -164,7 +151,7 @@ func (b *Browser) Relaunch(headless bool) error {
 		if attempt > 1 {
 			time.Sleep(500 * time.Millisecond)
 		}
-		err = b.launch(headless)
+		err = b.launch()
 		if err == nil {
 			return nil
 		}
@@ -181,16 +168,7 @@ func (b *Browser) Close() error {
 	return nil
 }
 
-// SetAssetBlocking toggles blocking of images, fonts and CSS.
-// It must be disabled while a human solves a CAPTCHA.
-func (b *Browser) SetAssetBlocking(enabled bool) {
-	b.blockAssets.Store(enabled)
-}
-
-func shouldBlockRequest(t proto.NetworkResourceType, hostname string, blocking bool) bool {
-	if !blocking {
-		return false
-	}
+func shouldBlockRequest(t proto.NetworkResourceType, hostname string) bool {
 	return t == proto.NetworkResourceTypeImage ||
 		t == proto.NetworkResourceTypeFont ||
 		(t == proto.NetworkResourceTypeStylesheet && !strings.Contains(hostname, "steam"))

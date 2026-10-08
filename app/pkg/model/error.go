@@ -26,9 +26,6 @@ const (
 	tKeyErrCreateSession         ErrorLocalizationKey = "errCreateSession"
 	tKeyErrOpenResultsDirectory  ErrorLocalizationKey = "errOpenResultsDirectory"
 	tKeyErrReadThemeCSS          ErrorLocalizationKey = "errReadThemeCSS"
-	tKeyErrAuthNeedsHeadful      ErrorLocalizationKey = "errAuthNeedsHeadful"
-	tKeyErrAuthManualTimeout     ErrorLocalizationKey = "errAuthManualTimeout"
-	tKeyErrAuthBlocked           ErrorLocalizationKey = "errAuthBlocked"
 	tKeyErrAuthManualLoginFailed ErrorLocalizationKey = "errAuthManualLoginFailed"
 )
 
@@ -54,9 +51,6 @@ var AllErrorKeys = []struct {
 	{tKeyErrCreateSession, string(tKeyErrCreateSession)},
 	{tKeyErrOpenResultsDirectory, string(tKeyErrOpenResultsDirectory)},
 	{tKeyErrReadThemeCSS, string(tKeyErrReadThemeCSS)},
-	{tKeyErrAuthNeedsHeadful, string(tKeyErrAuthNeedsHeadful)},
-	{tKeyErrAuthManualTimeout, string(tKeyErrAuthManualTimeout)},
-	{tKeyErrAuthBlocked, string(tKeyErrAuthBlocked)},
 	{tKeyErrAuthManualLoginFailed, string(tKeyErrAuthManualLoginFailed)},
 }
 
@@ -80,13 +74,6 @@ var (
 	ErrOpenResultsDirectory = newError(tKeyErrOpenResultsDirectory, errors.New("open results directory"))
 	ErrReadThemeCSS         = newError(tKeyErrReadThemeCSS, errors.New("read theme css"))
 
-	// CAPTCHA-related errors get their own keys so the user sees how to resolve
-	// them instead of a generic ErrAuth message.
-	ErrAuthNeedsHeadful  = newError(tKeyErrAuthNeedsHeadful, errors.New("captcha requires a visible browser"))
-	ErrAuthManualTimeout = newError(tKeyErrAuthManualTimeout, errors.New("manual authentication timed out"))
-
-	// The login form never appears, e.g. when Cloudflare blocks access.
-	ErrAuthBlocked           = newError(tKeyErrAuthBlocked, errors.New("login form did not appear"))
 	ErrAuthManualLoginFailed = newError(tKeyErrAuthManualLoginFailed, errors.New("manual login did not establish a buckler session"))
 )
 

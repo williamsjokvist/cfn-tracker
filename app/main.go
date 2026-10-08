@@ -93,7 +93,6 @@ func init() {
 	if err := godotenv.Load(".env"); err != nil {
 		cfg = config.BuildConfig{
 			AppVersion:        wailsCfg.Info.ProductVersion,
-			Headless:          isProduction == "true",
 			BrowserSourcePort: 4242,
 		}
 		return
@@ -150,7 +149,7 @@ func main() {
 		}
 	}()
 
-	appBrowser, err := browser.NewBrowser(cfg.Headless)
+	appBrowser, err := browser.NewBrowser()
 	if err != nil {
 		closeWithError(fmt.Errorf("launch browser: %w", err))
 	}

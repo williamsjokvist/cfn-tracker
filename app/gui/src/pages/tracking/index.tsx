@@ -43,7 +43,7 @@ export function TrackingPage() {
           <Page.Header>
             <Page.Title>
               {authAction
-                ? t(authAction.localizationKey as 'authSolveCaptcha', {
+                ? t(authAction.localizationKey as 'authNeedRelogin', {
                     seconds: authAction.secondsLeft
                   })
                 : t('loading')}
@@ -52,7 +52,7 @@ export function TrackingPage() {
           </Page.Header>
           {authAction && (
             <div className='mx-6 mt-3 rounded-lg bg-amber-500/20 px-4 py-3 font-semibold text-amber-100'>
-              {t(authAction.localizationKey as 'authSolveCaptcha', {
+              {t(authAction.localizationKey as 'authNeedRelogin', {
                 seconds: authAction.secondsLeft
               })}
             </div>

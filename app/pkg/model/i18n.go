@@ -122,13 +122,6 @@ type Localization struct {
 	ErrNetwork               string `json:"errNetwork"`
 	ErrThrottled             string `json:"errThrottled"`
 	ErrStructureChanged      string `json:"errStructureChanged"`
-	AuthSolveCaptcha         string `json:"authSolveCaptcha"`
-	AuthWaitingForForm       string `json:"authWaitingForForm"`
-	AuthOpeningBrowser       string `json:"authOpeningBrowser"`
-	AuthManualLogin          string `json:"authManualLogin"`
-	AuthNeedsHeadful         string `json:"authNeedsHeadful"`
-	ErrAuthNeedsHeadful      string `json:"errAuthNeedsHeadful"`
-	ErrAuthManualTimeout     string `json:"errAuthManualTimeout"`
-	ErrAuthBlocked           string `json:"errAuthBlocked"`
+	AuthNeedRelogin          string `json:"authNeedRelogin"`
 	ErrAuthManualLoginFailed string `json:"errAuthManualLoginFailed"`
 }
