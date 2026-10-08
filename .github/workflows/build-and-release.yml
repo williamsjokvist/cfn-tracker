@@ -29,7 +29,6 @@ jobs:
         with:
           ref: master
 
-      # Installs go, bun and wails from app/mise.toml
       - uses: jdx/mise-action@v2
         with:
           working_directory: app
@@ -43,7 +42,7 @@ jobs:
         shell: pwsh
 
       - name: Build
-        run: mise run build:windows-amd64
+        run: mise build:windows-amd64
 
       - name: Zip build
         run: tar -a -c -f 'cfn-tracker-windows-amd64.zip' -C './build/bin' 'CFN Tracker.exe'

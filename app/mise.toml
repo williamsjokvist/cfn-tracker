@@ -1,6 +1,5 @@
 [tools]
 go = "1.25"
-bun = "latest"
 "go:github.com/wailsapp/wails/v2/cmd/wails" = "2.12.0"
 
 [tasks.dev]
@@ -15,32 +14,32 @@ run = "wails dev -forcebuild"
 description = "Generate go->ts bindings"
 run = "wails generate module"
 
-[tasks."build:windows-amd64"]
+[tasks."build-windows-amd64"]
 description = "Build for Windows (x86)"
 env = { GOOS = "windows", GOARCH = "amd64" }
 run = "wails build"
 
-[tasks."build:windows-arm64"]
+[tasks."build-windows-arm64"]
 description = "Build for Windows (arm)"
 env = { GOOS = "windows", GOARCH = "arm64" }
 run = "wails build"
 
-[tasks."build:linux-amd64"]
+[tasks."build-linux-amd64"]
 description = "Build for Linux (x86)"
 env = { GOOS = "linux", GOARCH = "amd64" }
 run = "wails build"
 
-[tasks."build:linux-arm64"]
+[tasks."build-linux-arm64"]
 description = "Build for Linux (arm)"
 env = { GOOS = "linux", GOARCH = "arm64" }
 run = "wails build"
 
-[tasks."build:mac-amd64"]
+[tasks."build-mac-amd64"]
 description = "Build for Mac (x86)"
 env = { GOOS = "darwin", GOARCH = "amd64" }
 run = "wails build"
 
-[tasks."build:mac-arm64"]
+[tasks."build-mac-arm64"]
 description = "Build for Mac (arm)"
 env = { GOOS = "darwin", GOARCH = "arm64" }
 run = "wails build"
