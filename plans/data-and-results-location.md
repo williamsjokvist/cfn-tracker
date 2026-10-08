@@ -44,4 +44,3 @@ If the folder is missing at startup, log a warning and fall back to the default.
   - copy, `.bak` and refusal-while-tracking for the DB move
   - the results switch under `-race`
   - both startup fallbacks
-- Open question: should the Chrome profile get its own subfolder?
