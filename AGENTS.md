@@ -14,4 +14,4 @@ Never edit generated code by hand. Change the source it's generated from and reg
 
 ## Tooling
 
-Tools (Go, Bun, Wails) and tasks are defined in `mise.toml`. Run `mise tasks` to list the tasks.
+This is a mise monorepo. The root `mise.toml` only marks the monorepo root. `app/mise.toml` (Go, Bun, Wails) and `web/mise.toml` (Bun) hold each project's tools and tasks. Run `mise tasks --all` to list them, and `mise run //app:<task>` or `//web:<task>` to run one from anywhere.

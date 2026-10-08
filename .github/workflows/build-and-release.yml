@@ -29,8 +29,10 @@ jobs:
         with:
           ref: master
 
-      # Installs go, bun and wails from mise.toml
+      # Installs go, bun and wails from app/mise.toml
       - uses: jdx/mise-action@v2
+        with:
+          working_directory: app
 
       - name: Set version in app config
         run: |
