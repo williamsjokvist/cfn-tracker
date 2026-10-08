@@ -51,10 +51,8 @@ jobs:
           echo $json.info
         shell: pwsh
 
-      # 配布物に認証情報を埋め込まない。Taskfile の ldflags は CAP_ID_EMAIL /
-      # CAP_ID_PASSWORD を参照するが、env を渡さなければ空文字のまま入る。
-      # 利用者は同梱の example.env を .env にコピーして自分の資格情報を書く。
-      # ここに secrets を渡すと exe に平文で焼き込まれ、公開リリースで漏れる。
+      # Don't pass CAP_ID_EMAIL / CAP_ID_PASSWORD here: the Taskfile ldflags would
+      # embed them in plain text in the public exe. Users provide their own via .env.
       - name: Build
         run: task build:windows-amd64 -- -o 'CFN Tracker.exe'
 

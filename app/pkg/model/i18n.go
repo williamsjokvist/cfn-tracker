@@ -114,9 +114,8 @@ type Localization struct {
 	ErrCreateSession         string `json:"errCreateSession"`
 	ErrOpenResultsDirectory  string `json:"errOpenResultsDirectory"`
 	ErrReadThemeCSS          string `json:"errReadThemeCSS"`
-	// 再試行まわり。翻訳はこの構造体を経由して配信されるため、
-	// ロケールJSONに書いてもここに宣言が無いと黙って捨てられ、
-	// 画面にはキー名がそのまま出る。
+	// Retry/recovery keys. Keys missing from this struct are silently dropped
+	// even if they exist in the locale JSON.
 	Retrying                 string `json:"retrying"`
 	RetryingDetail           string `json:"retryingDetail"`
 	Reconnected              string `json:"reconnected"`

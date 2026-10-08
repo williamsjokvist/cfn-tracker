@@ -16,8 +16,8 @@ import (
 	"github.com/go-rod/rod/lib/proto"
 )
 
-// browserCleanupTimeout は、閉じたブラウザの後始末を待つ上限。
-// これを超えたら諦めて先へ進む（認証が固まるほうが害が大きい）。
+// browserCleanupTimeout bounds how long we wait for a closed browser to clean up.
+// After that we move on, since a stuck authentication is worse than a leaked process.
 const browserCleanupTimeout = 5 * time.Second
 
 type Browser struct {
@@ -87,9 +87,8 @@ func (b *Browser) launch(headless bool) error {
 		}
 	}
 
-	// 表示ありで起動するのは認証を通すときだけ。全リクエストを傍受する Fetch ドメインは
-	// Cloudflare のボット検知に引っかかり、認証が永久に通らなくなる（実機で確認）。
-	// 通信量の削減より認証を通せることのほうが重要なので、この間はブロックを諦める。
+	// A headful browser is only launched to authenticate. Hijacking every request via
+	// the Fetch domain trips Cloudflare's bot detection, so skip asset blocking here.
 	if headless {
 		router := page.HijackRequests()
 		// Block the browser from fetching unnecessary resources
@@ -182,8 +181,8 @@ func (b *Browser) Close() error {
 	return nil
 }
 
-// SetAssetBlocking は画像・フォント・CSS のブロックを切り替える。
-// 画像認証を人間が解く場面では false にする必要がある。
+// SetAssetBlocking toggles blocking of images, fonts and CSS.
+// It must be disabled while a human solves a CAPTCHA.
 func (b *Browser) SetAssetBlocking(enabled bool) {
 	b.blockAssets.Store(enabled)
 }

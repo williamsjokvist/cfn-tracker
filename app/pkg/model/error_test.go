@@ -7,27 +7,25 @@ import (
 	"testing"
 )
 
-// FormatError はフロントへ送る値として InnerError を設定しない。その戻り値は
-// main.go の `event=%s data=%v` でログへ出力されるため、Error() が nil の
-// InnerError に触れると fmt が recover して %!v(PANIC=...) になり、
-// エラーの正体がログから失われる。
+// FormatError leaves InnerError nil, and main.go logs the result with `event=%s data=%v`.
+// If Error() touched the nil InnerError, fmt would print %!v(PANIC=...) and lose the error.
 func TestFormatErrorResultIsSafeToFormat(t *testing.T) {
 	tests := []struct {
 		name string
 		err  error
 		want string
 	}{
-		{"素のエラー", fmt.Errorf("poll: %w", errors.New("boom")), "boom"},
-		{"FGCTrackerError で包んだエラー", WrapError(ErrGetMatches, errors.New("boom")), "boom"},
+		{"plain error", fmt.Errorf("poll: %w", errors.New("boom")), "boom"},
+		{"wrapped in FGCTrackerError", WrapError(ErrGetMatches, errors.New("boom")), "boom"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			out := fmt.Sprintf("%v", FormatError(tt.err))
 			if strings.Contains(out, "PANIC") {
-				t.Fatalf("FormatError の戻り値を整形すると panic した: %s", out)
+				t.Fatalf("formatting FormatError result panicked: %s", out)
 			}
 			if !strings.Contains(out, tt.want) {
-				t.Errorf("元のエラー内容が失われた: got %q, want it to contain %q", out, tt.want)
+				t.Errorf("original error was lost: got %q, want it to contain %q", out, tt.want)
 			}
 		})
 	}
@@ -39,9 +37,9 @@ func TestErrorFallsBackWhenInnerErrorIsNil(t *testing.T) {
 		err  *FGCTrackerError
 		want string
 	}{
-		{"InnerError が優先される", &FGCTrackerError{LocalizationKey: tKeyErrAuth, Message: "detail", InnerError: errors.New("inner")}, "inner"},
-		{"InnerError が nil なら Message", &FGCTrackerError{LocalizationKey: tKeyErrUnknown, Message: "detail"}, "detail"},
-		{"どちらも無ければキー", &FGCTrackerError{LocalizationKey: tKeyErrAuth}, "errAuth"},
+		{"InnerError takes precedence", &FGCTrackerError{LocalizationKey: tKeyErrAuth, Message: "detail", InnerError: errors.New("inner")}, "inner"},
+		{"Message when InnerError is nil", &FGCTrackerError{LocalizationKey: tKeyErrUnknown, Message: "detail"}, "detail"},
+		{"key when neither is set", &FGCTrackerError{LocalizationKey: tKeyErrAuth}, "errAuth"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

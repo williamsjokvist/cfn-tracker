@@ -80,13 +80,12 @@ var (
 	ErrOpenResultsDirectory = newError(tKeyErrOpenResultsDirectory, errors.New("open results directory"))
 	ErrReadThemeCSS         = newError(tKeyErrReadThemeCSS, errors.New("read theme css"))
 
-	// 画像認証(CAPTCHA)まわり。ErrAuth で包むと汎用の「認証失敗」文言になり、
-	// 対処方法がユーザーに伝わらないため、専用のキーを持つエラーとして定義する。
+	// CAPTCHA-related errors get their own keys so the user sees how to resolve
+	// them instead of a generic ErrAuth message.
 	ErrAuthNeedsHeadful  = newError(tKeyErrAuthNeedsHeadful, errors.New("captcha requires a visible browser"))
 	ErrAuthManualTimeout = newError(tKeyErrAuthManualTimeout, errors.New("manual authentication timed out"))
 
-	// ログイン画面そのものが出てこない場合。Cloudflare 等にアクセスを遮断されると
-	// フォームが存在しないページで待ち続けることになるため、原因が伝わる専用キーにする。
+	// The login form never appears, e.g. when Cloudflare blocks access.
 	ErrAuthBlocked           = newError(tKeyErrAuthBlocked, errors.New("login form did not appear"))
 	ErrAuthManualLoginFailed = newError(tKeyErrAuthManualLoginFailed, errors.New("manual login did not establish a buckler session"))
 )
@@ -113,8 +112,8 @@ func newError(key ErrorLocalizationKey, err error) *FGCTrackerError {
 }
 
 func (e *FGCTrackerError) Error() string {
-	// FormatError はフロントへ送る値として InnerError を設定しない。その戻り値は
-	// ログへ %v で出力される経路があるため、nil でも panic せず情報を返す。
+	// FormatError leaves InnerError nil, and its result can be logged with %v,
+	// so fall back instead of panicking.
 	if e.InnerError != nil {
 		return e.InnerError.Error()
 	}

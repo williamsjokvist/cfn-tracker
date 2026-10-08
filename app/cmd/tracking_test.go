@@ -258,7 +258,7 @@ func TestPollTimeoutErrorRetriesAutomatically(t *testing.T) {
 
 	retries := make(chan struct{}, 4)
 	trackingError := make(chan struct{}, 1)
-	// 実際の GetBattleLog はタイムアウト時に DeadlineExceeded をラップして返す。
+	// The real GetBattleLog wraps DeadlineExceeded when it times out.
 	fake := &fakeTracker{pollWithContext: func(ctx context.Context, _ int) (*model.Match, error) {
 		<-ctx.Done()
 		return nil, fmt.Errorf("cfn: get battle log: %w", ctx.Err())
@@ -283,7 +283,7 @@ func TestPollTimeoutErrorRetriesAutomatically(t *testing.T) {
 		}
 	})
 
-	// ForcePoll を使わず、バックオフ経由で自動的に再試行され続けることを確認する。
+	// Without ForcePoll, verify that polling keeps retrying via backoff.
 	for i := 0; i < 2; i++ {
 		select {
 		case <-retries:

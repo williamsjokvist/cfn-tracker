@@ -58,8 +58,8 @@ func TestLaunchManualLoginRejectsImmediateExit(t *testing.T) {
 	}
 }
 
-// プロファイルのロックは rod の Chromium が残っていると数秒握られたままになる。
-// 1回目で諦めず、解放されてから起動できることを確かめる。
+// A leftover rod Chromium can hold the profile lock for a few seconds.
+// Verify we retry and launch once the lock is released.
 func TestLaunchManualLoginRetriesWhileProfileIsLocked(t *testing.T) {
 	t.Cleanup(browser.SetManualLoginTimingForTest(4, time.Millisecond, 10*time.Millisecond))
 
@@ -69,10 +69,10 @@ func TestLaunchManualLoginRetriesWhileProfileIsLocked(t *testing.T) {
 		func(context.Context, string, ...string) (browser.ManualLoginProcessForTest, error) {
 			attempts++
 			if attempts < 3 {
-				// ロックされたまま。起動を既存インスタンスへ渡して即終了する。
+				// Still locked: hands off to the existing instance and exits immediately.
 				return fakeManualLoginProcess{wait: func() error { return nil }}, nil
 			}
-			// ロックが解放された。人間がログインを終えて閉じるまで生き続ける。
+			// Lock released: stays alive until the user logs in and closes it.
 			return fakeManualLoginProcess{wait: func() error {
 				time.Sleep(50 * time.Millisecond)
 				return nil

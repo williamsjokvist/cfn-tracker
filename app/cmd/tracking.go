@@ -33,8 +33,8 @@ const (
 
 var selectGameTimeout = 7 * time.Minute
 
-// Poll 1回の上限。内側(battleLogTimeout=25s)より長く取り、内側が先に発火するようにする。
-// 内側が効かない経路でも poll ループが必ず戻ることを保証するための保険。
+// Upper bound for a single Poll. Longer than the inner battleLogTimeout (25s) so that
+// fires first; this is a safety net so the poll loop always returns.
 var pollTimeout = 40 * time.Second
 
 type EventEmitFn func(eventName string, optionalData ...interface{})
@@ -67,7 +67,7 @@ func NewTrackingHandler(wavuClient wavu.WavuClient, cfnClient cfn.CFNClient, sql
 
 func (ch *TrackingHandler) SetEventEmitter(eventEmitter EventEmitFn) { ch.eventEmitter = eventEmitter }
 
-// SetGameTracker はテストおよび将来のゲーム追加のために GameTracker を差し替える。
+// SetGameTracker replaces the GameTracker, for tests and future games.
 func (ch *TrackingHandler) SetGameTracker(gt tracker.GameTracker) { ch.gameTracker = gt }
 
 func (ch *TrackingHandler) emit(name string, data ...interface{}) {
@@ -354,9 +354,9 @@ func (ch *TrackingHandler) SelectGame(game model.GameType) error {
 				return nil
 			}
 			if status.Err != nil {
-				// 既に固有のローカライズキーを持つエラーはそのまま返す。
-				// ErrAuth で包み直すと汎用の「認証失敗」文言に潰れ、
-				// 「HEADLESS を false にする」等の対処方法がユーザーに届かない。
+				// Return errors that already have a specific localization key as-is.
+				// Wrapping them in ErrAuth would hide the actionable message behind
+				// a generic "authentication failed".
 				var localized *model.FGCTrackerError
 				if errors.As(status.Err, &localized) {
 					return localized
