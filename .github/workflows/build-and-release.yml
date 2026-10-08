@@ -51,8 +51,6 @@ jobs:
           echo $json.info
         shell: pwsh
 
-      # Don't pass CAP_ID_EMAIL / CAP_ID_PASSWORD here: the Taskfile ldflags would
-      # embed them in plain text in the public exe. Users provide their own via .env.
       - name: Build
         run: task build:windows-amd64 -- -o 'CFN Tracker.exe'
 

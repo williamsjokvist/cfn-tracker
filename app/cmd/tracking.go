@@ -304,7 +304,7 @@ func waitFor(ctx context.Context, delay time.Duration) bool {
 
 func (ch *TrackingHandler) reauthenticate(ctx context.Context) bool {
 	statuses := make(chan tracker.AuthStatus, 1)
-	go ch.gameTracker.Authenticate(ctx, ch.cfg.CapIDEmail, ch.cfg.CapIDPassword, statuses)
+	go ch.gameTracker.Authenticate(ctx, statuses)
 	for {
 		select {
 		case status, ok := <-statuses:
@@ -333,20 +333,18 @@ func (ch *TrackingHandler) StopTracking() {
 }
 
 func (ch *TrackingHandler) SelectGame(game model.GameType) error {
-	var username, password string
 	switch game {
 	case model.GameTypeT8:
 		ch.gameTracker = t8.NewT8Tracker(ch.wavuClient)
 	case model.GameTypeSF6:
 		ch.gameTracker = sf6.NewSF6Tracker(ch.cfnClient)
-		username, password = ch.cfg.CapIDEmail, ch.cfg.CapIDPassword
 	default:
 		return model.WrapError(model.ErrSelectGame, fmt.Errorf("game does not exist"))
 	}
 	authChan := make(chan tracker.AuthStatus)
 	ctx, cancel := context.WithTimeout(context.Background(), selectGameTimeout)
 	defer cancel()
-	go ch.gameTracker.Authenticate(ctx, username, password, authChan)
+	go ch.gameTracker.Authenticate(ctx, authChan)
 	for {
 		select {
 		case status, ok := <-authChan:
