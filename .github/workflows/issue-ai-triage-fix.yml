@@ -1,11 +1,11 @@
-name: "AI issue triage and fix"
+name: "Issue AI triage and fix"
 
 on:
   issues:
     types: [opened, labeled]
 
 concurrency:
-  group: ai-issue-triage-fix-${{ github.event.issue.number }}
+  group: issue-ai-triage-fix-${{ github.event.issue.number }}
   cancel-in-progress: false
 
 jobs:
