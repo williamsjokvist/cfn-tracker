@@ -69,8 +69,8 @@ func assertCalls(t *testing.T, f *fakeAuthBrowser, want ...string) {
 func assertDone(t *testing.T, statuses []tracker.AuthStatus) {
 	t.Helper()
 	last := statuses[len(statuses)-1]
-	if last.Err != nil || last.Progress != 100 {
-		t.Fatalf("last status = %+v, want progress 100 without error", last)
+	if last.Err != nil || !last.Done {
+		t.Fatalf("last status = %+v, want done without error", last)
 	}
 }
 

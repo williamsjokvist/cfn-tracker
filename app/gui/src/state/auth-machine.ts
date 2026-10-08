@@ -8,7 +8,6 @@ import { EventsOff, EventsOn } from '@runtime'
 import { TRACKING_MACHINE } from './tracking-machine'
 
 type AuthMachineContextProps = {
-  progress: number
   game?: model.GameType
   error: model.FGCTrackerError | null
   action: { localizationKey: string; secondsLeft: number } | null
@@ -23,30 +22,21 @@ export const AUTH_MACHINE = setup({
         SelectGame(context.game).catch(error => self.send({ type: 'error', error }))
       }
     },
-    subscribeToProgressEvents: ({ self }) => {
-      EventsOn('auth-progress', progress => {
-        self.send({ type: 'loaded', progress })
-        if (progress >= 100) {
-          self.send({ type: 'finished' })
-        }
-      })
+    subscribeToAuthEvents: ({ self }) => {
+      EventsOn('auth-success', () => self.send({ type: 'finished' }))
       EventsOn('auth-action-required', action => {
         self.send({ type: 'actionRequired', action })
       })
     },
-    unsubscribeToProgressEvents: () => {
-      EventsOff('auth-progress')
+    unsubscribeToAuthEvents: () => {
+      EventsOff('auth-success')
       EventsOff('auth-action-required')
     }
-  },
-  guards: {
-    isLoaded: ({ context }) => context.progress >= 100
   }
 }).createMachine({
   id: 'auth-machine',
   initial: 'gameForm',
   context: {
-    progress: 0,
     error: null,
     action: null
   },
@@ -61,7 +51,7 @@ export const AUTH_MACHINE = setup({
               action: null
             }),
             'selectGame',
-            'subscribeToProgressEvents'
+            'subscribeToAuthEvents'
           ],
           target: 'loading'
         }
@@ -71,20 +61,11 @@ export const AUTH_MACHINE = setup({
       on: {
         finished: {
           target: 'connected',
-          guard: 'isLoaded',
           actions: [
-            'unsubscribeToProgressEvents',
+            'unsubscribeToAuthEvents',
             assign({
-              progress: 0,
               error: null,
               action: null
-            })
-          ]
-        },
-        loaded: {
-          actions: [
-            assign({
-              progress: ({ event }) => event.progress
             })
           ]
         },
@@ -99,10 +80,9 @@ export const AUTH_MACHINE = setup({
           actions: [
             assign({
               error: ({ event }) => event.error,
-              progress: 0,
               action: null
             }),
-            'unsubscribeToProgressEvents'
+            'unsubscribeToAuthEvents'
           ],
           target: 'gameForm'
         }

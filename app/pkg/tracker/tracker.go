@@ -13,19 +13,14 @@ type GameTracker interface {
 }
 
 type AuthStatus struct {
-	Progress int
-	Err      error
-	Action   *AuthAction
+	Done   bool
+	Err    error
+	Action *AuthAction
 }
 
 type AuthAction struct {
 	LocalizationKey string `json:"localizationKey"`
 	SecondsLeft     int    `json:"secondsLeft"`
-}
-
-func (s *AuthStatus) WithProgress(progress int) *AuthStatus {
-	s.Progress = progress
-	return s
 }
 
 func (s *AuthStatus) WithError(err error) *AuthStatus {

@@ -323,7 +323,7 @@ func (ch *TrackingHandler) reauthenticate(ctx context.Context, attempt int) bool
 				ch.emit("tracking-retrying", RetryStatus{Attempt: attempt, Reason: status.Action.LocalizationKey})
 				continue
 			}
-			if status.Progress >= 100 {
+			if status.Done {
 				return true
 			}
 		case <-ctx.Done():
@@ -374,8 +374,8 @@ func (ch *TrackingHandler) SelectGame(game model.GameType) error {
 				ch.emit("auth-action-required", *status.Action)
 				continue
 			}
-			ch.emit("auth-progress", status.Progress)
-			if status.Progress >= 100 {
+			if status.Done {
+				ch.emit("auth-success")
 				return nil
 			}
 		case <-ctx.Done():

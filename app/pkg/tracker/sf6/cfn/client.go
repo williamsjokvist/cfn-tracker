@@ -91,7 +91,7 @@ func (c *Client) GetBattleLog(ctx context.Context, cfn string) (*BattleLog, erro
 }
 
 func (c *Client) Authenticate(ctx context.Context, statChan chan tracker.AuthStatus) {
-	status := &tracker.AuthStatus{Progress: 0, Err: nil}
+	status := &tracker.AuthStatus{}
 	if c.auth == nil {
 		send(ctx, statChan, *status.WithError(fmt.Errorf("browser not initialized")))
 		return
@@ -100,7 +100,7 @@ func (c *Client) Authenticate(ctx context.Context, statChan chan tracker.AuthSta
 	// Fetching matches only needs the buckler session (~1 month), so reuse it while valid.
 	if c.auth.HasBucklerSession(ctx) {
 		slog.Info("cfn: buckler session is still valid, skipping login")
-		send(ctx, statChan, *status.WithProgress(100))
+		send(ctx, statChan, tracker.AuthStatus{Done: true})
 		return
 	}
 
@@ -120,7 +120,7 @@ func (c *Client) Authenticate(ctx context.Context, statChan chan tracker.AuthSta
 	}
 	if c.auth.HasBucklerSession(ctx) {
 		slog.Info("passed cfn auth")
-		send(ctx, statChan, *status.WithProgress(100))
+		send(ctx, statChan, tracker.AuthStatus{Done: true})
 		return
 	}
 	send(ctx, statChan, *status.WithError(model.ErrAuthManualLoginFailed))

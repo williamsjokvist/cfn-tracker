@@ -135,5 +135,5 @@ func alreadyRecorded(prev model.Match, replay wavu.Replay, battleAt time.Time) b
 }
 
 func (t *T8Tracker) Authenticate(ctx context.Context, statChan chan tracker.AuthStatus) {
-	statChan <- tracker.AuthStatus{Progress: 100, Err: nil}
+	statChan <- tracker.AuthStatus{Done: true}
 }
