@@ -73,8 +73,15 @@ func (b *Browser) launch() error {
 	if err != nil {
 		return fmt.Errorf("connect to browser: %w", err)
 	}
-	page := b.rod.MustPage()
-	userAgent := page.MustEval(`() => navigator.userAgent`).Str()
+	page, err := b.rod.Page(proto.TargetCreateTarget{})
+	if err != nil {
+		return fmt.Errorf("open browser page: %w", err)
+	}
+	res, err := page.Eval(`() => navigator.userAgent`)
+	if err != nil {
+		return fmt.Errorf("read browser user agent: %w", err)
+	}
+	userAgent := res.Value.Str()
 	if strings.Contains(userAgent, "HeadlessChrome") {
 		userAgent = strings.ReplaceAll(userAgent, "HeadlessChrome", "Chrome")
 		if err := page.SetUserAgent(&proto.NetworkSetUserAgentOverride{UserAgent: userAgent}); err != nil {

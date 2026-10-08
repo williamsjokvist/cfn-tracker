@@ -31,7 +31,8 @@ const (
 	maxReauthAttempts  = 3
 )
 
-var selectGameTimeout = 7 * time.Minute
+// Longer than the SF6 manual login timeout (10 minutes), so the user has time to log in.
+var selectGameTimeout = 12 * time.Minute
 
 // Upper bound for a single Poll. Longer than the inner battleLogTimeout (25s) so that
 // fires first; this is a safety net so the poll loop always returns.
@@ -66,9 +67,6 @@ func NewTrackingHandler(wavuClient wavu.WavuClient, cfnClient cfn.CFNClient, sql
 }
 
 func (ch *TrackingHandler) SetEventEmitter(eventEmitter EventEmitFn) { ch.eventEmitter = eventEmitter }
-
-// SetGameTracker replaces the GameTracker, for tests and future games.
-func (ch *TrackingHandler) SetGameTracker(gt tracker.GameTracker) { ch.gameTracker = gt }
 
 func (ch *TrackingHandler) emit(name string, data ...interface{}) {
 	if ch.eventEmitter != nil {
@@ -228,7 +226,7 @@ func (ch *TrackingHandler) poll(ctx context.Context, force <-chan struct{}, sess
 			}
 			if class == model.ClassAuth {
 				authAttempts++
-				if ch.reauthenticate(ctx) {
+				if ch.reauthenticate(ctx, attempt) {
 					continue
 				}
 				if authAttempts >= maxReauthAttempts {
@@ -302,7 +300,7 @@ func waitFor(ctx context.Context, delay time.Duration) bool {
 	}
 }
 
-func (ch *TrackingHandler) reauthenticate(ctx context.Context) bool {
+func (ch *TrackingHandler) reauthenticate(ctx context.Context, attempt int) bool {
 	statuses := make(chan tracker.AuthStatus, 1)
 	go ch.gameTracker.Authenticate(ctx, statuses)
 	for {
@@ -313,6 +311,11 @@ func (ch *TrackingHandler) reauthenticate(ctx context.Context) bool {
 			}
 			if status.Err != nil {
 				return false
+			}
+			if status.Action != nil {
+				// Show the login prompt in the tracking banner while the user logs in.
+				ch.emit("tracking-retrying", RetryStatus{Attempt: attempt, Reason: status.Action.LocalizationKey})
+				continue
 			}
 			if status.Progress >= 100 {
 				return true
