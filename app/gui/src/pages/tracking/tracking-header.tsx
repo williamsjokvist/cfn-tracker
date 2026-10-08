@@ -4,8 +4,9 @@ import { useTranslation } from 'react-i18next'
 
 import { TrackingMachineContext } from '@/state/tracking-machine'
 import { type LocalizationKey } from '@/main/i18n'
+import * as Page from '@/ui/page'
 
-export function TrackingStatusBanner() {
+export function TrackingHeader() {
   const { t } = useTranslation()
   const actor = TrackingMachineContext.useActorRef()
   const state = useSelector(actor, snapshot => snapshot.value)
@@ -21,18 +22,22 @@ export function TrackingStatusBanner() {
     return () => window.clearInterval(timer)
   }, [retry])
 
-  if (state === 'retrying' && retry) {
-    return (
-      <div className='mx-6 mt-3 rounded-lg bg-amber-500/20 px-4 py-2 text-amber-100' role='status'>
-        {retry.nextRetryInMs > 0 && (
-          <>{t('retryingDetail', { attempt: retry.attempt, seconds })} — </>
+  const retrying = state === 'retrying' && retry
+
+  return (
+    <Page.Header>
+      <div className='flex items-baseline gap-4'>
+        <Page.Title>{retrying ? t('retrying') : t('tracking')}</Page.Title>
+        {retrying && (
+          <span className='text-sm whitespace-nowrap text-amber-200' role='status'>
+            {t(retry.reason as LocalizationKey)}
+            {retry.nextRetryInMs > 0 && (
+              <> · {t('retryingDetail', { attempt: retry.attempt, seconds })}</>
+            )}
+          </span>
         )}
-        {t(retry.reason as LocalizationKey)}
       </div>
-    )
-  }
-  if (state === 'tracking') {
-    return <div className='mx-6 mt-3 rounded-lg bg-emerald-500/15 px-4 py-2'>{t('tracking')}</div>
-  }
-  return null
+      <Page.LoadingIcon />
+    </Page.Header>
+  )
 }

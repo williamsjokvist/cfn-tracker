@@ -115,7 +115,7 @@
   "errOpenResultsDirectory": "結果ディレクトリを開けませんでした",
   "errReadThemeCSS": "テーマを読み取れませんでした",
   "retrying": "再試行中",
-  "retryingDetail": "再試行中（{{attempt}}回目・次回 {{seconds}}秒後）",
+  "retryingDetail": "{{attempt}}回目・次回 {{seconds}}秒後",
   "reconnected": "接続が回復しました",
   "errNetwork": "通信に失敗しました",
   "errThrottled": "アクセスが制限されています",

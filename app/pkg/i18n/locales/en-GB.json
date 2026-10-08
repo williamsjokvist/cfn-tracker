@@ -115,7 +115,7 @@
   "errOpenResultsDirectory": "Failed to open results directory",
   "errReadThemeCSS": "Failed to read theme",
   "retrying": "Retrying",
-  "retryingDetail": "Retrying ({{attempt}}) — next attempt in {{seconds}}s",
+  "retryingDetail": "attempt {{attempt}}, next in {{seconds}}s",
   "reconnected": "Connection restored",
   "errNetwork": "Network error",
   "errThrottled": "Rate limited",
