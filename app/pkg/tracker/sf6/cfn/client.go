@@ -104,8 +104,6 @@ func (c *Client) Authenticate(ctx context.Context, statChan chan tracker.AuthSta
 		return
 	}
 
-	// Chrome under rod can't pass Cloudflare's check on the Capcom ID login, so the
-	// user logs in themselves in a plain Chrome window sharing the same profile.
 	send(ctx, statChan, tracker.AuthStatus{Action: &tracker.AuthAction{LocalizationKey: "authNeedRelogin"}})
 	if closeErr := c.auth.Close(); closeErr != nil {
 		slog.Warn("failed to close controlled browser before manual login", slog.Any("error", closeErr))

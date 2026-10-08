@@ -40,8 +40,7 @@ var startManualLoginProcess = func(ctx context.Context, chromePath string, args 
 }
 
 // LaunchManualLogin starts a plain Chrome without CDP and waits until the user has
-// logged in and closed it. Chrome driven by rod can't pass Cloudflare's check, so no
-// launcher or debugging port is used here.
+// logged in and closed it.
 func LaunchManualLogin(ctx context.Context, url string) error {
 	chromePath, found := findChromeForManualLogin()
 	if !found {
