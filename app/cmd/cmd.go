@@ -8,6 +8,7 @@ import (
 	"runtime"
 	"strings"
 
+	"github.com/williamsjokvist/cfn-tracker/pkg/applog"
 	"github.com/williamsjokvist/cfn-tracker/pkg/config"
 	"github.com/williamsjokvist/cfn-tracker/pkg/i18n"
 	"github.com/williamsjokvist/cfn-tracker/pkg/model"
@@ -154,6 +155,21 @@ func (ch *CommandHandler) SaveSidebarMinimized(sidebar bool) error {
 	runtimeCfg.GUI.SideBar = sidebar
 	if err := ch.cfgDb.SaveRuntimeConfig(runtimeCfg); err != nil {
 		return model.WrapError(model.ErrSaveSidebar, err)
+	}
+	return nil
+}
+
+func (ch *CommandHandler) SaveLogFile(enabled bool) error {
+	runtimeCfg, err := ch.cfgDb.GetRuntimeConfig()
+	if err != nil {
+		return model.WrapError(model.ErrGetGUIConfig, err)
+	}
+	runtimeCfg.GUI.LogFile = enabled
+	if err := ch.cfgDb.SaveRuntimeConfig(runtimeCfg); err != nil {
+		return model.WrapError(model.ErrSaveLogFile, err)
+	}
+	if err := applog.SetFileLogging(enabled); err != nil {
+		return model.WrapError(model.ErrSaveLogFile, err)
 	}
 	return nil
 }

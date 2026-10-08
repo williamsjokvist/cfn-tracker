@@ -38,6 +38,7 @@ type Localization struct {
 	Statistics               string `json:"statistics"`
 	Date                     string `json:"date"`
 	Minimize                 string `json:"minimize"`
+	WriteLogFile             string `json:"writeLogFile"`
 	RestoreSession           string `json:"restoreSession"`
 	ExportLog                string `json:"exportLog"`
 	League                   string `json:"league"`
@@ -108,6 +109,7 @@ type Localization struct {
 	ErrSaveTheme             string `json:"errSaveTheme"`
 	ErrSaveUser              string `json:"errSaveUser"`
 	ErrSaveSidebar           string `json:"errSaveSidebar"`
+	ErrSaveLogFile           string `json:"errSaveLogFile"`
 	ErrGetSessions           string `json:"errGetSessions"`
 	ErrGetTranslations       string `json:"errGetTranslations"`
 	ErrGetSessionStatistics  string `json:"errGetSessionStatistics"`

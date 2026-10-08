@@ -20,10 +20,8 @@ tasks:
 
   build:
     internal: true
-    vars:
-      ldflags: -X 'main.isProduction="true"'
     cmds:
-      - cmd: GOOS={{.GOOS}} GOARCH={{.GOARCH}} wails build -ldflags="{{.ldflags}}" {{.CLI_ARGS}}
+      - cmd: GOOS={{.GOOS}} GOARCH={{.GOARCH}} wails build {{.CLI_ARGS}}
 
   build:windows-amd64:
     desc: Build for Linux (x86)
