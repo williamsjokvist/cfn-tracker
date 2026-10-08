@@ -23,19 +23,33 @@ type Storage struct {
 	db *sqlx.DB
 }
 
+func (s *Storage) DB() *sqlx.DB {
+	return s.db
+}
+
 func NewStorage(useInMemoryDb bool) (*Storage, error) {
-	if err := migrateSchema(nil); err != nil {
-		return nil, fmt.Errorf("perform sql migrations: %w", err)
-	}
-	dataSource := getDataSource()
+	var db *sqlx.DB
+	var err error
+
 	if useInMemoryDb {
-		dataSource = ":memory:"
+		db, err = sqlx.Open("sqlite", ":memory:")
+		if err != nil {
+			return nil, fmt.Errorf("open sqlite connection: %w", err)
+		}
+		if err := migrateSchema(db, nil); err != nil {
+			db.Close()
+			return nil, fmt.Errorf("perform sql migrations: %w", err)
+		}
+	} else {
+		if err := migrateSchema(nil, nil); err != nil {
+			return nil, fmt.Errorf("perform sql migrations: %w", err)
+		}
+		db, err = sqlx.Open("sqlite", getDataSource())
+		if err != nil {
+			return nil, fmt.Errorf("open sqlite connection: %w", err)
+		}
 	}
 
-	db, err := sqlx.Open("sqlite", dataSource)
-	if err != nil {
-		return nil, fmt.Errorf("open sqlite connection: %w", err)
-	}
 	return &Storage{
 		db,
 	}, nil
@@ -51,12 +65,17 @@ func getDataSource() string {
 	return filepath.Join(dataDir, "cfn-tracker.db")
 }
 
-func migrateSchema(nSteps *int) error {
+func migrateSchema(db *sqlx.DB, nSteps *int) error {
 	slog.Debug("starting db migrations", slog.Any("steps", nSteps))
 
-	db, err := sqlx.Open("sqlite", getDataSource())
-	if err != nil {
-		return fmt.Errorf("open sqlite connection: %w", err)
+	shouldClose := false
+	if db == nil {
+		var err error
+		db, err = sqlx.Open("sqlite", getDataSource())
+		if err != nil {
+			return fmt.Errorf("open sqlite connection: %w", err)
+		}
+		shouldClose = true
 	}
 
 	migrateDriver, err := sqlitex.WithInstance(db.DB, &sqlitex.Config{
@@ -79,8 +98,10 @@ func migrateSchema(nSteps *int) error {
 		return fmt.Errorf("create migration tooling instance: %w", err)
 	}
 	defer func() {
-		preparedMigrations.Close()
-		db.Close()
+		if shouldClose {
+			preparedMigrations.Close()
+			db.Close()
+		}
 	}()
 	if nSteps != nil {
 		fmt.Printf("stepping migrations %d...\n", *nSteps)
