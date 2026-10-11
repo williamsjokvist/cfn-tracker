@@ -146,7 +146,6 @@ export function TrackingLiveUpdater() {
             </div>
           </motion.div>
         </div>
-        {/* TODO: fix character image for tekken 8 */}
         <CharacterPortrait
           character={character}
           className='pointer-events-none absolute -end-20 top-0 z-[-1] h-full opacity-10 grayscale'

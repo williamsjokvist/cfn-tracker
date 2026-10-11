@@ -1,4 +1,8 @@
-import React from 'react'
+const portraits = Object.fromEntries(
+  Object.entries(
+    import.meta.glob<string>('../assets/characters/*.webp', { eager: true, import: 'default' })
+  ).map(([path, url]) => [path.slice(path.lastIndexOf('/') + 1, -'.webp'.length), url])
+)
 
 export function CharacterPortrait({
   character,
@@ -7,13 +11,9 @@ export function CharacterPortrait({
   character: string
   className?: string
 }) {
-  const src = `https://www.streetfighter.com/6/buckler/assets/images/material/character/character_${character
-    .toLowerCase()
-    .replace(/\s/g, '')
-    .replace('.', '')}_r.png`
-  const [failedSrc, setFailedSrc] = React.useState<string>()
-  if (!character || failedSrc === src) {
+  const src = portraits[character.toLowerCase().replace(/[^a-z0-9]/g, '')]
+  if (!src) {
     return null
   }
-  return <img className={className} src={src} alt='' onError={() => setFailedSrc(src)} />
+  return <img className={className} src={src} alt='' />
 }
