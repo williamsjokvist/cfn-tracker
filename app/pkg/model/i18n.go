@@ -84,6 +84,11 @@ type Localization struct {
 	ThemeTide                   string `json:"themeTide"`
 	ThemeDusk                   string `json:"themeDusk"`
 	ThemeSakura                 string `json:"themeSakura"`
+	BrowserSourceThemeBlades    string `json:"browserSourceThemeBlades"`
+	BrowserSourceThemeJaeger    string `json:"browserSourceThemeJaeger"`
+	BrowserSourceThemeNord      string `json:"browserSourceThemeNord"`
+	BrowserSourceThemePills     string `json:"browserSourceThemePills"`
+	CreateYourOwnTheme          string `json:"createYourOwnTheme"`
 	PickTheme                   string `json:"pickTheme"`
 	UsingBrowserSource          string `json:"usingBrowserSource"`
 	CopyBrowserSourceLink       string `json:"copyBrowserSourceLink"`

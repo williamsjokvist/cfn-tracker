@@ -16,7 +16,7 @@ export function SettingButton(
         'hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-50'
       )}
     >
-      <Icon icon={props.icon} className='h-5 w-5' />
+      <Icon icon={props.icon} className='text-icon h-5 w-5' />
       {props.children}
     </button>
   )

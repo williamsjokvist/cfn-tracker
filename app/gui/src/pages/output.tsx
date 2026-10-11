@@ -12,13 +12,24 @@ import { Checkbox } from '@/ui/checkbox'
 
 import { model } from '@model'
 import { GetThemes, OpenResultsDirectory } from '@cmd/CommandHandler'
+import { BrowserOpenURL } from '@runtime'
 
 import { useErrorPopup } from '@/main/error-popup'
 import { ConfigContext } from '@/main/config'
+import type { LocalizationKey } from '@/main/i18n'
 import { cn } from '@/helpers/cn'
 
 type StatOptions = Omit<Record<keyof model.Match, boolean>, 'replayId' | 'sessionId'> & {
   theme: string
+}
+
+// Custom themes from the user's themes folder have no translation, so they show their file name
+const themeLabels: Record<string, LocalizationKey> = {
+  default: 'themeDefault',
+  blades: 'browserSourceThemeBlades',
+  jaeger: 'browserSourceThemeJaeger',
+  nord: 'browserSourceThemeNord',
+  pills: 'browserSourceThemePills'
 }
 
 const defaultOptions: StatOptions = {
@@ -113,6 +124,13 @@ export function OutputPage() {
                 options={statOptions}
                 onSelect={(opt, checked) => setOptions({ ...options, [opt]: checked })}
               />
+              <Button
+                onClick={() => BrowserOpenURL('https://cfn.williamsjokvist.se/theme-guide/')}
+                style={{ filter: 'hue-rotate(35deg)', justifyContent: 'center' }}
+              >
+                <Icon icon='mdi:brush' className='me-3 h-6 w-6' />
+                {t('createYourOwnTheme')}
+              </Button>
             </div>
           </div>
         </motion.section>
@@ -178,6 +196,7 @@ function StatSelect(props: {
 }
 
 function ThemeSelect(props: { value: string; onSelect: (theme: string) => void }) {
+  const { t } = useTranslation()
   const [themes, setThemes] = React.useState<model.Theme[]>([])
   const [isOpen, setOpen] = React.useState(false)
   const setError = useErrorPopup()
@@ -218,7 +237,7 @@ function ThemeSelect(props: { value: string; onSelect: (theme: string) => void }
           style={{ filter: 'hue-rotate(-180deg)', justifyContent: 'center' }}
         >
           <Icon icon='ph:paint-bucket-fill' className='me-3 h-6 w-6' />
-          {props.value}
+          {themeLabels[props.value] ? t(themeLabels[props.value]) : props.value}
         </Button>
       </Dialog.Trigger>
       <Dialog.Content title='selectTheme'>
@@ -238,7 +257,7 @@ function ThemeSelect(props: { value: string; onSelect: (theme: string) => void }
                 htmlFor={`${theme.name}-checkbox`}
                 className='font-spartan w-full cursor-pointer py-1 ps-14 capitalize'
               >
-                {theme.name}
+                {themeLabels[theme.name] ? t(themeLabels[theme.name]) : theme.name}
               </label>
             </li>
           ))}

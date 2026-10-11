@@ -3,6 +3,7 @@
 
 @theme {
   --color-highlight: var(--color-highlight);
+  --color-icon: var(--color-icon);
   --color-divider: var(--color-divider);
   --opacity-enth: var(--enth-only);
   --font-app: var(--app-font);
@@ -51,6 +52,7 @@
   :root {
     --bg-main: radial-gradient(circle at 52.1% -29.6%, #901169 0%, #330083 100%);
     --color-highlight: #f85961;
+    --color-icon: white;
     --color-divider: rgba(255, 255, 255, 0.125);
     --enth-only: 0;
     --app-font: 'League Spartan', sans serif;
@@ -59,6 +61,7 @@
   body[data-theme='tekken'] {
     --bg-main: radial-gradient(circle at 52.1% -29.6%, #1e3c52 0%, #000 100%);
     --color-highlight: #dd1d5b;
+    --color-icon: #dd1d5b;
     --color-divider: rgba(255, 255, 255, 0.125);
     --enth-only: 0;
     --app-font: 'League Spartan', sans serif;
@@ -67,6 +70,7 @@
   body[data-theme='enth'] {
     --bg-main: radial-gradient(circle at 52.1% -29.6%, #0e254d 0%, #010814 100%);
     --color-highlight: #95f3f6;
+    --color-icon: #95f3f6;
     --color-divider: rgba(149, 243, 246, 0.075);
     --enth-only: 1;
     --app-font: 'League Spartan', sans serif;
@@ -75,6 +79,7 @@
   body[data-theme='jade'] {
     --bg-main: radial-gradient(circle at 52.1% -29.6%, #0c8f62 0%, #023a4d 100%);
     --color-highlight: #ffbe5c;
+    --color-icon: #ffbe5c;
     --color-divider: rgba(255, 255, 255, 0.125);
     --enth-only: 0;
     --app-font: 'League Spartan', sans serif;
@@ -83,6 +88,7 @@
   body[data-theme='ember'] {
     --bg-main: radial-gradient(circle at 52.1% -29.6%, #b8321f 0%, #3a0b2e 100%);
     --color-highlight: #ffd166;
+    --color-icon: #ffd166;
     --color-divider: rgba(255, 255, 255, 0.125);
     --enth-only: 0;
     --app-font: 'League Spartan', sans serif;
@@ -91,6 +97,7 @@
   body[data-theme='tide'] {
     --bg-main: radial-gradient(circle at 52.1% -29.6%, #1767b8 0%, #0b1a4f 100%);
     --color-highlight: #ff7a8a;
+    --color-icon: #ff7a8a;
     --color-divider: rgba(255, 255, 255, 0.125);
     --enth-only: 0;
     --app-font: 'League Spartan', sans serif;
@@ -99,6 +106,7 @@
   body[data-theme='dusk'] {
     --bg-main: radial-gradient(circle at 52.1% -29.6%, #5b3fd1 0%, #1a1240 100%);
     --color-highlight: #7cf2c8;
+    --color-icon: #7cf2c8;
     --color-divider: rgba(255, 255, 255, 0.125);
     --enth-only: 0;
     --app-font: 'League Spartan', sans serif;
@@ -107,6 +115,7 @@
   body[data-theme='sakura'] {
     --bg-main: radial-gradient(circle at 52.1% -29.6%, #d14f8a 0%, #3b1450 100%);
     --color-highlight: #fff0a8;
+    --color-icon: #fff0a8;
     --color-divider: rgba(255, 255, 255, 0.125);
     --enth-only: 0;
     --app-font: 'League Spartan', sans serif;

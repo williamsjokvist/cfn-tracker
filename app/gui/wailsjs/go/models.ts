@@ -161,6 +161,11 @@ export namespace model {
 	    themeTide: string;
 	    themeDusk: string;
 	    themeSakura: string;
+	    browserSourceThemeBlades: string;
+	    browserSourceThemeJaeger: string;
+	    browserSourceThemeNord: string;
+	    browserSourceThemePills: string;
+	    createYourOwnTheme: string;
 	    pickTheme: string;
 	    usingBrowserSource: string;
 	    copyBrowserSourceLink: string;
