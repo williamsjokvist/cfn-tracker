@@ -28,11 +28,11 @@ export function TrackingBreadcrumbs({ current }: { current?: string }) {
   return (
     <>
       <Page.Breadcrumbs
-        items={[
-          { label: t('pickGame'), onClick: () => (isTracking ? setConfirming(true) : pickGame()) },
-          { label: gameName(game) },
-          ...(current ? [{ label: current }] : [])
-        ]}
+        items={
+          current
+            ? [{ label: gameName(game), onClick: () => setConfirming(true) }, { label: current }]
+            : [{ label: t('pickGame'), onClick: pickGame }, { label: gameName(game) }]
+        }
       />
       <Dialog.Root open={confirming} onOpenChange={setConfirming}>
         <Dialog.Content
