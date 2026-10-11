@@ -23,6 +23,13 @@ run = "go test ./..."
 description = "Format the Go and GUI code"
 run = ["go fmt ./...", "bun run --cwd gui fmt"]
 
+[tasks."fmt:check"]
+description = "Check the Go and GUI code is formatted"
+run = [
+  '''files=$(gofmt -l $(find . -name '*.go' -not -path './gui/*')); if [ -n "$files" ]; then echo "$files"; exit 1; fi''',
+  "bun run --cwd gui fmt:check",
+]
+
 [tasks."build-windows-amd64"]
 description = "Build for Windows (x86)"
 env = { GOOS = "windows", GOARCH = "amd64" }
