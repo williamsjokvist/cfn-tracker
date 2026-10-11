@@ -73,6 +73,7 @@ export function StatisticsPage() {
         <div className='flex min-h-14 items-center justify-between gap-4 border-b border-slate-50/10 px-8 py-2'>
           {users && users.length > 1 ? (
             <Select.Root
+              size='sm'
               value={user?.code}
               onValueChange={code => setSearchParams({ user: code }, { replace: true })}
             >
