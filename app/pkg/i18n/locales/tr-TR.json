@@ -52,7 +52,7 @@
   "writeLogFile": "Uygulama günlük dosyası yaz",
   "browserSourcePort": "Tarayıcı kaynağı portu",
   "reportIssue": "Hata bildir",
-  "reportIssueDescription": "GitHub'da herkese açık olarak yayınlanacak",
+  "reportIssueDescription": "Bugünün uygulama günlüğüyle birlikte GitHub'da herkese açık olarak yayınlanacak",
   "issueTitle": "Başlık",
   "issueDescription": "Ne oldu? Nasıl tekrarlanabilir?",
   "issueContact": "İletişim (isteğe bağlı, herkese açık)",

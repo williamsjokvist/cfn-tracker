@@ -52,7 +52,7 @@
   "writeLogFile": "ログファイルを書き出す",
   "browserSourcePort": "ブラウザソースのポート",
   "reportIssue": "不具合を報告",
-  "reportIssueDescription": "GitHubで公開されます",
+  "reportIssueDescription": "本日のアプリログと一緒にGitHubで公開されます",
   "issueTitle": "タイトル",
   "issueDescription": "何が起きましたか？再現方法は？",
   "issueContact": "連絡先（任意・公開）",

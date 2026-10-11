@@ -52,7 +52,7 @@
   "writeLogFile": "寫入應用程式記錄檔",
   "browserSourcePort": "瀏覽器來源連接埠",
   "reportIssue": "回報錯誤",
-  "reportIssueDescription": "將會公開發佈在 GitHub 上",
+  "reportIssueDescription": "將會連同今天的應用程式日誌一起公開發佈在 GitHub 上",
   "issueTitle": "標題",
   "issueDescription": "發生了什麼事？要如何重現？",
   "issueContact": "聯絡方式（選填，公開）",

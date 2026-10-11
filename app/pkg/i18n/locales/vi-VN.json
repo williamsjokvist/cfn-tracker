@@ -52,7 +52,7 @@
   "writeLogFile": "Ghi tệp nhật ký ứng dụng",
   "browserSourcePort": "Cổng nguồn trình duyệt",
   "reportIssue": "Báo lỗi",
-  "reportIssueDescription": "Báo cáo sẽ được đăng công khai trên GitHub",
+  "reportIssueDescription": "Báo cáo sẽ được đăng công khai trên GitHub cùng với nhật ký ứng dụng hôm nay",
   "issueTitle": "Tiêu đề",
   "issueDescription": "Chuyện gì đã xảy ra? Làm sao để tái hiện?",
   "issueContact": "Liên hệ (không bắt buộc, công khai)",

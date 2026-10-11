@@ -52,7 +52,7 @@
   "writeLogFile": "앱 로그 파일 저장",
   "browserSourcePort": "브라우저 소스 포트",
   "reportIssue": "오류 신고",
-  "reportIssueDescription": "GitHub에 공개적으로 게시됩니다",
+  "reportIssueDescription": "오늘의 앱 로그와 함께 GitHub에 공개적으로 게시됩니다",
   "issueTitle": "제목",
   "issueDescription": "무슨 일이 있었나요? 어떻게 재현할 수 있나요?",
   "issueContact": "연락처 (선택, 공개됨)",

@@ -52,7 +52,7 @@
   "writeLogFile": "Scrie fișierul jurnal al aplicației",
   "browserSourcePort": "Portul sursei browser",
   "reportIssue": "Raportează eroarea",
-  "reportIssueDescription": "Va fi publicat public pe GitHub",
+  "reportIssueDescription": "Va fi publicat public pe GitHub, împreună cu jurnalul aplicației de azi",
   "issueTitle": "Titlu",
   "issueDescription": "Ce s-a întâmplat? Cum se poate reproduce?",
   "issueContact": "Contact (opțional, public)",

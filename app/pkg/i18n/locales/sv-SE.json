@@ -52,7 +52,7 @@
   "writeLogFile": "Skriv appens loggfil",
   "browserSourcePort": "Port för webbläsarkälla",
   "reportIssue": "Rapportera fel",
-  "reportIssueDescription": "Rapporten publiceras offentligt på GitHub",
+  "reportIssueDescription": "Rapporten publiceras offentligt på GitHub tillsammans med dagens applogg",
   "issueTitle": "Rubrik",
   "issueDescription": "Vad hände? Hur kan det återskapas?",
   "issueContact": "Kontakt (valfritt, offentligt)",

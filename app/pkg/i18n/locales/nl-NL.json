@@ -52,7 +52,7 @@
   "writeLogFile": "App-logbestand schrijven",
   "browserSourcePort": "Poort van browserbron",
   "reportIssue": "Fout melden",
-  "reportIssueDescription": "Wordt openbaar geplaatst op GitHub",
+  "reportIssueDescription": "Wordt samen met het app-logboek van vandaag openbaar geplaatst op GitHub",
   "issueTitle": "Titel",
   "issueDescription": "Wat gebeurde er? Hoe kun je het reproduceren?",
   "issueContact": "Contact (optioneel, openbaar)",

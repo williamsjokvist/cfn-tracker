@@ -52,7 +52,7 @@
   "writeLogFile": "Écrire le fichier journal",
   "browserSourcePort": "Port de la source navigateur",
   "reportIssue": "Signaler une erreur",
-  "reportIssueDescription": "Il sera publié publiquement sur GitHub",
+  "reportIssueDescription": "Il sera publié publiquement sur GitHub, avec le journal de l'application du jour",
   "issueTitle": "Titre",
   "issueDescription": "Que s'est-il passé ? Comment le reproduire ?",
   "issueContact": "Contact (facultatif, public)",
