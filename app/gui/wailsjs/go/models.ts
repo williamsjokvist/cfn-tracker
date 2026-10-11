@@ -104,7 +104,6 @@ export namespace model {
 	    lpGain: string;
 	    mrGain: string;
 	    deleteLog: string;
-	    goBack: string;
 	    loading: string;
 	    wins: string;
 	    losses: string;

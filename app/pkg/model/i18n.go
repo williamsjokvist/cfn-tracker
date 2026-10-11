@@ -19,7 +19,6 @@ type Localization struct {
 	LPGain                      string `json:"lpGain"`
 	MRGain                      string `json:"mrGain"`
 	DeleteLog                   string `json:"deleteLog"`
-	GoBack                      string `json:"goBack"`
 	Loading                     string `json:"loading"`
 	Wins                        string `json:"wins"`
 	Losses                      string `json:"losses"`
