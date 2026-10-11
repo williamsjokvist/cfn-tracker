@@ -185,7 +185,8 @@ func main() {
 		&cfg,
 		browserSrcMatchChan,
 	)
-	sf6ComparisonHandler := cmd.NewSF6ComparisonHandler(cfnClient)
+	exporter := cmd.NewExporter()
+	sf6ComparisonHandler := cmd.NewSF6ComparisonHandler(cfnClient, exporter)
 
 	var onSecondInstanceLaunch func(secondInstanceData options.SecondInstanceData)
 	err = wails.Run(&options.App{
@@ -227,9 +228,17 @@ func main() {
 				go runtime.EventsEmit(ctx, "launchArgs", secondInstanceData.Args)
 			}
 
-			trackingHandler.SetEventEmitter(func(eventName string, optionalData ...interface{}) {
+			emit := func(eventName string, optionalData ...interface{}) {
 				slog.Info("[FE]", slog.String("event", eventName), slog.Any("data", optionalData))
 				runtime.EventsEmit(ctx, eventName, optionalData...)
+			}
+			trackingHandler.SetEventEmitter(emit)
+			sf6ComparisonHandler.SetEventEmitter(emit)
+			exporter.SetSaveFileDialog(func(defaultFilename string) (string, error) {
+				return runtime.SaveFileDialog(ctx, runtime.SaveDialogOptions{
+					DefaultFilename: defaultFilename,
+					Filters:         []runtime.FileFilter{{DisplayName: "CSV", Pattern: "*.csv"}},
+				})
 			})
 		},
 		OnStartup: func(ctx context.Context) {

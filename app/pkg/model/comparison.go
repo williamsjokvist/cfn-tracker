@@ -14,6 +14,7 @@ type SF6BattleStatsMetric struct {
 
 type SF6BattleStatsComparisonReport struct {
 	UserCode          string                 `json:"userCode"`
+	UserName          string                 `json:"userName"`
 	CharacterName     string                 `json:"characterName"`
 	CharacterToolName string                 `json:"characterToolName"`
 	TopN              int                    `json:"topN"`

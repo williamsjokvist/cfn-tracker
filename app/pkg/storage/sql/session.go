@@ -126,13 +126,25 @@ func (s *Storage) GetSessions(ctx context.Context, userId string, date string, l
 			COUNT(IIF(m.victory = false, 1, NULL)) as matches_lost,
 			m.lp as starting_lp,
 			s.lp as ending_lp,
-			(s.lp - m.lp) as lp_gain,
+			g.lp_gain,
 			m.mr as starting_mr,
 			s.mr as ending_mr,
-			(s.mr - m.mr) as mr_gain
+			g.mr_gain
 		FROM sessions as s
 		JOIN users u on u.code = s.user_id
 		JOIN matches m on s.id = m.session_id
+		-- A match's gain is its character's running total for the session, so the
+		-- session gained the sum of each character's latest match. SQLite takes the
+		-- bare gain columns from the row picked by MAX.
+		JOIN (
+			SELECT session_id, SUM(lp_gain) as lp_gain, SUM(mr_gain) as mr_gain
+			FROM (
+				SELECT session_id, lp_gain, mr_gain, MAX(date || ' ' || time)
+				FROM matches
+				GROUP BY session_id, character
+			)
+			GROUP BY session_id
+		) g on g.session_id = s.id
 		%s
 		GROUP BY s.id
 		ORDER BY s.id DESC

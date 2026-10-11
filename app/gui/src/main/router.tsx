@@ -6,7 +6,8 @@ import { MatchesListPage } from '@/pages/matches'
 import { SessionsListPage } from '@/pages/sessions'
 import { SessionOverviewPage, type SessionData } from '@/pages/session'
 import { TrackingPage } from '@/pages/tracking'
-import { SF6ComparisonPage } from '@/pages/comparison'
+import { StatisticsPage } from '@/pages/statistics'
+import { ComparisonPage } from '@/pages/statistics/comparison'
 
 import { AppWrapper } from './app-wrapper'
 import { AppErrorBoundary, PageErrorBoundary } from './app-error'
@@ -42,12 +43,16 @@ const router = createHashRouter([
             path: '/output'
           },
           {
-            element: <SF6ComparisonPage />,
-            path: '/sf6-comparison'
-          },
-          {
             element: <SettingsPage />,
             path: '/settings'
+          },
+          {
+            element: <StatisticsPage />,
+            path: '/statistics'
+          },
+          {
+            element: <ComparisonPage />,
+            path: '/statistics/comparison'
           },
           {
             element: <SessionsListPage />,

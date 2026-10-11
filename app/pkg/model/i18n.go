@@ -28,14 +28,14 @@ type Localization struct {
 	Files                       string `json:"files"`
 	EnterCfnName                string `json:"enterCfnName"`
 	EnterTekkenId               string `json:"enterTekkenId"`
-	EnterUserCode               string `json:"enterUserCode"`
-	UserCodeLabel               string `json:"userCodeLabel"`
-	TopPlayers                  string `json:"topPlayers"`
-	TopNPlayers                 string `json:"topNPlayers"`
 	ComparisonMetric            string `json:"comparisonMetric"`
-	ComparisonYou               string `json:"comparisonYou"`
 	ComparisonTopAvg            string `json:"comparisonTopAvg"`
-	ComparisonDelta             string `json:"comparisonDelta"`
+	ComparisonCheckingLogin     string `json:"comparisonCheckingLogin"`
+	ComparisonFetchingBattleLog string `json:"comparisonFetchingBattleLog"`
+	ComparisonFetchingStats     string `json:"comparisonFetchingStats"`
+	ComparisonFetchingRanking   string `json:"comparisonFetchingRanking"`
+	ComparisonFetchingTopPlayer string `json:"comparisonFetchingTopPlayer"`
+	ComparisonComparing         string `json:"comparisonComparing"`
 	Result                      string `json:"result"`
 	ReplayId                    string `json:"replayId"`
 	Copy                        string `json:"copy"`
@@ -45,6 +45,10 @@ type Localization struct {
 	Pause                       string `json:"pause"`
 	Unpause                     string `json:"unpause"`
 	Statistics                  string `json:"statistics"`
+	RecentSessions              string `json:"recentSessions"`
+	ViewSessions                string `json:"viewSessions"`
+	CompareWithTopPlayers       string `json:"compareWithTopPlayers"`
+	NoStatistics                string `json:"noStatistics"`
 	Date                        string `json:"date"`
 	Minimize                    string `json:"minimize"`
 	WriteLogFile                string `json:"writeLogFile"`
@@ -59,6 +63,7 @@ type Localization struct {
 	ViewIssue                   string `json:"viewIssue"`
 	RestoreSession              string `json:"restoreSession"`
 	ExportLog                   string `json:"exportLog"`
+	Export                      string `json:"export"`
 	League                      string `json:"league"`
 	PickGame                    string `json:"pickGame"`
 	StopTrackingTitle           string `json:"stopTrackingTitle"`
@@ -154,6 +159,7 @@ type Localization struct {
 	ErrInvalidBrowserSourcePort string `json:"errInvalidBrowserSourcePort"`
 	ErrSaveBrowserSourcePort    string `json:"errSaveBrowserSourcePort"`
 	ErrReportIssue              string `json:"errReportIssue"`
+	ErrExport                   string `json:"errExport"`
 	// Retry/recovery keys. Keys missing from this struct are silently dropped
 	// even if they exist in the locale JSON.
 	Retrying                 string `json:"retrying"`
@@ -164,5 +170,8 @@ type Localization struct {
 	ErrStructureChanged      string `json:"errStructureChanged"`
 	AuthNeedRelogin          string `json:"authNeedRelogin"`
 	AuthNeedReloginHint      string `json:"authNeedReloginHint"`
+	AuthCheckingSession      string `json:"authCheckingSession"`
+	AuthRestartingBrowser    string `json:"authRestartingBrowser"`
+	AuthVerifyingLogin       string `json:"authVerifyingLogin"`
 	ErrAuthManualLoginFailed string `json:"errAuthManualLoginFailed"`
 }

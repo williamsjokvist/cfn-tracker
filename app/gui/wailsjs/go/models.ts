@@ -5,6 +5,7 @@ export namespace model {
 	    errAuthManualLoginFailed = "errAuthManualLoginFailed",
 	    errCheckForUpdate = "errCheckForUpdate",
 	    errCreateSession = "errCreateSession",
+	    errExport = "errExport",
 	    errGetGuiConfig = "errGetGuiConfig",
 	    errGetLatestSession = "errGetLatestSession",
 	    errGetMatches = "errGetMatches",
@@ -38,6 +39,13 @@ export namespace model {
 	    SAKURA = "sakura",
 	    TEKKEN = "tekken",
 	    TIDE = "tide",
+	}
+	export interface CharacterStatistics {
+	    character: string;
+	    wins: number;
+	    losses: number;
+	    lp: number;
+	    mr: number;
 	}
 	export interface FGCTrackerError {
 	    localizationKey: ErrorLocalizationKey;
@@ -83,14 +91,14 @@ export namespace model {
 	    files: string;
 	    enterCfnName: string;
 	    enterTekkenId: string;
-	    enterUserCode: string;
-	    userCodeLabel: string;
-	    topPlayers: string;
-	    topNPlayers: string;
 	    comparisonMetric: string;
-	    comparisonYou: string;
 	    comparisonTopAvg: string;
-	    comparisonDelta: string;
+	    comparisonCheckingLogin: string;
+	    comparisonFetchingBattleLog: string;
+	    comparisonFetchingStats: string;
+	    comparisonFetchingRanking: string;
+	    comparisonFetchingTopPlayer: string;
+	    comparisonComparing: string;
 	    result: string;
 	    replayId: string;
 	    copy: string;
@@ -100,6 +108,10 @@ export namespace model {
 	    pause: string;
 	    unpause: string;
 	    statistics: string;
+	    recentSessions: string;
+	    viewSessions: string;
+	    compareWithTopPlayers: string;
+	    noStatistics: string;
 	    date: string;
 	    minimize: string;
 	    writeLogFile: string;
@@ -114,6 +126,7 @@ export namespace model {
 	    viewIssue: string;
 	    restoreSession: string;
 	    exportLog: string;
+	    export: string;
 	    league: string;
 	    pickGame: string;
 	    stopTrackingTitle: string;
@@ -209,6 +222,7 @@ export namespace model {
 	    errInvalidBrowserSourcePort: string;
 	    errSaveBrowserSourcePort: string;
 	    errReportIssue: string;
+	    errExport: string;
 	    retrying: string;
 	    retryingDetail: string;
 	    reconnected: string;
@@ -255,6 +269,7 @@ export namespace model {
 	}
 	export interface SF6BattleStatsComparisonReport {
 	    userCode: string;
+	    userName: string;
 	    characterName: string;
 	    characterToolName: string;
 	    topN: number;
@@ -296,6 +311,13 @@ export namespace model {
 	    game: GameType;
 	    LP: number;
 	    MR: number;
+	}
+	export interface UserStatistics {
+	    mainCharacter: string;
+	    sessions: number;
+	    wins: number;
+	    losses: number;
+	    characters: CharacterStatistics[];
 	}
 
 }

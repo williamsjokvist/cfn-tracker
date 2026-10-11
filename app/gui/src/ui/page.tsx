@@ -58,7 +58,7 @@ const noDrag = { '--draggable': 'no-drag' } as React.CSSProperties
 export function Breadcrumbs({
   items
 }: {
-  items: { label: string; to?: string; onClick?: () => void }[]
+  items: { label: string; to?: string; state?: unknown; onClick?: () => void }[]
 }) {
   return (
     <motion.nav
@@ -73,7 +73,7 @@ export function Breadcrumbs({
             <Icon icon='material-symbols:chevron-right' className='opacity-50 rtl:rotate-180' />
           )}
           {item.to ? (
-            <Link to={item.to} className={crumbLinkClass} style={noDrag}>
+            <Link to={item.to} state={item.state} className={crumbLinkClass} style={noDrag}>
               {item.label}
             </Link>
           ) : item.onClick ? (

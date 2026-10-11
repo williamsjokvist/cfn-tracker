@@ -18,6 +18,9 @@ type AuthStatus struct {
 	Done   bool
 	Err    error
 	Action *AuthAction
+	// The localization key of what the login is doing, as checking and restarting
+	// the browser take long enough to be worth showing.
+	Step string
 }
 
 type AuthAction struct {

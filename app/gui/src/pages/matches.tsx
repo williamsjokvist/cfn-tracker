@@ -10,11 +10,12 @@ import type { model } from '@model'
 import { Button } from '@/ui/button'
 import { type LocalizationKey } from '@/main/i18n'
 import { Tooltip } from '@/ui/tooltip'
-import { SessionBreadcrumbs, type SessionData } from '@/pages/session'
+import { SessionBreadcrumbs, useSessionBackTo, type SessionData } from '@/pages/session'
 
 export function MatchesListPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const { state } = useSessionBackTo()
   const { session, matches: sessionMatches } = useLoaderData() as SessionData
   const [searchParams] = useSearchParams()
   const character = searchParams.get('character') ?? undefined
@@ -60,7 +61,7 @@ export function MatchesListPage() {
               if (matches.length != totalMatches.length) {
                 setMatches(totalMatches)
               } else {
-                navigate(`/sessions/${session.id}`)
+                navigate(`/sessions/${session.id}`, { state })
               }
             }}
           >

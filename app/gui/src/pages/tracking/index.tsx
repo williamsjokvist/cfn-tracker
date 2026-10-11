@@ -5,10 +5,14 @@ import { useTranslation } from 'react-i18next'
 import { TrackingMachineContext } from '@/state/tracking-machine'
 import { AuthMachineContext } from '@/state/auth-machine'
 import { useErrorPopup } from '@/main/error-popup'
+import type { LocalizationKey } from '@/main/i18n'
 import * as Page from '@/ui/page'
+import { LoginPrompt } from '@/ui/login-prompt'
+import { Banner } from '@/ui/banner'
 
 import { TrackingForm } from './tracking-form'
 import { TrackingGamePicker } from './tracking-game-picker'
+import { TrackingBreadcrumbs } from './tracking-breadcrumbs'
 import { TrackingLiveUpdater } from './tracking-live-updater'
 
 export function TrackingPage() {
@@ -22,6 +26,7 @@ export function TrackingPage() {
 
   const authError = useSelector(authActor, ({ context }) => context.error)
   const authAction = useSelector(authActor, ({ context }) => context.action)
+  const authStep = useSelector(authActor, ({ context }) => context.step)
   const trackingError = useSelector(trackingActor, ({ context }) => context.error)
 
   const setError = useErrorPopup()
@@ -41,25 +46,21 @@ export function TrackingPage() {
       return (
         <Page.Root>
           <Page.Header>
-            <Page.Title>
+            <TrackingBreadcrumbs />
+            <Page.LoadingIcon />
+          </Page.Header>
+          {authAction && <LoginPrompt />}
+          <Banner open variant='loading'>
+            <span>
               {authAction
                 ? t(authAction.localizationKey as 'authNeedRelogin', {
                     seconds: authAction.secondsLeft
                   })
-                : t('loading')}
-            </Page.Title>
-            {!authAction && <Page.LoadingIcon />}
-          </Page.Header>
-          {authAction && (
-            <div className='flex flex-col items-center justify-center gap-6 px-8 text-center'>
-              <i
-                aria-label='loading'
-                className='text-highlight inline-block h-12 w-12 animate-spin rounded-full border-[4px] border-current border-t-transparent'
-                role='status'
-              />
-              <p className='max-w-sm text-white/70'>{t('authNeedReloginHint')}</p>
-            </div>
-          )}
+                : authStep
+                  ? t(authStep as LocalizationKey)
+                  : t('loading')}
+            </span>
+          </Banner>
         </Page.Root>
       )
   }

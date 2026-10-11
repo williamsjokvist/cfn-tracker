@@ -103,8 +103,8 @@ func (b *Browser) launch() error {
 	return nil
 }
 
-// NewTab opens another page in the same browser, so work like the comparison
-// doesn't navigate away from the page GetBattleLog polls with.
+// NewTab gives work like the comparison its own page, so it doesn't navigate away
+// from the page GetBattleLog polls with.
 func (b *Browser) NewTab() (*Browser, func(), error) {
 	b.mu.Lock()
 	defer b.mu.Unlock()

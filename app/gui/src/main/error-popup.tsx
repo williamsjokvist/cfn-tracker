@@ -1,12 +1,8 @@
 import React from 'react'
-import { Icon } from '@iconify/react'
-import { useAnimate } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 
 import { type model } from '@model'
-import { cn } from '@/helpers/cn'
-
-import type { LocalizationKey } from './i18n'
+import { Banner } from '@/ui/banner'
 
 type ErrorContextType = [
   error: model.FGCTrackerError | null,
@@ -17,44 +13,23 @@ export const useErrorPopup = () => React.useContext(ErrorContext)![1]
 
 export function ErrorPopupProvider(props: React.PropsWithChildren) {
   const { t } = useTranslation()
-  const [scope, animate] = useAnimate()
   const [error, setError] = React.useState<model.FGCTrackerError | null>(null)
 
-  const dismiss = React.useCallback(() => {
-    animate('#error-message', { opacity: 0 }).then(() => setError(null))
-  }, [animate])
+  const dismiss = React.useCallback(() => setError(null), [])
 
   React.useEffect(() => {
     if (error === null) {
       return
     }
-    animate('#error-message', { opacity: 1 })
     const timer = window.setTimeout(dismiss, 15_000)
     return () => window.clearTimeout(timer)
   }, [error])
 
   return (
     <ErrorContext.Provider value={[error, setError]}>
-      <div ref={scope} className='absolute flex w-full justify-end'>
-        <div
-          id='error-message'
-          className={cn(
-            'flex items-center justify-around gap-6',
-            'fixed z-50 mx-auto',
-            'rounded-es-xl px-8 py-3 text-xl backdrop-blur-xs',
-            'bg-linear-to-r from-[#870e65] to-[#6c086d] text-white',
-            error ? 'cursor-pointer' : 'pointer-events-none'
-          )}
-          style={{ opacity: 0 }}
-          onClick={dismiss}
-        >
-          <Icon
-            icon='material-symbols:warning-outline'
-            className='animate-blink h-8 w-8 text-[#ff6388]'
-          />
-          {error?.localizationKey && <span>{t(error.localizationKey)}</span>}
-        </div>
-      </div>
+      <Banner open={error !== null} variant='error' onClick={dismiss}>
+        {error?.localizationKey && <span>{t(error.localizationKey)}</span>}
+      </Banner>
       {props.children}
     </ErrorContext.Provider>
   )

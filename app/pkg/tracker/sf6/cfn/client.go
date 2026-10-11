@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/url"
+	"sync"
 	"time"
 
 	"github.com/williamsjokvist/cfn-tracker/pkg/browser"
@@ -22,6 +23,9 @@ type CFNClient interface {
 type Client struct {
 	browser *browser.Browser
 	auth    authBrowser
+	// Tracking and the comparison can both need a login, which must not open two
+	// login windows or relaunch the browser under each other.
+	authMu sync.Mutex
 }
 
 // Tests replace this so the manual login doesn't open Chrome or wait for a user.
@@ -71,6 +75,10 @@ func (c *Client) NewTabClient() (*Client, func(), error) {
 	return NewClient(tabBrowser), cleanup, nil
 }
 
+func (c *Client) HasSession(ctx context.Context) bool {
+	return c.auth != nil && c.auth.HasBucklerSession(ctx)
+}
+
 func (c *Client) GetBattleLog(ctx context.Context, cfn string) (*BattleLog, error) {
 	page := c.browser.Page.Context(ctx).Timeout(battleLogTimeout)
 	err := page.Navigate(fmt.Sprintf("%s/profile/%s/battlelog/rank", bucklerBaseURL, cfn))
@@ -104,6 +112,8 @@ func (c *Client) GetBattleLog(ctx context.Context, cfn string) (*BattleLog, erro
 }
 
 func (c *Client) Authenticate(ctx context.Context, statChan chan tracker.AuthStatus) {
+	c.authMu.Lock()
+	defer c.authMu.Unlock()
 	status := &tracker.AuthStatus{}
 	if c.auth == nil {
 		send(ctx, statChan, *status.WithError(fmt.Errorf("browser not initialized")))
@@ -111,6 +121,7 @@ func (c *Client) Authenticate(ctx context.Context, statChan chan tracker.AuthSta
 	}
 
 	// Fetching matches only needs the buckler session (~1 month), so reuse it while valid.
+	send(ctx, statChan, tracker.AuthStatus{Step: "authCheckingSession"})
 	if c.auth.HasBucklerSession(ctx) {
 		slog.Info("cfn: buckler session is still valid, skipping login")
 		send(ctx, statChan, tracker.AuthStatus{Done: true})
@@ -127,10 +138,12 @@ func (c *Client) Authenticate(ctx context.Context, statChan chan tracker.AuthSta
 	if manualErr != nil {
 		slog.Info("manual login browser ended with an error", slog.Any("error", manualErr))
 	}
+	send(ctx, statChan, tracker.AuthStatus{Step: "authRestartingBrowser"})
 	if relaunchErr := c.auth.Relaunch(); relaunchErr != nil {
 		send(ctx, statChan, *status.WithError(model.ErrAuthManualLoginFailed))
 		return
 	}
+	send(ctx, statChan, tracker.AuthStatus{Step: "authVerifyingLogin"})
 	if c.auth.HasBucklerSession(ctx) {
 		slog.Info("passed cfn auth")
 		send(ctx, statChan, tracker.AuthStatus{Done: true})
