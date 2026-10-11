@@ -196,6 +196,7 @@ export namespace model {
 	    browserSourceThemeParchment: string;
 	    browserSourceThemeSticker: string;
 	    browserSourceThemeGlitch: string;
+	    browserSourceThemeLed: string;
 	    createYourOwnTheme: string;
 	    userId: string;
 	    userName: string;

@@ -111,6 +111,7 @@ type Localization struct {
 	BrowserSourceThemeParchment   string `json:"browserSourceThemeParchment"`
 	BrowserSourceThemeSticker     string `json:"browserSourceThemeSticker"`
 	BrowserSourceThemeGlitch      string `json:"browserSourceThemeGlitch"`
+	BrowserSourceThemeLed         string `json:"browserSourceThemeLed"`
 	CreateYourOwnTheme            string `json:"createYourOwnTheme"`
 	UserId                        string `json:"userId"`
 	UserName                      string `json:"userName"`

@@ -37,6 +37,7 @@ const themeLabels: Record<string, LocalizationKey> = {
   hud: 'browserSourceThemeHud',
   ink: 'browserSourceThemeInk',
   jaeger: 'browserSourceThemeJaeger',
+  led: 'browserSourceThemeLed',
   minimal: 'browserSourceThemeMinimal',
   'minimal-dark': 'browserSourceThemeMinimalDark',
   neon: 'browserSourceThemeNeon',
