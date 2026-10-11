@@ -10,6 +10,7 @@ import * as Page from '@/ui/page'
 import { Button } from '@/ui/button'
 import { BigStat } from '@/ui/stat'
 import { CharacterPortrait } from '@/ui/character-portrait'
+import { cn } from '@/helpers/cn'
 
 type CharacterStats = {
   character: string
@@ -161,12 +162,17 @@ function CharacterSection({ stats, hasPoints }: { stats: CharacterStats; hasPoin
           <BigStat text={t('wins')} value={stats.wins} />
           <BigStat text={t('losses')} value={stats.losses} />
           <BigStat text={t('winRate')} value={`${winRate(stats.wins, stats.losses)}%`} />
-          {hasPoints && (
-            <>
-              <BigStat text={t('lpGain')} value={signed(stats.lpGain)} />
-              <BigStat text={t('mrGain')} value={signed(stats.mrGain)} />
-            </>
-          )}
+          {/* Tekken has no points, but keeps the row so every character is the same size. */}
+          <BigStat
+            text={t('lpGain')}
+            value={signed(stats.lpGain)}
+            className={cn(!hasPoints && 'invisible')}
+          />
+          <BigStat
+            text={t('mrGain')}
+            value={signed(stats.mrGain)}
+            className={cn(!hasPoints && 'invisible')}
+          />
         </dl>
       </div>
     </section>
