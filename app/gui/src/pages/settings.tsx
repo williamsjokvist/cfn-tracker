@@ -146,6 +146,7 @@ function BrowserSourcePortInput() {
   const setError = useErrorPopup()
   const [cfg, setCfg] = React.useContext(ConfigContext)
   const [port, setPort] = React.useState(String(cfg.browserSourcePort))
+  const [saving, setSaving] = React.useState(false)
 
   // The config loads after the first render.
   React.useEffect(() => {
@@ -158,18 +159,34 @@ function BrowserSourcePortInput() {
     if (newPort === cfg.browserSourcePort) {
       return
     }
+    // Wails rejects values that don't fit a uint16 before the command runs, with a generic error.
+    if (port.trim() === '' || !Number.isInteger(newPort) || newPort < 1024 || newPort > 65535) {
+      setPort(String(cfg.browserSourcePort))
+      setError({
+        localizationKey: model.ErrorLocalizationKey.errInvalidBrowserSourcePort,
+        message: `port ${port}`
+      })
+      return
+    }
+    // Disabled until the save finishes, so two saves can't race to rebind the server.
+    setSaving(true)
     SaveBrowserSourcePort(newPort)
       .then(() => setCfg({ ...cfg, browserSourcePort: newPort }))
       .catch(err => {
         setPort(String(cfg.browserSourcePort))
         setError(err)
       })
+      .finally(() => setSaving(false))
   }
 
   return (
     <div className='flex w-full items-center justify-between'>
-      <h3 className='font-bold'>{t('browserSourcePort')}</h3>
+      <label htmlFor='browser-source-port' className='font-bold'>
+        {t('browserSourcePort')}
+      </label>
       <Input
+        id='browser-source-port'
+        disabled={saving}
         type='number'
         inputMode='numeric'
         min={1024}

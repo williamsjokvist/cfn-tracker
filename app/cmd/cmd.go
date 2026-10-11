@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -185,11 +186,16 @@ func (ch *CommandHandler) SaveBrowserSourcePort(port uint16) error {
 	if err != nil {
 		return model.WrapError(model.ErrGetGUIConfig, err)
 	}
+	previousPort := runtimeCfg.GUI.BrowserSourcePort
 	if err := ch.browserSrcServer.Listen(port); err != nil {
 		return model.WrapError(model.ErrSaveBrowserSourcePort, err)
 	}
 	runtimeCfg.GUI.BrowserSourcePort = port
 	if err := ch.cfgDb.SaveRuntimeConfig(runtimeCfg); err != nil {
+		// Move back so the server matches the saved setting.
+		if rollbackErr := ch.browserSrcServer.Listen(previousPort); rollbackErr != nil {
+			err = errors.Join(err, fmt.Errorf("restore port %d: %w", previousPort, rollbackErr))
+		}
 		return model.WrapError(model.ErrSaveBrowserSourcePort, err)
 	}
 	return nil
