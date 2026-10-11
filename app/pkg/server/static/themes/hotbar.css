@@ -1,0 +1,50 @@
+@import url("https://fonts.googleapis.com/css2?family=Silkscreen&family=Pixelify+Sans:wght@600&display=swap");
+
+body {
+  background: #4a6b3a;
+}
+
+.stat-list {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  background: rgba(0, 0, 0, 0.55);
+  border: 3px solid #1a1a1a;
+
+  white-space: nowrap;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  justify-content: center;
+  min-width: 84px;
+  height: 76px;
+  padding: 0 8px;
+  box-sizing: border-box;
+  background: #8b8b8b;
+  box-shadow:
+    inset 3px 3px 0 #c6c6c6,
+    inset -3px -3px 0 #555;
+}
+
+.stat-item:first-child {
+  outline: 3px solid #fff;
+  outline-offset: -1px;
+}
+
+.stat-title {
+  color: #2a2a2a;
+  font-family: "Silkscreen", monospace;
+  font-size: 0.6rem;
+  text-transform: uppercase;
+}
+
+.stat-value {
+  color: #fff;
+  font-family: "Pixelify Sans", monospace;
+  font-weight: 600;
+  font-size: 1.75rem;
+  text-shadow: 3px 3px 0 #3f3f3f;
+}

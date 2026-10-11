@@ -1,0 +1,53 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@500;700&display=swap");
+
+body {
+  background: #3a3f4b;
+}
+
+.stat-list {
+  display: inline-flex;
+  gap: 6px;
+
+  font-family: "DM Sans", "Segoe UI", sans-serif;
+  white-space: nowrap;
+}
+
+.stat-item {
+  --dot: #7c9cff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px 5px 10px;
+  background: rgba(15, 17, 23, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+}
+
+.stat-item:nth-child(5n + 2) { --dot: #ff7aa2; }
+.stat-item:nth-child(5n + 3) { --dot: #5ee6a8; }
+.stat-item:nth-child(5n + 4) { --dot: #ffc857; }
+.stat-item:nth-child(5n + 5) { --dot: #c792ff; }
+
+.stat-title::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 6px;
+  vertical-align: 0.1em;
+  border-radius: 50%;
+  background: var(--dot);
+  box-shadow: 0 0 8px var(--dot);
+}
+
+.stat-title {
+  color: #aab1c2;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.stat-value {
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.15rem;
+}
