@@ -60,7 +60,6 @@ func (s *Session) Record(outcome model.Match) model.Match {
 	return match
 }
 
-// A character's latest match carries its running stats for the session.
 func (s *Session) Character(character string) (model.Match, bool) {
 	for _, match := range s.state.Matches {
 		if match.Character == character {

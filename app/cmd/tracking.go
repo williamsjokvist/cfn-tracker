@@ -139,7 +139,6 @@ func (ch *TrackingHandler) StartTracking(userCodeInput string, restore bool) err
 		if err := ch.txtDb.SaveMatch(match); err != nil {
 			return ch.storageError(cancel, "save to text files", err)
 		}
-		// Emitted once saved, so whoever sees the event can rely on the stored state.
 		ch.emit("match", match)
 		return nil
 	})
