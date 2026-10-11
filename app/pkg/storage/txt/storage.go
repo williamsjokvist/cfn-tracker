@@ -13,8 +13,7 @@ type Storage struct {
 	directory string
 }
 
-func NewStorage() (*Storage, error) {
-	directory := `results`
+func NewStorage(directory string) (*Storage, error) {
 	err := os.MkdirAll(directory, os.FileMode(0755))
 	if err != nil {
 		return nil, fmt.Errorf(`create directories: %w`, err)
@@ -22,6 +21,10 @@ func NewStorage() (*Storage, error) {
 	return &Storage{
 		directory: directory,
 	}, nil
+}
+
+func (s *Storage) Dir() string {
+	return s.directory
 }
 
 func (s *Storage) SaveMatch(match model.Match) error {

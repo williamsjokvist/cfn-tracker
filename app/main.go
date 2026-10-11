@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	goruntime "runtime"
 	"strconv"
 	"strings"
 	"syscall"
@@ -168,7 +169,13 @@ func main() {
 	if err != nil {
 		closeWithError(fmt.Errorf("initalize database: %w", err))
 	}
-	txtDb, err := txt.NewStorage()
+	// A Finder-launched macOS app runs with the read-only root as its working directory,
+	// while Windows users expect the results next to the executable for OBS.
+	resultsDir := "results"
+	if goruntime.GOOS == "darwin" {
+		resultsDir = filepath.Join(dataDir, "results")
+	}
+	txtDb, err := txt.NewStorage(resultsDir)
 	if err != nil {
 		closeWithError(fmt.Errorf("initalize text store: %w", err))
 	}
