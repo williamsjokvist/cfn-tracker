@@ -91,6 +91,8 @@ const statListHtml = `<dl class="stat-list">${outputStats
   .join("")}</dl>`;
 const themes = [
   { id: "default", name: "Default", css: defaultTheme },
+  { id: "ticker", name: "Ticker", css: tickerTheme },
+  { id: "sticker", name: "Sticker", css: stickerTheme },
   { id: "pills", name: "Pills", css: pillsTheme },
   { id: "ink", name: "Ink", css: inkTheme },
   { id: "terminal", name: "Terminal", css: terminalTheme },
@@ -102,9 +104,7 @@ const themes = [
   { id: "glass", name: "Glass", css: glassTheme },
   { id: "versus", name: "Versus", css: versusTheme },
   { id: "comic", name: "Comic", css: comicTheme },
-  { id: "ticker", name: "Ticker", css: tickerTheme },
   { id: "parchment", name: "Parchment", css: parchmentTheme },
-  { id: "sticker", name: "Sticker", css: stickerTheme },
   { id: "glitch", name: "Glitch", css: glitchTheme },
 ].map((theme) => ({
   ...theme,
