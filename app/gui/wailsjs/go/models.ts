@@ -69,6 +69,8 @@ export namespace model {
 	    sidebar: boolean;
 	    logFile: boolean;
 	    browserSourcePort: number;
+	    lastGame: GameType;
+	    lastUsers: Record<string, string>;
 	}
 	export interface IssueReport {
 	    title: string;

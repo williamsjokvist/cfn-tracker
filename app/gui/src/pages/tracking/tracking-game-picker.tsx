@@ -3,6 +3,10 @@ import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
 
 import { model } from '@model'
+import { useSelector } from '@xstate/react'
+
+import { AuthMachineContext } from '@/state/auth-machine'
+import { ConfigContext } from '@/main/config'
 
 import { Button } from '@/ui/button'
 import * as Page from '@/ui/page'
@@ -35,7 +39,13 @@ export const gameName = (game?: model.GameType) => GAMES.find(g => g.code === ga
 
 export function TrackingGamePicker(props: { onSubmit: (game: model.GameType) => void }) {
   const { t } = useTranslation()
-  const [selectedGame, setSelectedGame] = React.useState<model.GameType>()
+  const [cfg] = React.useContext(ConfigContext)
+  const authActor = AuthMachineContext.useActorRef()
+  // The game in the auth machine is newer than the one the config had at startup.
+  const currentGame = useSelector(authActor, ({ context }) => context.game)
+  const [selectedGame, setSelectedGame] = React.useState<model.GameType | undefined>(
+    currentGame ?? (cfg.lastGame || undefined)
+  )
 
   return (
     <Page.Root>

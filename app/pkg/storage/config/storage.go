@@ -75,6 +75,10 @@ func (s *Storage) GetRuntimeConfig() (*model.RuntimeConfig, error) {
 	if err != nil {
 		return nil, fmt.Errorf("map config to struct: %w", err)
 	}
+	cfg.GUI.LastUsers = make(map[model.GameType]string)
+	for _, key := range iniData.Section("last_user").Keys() {
+		cfg.GUI.LastUsers[model.GameType(key.Name())] = key.Value()
+	}
 	return &cfg, nil
 }
 
@@ -88,6 +92,10 @@ func (s *Storage) SaveRuntimeConfig(cfg *model.RuntimeConfig) error {
 	iniData.Section("gui").Key("sidebar").SetValue(strconv.FormatBool(cfg.GUI.SideBar))
 	iniData.Section("gui").Key("log_file").SetValue(strconv.FormatBool(cfg.GUI.LogFile))
 	iniData.Section("gui").Key("browser_source_port").SetValue(strconv.FormatUint(uint64(cfg.GUI.BrowserSourcePort), 10))
+	iniData.Section("gui").Key("last_game").SetValue(string(cfg.GUI.LastGame))
+	for game, code := range cfg.GUI.LastUsers {
+		iniData.Section("last_user").Key(string(game)).SetValue(code)
+	}
 
 	if err := iniData.SaveTo(s.iniPath()); err != nil {
 		return fmt.Errorf("save ini config file: %w", err)
@@ -130,6 +138,30 @@ func (s *Storage) SaveDataDir(dir string) error {
 		dir = ""
 	}
 	iniData.Section("data").Key("dir").SetValue(dir)
+	if err := iniData.SaveTo(s.iniPath()); err != nil {
+		return fmt.Errorf("save ini config file: %w", err)
+	}
+	return nil
+}
+
+func (s *Storage) SaveLastGame(game model.GameType) error {
+	iniData, err := s.getIniFile()
+	if err != nil {
+		return fmt.Errorf("get config file: %w", err)
+	}
+	iniData.Section("gui").Key("last_game").SetValue(string(game))
+	if err := iniData.SaveTo(s.iniPath()); err != nil {
+		return fmt.Errorf("save ini config file: %w", err)
+	}
+	return nil
+}
+
+func (s *Storage) SaveLastUser(game model.GameType, code string) error {
+	iniData, err := s.getIniFile()
+	if err != nil {
+		return fmt.Errorf("get config file: %w", err)
+	}
+	iniData.Section("last_user").Key(string(game)).SetValue(code)
 	if err := iniData.SaveTo(s.iniPath()); err != nil {
 		return fmt.Errorf("save ini config file: %w", err)
 	}
