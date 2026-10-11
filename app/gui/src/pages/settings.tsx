@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 
 import { ConfigContext } from '@/main/config'
 import { useErrorPopup } from '@/main/error-popup'
+import type { LocalizationKey } from '@/main/i18n'
 
 import {
   GetAppVersion,
@@ -200,37 +201,45 @@ function BrowserSourcePortInput() {
   )
 }
 
-const Themes = [
+const Themes: { name: model.ThemeName; label: LocalizationKey; colors: string[] }[] = [
   {
     name: model.ThemeName.DEFAULT,
+    label: 'themeDefault',
     colors: ['#901169', '#330083']
   },
   {
     name: model.ThemeName.ENTH,
+    label: 'themeEnth',
     colors: ['#95F3F6', '#0E254D']
   },
   {
     name: model.ThemeName.TEKKEN,
+    label: 'themeTekken',
     colors: ['#dd1d5b', '#1e3c52']
   },
   {
     name: model.ThemeName.JADE,
+    label: 'themeJade',
     colors: ['#0c8f62', '#023a4d']
   },
   {
     name: model.ThemeName.EMBER,
+    label: 'themeEmber',
     colors: ['#b8321f', '#3a0b2e']
   },
   {
     name: model.ThemeName.TIDE,
+    label: 'themeTide',
     colors: ['#1767b8', '#0b1a4f']
   },
   {
     name: model.ThemeName.DUSK,
+    label: 'themeDusk',
     colors: ['#5b3fd1', '#1a1240']
   },
   {
     name: model.ThemeName.SAKURA,
+    label: 'themeSakura',
     colors: ['#d14f8a', '#3b1450']
   }
 ]
@@ -263,7 +272,7 @@ function ThemeSelect() {
             {theme.colors.map(color => (
               <i key={color} style={{ background: color }} className={`h-4 w-3 rounded-md`} />
             ))}
-            <span className='first-letter:uppercase'>{theme.name}</span>
+            <span>{t(theme.label)}</span>
           </Select.Item>
         ))}
       </Select.Root>
