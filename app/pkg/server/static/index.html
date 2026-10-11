@@ -92,7 +92,7 @@
           "<p>In CFN Tracker, open <b>Output</b>, tick the stats you want,",
           "then press <b>Copy browser source link</b> and use that URL here",
           "and in your OBS browser source.</p>",
-          "<p class='example'>http://localhost:4242?theme=default&amp;cfn=true&amp;lp=true</p>"
+          `<p class='example'>${window.location.origin}?theme=default&amp;cfn=true&amp;lp=true</p>`
         ].join(" ")
         document.body.appendChild(hint)
       }

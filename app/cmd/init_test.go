@@ -34,8 +34,7 @@ func TestMain(m *testing.M) {
 	}
 
 	cfg := config.BuildConfig{
-		AppVersion:        "4.0.0",
-		BrowserSourcePort: 4242,
+		AppVersion: "4.0.0",
 	}
 
 	testSuite.trackingHandler = cmd.NewTrackingHandler(

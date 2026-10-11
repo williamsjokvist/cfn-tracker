@@ -17,8 +17,6 @@ import (
 	"time"
 
 	"github.com/hashicorp/go-version"
-	"github.com/joho/godotenv"
-	"github.com/kelseyhightower/envconfig"
 	"github.com/samber/lo"
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/logger"
@@ -70,16 +68,6 @@ func init() {
 		log.Fatalf("parse project config: %v", err)
 	}
 
-	if err := godotenv.Load(".env"); err != nil {
-		cfg = config.BuildConfig{
-			AppVersion:        wailsCfg.Info.ProductVersion,
-			BrowserSourcePort: 4242,
-		}
-		return
-	}
-	if err := envconfig.Process("", &cfg); err != nil {
-		log.Fatalf("process envconfig: %v", err)
-	}
 	cfg.AppVersion = wailsCfg.Info.ProductVersion
 }
 
@@ -168,12 +156,14 @@ func main() {
 	}
 
 	browserSrcMatchChan := make(chan model.Match, 1)
+	browserSrcServer := server.NewBrowserSourceServer(browserSrcMatchChan)
 
 	cmdHandler := cmd.NewCommandHandler(
 		sqlDb,
 		noSqlDb,
 		txtDb,
 		&cfg,
+		browserSrcServer,
 	)
 	trackingHandler := cmd.NewTrackingHandler(
 		wavu.NewClient(),
@@ -184,8 +174,6 @@ func main() {
 		&cfg,
 		browserSrcMatchChan,
 	)
-
-	browserSrcServer := server.NewBrowserSourceServer(browserSrcMatchChan)
 
 	var onSecondInstanceLaunch func(secondInstanceData options.SecondInstanceData)
 	err = wails.Run(&options.App{
@@ -233,7 +221,9 @@ func main() {
 			})
 		},
 		OnStartup: func(ctx context.Context) {
-			go browserSrcServer.Start(ctx, &cfg)
+			if err := browserSrcServer.Start(ctx, runtimeCfg.GUI.BrowserSourcePort); err != nil {
+				slog.Error("browser source: start server", slog.Any("error", err))
+			}
 		},
 		OnShutdown: func(_ context.Context) {
 			appBrowser.Page.Browser().Close()

@@ -9,6 +9,7 @@ import { useErrorPopup } from '@/main/error-popup'
 import {
   GetAppVersion,
   GetSupportedLanguages,
+  SaveBrowserSourcePort,
   SaveLocale,
   SaveLogFile,
   SaveSidebarMinimized,
@@ -19,6 +20,7 @@ import { BrowserOpenURL } from '@runtime'
 import * as Page from '@/ui/page'
 import * as Select from '@/ui/select'
 import { Switch } from '@/ui/switch'
+import { Input } from '@/ui/input'
 import { Flag } from '@/ui/flag'
 import { cn } from '@/helpers/cn'
 import { model } from '@model'
@@ -36,12 +38,13 @@ export function SettingsPage() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.125 }}
-        className='text-xl'
+        className='overflow-y-scroll text-xl'
       >
         <div className='border-b-divider border-b-[1px] border-solid px-8 py-6'>
-          <div className='mx-auto grid max-w-xl gap-4'>
+          <div className='mx-auto grid max-w-xl auto-rows-fr gap-4'>
             <ThemeSelect />
             <LanguageSelect />
+            <BrowserSourcePortInput />
             <SideBarToggle />
             <LogFileToggle />
           </div>
@@ -105,7 +108,7 @@ function SideBarToggle() {
   const setError = useErrorPopup()
   const [cfg, setCfg] = React.useContext(ConfigContext)
   return (
-    <div className='flex w-full justify-between'>
+    <div className='flex w-full items-center justify-between'>
       <h3 className='font-bold'>{t('minimize')}</h3>
       <Switch
         checked={cfg.sidebar}
@@ -124,7 +127,7 @@ function LogFileToggle() {
   const setError = useErrorPopup()
   const [cfg, setCfg] = React.useContext(ConfigContext)
   return (
-    <div className='flex w-full justify-between'>
+    <div className='flex w-full items-center justify-between'>
       <h3 className='font-bold'>{t('writeLogFile')}</h3>
       <Switch
         checked={cfg.logFile}
@@ -133,6 +136,48 @@ function LogFileToggle() {
             .then(() => setCfg({ ...cfg, logFile: checked }))
             .catch(setError)
         }}
+      />
+    </div>
+  )
+}
+
+function BrowserSourcePortInput() {
+  const { t } = useTranslation()
+  const setError = useErrorPopup()
+  const [cfg, setCfg] = React.useContext(ConfigContext)
+  const [port, setPort] = React.useState(String(cfg.browserSourcePort))
+
+  // The config loads after the first render.
+  React.useEffect(() => {
+    setPort(String(cfg.browserSourcePort))
+  }, [cfg.browserSourcePort])
+
+  // Every save rebinds the server, so save on blur or Enter rather than on each keystroke.
+  function save() {
+    const newPort = Number(port)
+    if (newPort === cfg.browserSourcePort) {
+      return
+    }
+    SaveBrowserSourcePort(newPort)
+      .then(() => setCfg({ ...cfg, browserSourcePort: newPort }))
+      .catch(err => {
+        setPort(String(cfg.browserSourcePort))
+        setError(err)
+      })
+  }
+
+  return (
+    <div className='flex w-full items-center justify-between'>
+      <h3 className='font-bold'>{t('browserSourcePort')}</h3>
+      <Input
+        type='number'
+        inputMode='numeric'
+        min={1024}
+        max={65535}
+        value={port}
+        onValueChange={setPort}
+        onBlur={save}
+        onKeyDown={e => e.key === 'Enter' && e.currentTarget.blur()}
       />
     </div>
   )

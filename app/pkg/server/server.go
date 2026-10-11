@@ -4,15 +4,16 @@ import (
 	"context"
 	"embed"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/fs"
 	"log/slog"
+	"net"
 	"net/http"
 	"strings"
 	"sync"
 	"time"
 
-	"github.com/williamsjokvist/cfn-tracker/pkg/config"
 	"github.com/williamsjokvist/cfn-tracker/pkg/model"
 )
 
@@ -21,59 +22,125 @@ var staticFs embed.FS
 
 type BrowserSourceServer struct {
 	matchChan chan model.Match
+	mux       *http.ServeMux
 	mu        sync.Mutex
 	sseChans  map[chan []byte]struct{}
 	lastMatch []byte
+
+	// Separate from mu: stopping a server waits for its handlers, which take mu.
+	srvMu     sync.Mutex
+	srv       *http.Server
+	srvPort   uint16
+	cancelSrv context.CancelFunc
 }
 
 var heartbeatInterval = 15 * time.Second
 
+var shutdownTimeout = time.Second
+
 func NewBrowserSourceServer(matchChan chan model.Match) *BrowserSourceServer {
-	return &BrowserSourceServer{
+	b := &BrowserSourceServer{
 		matchChan: matchChan,
+		mux:       http.NewServeMux(),
 		lastMatch: nil,
 		sseChans:  make(map[chan []byte]struct{}),
 	}
-}
-
-func (b *BrowserSourceServer) Start(ctx context.Context, cfg *config.BuildConfig) {
-	go func() {
-		for match := range b.matchChan {
-			slog.Info("browser source: match received", slog.Any("replay_id", match.ReplayID))
-			matchJson, err := json.Marshal(match)
-			if err != nil {
-				slog.Error("browser source: marshal match data", slog.Any("error", err))
-			}
-			b.mu.Lock()
-			b.lastMatch = matchJson
-			for sse := range b.sseChans {
-				// Replace a match the client hasn't read yet, so it always gets the latest.
-				select {
-				case <-sse:
-				default:
-				}
-				select {
-				case sse <- matchJson:
-				default:
-				}
-			}
-			b.mu.Unlock()
-		}
-	}()
-
-	slog.Debug("launching browser source server")
-
-	http.HandleFunc("/", b.handleRoot)
-	http.HandleFunc("GET /stream", b.handleStream)
-	http.HandleFunc("GET /themes/{theme}", b.handleTheme)
+	b.mux.HandleFunc("/", b.handleRoot)
+	b.mux.HandleFunc("GET /stream", b.handleStream)
+	b.mux.HandleFunc("GET /themes/{theme}", b.handleTheme)
 
 	// serve custom themes through "themes" directory in the same directory as the user's executable
 	fs := http.FileServer(http.Dir("./themes"))
-	http.Handle("/themes/", http.StripPrefix("/themes/", fs))
+	b.mux.Handle("/themes/", http.StripPrefix("/themes/", fs))
+	return b
+}
 
-	if err := http.ListenAndServe(fmt.Sprintf(":%d", cfg.BrowserSourcePort), nil); err != nil {
-		slog.Error("browser source: launch server", slog.Any("error", err))
+// Start forwards matches to connected clients and serves on port until ctx is done.
+// It must only be called once.
+func (b *BrowserSourceServer) Start(ctx context.Context, port uint16) error {
+	go b.forwardMatches()
+	go func() {
+		<-ctx.Done()
+		b.Close()
+	}()
+	slog.Debug("launching browser source server")
+	return b.Listen(port)
+}
+
+func (b *BrowserSourceServer) forwardMatches() {
+	for match := range b.matchChan {
+		slog.Info("browser source: match received", slog.Any("replay_id", match.ReplayID))
+		matchJson, err := json.Marshal(match)
+		if err != nil {
+			slog.Error("browser source: marshal match data", slog.Any("error", err))
+		}
+		b.mu.Lock()
+		b.lastMatch = matchJson
+		for sse := range b.sseChans {
+			// Replace a match the client hasn't read yet, so it always gets the latest.
+			select {
+			case <-sse:
+			default:
+			}
+			select {
+			case sse <- matchJson:
+			default:
+			}
+		}
+		b.mu.Unlock()
 	}
+}
+
+// Listen moves the server to port. The new port is bound before the old server
+// stops, so on error the old server keeps running.
+func (b *BrowserSourceServer) Listen(port uint16) error {
+	b.srvMu.Lock()
+	defer b.srvMu.Unlock()
+	// Rebinding the port we're already on would fail with "address in use".
+	if b.srv != nil && b.srvPort == port {
+		return nil
+	}
+
+	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
+	if err != nil {
+		return fmt.Errorf("listen on port %d: %w", port, err)
+	}
+	b.stopLocked()
+
+	// Requests inherit this context, so cancelling it ends SSE streams that
+	// would otherwise keep Shutdown waiting.
+	ctx, cancel := context.WithCancel(context.Background())
+	srv := &http.Server{
+		Handler:     b.mux,
+		BaseContext: func(net.Listener) context.Context { return ctx },
+	}
+	b.srv, b.srvPort, b.cancelSrv = srv, port, cancel
+	go func() {
+		if err := srv.Serve(listener); !errors.Is(err, http.ErrServerClosed) {
+			slog.Error("browser source: serve", slog.Any("error", err))
+		}
+	}()
+	return nil
+}
+
+func (b *BrowserSourceServer) Close() {
+	b.srvMu.Lock()
+	defer b.srvMu.Unlock()
+	b.stopLocked()
+}
+
+func (b *BrowserSourceServer) stopLocked() {
+	if b.srv == nil {
+		return
+	}
+	b.cancelSrv()
+	ctx, cancel := context.WithTimeout(context.Background(), shutdownTimeout)
+	defer cancel()
+	if err := b.srv.Shutdown(ctx); err != nil {
+		slog.Warn("browser source: graceful shutdown", slog.Any("error", err))
+		_ = b.srv.Close()
+	}
+	b.srv = nil
 }
 
 func (b *BrowserSourceServer) handleStream(w http.ResponseWriter, req *http.Request) {

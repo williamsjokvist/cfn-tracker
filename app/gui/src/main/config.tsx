@@ -8,7 +8,8 @@ const initialConfig: model.GUIConfig = {
   locale: 'en-GB',
   theme: model.ThemeName.DEFAULT,
   sidebar: false,
-  logFile: true
+  logFile: true,
+  browserSourcePort: 4242
 }
 
 export const ConfigContext = React.createContext<

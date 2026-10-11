@@ -8,26 +8,28 @@ import (
 type ErrorLocalizationKey string
 
 const (
-	tKeyErrUnknown               ErrorLocalizationKey = "errUnknown"
-	tKeyErrSelectGame            ErrorLocalizationKey = "errSelectGame"
-	tKeyErrAuth                  ErrorLocalizationKey = "errAuth"
-	tKeyErrGetLatestSession      ErrorLocalizationKey = "errGetLatestSession"
-	tKeyErrGetUser               ErrorLocalizationKey = "errGetUser"
-	tKeyErrGetMatches            ErrorLocalizationKey = "errGetMatches"
-	tKeyErrSaveLocale            ErrorLocalizationKey = "errSaveLocale"
-	tKeyErrCheckForUpdate        ErrorLocalizationKey = "errCheckForUpdate"
-	tKeyErrGetGuiConfig          ErrorLocalizationKey = "errGetGuiConfig"
-	tKeyErrSaveTheme             ErrorLocalizationKey = "errSaveTheme"
-	tKeyErrSaveUser              ErrorLocalizationKey = "errSaveUser"
-	tKeyErrSaveSidebar           ErrorLocalizationKey = "errSaveSidebar"
-	tKeyErrSaveLogFile           ErrorLocalizationKey = "errSaveLogFile"
-	tKeyErrGetSessions           ErrorLocalizationKey = "errGetSessions"
-	tKeyErrGetTranslations       ErrorLocalizationKey = "errGetTranslations"
-	tKeyErrGetSessionStatistics  ErrorLocalizationKey = "errGetSessionStatistics"
-	tKeyErrCreateSession         ErrorLocalizationKey = "errCreateSession"
-	tKeyErrOpenResultsDirectory  ErrorLocalizationKey = "errOpenResultsDirectory"
-	tKeyErrReadThemeCSS          ErrorLocalizationKey = "errReadThemeCSS"
-	tKeyErrAuthManualLoginFailed ErrorLocalizationKey = "errAuthManualLoginFailed"
+	tKeyErrUnknown                  ErrorLocalizationKey = "errUnknown"
+	tKeyErrSelectGame               ErrorLocalizationKey = "errSelectGame"
+	tKeyErrAuth                     ErrorLocalizationKey = "errAuth"
+	tKeyErrGetLatestSession         ErrorLocalizationKey = "errGetLatestSession"
+	tKeyErrGetUser                  ErrorLocalizationKey = "errGetUser"
+	tKeyErrGetMatches               ErrorLocalizationKey = "errGetMatches"
+	tKeyErrSaveLocale               ErrorLocalizationKey = "errSaveLocale"
+	tKeyErrCheckForUpdate           ErrorLocalizationKey = "errCheckForUpdate"
+	tKeyErrGetGuiConfig             ErrorLocalizationKey = "errGetGuiConfig"
+	tKeyErrSaveTheme                ErrorLocalizationKey = "errSaveTheme"
+	tKeyErrSaveUser                 ErrorLocalizationKey = "errSaveUser"
+	tKeyErrSaveSidebar              ErrorLocalizationKey = "errSaveSidebar"
+	tKeyErrSaveLogFile              ErrorLocalizationKey = "errSaveLogFile"
+	tKeyErrGetSessions              ErrorLocalizationKey = "errGetSessions"
+	tKeyErrGetTranslations          ErrorLocalizationKey = "errGetTranslations"
+	tKeyErrGetSessionStatistics     ErrorLocalizationKey = "errGetSessionStatistics"
+	tKeyErrCreateSession            ErrorLocalizationKey = "errCreateSession"
+	tKeyErrOpenResultsDirectory     ErrorLocalizationKey = "errOpenResultsDirectory"
+	tKeyErrReadThemeCSS             ErrorLocalizationKey = "errReadThemeCSS"
+	tKeyErrAuthManualLoginFailed    ErrorLocalizationKey = "errAuthManualLoginFailed"
+	tKeyErrInvalidBrowserSourcePort ErrorLocalizationKey = "errInvalidBrowserSourcePort"
+	tKeyErrSaveBrowserSourcePort    ErrorLocalizationKey = "errSaveBrowserSourcePort"
 )
 
 var AllErrorKeys = []struct {
@@ -54,28 +56,32 @@ var AllErrorKeys = []struct {
 	{tKeyErrOpenResultsDirectory, string(tKeyErrOpenResultsDirectory)},
 	{tKeyErrReadThemeCSS, string(tKeyErrReadThemeCSS)},
 	{tKeyErrAuthManualLoginFailed, string(tKeyErrAuthManualLoginFailed)},
+	{tKeyErrInvalidBrowserSourcePort, string(tKeyErrInvalidBrowserSourcePort)},
+	{tKeyErrSaveBrowserSourcePort, string(tKeyErrSaveBrowserSourcePort)},
 }
 
 var (
-	ErrUnknown              = newError(tKeyErrUnknown, errors.New("unknown error"))
-	ErrSelectGame           = newError(tKeyErrSelectGame, errors.New("select game"))
-	ErrAuth                 = newError(tKeyErrAuth, errors.New("unauthenticated"))
-	ErrGetLatestSession     = newError(tKeyErrGetLatestSession, errors.New("get latest session"))
-	ErrGetUser              = newError(tKeyErrGetUser, errors.New("get user"))
-	ErrGetMatches           = newError(tKeyErrGetMatches, errors.New("get matches"))
-	ErrSaveLocale           = newError(tKeyErrSaveLocale, errors.New("save locale"))
-	ErrCheckForUpdate       = newError(tKeyErrCheckForUpdate, errors.New("check for update"))
-	ErrGetGUIConfig         = newError(tKeyErrGetGuiConfig, errors.New("get gui config"))
-	ErrSaveTheme            = newError(tKeyErrSaveTheme, errors.New("save theme"))
-	ErrSaveUser             = newError(tKeyErrSaveUser, errors.New("save user"))
-	ErrSaveSidebar          = newError(tKeyErrSaveSidebar, errors.New("save sidebar"))
-	ErrSaveLogFile          = newError(tKeyErrSaveLogFile, errors.New("save log file setting"))
-	ErrGetSessions          = newError(tKeyErrGetSessions, errors.New("get sessions"))
-	ErrGetTranslations      = newError(tKeyErrGetTranslations, errors.New("get translations"))
-	ErrGetSessionStatistics = newError(tKeyErrGetSessionStatistics, errors.New("get session statistics"))
-	ErrCreateSession        = newError(tKeyErrCreateSession, errors.New("create session"))
-	ErrOpenResultsDirectory = newError(tKeyErrOpenResultsDirectory, errors.New("open results directory"))
-	ErrReadThemeCSS         = newError(tKeyErrReadThemeCSS, errors.New("read theme css"))
+	ErrUnknown                  = newError(tKeyErrUnknown, errors.New("unknown error"))
+	ErrSelectGame               = newError(tKeyErrSelectGame, errors.New("select game"))
+	ErrAuth                     = newError(tKeyErrAuth, errors.New("unauthenticated"))
+	ErrGetLatestSession         = newError(tKeyErrGetLatestSession, errors.New("get latest session"))
+	ErrGetUser                  = newError(tKeyErrGetUser, errors.New("get user"))
+	ErrGetMatches               = newError(tKeyErrGetMatches, errors.New("get matches"))
+	ErrSaveLocale               = newError(tKeyErrSaveLocale, errors.New("save locale"))
+	ErrCheckForUpdate           = newError(tKeyErrCheckForUpdate, errors.New("check for update"))
+	ErrGetGUIConfig             = newError(tKeyErrGetGuiConfig, errors.New("get gui config"))
+	ErrSaveTheme                = newError(tKeyErrSaveTheme, errors.New("save theme"))
+	ErrSaveUser                 = newError(tKeyErrSaveUser, errors.New("save user"))
+	ErrSaveSidebar              = newError(tKeyErrSaveSidebar, errors.New("save sidebar"))
+	ErrSaveLogFile              = newError(tKeyErrSaveLogFile, errors.New("save log file setting"))
+	ErrGetSessions              = newError(tKeyErrGetSessions, errors.New("get sessions"))
+	ErrGetTranslations          = newError(tKeyErrGetTranslations, errors.New("get translations"))
+	ErrGetSessionStatistics     = newError(tKeyErrGetSessionStatistics, errors.New("get session statistics"))
+	ErrCreateSession            = newError(tKeyErrCreateSession, errors.New("create session"))
+	ErrOpenResultsDirectory     = newError(tKeyErrOpenResultsDirectory, errors.New("open results directory"))
+	ErrReadThemeCSS             = newError(tKeyErrReadThemeCSS, errors.New("read theme css"))
+	ErrInvalidBrowserSourcePort = newError(tKeyErrInvalidBrowserSourcePort, errors.New("invalid browser source port"))
+	ErrSaveBrowserSourcePort    = newError(tKeyErrSaveBrowserSourcePort, errors.New("save browser source port"))
 
 	ErrAuthManualLoginFailed = newError(tKeyErrAuthManualLoginFailed, errors.New("manual login did not establish a buckler session"))
 )
