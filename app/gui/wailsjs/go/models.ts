@@ -196,9 +196,7 @@ export namespace model {
 	    browserSourceThemeSticker: string;
 	    browserSourceThemeGlitch: string;
 	    browserSourceThemeLed: string;
-	    browserSourceThemeScorebug: string;
 	    browserSourceThemeChips: string;
-	    browserSourceThemeHotbar: string;
 	    createYourOwnTheme: string;
 	    userId: string;
 	    userName: string;
