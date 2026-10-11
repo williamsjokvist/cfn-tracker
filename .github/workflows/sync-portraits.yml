@@ -30,7 +30,7 @@ jobs:
           bootstrap: true
           bootstrap_args: "--yes"
 
-      - run: mise portraits
+      - run: mise sync-portraits
 
       - name: Commit portraits
         if: github.event_name != 'pull_request'
