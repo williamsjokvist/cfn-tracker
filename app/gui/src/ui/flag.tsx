@@ -21,6 +21,7 @@ import {
   UA,
   NL,
   PH,
+  RO,
   Props
 } from 'country-flag-icons/react/3x2'
 
@@ -46,7 +47,8 @@ const flagMap = {
   'vi-VN': VN,
   'uk-UA': UA,
   'nl-NL': NL,
-  'fil-PH': PH
+  'fil-PH': PH,
+  'ro-RO': RO
 }
 
 export function Flag(props: Props & { code: string }) {
