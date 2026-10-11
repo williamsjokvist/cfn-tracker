@@ -41,10 +41,7 @@ export function StatisticsPage() {
   const [users, setUsers] = React.useState<model.User[]>()
   const [lastUserCode, setLastUserCode] = React.useState<string>()
   React.useEffect(() => {
-    Promise.all([
-      Promise.all(Object.values(model.GameType).map(g => GetUsers(g))),
-      GetGuiConfig()
-    ])
+    Promise.all([Promise.all(Object.values(model.GameType).map(g => GetUsers(g))), GetGuiConfig()])
       .then(([results, cfg]) => {
         const game = currentGame ?? cfg.lastGame
         setLastUserCode(game ? cfg.lastUsers?.[game] : undefined)
