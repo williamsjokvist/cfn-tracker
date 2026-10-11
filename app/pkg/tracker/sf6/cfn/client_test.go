@@ -13,19 +13,25 @@ import (
 
 type fakeAuthBrowser struct {
 	sessions    []bool
+	sessionErrs []error
 	manualLogin func(ctx context.Context, url string) error
 	relaunchErr error
 	calls       []string
 }
 
-func (f *fakeAuthBrowser) HasBucklerSession(context.Context) bool {
+func (f *fakeAuthBrowser) HasBucklerSession(context.Context) (bool, error) {
 	f.calls = append(f.calls, "session")
+	var err error
+	if len(f.sessionErrs) > 0 {
+		err = f.sessionErrs[0]
+		f.sessionErrs = f.sessionErrs[1:]
+	}
 	if len(f.sessions) == 0 {
-		return false
+		return false, err
 	}
 	ok := f.sessions[0]
 	f.sessions = f.sessions[1:]
-	return ok
+	return ok, err
 }
 
 func (f *fakeAuthBrowser) Close() error {
@@ -104,6 +110,31 @@ func TestAuthenticateReusesValidSession(t *testing.T) {
 	if len(statuses) != 2 {
 		t.Fatalf("statuses = %+v, want the session check then done", statuses)
 	}
+	assertDone(t, statuses)
+}
+
+func TestAuthenticateRelaunchesWhenBrowserIsUnreachable(t *testing.T) {
+	f := &fakeAuthBrowser{
+		sessions:    []bool{false, true},
+		sessionErrs: []error{errors.New("use of closed network connection")},
+	}
+	statuses := authenticate(t, f)
+
+	assertCalls(t, f, "session", "relaunch", "session")
+	if len(statuses) != 2 {
+		t.Fatalf("statuses = %+v, want the session check then done", statuses)
+	}
+	assertDone(t, statuses)
+}
+
+func TestAuthenticateAsksForLoginWhenRelaunchedBrowserHasNoSession(t *testing.T) {
+	f := &fakeAuthBrowser{
+		sessions:    []bool{false, false, true},
+		sessionErrs: []error{errors.New("use of closed network connection")},
+	}
+	statuses := authenticate(t, f)
+
+	assertCalls(t, f, "session", "relaunch", "session", "close", "manual-login", "relaunch", "session")
 	assertDone(t, statuses)
 }
 
