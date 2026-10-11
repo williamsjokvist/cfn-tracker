@@ -1,8 +1,12 @@
 import DownloadButton from '../components/DownloadButton.astro'
 
 # Getting Started
-- Download the app (Windows only)
+- Download the app for Windows or Mac
   <DownloadButton transition:persist/>
+- On Mac, unzip the app and move it to Applications. The app isn't signed with an Apple Developer ID, so macOS will say it's damaged or can't be opened the first time. Either try to open it and click "Open Anyway" under System Settings → Privacy & Security, or run this in Terminal:
+  ```sh
+  xattr -dr com.apple.quarantine "/Applications/CFN Tracker.app"
+  ```
 
 ## Tracking
 - Extract the app wherever you want and launch it.

@@ -1,14 +1,32 @@
 ---
 import { Icon } from "astro-icon/components";
+
+interface Props {
+  // The Mac app needs extra steps to open, so the front page sends Mac users to the guide instead.
+  macHref?: string;
+}
+
+const {
+  macHref = "https://github.com/williamsjokvist/cfn-tracker/releases/latest/download/cfn-tracker-macos.zip",
+} = Astro.props;
 ---
 
-<a
-  href="https://github.com/williamsjokvist/cfn-tracker/releases/latest/download/cfn-tracker-windows-amd64.zip"
-  class="link-card windows my-1 inline-flex gap-2 justify-between items-center rounded-full px-6 py-4 text-2xl"
->
-  <Icon name="mdi:microsoft-windows" class="w-8 h-8" />
-  <span>Download</span>
-</a>
+<div class="not-prose flex flex-wrap gap-4 mt-2">
+  <a
+    href="https://github.com/williamsjokvist/cfn-tracker/releases/latest/download/cfn-tracker-windows-amd64.zip"
+    class="link-card windows my-1 inline-flex gap-2 justify-between items-center rounded-full px-6 py-4 text-2xl"
+  >
+    <Icon name="mdi:microsoft-windows" class="w-8 h-8" />
+    <span>Download</span>
+  </a>
+  <a
+    href={macHref}
+    class="link-card mac my-1 inline-flex gap-2 justify-between items-center rounded-full px-6 py-4 text-2xl"
+  >
+    <Icon name="mdi:apple" class="w-8 h-8" />
+    <span>Download</span>
+  </a>
+</div>
 
 <style lang="sass">
   .link-card
@@ -24,4 +42,7 @@ import { Icon } from "astro-icon/components";
 
   .windows
     --accent-gradient: linear-gradient(45deg,rgb(124, 58, 237), #627ada 30%, rgba(115, 115, 115, 0.125) 60%)
+
+  .mac
+    --accent-gradient: linear-gradient(45deg, #eb3349, #dd2476 30%, rgba(115, 115, 115, 0.125) 60%)
 </style>

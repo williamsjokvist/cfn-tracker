@@ -12,6 +12,7 @@
   "dependencies": {
     "@astrojs/mdx": "^4.3.13",
     "@astrojs/tailwind": "^6.0.2",
+    "@iconify-json/teenyicons": "^1.2.2",
     "astro": "^6.1.8",
     "astro-icon": "^1.1.5",
     "gsap": "^3.12.4",

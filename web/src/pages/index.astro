@@ -56,7 +56,7 @@ import world from "../components/world.svg";
         >
           <div class="flex gap-3 text-xl">
             <dt class="text-xl">CFN</dt>
-            <dd class="font-bold">Hjejjjej</dd>
+            <dd class="font-bold">Gamer123</dd>
           </div>
           <div class="flex justify-between gap-8">
             <div class="flex gap-3 text-xl">
@@ -70,54 +70,63 @@ import world from "../components/world.svg";
           </div>
         </dl>
 
-        <dl class="text-lg whitespace-nowrap mt-2 px-6 w-[420px]">
-          <div class="flex justify-between gap-2">
-            <div
-              class="mb-2 flex flex-1 gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl"
-            >
-              <dt class="tracking-wider font-extralight">Wins</dt>
-              <dd class="text-4xl font-semibold">4</dd>
+        <div class="flex items-center mt-2 px-6 gap-4">
+          <dl class="text-lg whitespace-nowrap w-[420px]">
+            <div class="flex justify-between gap-2">
+              <div
+                class="mb-2 flex flex-1 gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl"
+              >
+                <dt class="tracking-wider font-extralight">Wins</dt>
+                <dd class="text-4xl font-semibold">4</dd>
+              </div>
+              <div
+                class="mb-2 flex flex-1 gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl"
+              >
+                <dt class="tracking-wider font-extralight">Losses</dt>
+                <dd class="text-4xl font-semibold">2</dd>
+              </div>
             </div>
-            <div
-              class="mb-2 flex flex-1 gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl"
-            >
-              <dt class="tracking-wider font-extralight">Losses</dt>
-              <dd class="text-4xl font-semibold">2</dd>
+            <div class="flex justify-between gap-2">
+              <div
+                class="mb-2 flex flex-1 gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl"
+              >
+                <dt class="tracking-wider font-extralight">Win Rate</dt>
+                <dd class="text-4xl font-semibold">67%</dd>
+              </div>
+              <div
+                class="mb-2 flex flex-1 gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl"
+              >
+                <dt class="tracking-wider font-extralight">Win Streak</dt>
+                <dd class="text-4xl font-semibold">2</dd>
+              </div>
             </div>
-          </div>
-          <div class="flex justify-between gap-2">
-            <div
-              class="mb-2 flex flex-1 gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl"
-            >
-              <dt class="tracking-wider font-extralight">Win Rate</dt>
-              <dd class="text-4xl font-semibold">69%</dd>
+            <div class="flex justify-between gap-2">
+              <div
+                class="mb-2 flex flex-1 gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl"
+              >
+                <dt class="tracking-wider font-extralight">LP Gain</dt>
+                <dd class="text-4xl font-semibold">+125</dd>
+              </div>
+              <div
+                class="mb-2 flex flex-1 gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl"
+              >
+                <dt class="tracking-wider font-extralight">MR Gain</dt>
+                <dd class="text-4xl font-semibold">+12</dd>
+              </div>
             </div>
-            <div
-              class="mb-2 flex flex-1 gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl"
-            >
-              <dt class="tracking-wider font-extralight">Win Streak</dt>
-              <dd class="text-4xl font-semibold">2</dd>
-            </div>
-          </div>
-          <div class="flex justify-between gap-2">
-            <div
-              class="mb-2 flex flex-1 gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl"
-            >
-              <dt class="tracking-wider font-extralight">LP Gain</dt>
-              <dd class="text-4xl font-semibold">+125</dd>
-            </div>
-            <div
-              class="mb-2 flex flex-1 gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl"
-            >
-              <dt class="tracking-wider font-extralight">MR Gain</dt>
-              <dd class="text-4xl font-semibold">+12</dd>
-            </div>
-          </div>
-        </dl>
+          </dl>
+          <!-- Mirrors the app's win/loss pie (react-minimal-pie-chart with lineWidth 85) -->
+          <svg viewBox="0 0 100 100" class="w-36 h-36 shrink-0" role="img" aria-label="Wins and losses">
+            <circle cx="50" cy="50" r="28.75" fill="none" stroke-width="42.5" pathLength="100"
+              stroke="rgba(0, 255, 77, .65)" stroke-dasharray="75 25" />
+            <circle cx="50" cy="50" r="28.75" fill="none" stroke-width="42.5" pathLength="100"
+              stroke="rgba(251, 73, 73, .65)" stroke-dasharray="25 75" stroke-dashoffset="-75" />
+          </svg>
+        </div>
       </MockTracker>
     </div>
     <div id="download-container" class="w-full flex flex-wrap justify-center gap-8">
-      <DownloadButton transition:persist />
+      <DownloadButton macHref="/getting-started" transition:persist />
     </div>
     <Image src={world} class="world" format="svg" alt="Image of the world"  />
   </section>

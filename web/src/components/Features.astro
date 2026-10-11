@@ -1,86 +1,115 @@
 ---
 import { Icon } from "astro-icon/components";
+import { Image } from "astro:assets";
 import MockTracker from "./MockTracker.astro";
-const matches = [
+
+import defaultTheme from "../../../app/pkg/server/static/themes/default.css?raw";
+import bladesTheme from "../../../app/pkg/server/static/themes/blades.css?raw";
+import jaegerTheme from "../../../app/pkg/server/static/themes/jaeger.css?raw";
+import nordTheme from "../../../app/pkg/server/static/themes/nord.css?raw";
+import pillsTheme from "../../../app/pkg/server/static/themes/pills.css?raw";
+
+const portraits = import.meta.glob<{ default: ImageMetadata }>(
+  "../../../app/gui/src/assets/characters/{sf6,t8}/*.webp",
+  { eager: true },
+);
+const portrait = (game: string, character: string) =>
+  portraits[`../../../app/gui/src/assets/characters/${game}/${character}.webp`].default;
+const games = [
   {
-    date: "2023-04-23",
-    time: "12:42",
-    opponent: "bboylong",
-    opponentLeague: "Diamond",
-    opponentCharacter: "Akuma",
-    victory: false,
+    name: "Street Fighter 6",
+    source: "Buckler",
+    stats: "LP, MR and league",
+    characters: ["elena", "alex", "aki", "sagat", "deejay", "cammy", "mai", "blanka"].map((c) => portrait("sf6", c)),
   },
   {
-    date: "2023-04-23",
-    time: "12:38",
-    opponent: "dierto",
-    opponentLeague: "Diamond",
-    opponentCharacter: "Chun-Li",
-    victory: false,
-  },
-  {
-    date: "2023-04-23",
-    time: "12:25",
-    opponent: "indigoinconnu",
-    opponentLeague: "Diamond",
-    opponentCharacter: "Zangief",
-    victory: true,
-  },
-  {
-    date: "2023-04-23",
-    time: "12:23",
-    opponent: "UchihaStrider",
-    opponentLeague: "Diamond",
-    opponentCharacter: "Akuma",
-    victory: true,
-  },
-  {
-    date: "2023-04-23",
-    time: "12:08",
-    opponent: "ferret_ja",
-    opponentLeague: "S. Diamond",
-    opponentCharacter: "Rashid",
-    victory: false,
-  },
-  {
-    date: "2023-04-23",
-    time: "12:00",
-    opponent: "Dooradoyle",
-    opponentLeague: "S. Diamond",
-    opponentCharacter: "Akuma",
-    victory: false,
-  },
-  {
-    date: "2023-04-23",
-    time: "11:48",
-    opponent: "Abelievable",
-    opponentLeague: "Diamond",
-    opponentCharacter: "Ken",
-    victory: false,
-  },
-  {
-    date: "2023-04-23",
-    time: "11:40",
-    opponent: "Ryu_Knight",
-    opponentLeague: "Diamond",
-    opponentCharacter: "Ryu",
-    victory: true,
-  },
-  {
-    date: "2023-04-23",
-    time: "11:35",
-    opponent: "AlexLeder",
-    opponentLeague: "Diamond",
-    opponentCharacter: "Abigail",
-    victory: false,
+    name: "Tekken 8",
+    source: "Wavu Wank",
+    stats: "Rank and replays",
+    characters: ["leroy", "kazuya", "king", "paul", "nina", "dragunov", "lili", "lidia"].map((c) => portrait("t8", c)),
   },
 ];
+
+const mrHistory = [1482, 1501, 1494, 1530, 1521, 1548, 1539, 1566, 1581, 1573, 1592, 1604];
+const chart = { width: 560, height: 80, pad: 6 };
+const mrMin = Math.min(...mrHistory) - 10;
+const mrMax = Math.max(...mrHistory) + 10;
+const points = mrHistory.map((mr, i) => [
+  chart.pad + (i * (chart.width - chart.pad * 2)) / (mrHistory.length - 1),
+  chart.pad + ((mrMax - mr) * (chart.height - chart.pad * 2)) / (mrMax - mrMin),
+]);
+const linePath = points.map(([x, y], i) => `${i ? "L" : "M"}${x.toFixed(1)},${y.toFixed(1)}`).join(" ");
+const areaPath = `${linePath} L${points[points.length - 1][0].toFixed(1)},${chart.height} L${points[0][0].toFixed(1)},${chart.height} Z`;
+
+const recentSessions = [
+  { date: "Sat 12 Oct", wins: 9, losses: 5, lpGain: 210, mrGain: 31 },
+  { date: "Thu 10 Oct", wins: 6, losses: 7, lpGain: -40, mrGain: -8 },
+];
+
+const comparison = [
+  { metric: "Drive Parry", you: 312, top: 498 },
+  { metric: "Throw Tech", you: 22, top: 61 },
+  { metric: "Punish Counter", you: 141, top: 187 },
+  { metric: "Just Parry", you: 9, top: 34 },
+  { metric: "Drive Impact", you: 58, top: 41 },
+];
+
+const csvRows = [
+  ["date", "time", "character", "opponent", "opponent_character", "victory", "mr", "mr_gain"],
+  ["2026-10-12", "21:42", "Ken", "bboylong", "Akuma", "true", "1604", "12"],
+  ["2026-10-12", "21:38", "Ken", "dierto", "Chun-Li", "false", "1592", "-9"],
+  ["2026-10-12", "21:25", "Ken", "indigoinconnu", "Zangief", "true", "1601", "11"],
+  ["2026-10-12", "21:23", "Ken", "UchihaStrider", "Akuma", "true", "1590", "10"],
+  ["2026-10-12", "21:08", "Ken", "ferret_ja", "Rashid", "false", "1580", "-8"],
+  ["2026-10-12", "21:00", "Ken", "Ryu_Knight", "Ryu", "true", "1588", "9"],
+];
+
+// The app's own browser source themes, rendered against the same markup it serves to OBS.
+const outputStats = [
+  ["wins", "Wins", "4"],
+  ["losses", "Losses", "2"],
+  ["winRate", "Win Rate", "67%"],
+  ["mr", "MR", "1604"],
+  ["mrGain", "MR Gain", "+12"],
+];
+const statListHtml = `<dl class="stat-list">${outputStats
+  .map(
+    ([key, title, value]) =>
+      `<div class="stat-item" data-stat="${key}"><dt class="stat-title">${title}</dt><dd class="stat-value">${value}</dd></div>`,
+  )
+  .join("")}</dl>`;
+const themes = [
+  { id: "default", name: "Default", css: defaultTheme },
+  { id: "blades", name: "Blades", css: bladesTheme },
+  { id: "jaeger", name: "Jaeger", css: jaegerTheme },
+  { id: "nord", name: "Nord", css: nordTheme },
+  { id: "pills", name: "Pills", css: pillsTheme },
+].map((theme) => ({
+  ...theme,
+  srcdoc: `<!doctype html><html><head><style>*{margin:0}body{padding:24px;overflow:hidden}</style><style>${theme.css}</style></head><body>${statListHtml}</body></html>`,
+}));
+const browserSourceQuery = outputStats.map(([key]) => `&${key}=true`).join("");
 ---
 
 <script>
   import { gsap, Power2 } from "../lib/gsap";
 
   document.addEventListener("astro:page-load", () => {
+    const themePicker = document.getElementById("theme-picker");
+    themePicker?.addEventListener("click", (e) => {
+      const button = (e.target as HTMLElement).closest<HTMLButtonElement>("button[data-theme]");
+      if (!button) return;
+      const theme = button.dataset.theme ?? "default";
+      for (const b of themePicker.querySelectorAll("button[data-theme]")) {
+        b.setAttribute("aria-pressed", String(b === button));
+      }
+      for (const frame of document.querySelectorAll<HTMLIFrameElement>("#theme-previews iframe")) {
+        frame.hidden = frame.dataset.theme !== theme;
+      }
+      const url = document.getElementById("browser-source-theme");
+      if (url) url.textContent = theme;
+    });
+
     // respect users’ prefers-reduced-motion setting
     const prefersReducedMotion = window
       .matchMedia("(prefers-reduced-motion: reduce)")
@@ -131,80 +160,123 @@ const matches = [
     <header class="mb-8 max-w-[700px] w-full">
       <h2 class="font-bold text-3xl md:text-5xl">
         <Icon
-          name="ri:search-fill"
+          name="mdi:gamepad-variant"
           class="inline text-[#f85961] w-12 h-12 mr-1"
         />
-        Live match updates
+        Street Fighter 6 & Tekken 8
       </h2>
       <p class="text-lg mt-8">
-        New matches are tracked instantly as soon as you press start!
+        One app for both games. Pick a game, enter your player ID and every
+        ranked match gets tracked
       </p>
     </header>
     <div class="tracker-container w-full md:w-auto overflow-auto md:overflow-visible">
-      <MockTracker title="Tracking" page="track" spin>
-        <dl
-          class="flex whitespace-nowrap items-center justify-between w-full pt-3 px-6"
-        >
-          <div class="flex gap-3 text-xl">
-            <dt class="text-xl">CFN</dt>
-            <dd class="font-bold">Hjejjjej</dd>
-          </div>
-          <div class="flex justify-between gap-8">
-            <div class="flex gap-3 text-xl">
-              <dt class="text-xl">LP</dt>
-              <dd class="font-bold">35652</dd>
-            </div>
-            <div class="flex gap-3 text-xl">
-              <dt class="text-xl">MR</dt>
-              <dd class="font-bold">1604</dd>
-            </div>
-          </div>
-        </dl>
+      <div class="games flex gap-4">
+        {
+          games.map((game) => (
+            <article class="game-card flex-1 rounded-xl p-5">
+              <h3 class="text-2xl font-bold">{game.name}</h3>
+              <p class="text-sm font-extralight tracking-wider mt-1">
+                {`${game.stats} via ${game.source}`}
+              </p>
+              <div class="grid grid-cols-4 gap-2 mt-4">
+                {game.characters.map((src) => (
+                  <Image src={src} alt="" width={72} height={72} class="rounded-lg bg-slate-50 bg-opacity-5" />
+                ))}
+              </div>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </section>
 
-        <dl class="text-lg whitespace-nowrap mt-2 px-6 w-[420px]">
-          <div class="flex justify-between gap-2">
-            <div
-              class="mb-2 flex flex-1 gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl"
-            >
-              <dt class="tracking-wider font-extralight">Wins</dt>
-              <dd class="text-4xl font-semibold">4</dd>
+  <section class="flex flex-wrap items-center justify-around">
+    <header class="mb-8 max-w-[700px] w-full">
+      <h2 class="font-bold text-3xl md:text-5xl">
+        <Icon
+          name="ion:stats-chart"
+          class="inline text-[#f85961] w-12 h-12 mr-1"
+        />
+        Sessions & progress
+      </h2>
+      <p class="text-lg mt-8">
+        Every match is logged into sessions, so you can look back at how each
+        one went and watch your MR and LP climb over time. Break it down per
+        character, or dig into the full match log with replay IDs
+      </p>
+    </header>
+    <div class="tracker-container w-full md:w-auto overflow-auto md:overflow-visible">
+      <MockTracker title="Statistics" page="stats">
+        <div class="px-6 pt-3 whitespace-nowrap">
+          <dl class="flex gap-2">
+            <div class="flex flex-1 gap-3 justify-between bg-slate-50 bg-opacity-5 px-3 pt-2 pb-0.5 rounded-xl">
+              <dt class="tracking-wider font-extralight text-sm">Sessions</dt>
+              <dd class="text-2xl font-semibold">24</dd>
             </div>
-            <div
-              class="mb-2 flex flex-1 gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl"
-            >
-              <dt class="tracking-wider font-extralight">Losses</dt>
-              <dd class="text-4xl font-semibold">2</dd>
+            <div class="flex flex-1 gap-3 justify-between bg-slate-50 bg-opacity-5 px-3 pt-2 pb-0.5 rounded-xl">
+              <dt class="tracking-wider font-extralight text-sm">Wins</dt>
+              <dd class="text-2xl font-semibold">186</dd>
             </div>
-          </div>
-          <div class="flex justify-between gap-2">
-            <div
-              class="mb-2 flex flex-1 gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl"
-            >
-              <dt class="tracking-wider font-extralight">Win Rate</dt>
-              <dd class="text-4xl font-semibold">69%</dd>
+            <div class="flex flex-1 gap-3 justify-between bg-slate-50 bg-opacity-5 px-3 pt-2 pb-0.5 rounded-xl">
+              <dt class="tracking-wider font-extralight text-sm">Losses</dt>
+              <dd class="text-2xl font-semibold">151</dd>
             </div>
-            <div
-              class="mb-2 flex flex-1 gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl"
-            >
-              <dt class="tracking-wider font-extralight">Win Streak</dt>
-              <dd class="text-4xl font-semibold">2</dd>
+            <div class="flex flex-1 gap-3 justify-between bg-slate-50 bg-opacity-5 px-3 pt-2 pb-0.5 rounded-xl">
+              <dt class="tracking-wider font-extralight text-sm">Win Rate</dt>
+              <dd class="text-2xl font-semibold">55%</dd>
             </div>
-          </div>
-          <div class="flex justify-between gap-2">
-            <div
-              class="mb-2 flex flex-1 gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl"
+          </dl>
+
+          <figure class="mt-2 bg-slate-50 bg-opacity-5 rounded-xl px-3 pt-2 pb-1">
+            <figcaption class="flex justify-between text-sm tracking-wider font-extralight">
+              <span>MR over time</span>
+              <span class="font-semibold text-[#00ff4d]">+122</span>
+            </figcaption>
+            <svg
+              viewBox={`0 0 ${chart.width} ${chart.height}`}
+              class="w-full h-[64px]"
+              preserveAspectRatio="none"
+              role="img"
+              aria-label="MR rising from 1482 to 1604 over the last 12 sessions"
             >
-              <dt class="tracking-wider font-extralight">LP Gain</dt>
-              <dd class="text-4xl font-semibold">+125</dd>
-            </div>
-            <div
-              class="mb-2 flex flex-1 gap-4 justify-between bg-slate-50 bg-opacity-5 p-3 pb-1 rounded-xl"
-            >
-              <dt class="tracking-wider font-extralight">MR Gain</dt>
-              <dd class="text-4xl font-semibold">+12</dd>
-            </div>
-          </div>
-        </dl>
+              <defs>
+                <linearGradient id="mr-area" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="rgba(0, 255, 77, .35)" />
+                  <stop offset="100%" stop-color="rgba(0, 255, 77, 0)" />
+                </linearGradient>
+              </defs>
+              <path d={areaPath} fill="url(#mr-area)" />
+              <path
+                d={linePath}
+                fill="none"
+                stroke="rgba(0, 255, 77, .8)"
+                stroke-width="2.5"
+                stroke-linejoin="round"
+                vector-effect="non-scaling-stroke"
+              />
+            </svg>
+          </figure>
+
+          <h3 class="mt-3 mb-1 text-sm uppercase tracking-widest">Recent sessions</h3>
+          <ul class="flex flex-col gap-1">
+            {
+              recentSessions.map((session) => (
+                <li class="flex justify-between gap-4 bg-slate-50 bg-opacity-5 rounded-xl px-3 py-1.5">
+                  <span class="w-28">{session.date}</span>
+                  <span>{`${session.wins} – ${session.losses}`}</span>
+                  <span>{Math.round((session.wins / (session.wins + session.losses)) * 100)}%</span>
+                  <span class={session.lpGain >= 0 ? "text-[#00ff4d]" : "text-[#fb4949]"}>
+                    {`${session.lpGain >= 0 ? "+" : ""}${session.lpGain} LP`}
+                  </span>
+                  <span class={session.mrGain >= 0 ? "text-[#00ff4d]" : "text-[#fb4949]"}>
+                    {`${session.mrGain >= 0 ? "+" : ""}${session.mrGain} MR`}
+                  </span>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
       </MockTracker>
     </div>
   </section>
@@ -213,55 +285,41 @@ const matches = [
     <header class="mb-8 max-w-[700px] w-full">
       <h2 class="font-bold text-3xl md:text-5xl">
         <Icon
-          name="ion:document-text"
+          name="mdi:trophy"
           class="inline text-[#f85961] w-12 h-12 mr-1"
         />
-        Statistics
+        Compare with top players
       </h2>
       <p class="text-lg mt-8">
-        Matches are stored so you can keep track of your progress from session
-        to session. <br /> You own your match logs, not Capcom or Bamco.
+        See how your Street Fighter 6 battle stats stack up against the top
+        Master Rating players of your main character. Drive parries, punish
+        counters, throw techs and dozens more, sorted by where you differ the
+        most
       </p>
     </header>
     <div class="tracker-container w-full md:w-auto overflow-auto md:overflow-visible">
-      <MockTracker title="Match Log" page="log">
-        <table class="mx-6 mt-2 border-spacing-y-1 border-separate">
+      <MockTracker title="Comparison · Gamer123" page="stats">
+        <table class="mx-6 mt-2 w-[calc(100%-3rem)] border-spacing-y-1 border-separate whitespace-nowrap">
           <thead>
             <tr>
-              <th class="text-left px-3 whitespace-nowrap w-[120px]"> Date</th>
-              <th class="text-left px-3 whitespace-nowrap w-[70px]"> Time</th>
-              <th class="text-left px-3 whitespace-nowrap w-[180px]">
-                Opponent
-              </th>
-              <th class="text-left px-3 whitespace-nowrap"> Character</th>
-              <th class="text-center px-3 whitespace-nowrap"> League</th>
-              <th class="text-center px-3 whitespace-nowrap"> Result</th>
+              <th class="text-left px-3">Metric</th>
+              <th class="text-right px-3 w-[110px]">Gamer123</th>
+              <th class="text-right px-3 w-[110px]">Top Avg</th>
+              <th class="text-center px-3 w-[90px]">Δ</th>
             </tr>
           </thead>
-          <tbody class="">
+          <tbody>
             {
-              matches.map((log) => (
-                <tr class="backdrop-blur group">
-                  <td class="whitespace-nowrap text-left rounded-l-xl rounded-r-none bg-slate-50 bg-opacity-5 group-hover:bg-opacity-10 transition-colors px-3 py-2  ">
-                    {log.date}
-                  </td>
-                  <td class="whitespace-nowrap text-left bg-slate-50 bg-opacity-5 group-hover:bg-opacity-10 transition-colors px-3 py-2">
-                    {log.time}
-                  </td>
-                  <td class="whitespace-nowrap rounded-none bg-slate-50 bg-opacity-5 group-hover:bg-opacity-10 transition-colors px-3 py-2  ">
-                    {log.opponent}
-                  </td>
-                  <td class="rounded-none bg-slate-50 bg-opacity-5 group-hover:bg-opacity-10 transition-colors px-3 py-2 text-center">
-                    {log.opponentCharacter}
-                  </td>
-                  <td class="text-center whitespace-nowrap rounded-none bg-slate-50 bg-opacity-5 group-hover:bg-opacity-10 transition-colors px-3 py-2  ">
-                    {log.opponentLeague}
-                  </td>
+              comparison.map((row) => (
+                <tr>
+                  <td class="rounded-l-xl bg-slate-50 bg-opacity-5 px-3 py-2">{row.metric}</td>
+                  <td class="bg-slate-50 bg-opacity-5 px-3 py-2 text-right font-semibold">{row.you}</td>
+                  <td class="bg-slate-50 bg-opacity-5 px-3 py-2 text-right">{row.top}</td>
                   <td
-                    class="rounded-r-xl rounded-l-none bg-slate-50 bg-opacity-5 group-hover:bg-opacity-10 transition-colors px-3 py-2 text-center"
-                    style={{ color: log.victory == true ? "lime" : "red" }}
+                    class="rounded-r-xl bg-slate-50 bg-opacity-5 px-3 py-2 text-center"
+                    style={{ color: row.you >= row.top ? "#00ff4d" : "#fb4949" }}
                   >
-                    {log.victory == true ? "W" : "L"}
+                    {row.you >= row.top ? "▲" : "▼"} {Math.abs(row.you - row.top)}
                   </td>
                 </tr>
               ))
@@ -276,16 +334,104 @@ const matches = [
     <header class="mb-8 max-w-[700px] w-full">
       <h2 class="font-bold text-3xl md:text-5xl">
         <Icon
+          name="mdi:file-export"
+          class="inline text-[#f85961] w-12 h-12 mr-1"
+        />
+        Export your data
+      </h2>
+      <p class="text-lg mt-8">
+        Export your whole match history, or a comparison with the top players,
+        to CSV and take it into a spreadsheet or your own tools <br /> You own
+        your match logs, not Capcom or Bamco
+      </p>
+    </header>
+    <div class="tracker-container w-full md:w-auto overflow-auto md:overflow-visible">
+      <figure class="csv-window">
+        <figcaption class="flex items-center gap-2 px-4 py-2 text-sm">
+          <Icon name="mdi:file-delimited" class="w-5 h-5 text-[#00ff4d]" />
+          Gamer123-matches.csv
+        </figcaption>
+        <table class="sheet">
+          <thead>
+            <tr>
+              <th />
+              {csvRows[0].map((_, i) => <th>{String.fromCharCode(65 + i)}</th>)}
+            </tr>
+          </thead>
+          <tbody>
+            {
+              csvRows.map((row, r) => (
+                <tr class:list={{ "sheet-header": r === 0 }}>
+                  <th>{r + 1}</th>
+                  {row.map((cell) => (
+                    <td class:list={{ numeric: /^-?\d+$/.test(cell) }}>
+                      {cell === "true" || cell === "false" ? cell.toUpperCase() : cell}
+                    </td>
+                  ))}
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </figure>
+    </div>
+  </section>
+
+  <section class="flex flex-wrap items-center justify-around">
+    <header class="mb-8 max-w-[700px] w-full">
+      <h2 class="font-bold text-3xl md:text-5xl">
+        <Icon
           name="clarity:sign-out-solid"
           class="inline text-[#f85961] w-12 h-12 mr-1"
         />
         Made for streamers
       </h2>
       <p class="text-lg mt-8">
-        Display your stats in OBS, choose from multiple themes or create your
-        own with CSS!
+        Add your stats to OBS as a browser source. Pick the stats to show,
+        choose one of the built-in themes or <a
+          href="/theme-guide"
+          class="underline">create your own with CSS</a
+        >, and they update live after every match
       </p>
     </header>
+    <div class="tracker-container w-full md:w-auto overflow-auto md:overflow-visible">
+      <figure class="browser-source">
+        <figcaption class="flex items-center gap-2 px-4 py-2 text-sm whitespace-nowrap overflow-hidden">
+          <Icon name="mdi:broadcast" class="w-5 h-5 shrink-0 text-[#f85961]" />
+          <span class="truncate">
+            http://localhost:4242?theme=<b id="browser-source-theme">default</b>{browserSourceQuery}
+          </span>
+        </figcaption>
+        <div id="theme-previews">
+          {
+            themes.map((theme, i) => (
+              <iframe
+                data-theme={theme.id}
+                title={`${theme.name} browser source theme`}
+                srcdoc={theme.srcdoc}
+                hidden={i !== 0}
+                loading="lazy"
+                tabindex="-1"
+              />
+            ))
+          }
+        </div>
+        <div id="theme-picker" class="flex flex-wrap gap-2 px-4 py-3" role="group" aria-label="Theme">
+          {
+            themes.map((theme, i) => (
+              <button
+                type="button"
+                data-theme={theme.id}
+                aria-pressed={String(i === 0)}
+                class="theme-button rounded-full px-4 py-1 text-sm"
+              >
+                {theme.name}
+              </button>
+            ))
+          }
+        </div>
+      </figure>
+    </div>
   </section>
 </section>
 
@@ -318,4 +464,72 @@ const matches = [
     top: 28px
     z-index: -1
     border-radius: 24px
+
+  .games
+    width: 700px
+
+  .game-card
+    background: radial-gradient(circle at 52.1% -29.6%, rgb(144, 17, 105) 0%, rgb(51, 0, 131) 100.2%)
+    box-shadow: 0 2px 18px rgba(0,0,0,.25)
+
+  .csv-window,
+  .browser-source
+    width: 700px
+    border-radius: 12px
+    overflow: hidden
+    background: rgb(22 10 40)
+    box-shadow: 0 2px 18px rgba(0,0,0,.25)
+
+    figcaption
+      background: rgba(255,255,255,.06)
+      border-bottom: 1px solid rgba(255,255,255,.1)
+
+  .sheet
+    width: 100%
+    border-collapse: collapse
+    color: #e8e3f0
+    font-family: Arial, Helvetica, sans-serif
+    font-size: 12px
+    white-space: nowrap
+
+    th, td
+      border: 1px solid rgba(255,255,255,.1)
+      padding: 5px 8px
+      text-align: left
+
+    thead th, tbody th
+      background: rgba(255,255,255,.06)
+      color: rgba(255,255,255,.5)
+      font-weight: 400
+      text-align: center
+
+    tbody th
+      width: 32px
+
+    td.numeric
+      text-align: right
+
+    .sheet-header td
+      color: #f85961
+      font-weight: 700
+
+  .browser-source iframe
+    display: block
+    width: 100%
+    height: 380px
+    border: 0
+    background: #2e3440
+
+    &[hidden]
+      display: none
+
+  .theme-button
+    background: rgba(255,255,255,.08)
+    transition: background .2s
+
+    &:hover
+      background: rgba(255,255,255,.16)
+
+    &[aria-pressed="true"]
+      background: #f85961
 </style>

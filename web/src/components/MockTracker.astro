@@ -21,8 +21,9 @@ const { title, page, spin, className, ...props } = Astro.props
     </header>
     <div class="mt-5 w-full flex flex-col gap-4">
       <Icon name={`ri:search-${page == "track" ? "fill" : "line"}`} class="text-[#f85961] w-10 h-7 mr-1"/>
-      <Icon name={`ion:document-text${page == "log" ? "" : "-outline"}`} class="text-[#f85961] w-10 h-7 mr-1"/>
+      <Icon name={`ion:stats-chart${page == "stats" ? "" : "-outline"}`} class="text-[#f85961] w-10 h-7 mr-1"/>
       <Icon name={`clarity:sign-out-${page == "out" ? "solid" : "line"}`} class="text-[#f85961] w-10 h-7 mr-1"/>
+      <Icon name={`teenyicons:cog-${page == "settings" ? "solid" : "outline"}`} class="text-[#f85961] w-10 h-7 mr-1"/>
     </div>
   </div>
   <div class="w-full">
