@@ -44,7 +44,7 @@ var startManualLoginProcess = func(ctx context.Context, chromePath string, args 
 func LaunchManualLogin(ctx context.Context, url string) error {
 	chromePath, found := findChromeForManualLogin()
 	if !found {
-		return errors.New("Chrome executable not found")
+		return ErrBrowserNotFound
 	}
 	dir, err := UserDataDir()
 	if err != nil {
@@ -75,7 +75,8 @@ func LaunchManualLogin(ctx context.Context, url string) error {
 
 // runManualLoginBrowser starts plain Chrome once and waits for it to be closed.
 func runManualLoginBrowser(ctx context.Context, chromePath, dir, url string) error {
-	process, err := startManualLoginProcess(ctx, chromePath, "--user-data-dir="+dir, url)
+	args := append(cookieKeyArgs(), "--user-data-dir="+dir, url)
+	process, err := startManualLoginProcess(ctx, chromePath, args...)
 	if err != nil {
 		return fmt.Errorf("start manual login browser: %w", err)
 	}
