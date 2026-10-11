@@ -38,7 +38,7 @@
   "minimize": "側邊欄",
   "writeLogFile": "寫入應用程式記錄檔",
   "browserSourcePort": "瀏覽器來源連接埠",
-  "reportIssue": "回報問題",
+  "reportIssue": "回報錯誤",
   "reportIssueDescription": "將會公開發佈在 GitHub 上",
   "issueTitle": "標題",
   "issueDescription": "發生了什麼事？要如何重現？",

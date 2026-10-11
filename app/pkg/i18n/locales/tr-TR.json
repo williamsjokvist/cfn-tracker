@@ -38,7 +38,7 @@
   "minimize": "Kenar çubuğu",
   "writeLogFile": "Uygulama günlük dosyası yaz",
   "browserSourcePort": "Tarayıcı kaynağı portu",
-  "reportIssue": "Sorun bildir",
+  "reportIssue": "Hata bildir",
   "reportIssueDescription": "GitHub'da herkese açık olarak yayınlanacak",
   "issueTitle": "Başlık",
   "issueDescription": "Ne oldu? Nasıl tekrarlanabilir?",

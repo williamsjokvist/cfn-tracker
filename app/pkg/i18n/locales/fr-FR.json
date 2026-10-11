@@ -38,7 +38,7 @@
   "minimize": "Barre latérale",
   "writeLogFile": "Écrire le fichier journal",
   "browserSourcePort": "Port de la source navigateur",
-  "reportIssue": "Signaler un problème",
+  "reportIssue": "Signaler une erreur",
   "reportIssueDescription": "Il sera publié publiquement sur GitHub",
   "issueTitle": "Titre",
   "issueDescription": "Que s'est-il passé ? Comment le reproduire ?",

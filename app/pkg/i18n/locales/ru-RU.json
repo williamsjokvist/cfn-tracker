@@ -38,7 +38,7 @@
   "minimize": "Боковая панель",
   "writeLogFile": "Записывать лог-файл приложения",
   "browserSourcePort": "Порт источника «Браузер»",
-  "reportIssue": "Сообщить о проблеме",
+  "reportIssue": "Сообщить об ошибке",
   "reportIssueDescription": "Сообщение будет опубликовано на GitHub в открытом доступе",
   "issueTitle": "Заголовок",
   "issueDescription": "Что произошло? Как это воспроизвести?",

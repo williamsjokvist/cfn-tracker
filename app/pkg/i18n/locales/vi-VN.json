@@ -38,7 +38,7 @@
   "minimize": "Thanh bên",
   "writeLogFile": "Ghi tệp nhật ký ứng dụng",
   "browserSourcePort": "Cổng nguồn trình duyệt",
-  "reportIssue": "Báo cáo sự cố",
+  "reportIssue": "Báo lỗi",
   "reportIssueDescription": "Báo cáo sẽ được đăng công khai trên GitHub",
   "issueTitle": "Tiêu đề",
   "issueDescription": "Chuyện gì đã xảy ra? Làm sao để tái hiện?",

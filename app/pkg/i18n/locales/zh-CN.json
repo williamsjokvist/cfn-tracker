@@ -38,7 +38,7 @@
   "minimize": "侧边栏",
   "writeLogFile": "写入应用日志文件",
   "browserSourcePort": "浏览器源端口",
-  "reportIssue": "报告问题",
+  "reportIssue": "报告错误",
   "reportIssueDescription": "将会公开发布在 GitHub 上",
   "issueTitle": "标题",
   "issueDescription": "发生了什么？如何复现？",

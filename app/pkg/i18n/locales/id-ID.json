@@ -38,7 +38,7 @@
   "minimize": "Bilah samping",
   "writeLogFile": "Tulis file log aplikasi",
   "browserSourcePort": "Port browser source",
-  "reportIssue": "Laporkan masalah",
+  "reportIssue": "Laporkan kesalahan",
   "reportIssueDescription": "Laporan akan diposting secara publik di GitHub",
   "issueTitle": "Judul",
   "issueDescription": "Apa yang terjadi? Bagaimana cara mengulanginya?",

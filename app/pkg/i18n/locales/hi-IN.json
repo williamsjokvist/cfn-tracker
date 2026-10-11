@@ -38,7 +38,7 @@
   "minimize": "साइडबार",
   "writeLogFile": "ऐप की लॉग फ़ाइल लिखें",
   "browserSourcePort": "ब्राउज़र सोर्स पोर्ट",
-  "reportIssue": "समस्या की रिपोर्ट करें",
+  "reportIssue": "त्रुटि रिपोर्ट करें",
   "reportIssueDescription": "इसे GitHub पर सार्वजनिक रूप से पोस्ट किया जाएगा",
   "issueTitle": "शीर्षक",
   "issueDescription": "क्या हुआ? इसे दोबारा कैसे किया जा सकता है?",

@@ -38,7 +38,7 @@
   "minimize": "Seitenleiste",
   "writeLogFile": "App-Logdatei schreiben",
   "browserSourcePort": "Port der Browserquelle",
-  "reportIssue": "Problem melden",
+  "reportIssue": "Fehler melden",
   "reportIssueDescription": "Die Meldung wird öffentlich auf GitHub gepostet",
   "issueTitle": "Titel",
   "issueDescription": "Was ist passiert? Wie lässt es sich reproduzieren?",
