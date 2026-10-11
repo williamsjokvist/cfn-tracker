@@ -60,6 +60,8 @@ func TestMain(m *testing.M) {
 		log.Println(fmt.Sprintf("[EVENT] %s", eventName), optionalData)
 	})
 	code := m.Run()
-	os.RemoveAll(cfgDir)
+	if err := os.RemoveAll(cfgDir); err != nil {
+		log.Printf("remove config dir: %v", err)
+	}
 	os.Exit(code)
 }
