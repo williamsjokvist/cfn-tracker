@@ -38,7 +38,7 @@
   "minimize": "Sidofält",
   "writeLogFile": "Skriv appens loggfil",
   "browserSourcePort": "Port för webbläsarkälla",
-  "reportIssue": "Rapportera ett problem",
+  "reportIssue": "Rapportera fel",
   "reportIssueDescription": "Rapporten publiceras offentligt på GitHub",
   "issueTitle": "Rubrik",
   "issueDescription": "Vad hände? Hur kan det återskapas?",

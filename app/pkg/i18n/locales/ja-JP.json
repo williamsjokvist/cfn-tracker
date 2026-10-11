@@ -38,7 +38,7 @@
   "minimize": "最小化",
   "writeLogFile": "ログファイルを書き出す",
   "browserSourcePort": "ブラウザソースのポート",
-  "reportIssue": "問題を報告",
+  "reportIssue": "不具合を報告",
   "reportIssueDescription": "GitHubで公開されます",
   "issueTitle": "タイトル",
   "issueDescription": "何が起きましたか？再現方法は？",

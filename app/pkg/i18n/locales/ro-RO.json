@@ -38,7 +38,7 @@
   "minimize": "Bară laterală",
   "writeLogFile": "Scrie fișierul jurnal al aplicației",
   "browserSourcePort": "Portul sursei browser",
-  "reportIssue": "Raportează o problemă",
+  "reportIssue": "Raportează eroarea",
   "reportIssueDescription": "Va fi publicat public pe GitHub",
   "issueTitle": "Titlu",
   "issueDescription": "Ce s-a întâmplat? Cum se poate reproduce?",

@@ -11,6 +11,8 @@ import { Button } from '@/ui/button'
 import { Input } from '@/ui/input'
 import { cn } from '@/helpers/cn'
 
+import { ConfigContext } from './config'
+
 type Status =
   | { kind: 'editing' }
   | { kind: 'sending' }
@@ -20,6 +22,7 @@ type Status =
 // The sidebar is never unmounted, so the outcome of a report stays until the app is closed.
 export function ReportIssueDialog() {
   const { t } = useTranslation()
+  const [cfg] = React.useContext(ConfigContext)
   const [open, setOpen] = React.useState(false)
   const [status, setStatus] = React.useState<Status>({ kind: 'editing' })
   const [report, setReport] = React.useState<model.IssueReport>({
@@ -47,14 +50,26 @@ export function ReportIssueDialog() {
     <Dialog.Root open={open} onOpenChange={open => !sending && setOpen(open)}>
       <Dialog.Trigger asChild>
         <button
-          aria-label={t('reportIssue')}
-          title={t('reportIssue')}
           className={cn(
-            'grid h-9 w-9 place-items-center rounded-sm text-[#bfbcff]/60',
+            'group relative flex h-9 items-center rounded-sm text-[#bfbcff]/60',
             'transition-colors hover:bg-slate-50/5 hover:text-white active:bg-white/[0.075]'
           )}
         >
-          <Icon icon='mdi:alarm-light-outline' className='h-5 w-5' />
+          <div className='grid h-9 w-9 shrink-0 place-items-center'>
+            <Icon icon='mdi:alarm-light-outline' className='h-5 w-5' />
+          </div>
+          <span className='pe-2 text-sm'>{t('reportIssue')}</span>
+          {cfg.sidebar && (
+            <div
+              className={cn(
+                'pointer-events-none invisible absolute start-full top-1/2 ms-3 -translate-y-1/2',
+                'rounded-full border bg-white px-2.5 pt-1 pb-0.5 text-sm font-semibold text-black',
+                'opacity-0 transition-all group-hover:visible group-hover:opacity-100 group-hover:delay-500'
+              )}
+            >
+              {t('reportIssue')}
+            </div>
+          )}
         </button>
       </Dialog.Trigger>
       <Dialog.Content

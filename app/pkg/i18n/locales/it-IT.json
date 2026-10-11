@@ -38,7 +38,7 @@
   "minimize": "Barra laterale",
   "writeLogFile": "Scrivi file di log dell'app",
   "browserSourcePort": "Porta della fonte browser",
-  "reportIssue": "Segnala un problema",
+  "reportIssue": "Segnala errore",
   "reportIssueDescription": "Verrà pubblicata pubblicamente su GitHub",
   "issueTitle": "Titolo",
   "issueDescription": "Cosa è successo? Come si può riprodurre?",

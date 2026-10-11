@@ -38,7 +38,7 @@
   "minimize": "Zijbalk",
   "writeLogFile": "App-logbestand schrijven",
   "browserSourcePort": "Poort van browserbron",
-  "reportIssue": "Probleem melden",
+  "reportIssue": "Fout melden",
   "reportIssueDescription": "Wordt openbaar geplaatst op GitHub",
   "issueTitle": "Titel",
   "issueDescription": "Wat gebeurde er? Hoe kun je het reproduceren?",

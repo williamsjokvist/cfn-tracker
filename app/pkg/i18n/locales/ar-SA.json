@@ -38,7 +38,7 @@
   "minimize": "الشريط الجانبي",
   "writeLogFile": "كتابة ملف سجل التطبيق",
   "browserSourcePort": "منفذ مصدر المتصفح",
-  "reportIssue": "الإبلاغ عن مشكلة",
+  "reportIssue": "الإبلاغ عن خطأ",
   "reportIssueDescription": "سيُنشر بشكل علني على GitHub",
   "issueTitle": "العنوان",
   "issueDescription": "ماذا حدث؟ وكيف يمكن إعادة إنتاج المشكلة؟",
