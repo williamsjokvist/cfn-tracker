@@ -308,6 +308,10 @@ func (ch *TrackingHandler) reauthenticate(ctx context.Context, attempt int) bool
 				ch.emit("tracking-retrying", RetryStatus{Attempt: attempt, Reason: status.Action.LocalizationKey})
 				continue
 			}
+			if status.Step != "" {
+				ch.emit("tracking-retrying", RetryStatus{Attempt: attempt, Reason: status.Step})
+				continue
+			}
 			if status.Done {
 				return true
 			}
@@ -335,15 +339,28 @@ func (ch *TrackingHandler) SelectGame(game model.GameType) error {
 	default:
 		return model.WrapError(model.ErrSelectGame, fmt.Errorf("game does not exist"))
 	}
+	done, err := authenticate(ch.gameTracker.Authenticate, func(action tracker.AuthAction) {
+		ch.emit("auth-action-required", action)
+	}, func(step string) {
+		ch.emit("auth-progress", step)
+	})
+	if done {
+		ch.emit("auth-success")
+	}
+	return err
+}
+
+// authenticate returns false without an error if the login stopped without finishing.
+func authenticate(auth func(context.Context, chan tracker.AuthStatus), onAction func(tracker.AuthAction), onStep func(string)) (bool, error) {
 	authChan := make(chan tracker.AuthStatus)
 	ctx, cancel := context.WithTimeout(context.Background(), selectGameTimeout)
 	defer cancel()
-	go ch.gameTracker.Authenticate(ctx, authChan)
+	go auth(ctx, authChan)
 	for {
 		select {
 		case status, ok := <-authChan:
 			if !ok {
-				return nil
+				return false, nil
 			}
 			if status.Err != nil {
 				// Return errors that already have a specific localization key as-is.
@@ -351,20 +368,23 @@ func (ch *TrackingHandler) SelectGame(game model.GameType) error {
 				// a generic "authentication failed".
 				var localized *model.FGCTrackerError
 				if errors.As(status.Err, &localized) {
-					return localized
+					return false, localized
 				}
-				return model.WrapError(model.ErrAuth, status.Err)
+				return false, model.WrapError(model.ErrAuth, status.Err)
 			}
 			if status.Action != nil {
-				ch.emit("auth-action-required", *status.Action)
+				onAction(*status.Action)
+				continue
+			}
+			if status.Step != "" {
+				onStep(status.Step)
 				continue
 			}
 			if status.Done {
-				ch.emit("auth-success")
-				return nil
+				return true, nil
 			}
 		case <-ctx.Done():
-			return model.WrapError(model.ErrAuth, ctx.Err())
+			return false, model.WrapError(model.ErrAuth, ctx.Err())
 		}
 	}
 }

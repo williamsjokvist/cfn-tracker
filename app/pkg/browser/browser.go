@@ -94,19 +94,50 @@ func (b *Browser) launch() error {
 	if err != nil {
 		return fmt.Errorf("connect to browser: %w", err)
 	}
-	page, err := b.rod.Page(proto.TargetCreateTarget{})
+	page, router, err := newPage(b.rod)
 	if err != nil {
-		return fmt.Errorf("open browser page: %w", err)
+		return err
+	}
+	b.HijackRouter = router
+	b.Page = page
+	return nil
+}
+
+// NewTab gives work like the comparison its own page, so it doesn't navigate away
+// from the page GetBattleLog polls with.
+func (b *Browser) NewTab() (*Browser, func(), error) {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+	if b.rod == nil {
+		return nil, func() {}, errors.New("browser not initialized")
+	}
+	page, router, err := newPage(b.rod)
+	if err != nil {
+		return nil, func() {}, err
+	}
+	cleanup := func() {
+		_ = router.Stop()
+		_ = page.Close()
+	}
+	return &Browser{Page: page, HijackRouter: router}, cleanup, nil
+}
+
+func newPage(browser *rod.Browser) (*rod.Page, *rod.HijackRouter, error) {
+	page, err := browser.Page(proto.TargetCreateTarget{})
+	if err != nil {
+		return nil, nil, fmt.Errorf("open browser page: %w", err)
 	}
 	res, err := page.Eval(`() => navigator.userAgent`)
 	if err != nil {
-		return fmt.Errorf("read browser user agent: %w", err)
+		_ = page.Close()
+		return nil, nil, fmt.Errorf("read browser user agent: %w", err)
 	}
 	userAgent := res.Value.Str()
 	if strings.Contains(userAgent, "HeadlessChrome") {
 		userAgent = strings.ReplaceAll(userAgent, "HeadlessChrome", "Chrome")
 		if err := page.SetUserAgent(&proto.NetworkSetUserAgentOverride{UserAgent: userAgent}); err != nil {
-			return fmt.Errorf("set browser user agent: %w", err)
+			_ = page.Close()
+			return nil, nil, fmt.Errorf("set browser user agent: %w", err)
 		}
 	}
 
@@ -122,9 +153,7 @@ func (b *Browser) launch() error {
 	})
 
 	go router.Run()
-	b.HijackRouter = router
-	b.Page = page
-	return nil
+	return page, router, nil
 }
 
 func (b *Browser) closeCurrent() {

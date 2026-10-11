@@ -11,6 +11,7 @@ type AuthMachineContextProps = {
   game?: model.GameType
   error: model.FGCTrackerError | null
   action: { localizationKey: string; secondsLeft: number } | null
+  step: string | null
 }
 export const AUTH_MACHINE = setup({
   types: {
@@ -27,10 +28,12 @@ export const AUTH_MACHINE = setup({
       EventsOn('auth-action-required', action => {
         self.send({ type: 'actionRequired', action })
       })
+      EventsOn('auth-progress', step => self.send({ type: 'progress', step }))
     },
     unsubscribeToAuthEvents: () => {
       EventsOff('auth-success')
       EventsOff('auth-action-required')
+      EventsOff('auth-progress')
     }
   }
 }).createMachine({
@@ -38,7 +41,8 @@ export const AUTH_MACHINE = setup({
   initial: 'gameForm',
   context: {
     error: null,
-    action: null
+    action: null,
+    step: null
   },
   states: {
     gameForm: {
@@ -48,7 +52,8 @@ export const AUTH_MACHINE = setup({
             assign({
               game: ({ event }) => event.game,
               error: null,
-              action: null
+              action: null,
+              step: null
             }),
             'selectGame',
             'subscribeToAuthEvents'
@@ -65,6 +70,16 @@ export const AUTH_MACHINE = setup({
             'unsubscribeToAuthEvents',
             assign({
               error: null,
+              action: null,
+              step: null
+            })
+          ]
+        },
+        // A step after the login prompt means the user is done in the Chrome window.
+        progress: {
+          actions: [
+            assign({
+              step: ({ event }) => event.step,
               action: null
             })
           ]
@@ -80,10 +95,16 @@ export const AUTH_MACHINE = setup({
           actions: [
             assign({
               error: ({ event }) => event.error,
-              action: null
+              action: null,
+              step: null
             }),
             'unsubscribeToAuthEvents'
           ],
+          target: 'gameForm'
+        },
+        // The login keeps running in the backend, but nothing listens for it anymore.
+        pickGame: {
+          actions: ['unsubscribeToAuthEvents', assign({ action: null, step: null })],
           target: 'gameForm'
         }
       }

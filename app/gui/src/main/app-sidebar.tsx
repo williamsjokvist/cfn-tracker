@@ -54,8 +54,8 @@ const NavItems = [
     href: 'tracking'
   },
   {
-    icons: ['ion:document-text-outline', 'ion:document-text'],
-    href: 'sessions'
+    icons: ['ion:stats-chart-outline', 'ion:stats-chart'],
+    href: 'statistics'
   },
   {
     icons: ['clarity:sign-out-line', 'clarity:sign-out-solid'],
@@ -75,7 +75,10 @@ function Nav() {
   return (
     <nav>
       {NavItems.map(({ href, icons }) => {
-        const selected = location.pathname.includes(href)
+        // Sessions are opened from the statistics page.
+        const selected =
+          location.pathname.includes(href) ||
+          (href === 'statistics' && location.pathname.startsWith('/sessions'))
         return (
           <Link
             key={href}

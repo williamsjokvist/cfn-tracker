@@ -22,6 +22,8 @@ export function GetThemes():Promise<Array<model.Theme>>;
 
 export function GetTranslation(arg1:string):Promise<model.Localization>;
 
+export function GetUserStatistics(arg1:string):Promise<model.UserStatistics>;
+
 export function GetUsers(arg1:model.GameType):Promise<Array<model.User>>;
 
 export function OpenResultsDirectory():Promise<void>;

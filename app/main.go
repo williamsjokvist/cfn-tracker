@@ -153,7 +153,6 @@ func main() {
 	newUpdateAvailable := appVersion.LessThan(lastRelease.Version)
 	if newUpdateAvailable {
 		handleAutoUpdate(lastRelease.Version.Original())
-		return
 	}
 
 	sqlDb, err := sql.NewStorage(false)
@@ -175,15 +174,19 @@ func main() {
 		&cfg,
 		browserSrcServer,
 	)
+
+	cfnClient := cfn.NewClient(appBrowser)
 	trackingHandler := cmd.NewTrackingHandler(
 		wavu.NewClient(),
-		cfn.NewClient(appBrowser),
+		cfnClient,
 		sqlDb,
 		noSqlDb,
 		txtDb,
 		&cfg,
 		browserSrcMatchChan,
 	)
+	exporter := cmd.NewExporter()
+	sf6ComparisonHandler := cmd.NewSF6ComparisonHandler(cfnClient, exporter)
 
 	var onSecondInstanceLaunch func(secondInstanceData options.SecondInstanceData)
 	err = wails.Run(&options.App{
@@ -225,9 +228,17 @@ func main() {
 				go runtime.EventsEmit(ctx, "launchArgs", secondInstanceData.Args)
 			}
 
-			trackingHandler.SetEventEmitter(func(eventName string, optionalData ...interface{}) {
+			emit := func(eventName string, optionalData ...interface{}) {
 				slog.Info("[FE]", slog.String("event", eventName), slog.Any("data", optionalData))
 				runtime.EventsEmit(ctx, eventName, optionalData...)
+			}
+			trackingHandler.SetEventEmitter(emit)
+			sf6ComparisonHandler.SetEventEmitter(emit)
+			exporter.SetSaveFileDialog(func(defaultFilename string) (string, error) {
+				return runtime.SaveFileDialog(ctx, runtime.SaveDialogOptions{
+					DefaultFilename: defaultFilename,
+					Filters:         []runtime.FileFilter{{DisplayName: "CSV", Pattern: "*.csv"}},
+				})
 			})
 		},
 		OnStartup: func(ctx context.Context) {
@@ -249,6 +260,7 @@ func main() {
 		Bind: []interface{}{
 			cmdHandler,
 			trackingHandler,
+			sf6ComparisonHandler,
 		},
 		EnumBind: []interface{}{
 			model.AllThemes,

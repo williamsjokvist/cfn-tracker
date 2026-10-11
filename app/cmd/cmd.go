@@ -89,6 +89,14 @@ func (ch *CommandHandler) GetSessionsStatistics(userId string) (*model.SessionsS
 	return sessionStatistics, nil
 }
 
+func (ch *CommandHandler) GetUserStatistics(userId string) (*model.UserStatistics, error) {
+	stats, err := ch.sqlDb.GetUserStatistics(context.Background(), userId)
+	if err != nil {
+		return nil, model.WrapError(model.ErrGetSessionStatistics, err)
+	}
+	return stats, nil
+}
+
 func (ch *CommandHandler) GetMatches(sessionId uint16, userId string, limit uint8, offset uint16) ([]*model.Match, error) {
 	matches, err := ch.sqlDb.GetMatches(context.Background(), sessionId, userId, limit, offset)
 	if err != nil {

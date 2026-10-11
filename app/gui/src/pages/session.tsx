@@ -1,5 +1,5 @@
 import React from 'react'
-import { useLoaderData, useNavigate } from 'react-router-dom'
+import { useLoaderData, useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
 import { Icon } from '@iconify/react'
@@ -9,8 +9,9 @@ import type { model } from '@model'
 import * as Page from '@/ui/page'
 import { Button } from '@/ui/button'
 import { BigStat } from '@/ui/stat'
-import { CharacterPortrait } from '@/ui/character-portrait'
+import { CharacterStatsCard } from '@/ui/character-stats'
 import { cn } from '@/helpers/cn'
+import { signed, winRate } from '@/helpers/stats'
 
 type CharacterStats = {
   character: string
@@ -44,12 +45,16 @@ function statsByCharacter(matches: model.Match[]): CharacterStats[] {
   return [...stats.values()].sort((a, b) => b.wins + b.losses - (a.wins + a.losses))
 }
 
-const signed = (value: number) => (value > 0 ? `+${value}` : value)
-
-const winRate = (wins: number, losses: number) =>
-  wins + losses === 0 ? 0 : Math.floor((wins / (wins + losses)) * 100)
-
 export type SessionData = { session: model.Session; matches: model.Match[] }
+
+// Where a session was opened from, carried between its overview and match log so
+// going back returns there.
+export type SessionLocationState = { backTo?: string } | null
+
+export function useSessionBackTo() {
+  const state = useLocation().state as SessionLocationState
+  return { backTo: state?.backTo ?? '/sessions', state }
+}
 
 export function SessionBreadcrumbs({
   session,
@@ -61,6 +66,7 @@ export function SessionBreadcrumbs({
   character?: string
 }) {
   const { t, i18n } = useTranslation()
+  const { backTo, state } = useSessionBackTo()
   const started = Intl.DateTimeFormat(i18n.resolvedLanguage, {
     dateStyle: 'medium',
     timeStyle: 'short'
@@ -68,8 +74,13 @@ export function SessionBreadcrumbs({
   return (
     <Page.Breadcrumbs
       items={[
-        { label: t('sessions'), to: '/sessions' },
-        { label: started, to: matchLog ? `/sessions/${session.id}` : undefined },
+        ...(backTo.startsWith('/statistics')
+          ? [{ label: t('statistics'), to: backTo }]
+          : [
+              { label: t('statistics'), to: '/statistics' },
+              { label: t('sessions'), to: '/sessions' }
+            ]),
+        { label: started, to: matchLog ? `/sessions/${session.id}` : undefined, state },
         ...(matchLog
           ? [{ label: character ? `${t('history')} · ${character}` : t('history') }]
           : [])
@@ -82,6 +93,7 @@ export function SessionOverviewPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const { session, matches } = useLoaderData() as SessionData
+  const { backTo } = useSessionBackTo()
 
   const characters = statsByCharacter(matches)
   const wins = characters.reduce((sum, c) => sum + c.wins, 0)
@@ -105,7 +117,7 @@ export function SessionOverviewPage() {
           <Button
             className='flex items-center gap-1 px-1 py-[2px]'
             style={{ filter: 'hue-rotate(-65deg)' }}
-            onClick={() => navigate('/sessions')}
+            onClick={() => navigate(backTo)}
           >
             <Icon
               width={20}
@@ -148,12 +160,13 @@ export function SessionOverviewPage() {
 function SectionHeading({ title, matchLog }: { title: string; matchLog: string }) {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const { state } = useSessionBackTo()
   return (
     <div className='mb-2 flex items-center justify-between gap-4'>
       <h3 className='text-lg font-bold'>{title}</h3>
       <Button
         className='flex shrink-0 items-center gap-2 px-2 py-[2px]'
-        onClick={() => navigate(matchLog)}
+        onClick={() => navigate(matchLog, { state })}
       >
         <Icon width={18} height={18} icon='material-symbols:list-alt-outline' />
         <span className='relative top-[2px]'>{t('history')}</span>
@@ -172,44 +185,30 @@ function CharacterSection({
   hasPoints: boolean
 }) {
   const { t } = useTranslation()
-  // The portrait is a square as tall as the stats, which CSS can't size from a sibling.
-  const statsRef = React.useRef<HTMLDivElement>(null)
-  const [size, setSize] = React.useState(0)
-  React.useLayoutEffect(() => {
-    const observer = new ResizeObserver(([entry]) => setSize(entry.borderBoxSize[0].blockSize))
-    observer.observe(statsRef.current!)
-    return () => observer.disconnect()
-  }, [])
-
   return (
-    <section className='flex items-start gap-4'>
-      <CharacterPortrait
-        character={stats.character}
-        className='relative shrink-0 overflow-hidden rounded-xl bg-slate-50/5'
-        style={{ width: size, height: size }}
-      />
-      <div ref={statsRef} className='flex-1'>
+    <CharacterStatsCard
+      character={stats.character}
+      heading={
         <SectionHeading
           title={stats.character}
           matchLog={`/sessions/${sessionId}/matches?${new URLSearchParams({ character: stats.character })}`}
         />
-        <dl className='grid grid-cols-3 gap-2 [&>div]:mb-0'>
-          <BigStat text={t('wins')} value={stats.wins} />
-          <BigStat text={t('losses')} value={stats.losses} />
-          <BigStat text={t('winRate')} value={`${winRate(stats.wins, stats.losses)}%`} />
-          {/* Tekken has no points, but keeps the row so every character is the same size. */}
-          <BigStat
-            text={t('lpGain')}
-            value={signed(stats.lpGain)}
-            className={cn(!hasPoints && 'invisible')}
-          />
-          <BigStat
-            text={t('mrGain')}
-            value={signed(stats.mrGain)}
-            className={cn(!hasPoints && 'invisible')}
-          />
-        </dl>
-      </div>
-    </section>
+      }
+    >
+      <BigStat text={t('wins')} value={stats.wins} />
+      <BigStat text={t('losses')} value={stats.losses} />
+      <BigStat text={t('winRate')} value={`${winRate(stats.wins, stats.losses)}%`} />
+      {/* Tekken has no points, but keeps the row so every character is the same size. */}
+      <BigStat
+        text={t('lpGain')}
+        value={signed(stats.lpGain)}
+        className={cn(!hasPoints && 'invisible')}
+      />
+      <BigStat
+        text={t('mrGain')}
+        value={signed(stats.mrGain)}
+        className={cn(!hasPoints && 'invisible')}
+      />
+    </CharacterStatsCard>
   )
 }

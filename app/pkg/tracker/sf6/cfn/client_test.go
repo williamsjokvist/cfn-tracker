@@ -66,6 +66,19 @@ func assertCalls(t *testing.T, f *fakeAuthBrowser, want ...string) {
 	}
 }
 
+func assertSteps(t *testing.T, statuses []tracker.AuthStatus, want ...string) {
+	t.Helper()
+	var steps []string
+	for _, s := range statuses {
+		if s.Step != "" {
+			steps = append(steps, s.Step)
+		}
+	}
+	if !slices.Equal(steps, want) {
+		t.Fatalf("steps = %v, want %v", steps, want)
+	}
+}
+
 func assertDone(t *testing.T, statuses []tracker.AuthStatus) {
 	t.Helper()
 	last := statuses[len(statuses)-1]
@@ -87,8 +100,9 @@ func TestAuthenticateReusesValidSession(t *testing.T) {
 	statuses := authenticate(t, f)
 
 	assertCalls(t, f, "session")
-	if len(statuses) != 1 {
-		t.Fatalf("statuses = %+v, want only the done status", statuses)
+	assertSteps(t, statuses, "authCheckingSession")
+	if len(statuses) != 2 {
+		t.Fatalf("statuses = %+v, want the session check then done", statuses)
 	}
 	assertDone(t, statuses)
 }
@@ -113,11 +127,12 @@ func TestAuthenticateWaitsForManualLogin(t *testing.T) {
 	if !hasDeadline {
 		t.Fatal("manual login context has no deadline")
 	}
-	if len(statuses) != 2 {
-		t.Fatalf("statuses = %+v, want relogin prompt then done", statuses)
+	assertSteps(t, statuses, "authCheckingSession", "authRestartingBrowser", "authVerifyingLogin")
+	if len(statuses) != 5 {
+		t.Fatalf("statuses = %+v, want 3 steps, relogin prompt and done", statuses)
 	}
-	if a := statuses[0].Action; a == nil || a.LocalizationKey != "authNeedRelogin" {
-		t.Fatalf("first status = %+v, want authNeedRelogin action", statuses[0])
+	if a := statuses[1].Action; a == nil || a.LocalizationKey != "authNeedRelogin" {
+		t.Fatalf("second status = %+v, want authNeedRelogin action", statuses[1])
 	}
 	assertDone(t, statuses)
 }
@@ -174,7 +189,9 @@ func TestAuthenticateReturnsWhenCallerStopsListening(t *testing.T) {
 		close(done)
 	}()
 
-	// The relogin prompt is sent before the manual login, so read it to get there.
+	// The session check and relogin prompt are sent before the manual login, so read
+	// them to get there.
+	<-statuses
 	<-statuses
 	select {
 	case <-done:
