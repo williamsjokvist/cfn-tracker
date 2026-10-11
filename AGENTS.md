@@ -16,4 +16,4 @@ Never edit generated code by hand. Change the source it's generated from and reg
 
 This is a mise monorepo. The root `mise.toml` only marks the monorepo root. `app/mise.toml` (Go, Bun, Wails) and `web/mise.toml` (Bun) hold each project's tools and tasks. Run `mise tasks --all` to list them, and for example `mise app:dev` or `mise app:build-mac-amd64` to run one from anywhere.
 
-Run `mise app:lint` before committing and pushing, since CI fails on any lint issue. It lints both the Go code and the GUI.
+Run `mise app:fmt` and `mise app:lint` before committing and pushing, since CI fails on any formatting or lint issue. Both cover the Go code and the GUI.
