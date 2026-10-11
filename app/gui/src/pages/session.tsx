@@ -6,9 +6,9 @@ import { Icon } from '@iconify/react'
 import type { model } from '@model'
 
 import * as Page from '@/ui/page'
-import * as Table from '@/ui/table'
 import { Button } from '@/ui/button'
-import { cn } from '@/helpers/cn'
+import { BigStat } from '@/ui/stat'
+import { CharacterPortrait } from '@/ui/character-portrait'
 
 type CharacterStats = {
   character: string
@@ -42,6 +42,8 @@ function statsByCharacter(matches: model.Match[]): CharacterStats[] {
   return [...stats.values()].sort((a, b) => b.wins + b.losses - (a.wins + a.losses))
 }
 
+const signed = (value: number) => (value > 0 ? `+${value}` : value)
+
 const winRate = (wins: number, losses: number) =>
   wins + losses === 0 ? 0 : Math.floor((wins / (wins + losses)) * 100)
 
@@ -54,7 +56,6 @@ export function SessionOverviewPage() {
   const characters = statsByCharacter(matches)
   const wins = characters.reduce((sum, c) => sum + c.wins, 0)
   const losses = characters.reduce((sum, c) => sum + c.losses, 0)
-  const lastMatch = matches[0]
   // Tekken has no LP or MR.
   const hasPoints = matches.some(m => m.lp !== 0 || m.mr !== 0)
 
@@ -94,71 +95,38 @@ export function SessionOverviewPage() {
           </Button>
         </div>
 
-        <dl className='mx-8 mt-3 flex flex-wrap gap-2'>
-          {lastMatch && <Stat text={t('user')} value={lastMatch.userName} />}
-          <Stat text={t('wins')} value={wins} />
-          <Stat text={t('losses')} value={losses} />
-          <Stat text={t('winRate')} value={`${winRate(wins, losses)}%`} />
-        </dl>
-
-        {characters.length > 0 && (
-          <Table.Page className='max-h-[250px]'>
-            <Table.Content>
-              <thead>
-                <Table.Tr>
-                  <Table.Th>{t('character')}</Table.Th>
-                  <Table.Th className='text-center'>{t('wins')}</Table.Th>
-                  <Table.Th className='text-center'>{t('losses')}</Table.Th>
-                  <Table.Th className='text-center'>{t('winRate')}</Table.Th>
+        <div className='flex max-h-[340px] flex-col gap-4 overflow-y-auto px-8 pt-2 pb-4'>
+          {characters.length > 1 && (
+            <dl className='flex gap-2'>
+              <BigStat text={t('wins')} value={wins} />
+              <BigStat text={t('losses')} value={losses} />
+              <BigStat text={t('winRate')} value={`${winRate(wins, losses)}%`} />
+            </dl>
+          )}
+          {characters.map(c => (
+            <section key={c.character} className='flex gap-4'>
+              <CharacterPortrait
+                character={c.character}
+                className='h-[136px] w-[136px] shrink-0 rounded-xl bg-slate-50/5 object-cover'
+              />
+              <div className='flex-1'>
+                <h3 className='mb-2 text-lg font-bold'>{c.character}</h3>
+                <dl className='grid grid-cols-3 gap-x-2'>
+                  <BigStat text={t('wins')} value={c.wins} />
+                  <BigStat text={t('losses')} value={c.losses} />
+                  <BigStat text={t('winRate')} value={`${winRate(c.wins, c.losses)}%`} />
                   {hasPoints && (
                     <>
-                      <Table.Th className='text-center'>{t('lpGain')}</Table.Th>
-                      <Table.Th className='text-center'>{t('mrGain')}</Table.Th>
+                      <BigStat text={t('lpGain')} value={signed(c.lpGain)} />
+                      <BigStat text={t('mrGain')} value={signed(c.mrGain)} />
                     </>
                   )}
-                </Table.Tr>
-              </thead>
-              <tbody>
-                {characters.map(c => (
-                  <Table.Tr key={c.character}>
-                    <Table.Td className='font-bold'>{c.character}</Table.Td>
-                    <Table.Td className='text-center'>{c.wins}</Table.Td>
-                    <Table.Td className='text-center'>{c.losses}</Table.Td>
-                    <Table.Td className='text-center'>{winRate(c.wins, c.losses)}%</Table.Td>
-                    {hasPoints && (
-                      <>
-                        <Table.Td className='text-center'>
-                          <Gain value={c.lpGain} />
-                        </Table.Td>
-                        <Table.Td className='text-center'>
-                          <Gain value={c.mrGain} />
-                        </Table.Td>
-                      </>
-                    )}
-                  </Table.Tr>
-                ))}
-              </tbody>
-            </Table.Content>
-          </Table.Page>
-        )}
+                </dl>
+              </div>
+            </section>
+          ))}
+        </div>
       </motion.div>
     </Page.Root>
-  )
-}
-
-function Stat({ text, value }: { text: string; value: string | number }) {
-  return (
-    <div className='flex items-baseline gap-3 rounded-xl bg-slate-50/5 px-3 pt-2 pb-1'>
-      <dt className='font-extralight tracking-wider'>{text}</dt>
-      <dd className='text-xl font-semibold'>{value}</dd>
-    </div>
-  )
-}
-
-function Gain({ value }: { value: number }) {
-  return (
-    <span className={cn(value > 0 && 'text-lime-400', value < 0 && 'text-red-400')}>
-      {value > 0 ? `+${value}` : value}
-    </span>
   )
 }

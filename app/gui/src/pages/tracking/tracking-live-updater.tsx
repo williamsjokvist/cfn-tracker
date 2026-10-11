@@ -8,6 +8,8 @@ import { PieChart } from 'react-minimal-pie-chart'
 import { TrackingMachineContext } from '@/state/tracking-machine'
 import { Button } from '@/ui/button'
 import { Tooltip } from '@/ui/tooltip'
+import { BigStat } from '@/ui/stat'
+import { CharacterPortrait } from '@/ui/character-portrait'
 import * as Page from '@/ui/page'
 import { type LocalizationKey } from '@/main/i18n'
 import { TrackingHeader } from './tracking-header'
@@ -145,39 +147,16 @@ export function TrackingLiveUpdater() {
           </motion.div>
         </div>
         {/* TODO: fix character image for tekken 8 */}
-        <CharacterImage character={character} />
+        <CharacterPortrait
+          character={character}
+          className='pointer-events-none absolute -end-20 top-0 z-[-1] h-full opacity-10 grayscale'
+        />
       </motion.section>
     </Page.Root>
   )
 }
 
-function CharacterImage({ character }: { character: string }) {
-  const src = `https://www.streetfighter.com/6/buckler/assets/images/material/character/character_${character
-    .toLowerCase()
-    .replace(/\s/g, '')
-    .replace('.', '')}_r.png`
-  const [failedSrc, setFailedSrc] = React.useState<string>()
-  if (!character || failedSrc === src) {
-    return null
-  }
-  return (
-    <img
-      className='pointer-events-none absolute -end-20 top-0 z-[-1] h-full opacity-10 grayscale'
-      src={src}
-      alt=''
-      onError={() => setFailedSrc(src)}
-    />
-  )
-}
-
 type StatProps = { text: string; value: string | number }
-const BigStat = ({ text, value }: StatProps) => (
-  <div className='mb-2 flex flex-1 justify-between gap-4 rounded-xl bg-slate-50/5 p-3 pb-1'>
-    <dt className='font-extralight tracking-wider'>{text}</dt>
-    <dd className='text-4xl font-semibold'>{value}</dd>
-  </div>
-)
-
 const SmallStat = ({ text, value }: StatProps) => (
   <div className='flex gap-3 text-2xl'>
     <dt className='text-xl leading-8'>{text}</dt>
