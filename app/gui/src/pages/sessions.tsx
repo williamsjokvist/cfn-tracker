@@ -62,7 +62,12 @@ export function SessionsListPage() {
             disabled={months[monthIndex + 1] === undefined}
             onClick={() => setMonthIndex(monthIndex + 1)}
           >
-            <Icon width={26} height={26} icon='material-symbols:chevron-left' />
+            <Icon
+              width={26}
+              height={26}
+              icon='material-symbols:chevron-left'
+              className='rtl:rotate-180'
+            />
           </Button>
           <Button
             className='text-md! px-0! py-0! font-normal!'
@@ -73,10 +78,10 @@ export function SessionsListPage() {
               width={26}
               height={26}
               icon='material-symbols:chevron-left'
-              className='rotate-180'
+              className='rotate-180 rtl:rotate-0'
             />
           </Button>
-          <h2 className='ml-2 font-bold'>
+          <h2 className='ms-2 font-bold'>
             {months.length > 0 && months[monthIndex] && (
               <>
                 {months[monthIndex].Date.split('-')[0]} /{' '}

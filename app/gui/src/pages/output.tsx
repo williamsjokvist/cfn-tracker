@@ -96,11 +96,11 @@ export function OutputPage() {
                   icon='twemoji:ok-hand'
                   width={45}
                   id='ok'
-                  className='absolute top-0 right-7 opacity-0'
+                  className='absolute end-7 top-0 opacity-0'
                 />
               </div>
               <Button onClick={copyUrlToClipBoard} style={{ filter: 'hue-rotate(-120deg)' }}>
-                <Icon icon='mdi:internet' className='mr-3 h-6 w-6' />
+                <Icon icon='mdi:internet' className='me-3 h-6 w-6' />
                 {t('copyBrowserSourceLink')}
               </Button>
             </div>
@@ -136,7 +136,7 @@ export function OutputPage() {
             style={{ filter: 'hue-rotate(-120deg)' }}
             className='mx-auto'
           >
-            <Icon icon='fa6-solid:folder-open' className='mr-3 h-6 w-6' />
+            <Icon icon='fa6-solid:folder-open' className='me-3 h-6 w-6' />
             {t('files')}
           </Button>
         </motion.section>
@@ -154,7 +154,7 @@ function StatSelect(props: {
     <Dialog.Root>
       <Dialog.Trigger asChild>
         <Button style={{ filter: 'hue-rotate(-45deg)' }}>
-          <Icon icon='bx:stats' className='mr-3 h-6 w-6' />
+          <Icon icon='bx:stats' className='me-3 h-6 w-6' />
           {t('displayStats')}
         </Button>
       </Dialog.Trigger>
@@ -167,7 +167,7 @@ function StatSelect(props: {
                 onClick={() => props.onSelect(opt, !checked)}
               >
                 <Checkbox checked={props.options[opt] === true} readOnly />
-                <span className='ml-4 cursor-pointer text-center capitalize'>{opt}</span>
+                <span className='ms-4 cursor-pointer text-center capitalize'>{opt}</span>
               </button>
             </li>
           ))}
@@ -217,7 +217,7 @@ function ThemeSelect(props: { value: string; onSelect: (theme: string) => void }
           className='capitalize'
           style={{ filter: 'hue-rotate(-180deg)', justifyContent: 'center' }}
         >
-          <Icon icon='ph:paint-bucket-fill' className='mr-3 h-6 w-6' />
+          <Icon icon='ph:paint-bucket-fill' className='me-3 h-6 w-6' />
           {props.value}
         </Button>
       </Dialog.Trigger>
@@ -232,11 +232,11 @@ function ThemeSelect(props: { value: string; onSelect: (theme: string) => void }
                 id={`${theme.name}-checkbox`}
                 checked={theme.name === props.value}
                 onChange={e => props.onSelect(theme.name)}
-                className='absolute top-1 left-2'
+                className='absolute start-2 top-1'
               />
               <label
                 htmlFor={`${theme.name}-checkbox`}
-                className='font-spartan w-full cursor-pointer py-1 pl-14 capitalize'
+                className='font-spartan w-full cursor-pointer py-1 ps-14 capitalize'
               >
                 {theme.name}
               </label>
@@ -250,7 +250,7 @@ function ThemeSelect(props: { value: string; onSelect: (theme: string) => void }
               style={{ opacity: theme.name === selectedTheme.name ? '100' : '0' }}
               className={cn(
                 `${theme.name}-preview`,
-                'absolute top-0 left-0 w-full transition-opacity',
+                'absolute start-0 top-0 w-full transition-opacity',
                 'pointer-events-none mx-auto h-[60px] w-[350px] select-none'
               )}
             >

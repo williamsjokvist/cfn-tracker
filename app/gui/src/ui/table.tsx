@@ -22,7 +22,7 @@ export function Tr(props: JSX.IntrinsicElements['tr']) {
   const { className, ...restProps } = props
   return (
     <tr
-      className={cn('[&>*:first-child]:rounded-l-xl [&>*:last-child]:rounded-r-xl', className)}
+      className={cn('[&>*:first-child]:rounded-s-xl [&>*:last-child]:rounded-e-xl', className)}
       {...restProps}
     />
   )
@@ -30,7 +30,7 @@ export function Tr(props: JSX.IntrinsicElements['tr']) {
 
 export function Th(props: JSX.IntrinsicElements['th']) {
   const { className, ...restProps } = props
-  return <th className={cn('px-3 text-left whitespace-nowrap', className)} {...restProps} />
+  return <th className={cn('px-3 text-start whitespace-nowrap', className)} {...restProps} />
 }
 
 export function Td(

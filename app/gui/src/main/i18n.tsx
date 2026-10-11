@@ -9,6 +9,11 @@ import { GetTranslation } from '@cmd/CommandHandler'
 
 export type LocalizationKey = keyof model.Localization
 
+i18n.on('languageChanged', lng => {
+  document.documentElement.lang = lng
+  document.documentElement.dir = i18n.dir(lng)
+})
+
 // https://www.i18next.com/overview/configuration-options
 export function I18nProvider(props: React.PropsWithChildren) {
   i18n

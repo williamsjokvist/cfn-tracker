@@ -30,7 +30,7 @@ export function SettingsPage() {
   return (
     <Page.Root>
       <Page.Header>
-        <div className='mx-auto w-full max-w-xl text-left'>
+        <div className='mx-auto w-full max-w-xl text-start'>
           <Page.Title>{t('settings')}</Page.Title>
         </div>
       </Page.Header>
@@ -57,7 +57,7 @@ export function SettingsPage() {
               icon={
                 <Icon
                   icon='mdi:scroll'
-                  className='mr-2 h-6 w-6 text-stone-300 transition-colors group-hover:text-white'
+                  className='me-2 h-6 w-6 text-stone-300 transition-colors group-hover:text-white'
                 />
               }
               text={t('changelog')}
@@ -67,7 +67,7 @@ export function SettingsPage() {
               icon={
                 <Icon
                   icon='fa6-brands:github'
-                  className='mr-2 h-6 w-6 text-orange-300 transition-colors group-hover:text-white'
+                  className='me-2 h-6 w-6 text-orange-300 transition-colors group-hover:text-white'
                 />
               }
               text={t('source')}
@@ -77,7 +77,7 @@ export function SettingsPage() {
               icon={
                 <Icon
                   icon='fa6-brands:twitter'
-                  className='mr-2 h-6 w-6 text-[#49b3f5] transition-colors group-hover:text-white'
+                  className='me-2 h-6 w-6 text-[#49b3f5] transition-colors group-hover:text-white'
                 />
               }
               text={t('follow')}
@@ -293,14 +293,15 @@ function LanguageSelect(props: React.PropsWithChildren) {
         value={i18n.resolvedLanguage}
       >
         {langs.map(code => {
+          const locale = new Intl.Locale(code).maximize()
+          const sharesLanguage =
+            langs.filter(c => new Intl.Locale(c).language === locale.language).length > 1
           const nativeName = new Intl.DisplayNames([code], {
             type: 'language',
             languageDisplay: 'standard',
             style: 'narrow',
             fallback: 'code'
-          })
-            .of(code)!
-            .split(/[ |（]/)[0]
+          }).of(sharesLanguage ? `${locale.language}-${locale.script}` : locale.language)!
 
           return (
             <Select.Item
@@ -344,7 +345,7 @@ function Link(props: {
       </div>
       <Icon
         icon='fa6-solid:arrow-up'
-        className='relative right-[-8px] h-3 w-3 opacity-0 transition-opacity group-hover:opacity-100'
+        className='relative -end-2 h-3 w-3 opacity-0 transition-opacity group-hover:opacity-100'
         style={{ transform: 'rotate(45deg)' }}
       />
     </button>

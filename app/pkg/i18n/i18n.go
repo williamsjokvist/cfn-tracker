@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/fs"
+	"slices"
 	"strings"
 
 	"github.com/williamsjokvist/cfn-tracker/pkg/model"
@@ -33,6 +34,9 @@ func GetSupportedLanguages() ([]string, error) {
 	var languages = make([]string, 0, len(dirEntries))
 	for _, d := range dirEntries {
 		languages = append(languages, strings.Split(d.Name(), ".json")[0])
+	}
+	if i := slices.Index(languages, "en-GB"); i > 0 {
+		languages = slices.Insert(slices.Delete(languages, i, i+1), 0, "en-GB")
 	}
 	return languages, nil
 }

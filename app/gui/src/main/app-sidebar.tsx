@@ -94,14 +94,14 @@ function Nav() {
             <div className='flex items-center justify-between'>
               <Icon
                 icon={selected ? icons[1] : icons[0]}
-                className='text-highlight mr-1 h-7 w-10 transition-colors'
+                className='text-highlight me-1 h-7 w-10 transition-colors'
               />
               <span>{t(href)}</span>
             </div>
             {cfg.sidebar ? (
               <div
                 className={cn(
-                  'pointer-events-none invisible absolute top-1/2 left-full ml-3 -translate-y-1/2',
+                  'pointer-events-none invisible absolute start-full top-1/2 ms-3 -translate-y-1/2',
                   'rounded-full border bg-white px-2.5 pt-1 pb-0.5 text-sm font-semibold text-black',
                   'opacity-0 transition-all group-hover:visible group-hover:opacity-100 group-hover:delay-500'
                 )}
@@ -111,7 +111,7 @@ function Nav() {
             ) : (
               <Icon
                 icon='fa6-solid:chevron-left'
-                className='h-3 w-3 rotate-180 opacity-0 transition-opacity group-hover:opacity-100'
+                className='h-3 w-3 rotate-180 opacity-0 transition-opacity group-hover:opacity-100 rtl:rotate-0'
               />
             )}
           </Link>
