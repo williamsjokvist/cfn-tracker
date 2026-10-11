@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -30,7 +31,7 @@ func (s *Storage) BackupTo(ctx context.Context, path string) error {
 	if err != nil {
 		return err
 	}
-	defer removeIfExists(tmp)
+	defer removeTemp(tmp)
 	if _, err := s.db.ExecContext(ctx, "VACUUM INTO ?", tmp); err != nil {
 		return fmt.Errorf("vacuum into %s: %w", tmp, err)
 	}
@@ -42,7 +43,7 @@ func CopyDatabase(src, dst string) error {
 	if err != nil {
 		return err
 	}
-	defer removeIfExists(tmp)
+	defer removeTemp(tmp)
 	if err := copyFile(src, tmp); err != nil {
 		return err
 	}
@@ -57,7 +58,11 @@ func CheckBackup(path string) error {
 	if err != nil {
 		return fmt.Errorf("open sqlite connection: %w", err)
 	}
-	defer db.Close()
+	defer func() {
+		if err := db.Close(); err != nil {
+			slog.Warn("close backup connection", slog.Any("error", err))
+		}
+	}()
 
 	var tables int
 	// Fails on a file that isn't SQLite at all.
@@ -86,7 +91,7 @@ func StageImport(src, dbPath string) error {
 	if err != nil {
 		return err
 	}
-	defer removeIfExists(tmp)
+	defer removeTemp(tmp)
 	if err := copyFile(src, tmp); err != nil {
 		return err
 	}
@@ -148,7 +153,11 @@ func copyFile(src, dst string) error {
 	if err != nil {
 		return fmt.Errorf("open %s: %w", src, err)
 	}
-	defer in.Close()
+	defer func() {
+		if err := in.Close(); err != nil {
+			slog.Warn("close copied file", slog.String("path", src), slog.Any("error", err))
+		}
+	}()
 	out, err := os.Create(dst)
 	if err != nil {
 		return fmt.Errorf("create %s: %w", dst, err)
@@ -160,6 +169,12 @@ func copyFile(src, dst string) error {
 		return fmt.Errorf("close %s: %w", dst, err)
 	}
 	return nil
+}
+
+func removeTemp(path string) {
+	if err := removeIfExists(path); err != nil {
+		slog.Warn("remove temp file", slog.Any("error", err))
+	}
 }
 
 func removeIfExists(path string) error {

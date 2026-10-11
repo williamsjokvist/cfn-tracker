@@ -70,7 +70,7 @@ func hasUser(t *testing.T, dbPath, code string) bool {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer storage.Close()
+	defer func() { _ = storage.Close() }()
 	user, err := storage.GetUserByCode(context.Background(), code)
 	return err == nil && user != nil
 }
