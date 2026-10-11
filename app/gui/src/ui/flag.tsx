@@ -13,6 +13,7 @@ import {
   TW,
   TH,
   PL,
+  SE,
   Props
 } from 'country-flag-icons/react/3x2'
 
@@ -30,7 +31,8 @@ const flagMap = {
   'ru-RU': RU,
   'zh-TW': TW,
   'th-TH': TH,
-  'pl-PL': PL
+  'pl-PL': PL,
+  'sv-SE': SE
 }
 
 export function Flag(props: Props & { code: string }) {
