@@ -19,7 +19,6 @@ type Localization struct {
 	LPGain                      string `json:"lpGain"`
 	MRGain                      string `json:"mrGain"`
 	DeleteLog                   string `json:"deleteLog"`
-	GoBack                      string `json:"goBack"`
 	Loading                     string `json:"loading"`
 	Wins                        string `json:"wins"`
 	Losses                      string `json:"losses"`
@@ -47,6 +46,10 @@ type Localization struct {
 	Unpause                     string `json:"unpause"`
 	Statistics                  string `json:"statistics"`
 	RecentSessions              string `json:"recentSessions"`
+	StatOverTime                string `json:"statOverTime"`
+	NetWins                     string `json:"netWins"`
+	NotEnoughMatches            string `json:"notEnoughMatches"`
+	AllTime                     string `json:"allTime"`
 	CompareWithTopPlayers       string `json:"compareWithTopPlayers"`
 	NoStatistics                string `json:"noStatistics"`
 	Date                        string `json:"date"`

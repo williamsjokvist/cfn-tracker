@@ -72,6 +72,14 @@ export namespace model {
 	    lastGame: GameType;
 	    lastUsers: Record<string, string>;
 	}
+	export interface HistoryMatch {
+	    date: string;
+	    time: string;
+	    character: string;
+	    victory: boolean;
+	    lp: number;
+	    mr: number;
+	}
 	export interface IssueReport {
 	    title: string;
 	    description: string;
@@ -96,7 +104,6 @@ export namespace model {
 	    lpGain: string;
 	    mrGain: string;
 	    deleteLog: string;
-	    goBack: string;
 	    loading: string;
 	    wins: string;
 	    losses: string;
@@ -124,6 +131,10 @@ export namespace model {
 	    unpause: string;
 	    statistics: string;
 	    recentSessions: string;
+	    statOverTime: string;
+	    netWins: string;
+	    notEnoughMatches: string;
+	    allTime: string;
 	    compareWithTopPlayers: string;
 	    noStatistics: string;
 	    date: string;
@@ -374,6 +385,7 @@ export namespace model {
 	    wins: number;
 	    losses: number;
 	    characters: CharacterStatistics[];
+	    history: HistoryMatch[];
 	}
 
 }

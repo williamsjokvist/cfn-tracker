@@ -48,9 +48,7 @@ export function SessionsListPage() {
   return (
     <Page.Root>
       <Page.Header>
-        <Page.Breadcrumbs
-          items={[{ label: t('statistics'), to: '/statistics' }, { label: t('sessions') }]}
-        />
+        <Page.Title>{t('sessions')}</Page.Title>
       </Page.Header>
       <motion.div
         initial={{ opacity: 0 }}

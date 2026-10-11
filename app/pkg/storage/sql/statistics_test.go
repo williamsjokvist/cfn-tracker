@@ -63,11 +63,26 @@ func TestGetUserStatistics(t *testing.T) {
 		}
 	}
 
+	wantHistory := []model.HistoryMatch{
+		{Date: "2026-01-01", Time: "10:00", Character: "Ken", Victory: true, LP: 1000, MR: 1500},
+		{Date: "2026-01-01", Time: "10:05", Character: "Ryu", LP: 500},
+		{Date: "2026-01-02", Time: "09:00", Character: "Ken", LP: 1100, MR: 1520},
+		{Date: "2026-01-02", Time: "09:05", Character: "Ken", Victory: true, LP: 1200, MR: 1540},
+	}
+	if len(got.History) != len(wantHistory) {
+		t.Fatalf("GetUserStatistics() history = %d, want %d", len(got.History), len(wantHistory))
+	}
+	for i, h := range got.History {
+		if *h != wantHistory[i] {
+			t.Errorf("GetUserStatistics() history %d = %+v, want %+v", i, *h, wantHistory[i])
+		}
+	}
+
 	empty, err := storage.GetUserStatistics(ctx, "000000000")
 	if err != nil {
 		t.Fatalf("GetUserStatistics() of a user without matches error = %v", err)
 	}
-	if empty.Sessions != 0 || len(empty.Characters) != 0 || empty.MainCharacter != "" {
+	if empty.Sessions != 0 || len(empty.Characters) != 0 || len(empty.History) != 0 || empty.MainCharacter != "" {
 		t.Fatalf("GetUserStatistics() of a user without matches = %+v, want nothing", empty)
 	}
 }
