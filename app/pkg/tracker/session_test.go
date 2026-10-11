@@ -38,7 +38,7 @@ func TestRecord(t *testing.T) {
 	}{
 		{
 			name:    "counts wins, losses and the streak",
-			session: model.Session{LP: 10000, MR: 1500},
+			session: model.Session{Character: "Ryu", LP: 10000, MR: 1500},
 			steps: []step{
 				{win("Ryu", 10100, 1510), stats{1, 0, 1, 100, 100, 10}},
 				{win("Ryu", 10200, 1520), stats{2, 0, 2, 100, 200, 20}},
@@ -48,7 +48,7 @@ func TestRecord(t *testing.T) {
 		},
 		{
 			name:    "counts each character separately",
-			session: model.Session{LP: 10000},
+			session: model.Session{Character: "Ryu", LP: 10000},
 			steps: []step{
 				{win("Ryu", 10100, 0), stats{1, 0, 1, 100, 100, 0}},
 				{win("Ryu", 10200, 0), stats{2, 0, 2, 100, 200, 0}},
@@ -61,11 +61,20 @@ func TestRecord(t *testing.T) {
 		},
 		{
 			name:    "gains nothing from placement",
-			session: model.Session{LP: -1},
+			session: model.Session{Character: "Ryu", LP: -1},
 			steps: []step{
 				{win("Ryu", -1, 0), stats{1, 0, 1, 100, 0, 0}},
 				{win("Ryu", 1200, 0), stats{2, 0, 2, 100, 0, 0}},
 				{win("Ryu", 1300, 0), stats{3, 0, 3, 100, 100, 0}},
+			},
+		},
+		{
+			name:    "switches character before the first match",
+			session: model.Session{Character: "Ryu", LP: 10000},
+			steps: []step{
+				// The session's LP is Ryu's, so Ken has no baseline yet.
+				{win("Ken", 5000, 0), stats{1, 0, 1, 100, 0, 0}},
+				{win("Ken", 5100, 0), stats{2, 0, 2, 100, 100, 0}},
 			},
 		},
 		{
@@ -149,7 +158,7 @@ func TestTick(t *testing.T) {
 }
 
 func TestCharacterSwitch(t *testing.T) {
-	state := &model.Session{LP: 10000}
+	state := &model.Session{Character: "Ryu", LP: 10000}
 	session := tracker.NewSession(nil, state)
 	characterStats := func(character string) stats {
 		t.Helper()

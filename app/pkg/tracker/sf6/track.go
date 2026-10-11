@@ -32,6 +32,7 @@ func (t *SF6Tracker) GetUser(ctx context.Context, userCode string) (*model.User,
 		Code:        userCode,
 		LP:          bl.GetLP(),
 		MR:          bl.GetMR(),
+		Character:   bl.GetCharacter(),
 	}, nil
 }
 

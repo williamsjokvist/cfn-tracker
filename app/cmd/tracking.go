@@ -119,7 +119,7 @@ func (ch *TrackingHandler) StartTracking(userCodeInput string, restore bool) err
 	if session == nil {
 		return ch.terminalError(model.ErrCreateSession)
 	}
-	session.LP, session.MR, session.UserName = user.LP, user.MR, user.DisplayName
+	session.LP, session.MR, session.Character, session.UserName = user.LP, user.MR, user.Character, user.DisplayName
 	ch.emit("match", model.Match{UserName: session.UserName, LP: session.LP, MR: session.MR, SessionId: session.Id, UserId: session.UserId})
 
 	if len(session.Matches) > 0 {

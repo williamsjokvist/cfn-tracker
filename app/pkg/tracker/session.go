@@ -43,19 +43,17 @@ func (s *Session) Record(outcome model.Match) model.Match {
 	}
 	match.WinRate = int(float64(match.Wins) / float64(match.Wins+match.Losses) * 100)
 
-	// The session's LP and MR are only a baseline for this character before any
-	// match is recorded, since they belong to whichever character played last.
 	baseLP, baseMR := prev.LP, prev.MR
 	if !hasPrev {
-		baseLP, baseMR = s.state.LP, s.state.MR
-		if len(s.state.Matches) > 0 {
-			baseLP, baseMR = match.LP, match.MR
+		baseLP, baseMR = match.LP, match.MR
+		if s.state.Character == match.Character {
+			baseLP, baseMR = s.state.LP, s.state.MR
 		}
 	}
 	match.LPGain = prev.LPGain + gain(baseLP, match.LP)
 	match.MRGain = prev.MRGain + gain(baseMR, match.MR)
 
-	s.state.LP, s.state.MR = match.LP, match.MR
+	s.state.LP, s.state.MR, s.state.Character = match.LP, match.MR, match.Character
 	s.state.Matches = append([]*model.Match{&match}, s.state.Matches...)
 	return match
 }

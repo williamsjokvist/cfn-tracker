@@ -6,4 +6,5 @@ type User struct {
 	Code        string `db:"code" json:"code"`
 	LP          int
 	MR          int
+	Character   string `db:"-" json:"-"`
 }

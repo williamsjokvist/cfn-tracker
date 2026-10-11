@@ -57,7 +57,7 @@ func TestPollMapsOpponent(t *testing.T) {
 func TestSession(t *testing.T) {
 	client := cfntest.NewClient("Kakeru", "Ryu", 10000, 0)
 	client.SetPoints("Ken", 5000, 0)
-	session := tracker.NewSession(NewSF6Tracker(client), &model.Session{UserId: "123456789", LP: 10000})
+	session := tracker.NewSession(NewSF6Tracker(client), &model.Session{UserId: "123456789", Character: "Ryu", LP: 10000})
 	tick := func() *model.Match {
 		t.Helper()
 		match, err := session.Tick(context.Background())
