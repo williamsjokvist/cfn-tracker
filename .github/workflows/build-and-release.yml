@@ -53,8 +53,7 @@ jobs:
           path: app/cfn-tracker-macos.zip
           if-no-files-found: error
 
-  build-and-release:
-    needs: build-macos
+  build-windows:
     runs-on: windows-2025
     defaults:
       run:
@@ -83,10 +82,33 @@ jobs:
       - name: Zip build
         run: tar -a -c -f 'cfn-tracker-windows-amd64.zip' -C './build/bin' 'CFN Tracker.exe'
 
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: app/cfn-tracker-windows-amd64.zip
+          if-no-files-found: error
+
+  release:
+    needs: [build-windows, build-macos]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./app
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: master
+
+      - name: Set version in app config
+        run: |
+          jq '.info.productVersion = "${{ inputs.version }}"' wails.json > wails.tmp.json
+          mv wails.tmp.json wails.json
+
       - uses: actions/download-artifact@v4
         with:
-          name: macos
           path: app
+          merge-multiple: true
 
       - name: Create draft release
         uses: softprops/action-gh-release@v2
