@@ -35,15 +35,18 @@ export function TrackingForm() {
   const playerIdInputRef = React.useRef<HTMLInputElement>(null)
   const restoreRef = React.useRef<HTMLInputElement>(null)
   const [playerIdInput, setPlayerIdInput] = React.useState('')
+  // Tekken IDs are often shared as 1234-5678-9abc, but are stored without dashes
+  const userCode =
+    game === model.GameType.TEKKEN_8 ? playerIdInput.replaceAll('-', '') : playerIdInput
 
   const onSubmit: React.FormEventHandler<HTMLFormElement> = e => {
     e.preventDefault()
-    if (playerIdInput == '') return
+    if (userCode == '') return
     trackingActor.send({
       type: 'submit',
       user: {
-        displayName: users.find(old => old.code == playerIdInput) ?? playerIdInput,
-        code: playerIdInput
+        displayName: users.find(old => old.code == userCode)?.displayName ?? userCode,
+        code: userCode
       },
       restore: restoreRef.current && restoreRef.current.checked
     })
@@ -116,7 +119,7 @@ export function TrackingForm() {
           </div>
         )}
         <footer className='flex w-full items-center'>
-          {users.some(old => old.code === playerIdInput) && (
+          {users.some(old => old.code === userCode) && (
             <div className='group flex items-center gap-4'>
               <Checkbox ref={restoreRef} id='restore-session' />
               <label
