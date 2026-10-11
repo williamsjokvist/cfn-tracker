@@ -14,6 +14,7 @@ import {
   TH,
   PL,
   SE,
+  IN,
   Props
 } from 'country-flag-icons/react/3x2'
 
@@ -32,7 +33,8 @@ const flagMap = {
   'zh-TW': TW,
   'th-TH': TH,
   'pl-PL': PL,
-  'sv-SE': SE
+  'sv-SE': SE,
+  'hi-IN': IN
 }
 
 export function Flag(props: Props & { code: string }) {
