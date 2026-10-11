@@ -193,6 +193,9 @@ export namespace model {
 	    browserSourceThemeMinimalDark: string;
 	    browserSourceThemeTicker: string;
 	    browserSourceThemeTextOnly: string;
+	    browserSourceThemeParchment: string;
+	    browserSourceThemeSticker: string;
+	    browserSourceThemeGlitch: string;
 	    createYourOwnTheme: string;
 	    userId: string;
 	    userName: string;

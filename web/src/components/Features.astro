@@ -15,6 +15,10 @@ import retroTheme from "../../../app/pkg/server/static/themes/retro.css?raw";
 import glassTheme from "../../../app/pkg/server/static/themes/glass.css?raw";
 import versusTheme from "../../../app/pkg/server/static/themes/versus.css?raw";
 import comicTheme from "../../../app/pkg/server/static/themes/comic.css?raw";
+import tickerTheme from "../../../app/pkg/server/static/themes/ticker.css?raw";
+import parchmentTheme from "../../../app/pkg/server/static/themes/parchment.css?raw";
+import stickerTheme from "../../../app/pkg/server/static/themes/sticker.css?raw";
+import glitchTheme from "../../../app/pkg/server/static/themes/glitch.css?raw";
 
 const portraits = import.meta.glob<{ default: ImageMetadata }>(
   "../../../app/gui/src/assets/characters/{sf6,t8}/*.webp",
@@ -98,6 +102,10 @@ const themes = [
   { id: "glass", name: "Glass", css: glassTheme },
   { id: "versus", name: "Versus", css: versusTheme },
   { id: "comic", name: "Comic", css: comicTheme },
+  { id: "ticker", name: "Ticker", css: tickerTheme },
+  { id: "parchment", name: "Parchment", css: parchmentTheme },
+  { id: "sticker", name: "Sticker", css: stickerTheme },
+  { id: "glitch", name: "Glitch", css: glitchTheme },
 ].map((theme) => ({
   ...theme,
   srcdoc: `<!doctype html><html><head><style>*{margin:0}body{padding:24px;overflow:hidden}</style><style>${theme.css}</style></head><body>${statListHtml}</body></html>`,

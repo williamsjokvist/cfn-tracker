@@ -1,0 +1,57 @@
+@import url("https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap");
+
+body {
+  background: #2d2a3e;
+}
+
+.stat-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  max-width: 520px;
+  padding: 10px;
+
+  font-family: "Fredoka", "Arial Rounded MT Bold", sans-serif;
+  white-space: nowrap;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 20px 6px;
+  color: #2b2238;
+  background: #ff9ecd;
+  border: 5px solid #fff;
+  border-radius: 18px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+  transform: rotate(-3deg);
+}
+
+.stat-item:nth-child(4n + 2) {
+  background: #ffe066;
+  transform: rotate(2deg);
+}
+
+.stat-item:nth-child(4n + 3) {
+  background: #8ef0c6;
+  transform: rotate(-1.5deg);
+}
+
+.stat-item:nth-child(4n + 4) {
+  background: #b9a6ff;
+  transform: rotate(3deg);
+}
+
+.stat-title {
+  font-weight: 500;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.stat-value {
+  font-weight: 700;
+  font-size: 2.1rem;
+  line-height: 1.1;
+}
