@@ -5,6 +5,11 @@ go = "1.26"
 golangci-lint = "2.14.0"
 jq = "latest"
 
+[bootstrap.packages]
+"apt:webp" = "latest"
+"apk:libwebp-tools" = "latest"
+"brew:webp" = "latest"
+
 [tasks.dev]
 description = "Run the dev server without generating bindings, hot reloading, go mod sync"
 run = "wails dev -skipbindings -noreload -nosyncgomod -nogorebuild"
@@ -50,7 +55,7 @@ description = "Type check the GUI code"
 run = "bun run --cwd gui tsc"
 
 [tasks.portraits]
-description = "Download the bundled character portraits (needs cwebp, e.g. brew install webp)"
+description = "Download the bundled character portraits"
 depends = ["portraits:sf6", "portraits:t8"]
 
 [tasks."portraits:sf6"]
