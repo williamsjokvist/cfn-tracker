@@ -14,6 +14,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/williamsjokvist/cfn-tracker/pkg/i18n"
 	"github.com/williamsjokvist/cfn-tracker/pkg/model"
 )
 
@@ -34,6 +35,29 @@ type BrowserSourceServer struct {
 	cancelSrv context.CancelFunc
 }
 
+// The localization key for each model.Match field the browser source can show.
+var statLabelKeys = map[string]string{
+	"userName":          "user",
+	"userId":            "userId",
+	"character":         "character",
+	"lp":                "lp",
+	"lpGain":            "lpGain",
+	"mr":                "mr",
+	"mrGain":            "mrGain",
+	"opponent":          "opponent",
+	"opponentCharacter": "opponentCharacter",
+	"opponentLp":        "opponentLp",
+	"opponentMr":        "opponentMr",
+	"opponentLeague":    "opponentLeague",
+	"victory":           "result",
+	"date":              "date",
+	"time":              "time",
+	"winStreak":         "winStreak",
+	"wins":              "wins",
+	"losses":            "losses",
+	"winRate":           "winRate",
+}
+
 var heartbeatInterval = 15 * time.Second
 
 var shutdownTimeout = time.Second
@@ -48,6 +72,7 @@ func NewBrowserSourceServer(matchChan chan model.Match) *BrowserSourceServer {
 	b.mux.HandleFunc("/", b.handleRoot)
 	b.mux.HandleFunc("GET /stream", b.handleStream)
 	b.mux.HandleFunc("GET /themes/{theme}", b.handleTheme)
+	b.mux.HandleFunc("GET /stat-labels/{locale}", b.handleStatLabels)
 
 	// serve custom themes through "themes" directory in the same directory as the user's executable
 	fs := http.FileServer(http.Dir("./themes"))
@@ -204,6 +229,22 @@ func (b *BrowserSourceServer) handleTheme(w http.ResponseWriter, req *http.Reque
 		if err != nil {
 			slog.Error("browser source: send css", slog.Any("error", err))
 		}
+	}
+}
+
+func (b *BrowserSourceServer) handleStatLabels(w http.ResponseWriter, req *http.Request) {
+	translation, err := i18n.GetTranslationMap(req.PathValue("locale"))
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+	labels := make(map[string]string, len(statLabelKeys))
+	for stat, key := range statLabelKeys {
+		labels[stat] = translation[key]
+	}
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(labels); err != nil {
+		slog.Error("browser source: send stat labels", slog.Any("error", err))
 	}
 }
 

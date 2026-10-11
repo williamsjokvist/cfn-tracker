@@ -36,45 +36,17 @@
     </style>
     <link id="theme-css" href="/themes/default.css" rel="stylesheet" />
     <script defer>
-      const statDictionaryEN = {
-        "cfn": "CFN",
-        "userCode": "User Code",
-        "character": "Character",
-        "lp": "LP",
-        "mr": "MR",
-        "lpGain": "LP Gain",
-        "mrGain": "MR Gain",
-        "result": "Result",
-        "date": "Date",
-        "timestamp": "Time",
-        "winRate": "Win Rate",
-        "wins": "Wins",
-        "losses": "Losses",
-        "winStreak": "Win Streak",
-        "opponent": "Opponent",
-        "opponentCharacter": "Opponent Character",
-        "opponentLP": "Opponent LP",
-        "opponentMR": "Opponent MR",
-        "opponentLeague": "Opponent League",
-        "totalWins": "Total Wins",
-        "totalLosses": "Total Losses",
-        "totalMatches": "Total Matches",
-      }
-
-      function formatStat(stat) {
-        return statDictionaryEN[stat]
-      }
-
       function formatValue(stat, value) {
         let v = value
         switch (stat) {
-          case "result":
+          case "victory":
             v = value ? "W" : "L";
             break
           case "winRate":
             v = `${value}%`
             break;
-          case "lpGain", "mrGain":
+          case "lpGain":
+          case "mrGain":
             if (value > 0) v = `+${value}`
             break
         }
@@ -92,13 +64,25 @@
           "<p>In CFN Tracker, open <b>Output</b>, tick the stats you want,",
           "then press <b>Copy browser source link</b> and use that URL here",
           "and in your OBS browser source.</p>",
-          `<p class='example'>${window.location.origin}?theme=default&amp;cfn=true&amp;lp=true</p>`
+          `<p class='example'>${window.location.origin}?theme=default&amp;userName=true&amp;lp=true</p>`
         ].join(" ")
         document.body.appendChild(hint)
       }
 
-      function main() {
+      // Falls back to the raw stat names if the labels can't be fetched, rather than drawing nothing.
+      async function getStatLabels(locale) {
+        try {
+          const res = await fetch(`/stat-labels/${encodeURIComponent(locale)}`)
+          if (res.ok) return await res.json()
+        } catch {}
+        return {}
+      }
+
+      async function main() {
         const searchParams = new URLSearchParams(window.location.search);
+        const locale = searchParams.get("lang") ?? "en-GB"
+        document.documentElement.lang = locale
+        const statLabels = await getStatLabels(locale)
 
         // apply theme
         const cssEl = document.getElementById("theme-css")
@@ -111,13 +95,19 @@
         for (const [stat, value] of searchParams) {
           if (value != "true") continue;
 
+          const title = document.createElement("dt")
+          title.classList.add("stat-title")
+          title.textContent = statLabels[stat] ?? stat
+
           const el = document.createElement("div")
           el.classList.add("stat-item")
           el.setAttribute("data-stat", stat)
-          el.innerHTML = `<dt class='stat-title'>${formatStat(stat)}</dt><dd class='stat-value'/>`
+          const valueEl = document.createElement("dd")
+          valueEl.classList.add("stat-value")
+          el.append(title, valueEl)
           statContainer.appendChild(el)
 
-          statElements[stat] = document.querySelector(`.stat-item[data-stat="${stat}"] .stat-value`)
+          statElements[stat] = valueEl
         }
 
         // No stats were requested, so nothing would ever be drawn. Say so instead of

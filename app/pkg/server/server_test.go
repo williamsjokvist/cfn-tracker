@@ -2,15 +2,18 @@ package server
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net"
 	"net/http"
 	"net/http/httptest"
+	"reflect"
 	"strings"
 	"testing"
 	"time"
 
+	"github.com/williamsjokvist/cfn-tracker/pkg/i18n"
 	"github.com/williamsjokvist/cfn-tracker/pkg/model"
 )
 
@@ -172,5 +175,44 @@ func TestListenEndsOpenStreams(t *testing.T) {
 	case <-closed:
 	case <-time.After(time.Second):
 		t.Fatal("stream is still open")
+	}
+}
+
+// A match field without a label, or a label key missing from a locale, would show an empty title on stream.
+func TestStatLabelsCoverMatchInEveryLocale(t *testing.T) {
+	matchType := reflect.TypeOf(model.Match{})
+	for i := range matchType.NumField() {
+		stat := matchType.Field(i).Tag.Get("json")
+		if stat == "replayId" || stat == "sessionId" {
+			continue
+		}
+		if _, ok := statLabelKeys[stat]; !ok {
+			t.Errorf("model.Match field %q has no entry in statLabelKeys", stat)
+		}
+	}
+
+	languages, err := i18n.GetSupportedLanguages()
+	if err != nil {
+		t.Fatalf("get supported languages: %v", err)
+	}
+	srv := httptest.NewServer(NewBrowserSourceServer(nil).mux)
+	defer srv.Close()
+	for _, lang := range languages {
+		t.Run(lang, func(t *testing.T) {
+			res, err := http.Get(fmt.Sprintf("%s/stat-labels/%s", srv.URL, lang))
+			if err != nil {
+				t.Fatalf("get stat labels: %v", err)
+			}
+			defer func() { _ = res.Body.Close() }()
+			var labels map[string]string
+			if err := json.NewDecoder(res.Body).Decode(&labels); err != nil {
+				t.Fatalf("decode stat labels: %v", err)
+			}
+			for stat := range statLabelKeys {
+				if labels[stat] == "" {
+					t.Errorf("stat %q has no label", stat)
+				}
+			}
+		})
 	}
 }

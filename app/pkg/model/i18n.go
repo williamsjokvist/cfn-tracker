@@ -89,6 +89,13 @@ type Localization struct {
 	BrowserSourceThemeNord      string `json:"browserSourceThemeNord"`
 	BrowserSourceThemePills     string `json:"browserSourceThemePills"`
 	CreateYourOwnTheme          string `json:"createYourOwnTheme"`
+	UserId                      string `json:"userId"`
+	LP                          string `json:"lp"`
+	MR                          string `json:"mr"`
+	OpponentCharacter           string `json:"opponentCharacter"`
+	OpponentLP                  string `json:"opponentLp"`
+	OpponentMR                  string `json:"opponentMr"`
+	OpponentLeague              string `json:"opponentLeague"`
 	PickTheme                   string `json:"pickTheme"`
 	UsingBrowserSource          string `json:"usingBrowserSource"`
 	CopyBrowserSourceLink       string `json:"copyBrowserSourceLink"`

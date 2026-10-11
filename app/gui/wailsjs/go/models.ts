@@ -166,6 +166,13 @@ export namespace model {
 	    browserSourceThemeNord: string;
 	    browserSourceThemePills: string;
 	    createYourOwnTheme: string;
+	    userId: string;
+	    lp: string;
+	    mr: string;
+	    opponentCharacter: string;
+	    opponentLp: string;
+	    opponentMr: string;
+	    opponentLeague: string;
 	    pickTheme: string;
 	    usingBrowserSource: string;
 	    copyBrowserSourceLink: string;

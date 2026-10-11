@@ -17,6 +17,7 @@ import { BrowserOpenURL } from '@runtime'
 import { useErrorPopup } from '@/main/error-popup'
 import { ConfigContext } from '@/main/config'
 import type { LocalizationKey } from '@/main/i18n'
+import { LanguageSelect } from '@/main/language-select'
 import { cn } from '@/helpers/cn'
 
 type StatOptions = Omit<Record<keyof model.Match, boolean>, 'replayId' | 'sessionId'> & {
@@ -30,6 +31,28 @@ const themeLabels: Record<string, LocalizationKey> = {
   jaeger: 'browserSourceThemeJaeger',
   nord: 'browserSourceThemeNord',
   pills: 'browserSourceThemePills'
+}
+
+const statLabels: Record<keyof Omit<StatOptions, 'theme'>, LocalizationKey> = {
+  userName: 'user',
+  userId: 'userId',
+  character: 'character',
+  lp: 'lp',
+  lpGain: 'lpGain',
+  mr: 'mr',
+  mrGain: 'mrGain',
+  opponent: 'opponent',
+  opponentCharacter: 'opponentCharacter',
+  opponentLp: 'opponentLp',
+  opponentMr: 'opponentMr',
+  opponentLeague: 'opponentLeague',
+  victory: 'result',
+  date: 'date',
+  time: 'time',
+  winStreak: 'winStreak',
+  wins: 'wins',
+  losses: 'losses',
+  winRate: 'winRate'
 }
 
 const defaultOptions: StatOptions = {
@@ -58,6 +81,8 @@ const defaultOptions: StatOptions = {
 export function OutputPage() {
   const { t } = useTranslation()
   const [options, setOptions] = React.useState(defaultOptions)
+  // English rather than the app language, since the stream's audience may not share it
+  const [statsLocale, setStatsLocale] = React.useState('en-GB')
   const [scope, animate] = useAnimate()
   const [cfg] = React.useContext(ConfigContext)
 
@@ -71,6 +96,7 @@ export function OutputPage() {
       }
       url += `&${key}=${value}`
     }
+    url += `&lang=${statsLocale}`
 
     navigator.clipboard.writeText(url)
 
@@ -113,6 +139,7 @@ export function OutputPage() {
                 options={statOptions}
                 onSelect={(opt, checked) => setOptions({ ...options, [opt]: checked })}
               />
+              <LanguageSelect value={statsLocale} onValueChange={setStatsLocale} />
             </div>
             <div className='flex flex-wrap gap-2'>
               <div className='relative' ref={scope}>
@@ -177,7 +204,7 @@ function StatSelect(props: {
                 onClick={() => props.onSelect(opt, !checked)}
               >
                 <Checkbox checked={props.options[opt] === true} readOnly />
-                <span className='ms-4 cursor-pointer text-center capitalize'>{opt}</span>
+                <span className='ms-4 cursor-pointer text-center'>{t(statLabels[opt])}</span>
               </button>
             </li>
           ))}

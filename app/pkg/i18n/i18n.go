@@ -26,6 +26,24 @@ func GetTranslation(locale string) (*model.Localization, error) {
 	return &lng, nil
 }
 
+// GetTranslationMap returns the locale's translations keyed by their JSON key.
+func GetTranslationMap(locale string) (map[string]string, error) {
+	lng, err := GetTranslation(locale)
+	if err != nil {
+		return nil, err
+	}
+	// Round-trip through the struct so only declared keys come back.
+	b, err := json.Marshal(lng)
+	if err != nil {
+		return nil, fmt.Errorf("marshal translation: %w", err)
+	}
+	var m map[string]string
+	if err := json.Unmarshal(b, &m); err != nil {
+		return nil, fmt.Errorf("unmarshal translation: %w", err)
+	}
+	return m, nil
+}
+
 func GetSupportedLanguages() ([]string, error) {
 	dirEntries, err := fs.ReadDir(localeFs, "locales")
 	if err != nil {
