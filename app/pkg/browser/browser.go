@@ -165,6 +165,11 @@ func (b *Browser) closeCurrent() {
 	if b.rod != nil {
 		if err := b.rod.Close(); err != nil {
 			slog.Warn("failed to close browser", slog.Any("error", err))
+			// It can't be told to close over a dead connection. Left running, it
+			// holds the profile and the login Chrome exits right away.
+			if b.launcher != nil {
+				b.launcher.Kill()
+			}
 		}
 	}
 	if b.launcher != nil {

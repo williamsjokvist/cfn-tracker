@@ -30,7 +30,7 @@ type Client struct {
 
 // Tests replace this so the manual login doesn't open Chrome or wait for a user.
 type authBrowser interface {
-	HasBucklerSession(ctx context.Context) bool
+	HasBucklerSession(ctx context.Context) (bool, error)
 	Close() error
 	LaunchManualLogin(ctx context.Context, url string) error
 	Relaunch() error
@@ -76,7 +76,11 @@ func (c *Client) NewTabClient() (*Client, func(), error) {
 }
 
 func (c *Client) HasSession(ctx context.Context) bool {
-	return c.auth != nil && c.auth.HasBucklerSession(ctx)
+	if c.auth == nil {
+		return false
+	}
+	ok, _ := c.auth.HasBucklerSession(ctx)
+	return ok
 }
 
 func (c *Client) GetBattleLog(ctx context.Context, cfn string) (*BattleLog, error) {
@@ -122,14 +126,28 @@ func (c *Client) Authenticate(ctx context.Context, statChan chan tracker.AuthSta
 
 	// Fetching matches only needs the buckler session (~1 month), so reuse it while valid.
 	send(ctx, statChan, tracker.AuthStatus{Step: "authCheckingSession"})
-	if c.auth.HasBucklerSession(ctx) {
-		slog.Info("cfn: buckler session is still valid, skipping login")
-		send(ctx, statChan, tracker.AuthStatus{Done: true})
-		return
-	}
+	ok, err := c.auth.HasBucklerSession(ctx)
 	// A cancelled check says nothing about the session, and logging in closes the
 	// browser, taking every other tab on it down too.
-	if ctx.Err() != nil {
+	if !ok && ctx.Err() != nil {
+		return
+	}
+	// A dead connection to the browser, e.g. after the computer slept, fails the
+	// check while the saved session is still fine. A fresh browser can tell.
+	if !ok && err != nil {
+		slog.Info("cfn: relaunching the browser to check the session again", slog.Any("error", err))
+		if relaunchErr := c.auth.Relaunch(); relaunchErr != nil {
+			slog.Warn("failed to relaunch browser", slog.Any("error", relaunchErr))
+		} else {
+			ok, _ = c.auth.HasBucklerSession(ctx)
+		}
+		if !ok && ctx.Err() != nil {
+			return
+		}
+	}
+	if ok {
+		slog.Info("cfn: buckler session is still valid, skipping login")
+		send(ctx, statChan, tracker.AuthStatus{Done: true})
 		return
 	}
 
@@ -149,7 +167,7 @@ func (c *Client) Authenticate(ctx context.Context, statChan chan tracker.AuthSta
 		return
 	}
 	send(ctx, statChan, tracker.AuthStatus{Step: "authVerifyingLogin"})
-	if c.auth.HasBucklerSession(ctx) {
+	if ok, _ := c.auth.HasBucklerSession(ctx); ok {
 		slog.Info("passed cfn auth")
 		send(ctx, statChan, tracker.AuthStatus{Done: true})
 		return
@@ -172,22 +190,22 @@ func (b browserAuth) LaunchManualLogin(ctx context.Context, url string) error {
 
 // HasBucklerSession reports whether we're logged in to buckler, based on the logout
 // link in the header. Returns false when unsure, which just falls back to logging in.
-func (b browserAuth) HasBucklerSession(ctx context.Context) bool {
+func (b browserAuth) HasBucklerSession(ctx context.Context) (bool, error) {
 	page := b.Page.Context(ctx).Timeout(bucklerSessionTimeout)
 	if err := page.Navigate(bucklerBaseURL + "/"); err != nil {
 		slog.Info("cfn: could not reach buckler", slog.Any("error", err))
-		return false
+		return false, err
 	}
 	if err := page.WaitLoad(); err != nil {
 		slog.Info("cfn: buckler did not finish loading", slog.Any("error", err))
-		return false
+		return false, err
 	}
 	// The logout link only appears in the header when logged in.
 	if _, err := page.Element(`a[href*="/auth/logout"]`); err != nil {
 		slog.Info("cfn: buckler shows no logged-in header", slog.Any("error", err))
-		return false
+		return false, nil
 	}
-	return true
+	return true, nil
 }
 
 func (c *Client) GetPlayData(ctx context.Context, cfn string) (*PlayData, error) {
