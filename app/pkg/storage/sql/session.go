@@ -149,6 +149,20 @@ func (s *Storage) GetSessions(ctx context.Context, userId string, date string, l
 	return sessions, nil
 }
 
+func (s *Storage) GetSession(ctx context.Context, id uint16) (*model.Session, error) {
+	var sesh model.Session
+	err := s.db.GetContext(ctx, &sesh, `
+		SELECT s.id, s.created_at, s.user_id, u.display_name AS user_name
+		FROM sessions AS s
+		JOIN users u ON u.code = s.user_id
+		WHERE s.id = ?
+	`, id)
+	if err != nil {
+		return nil, fmt.Errorf("get session: %w", err)
+	}
+	return &sesh, nil
+}
+
 func (s *Storage) UpdateSession(ctx context.Context, session *model.Session) error {
 	query := `
 		UPDATE sessions

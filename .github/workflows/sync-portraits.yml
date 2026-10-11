@@ -1,0 +1,46 @@
+name: Sync character portraits
+on:
+  schedule:
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+  # Checks the sync still works when it changes, without committing.
+  pull_request:
+    paths:
+      - "scripts/*-portraits.sh"
+      - ".github/workflows/sync-portraits.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  sync-portraits:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./app
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # master requires reviews, which an admin's token can push past.
+          token: ${{ github.event_name == 'pull_request' && github.token || secrets.PAT }}
+      - uses: jdx/mise-action@v4
+        with:
+          working_directory: app
+          bootstrap: true
+          bootstrap_args: "--yes"
+
+      - run: mise sync-portraits
+
+      - name: Commit portraits
+        if: github.event_name != 'pull_request'
+        run: |
+          git add gui/src/assets/characters
+          if git diff --cached --quiet; then
+            echo "Portraits are up to date"
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git commit -m "chore(automatic): sync character portraits"
+          git push

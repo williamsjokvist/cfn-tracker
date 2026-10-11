@@ -115,7 +115,7 @@ export function SessionsListPage() {
                   <HoverCard.Trigger>
                     <Button
                       className='mb-1 w-full justify-between! gap-2 rounded-xl px-[6px]! py-0! pt-[2px]! text-xl'
-                      onClick={() => navigate(`/sessions/${s.id}/matches`)}
+                      onClick={() => navigate(`/sessions/${s.id}`)}
                     >
                       <span className='text-base font-bold'>
                         {Intl.DateTimeFormat(i18n.resolvedLanguage, {

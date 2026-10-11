@@ -4,12 +4,21 @@ import { SettingsPage } from '@/pages/settings'
 import { OutputPage } from '@/pages/output'
 import { MatchesListPage } from '@/pages/matches'
 import { SessionsListPage } from '@/pages/sessions'
+import { SessionOverviewPage, type SessionData } from '@/pages/session'
 import { TrackingPage } from '@/pages/tracking'
 
 import { AppWrapper } from './app-wrapper'
 import { AppErrorBoundary, PageErrorBoundary } from './app-error'
 
-import { GetUsers, GetSessions, GetMatches } from '@cmd/CommandHandler'
+import { GetUsers, GetSession, GetMatches } from '@cmd/CommandHandler'
+
+async function loadSession(sessionId: number, page = 0, limit = 0): Promise<SessionData> {
+  const [session, matches] = await Promise.all([
+    GetSession(sessionId),
+    GetMatches(sessionId, '', page, limit)
+  ])
+  return { session, matches: matches ?? [] }
+}
 
 const router = createHashRouter([
   {
@@ -41,12 +50,16 @@ const router = createHashRouter([
             path: '/sessions'
           },
           {
+            element: <SessionOverviewPage />,
+            path: '/sessions/:sessionId',
+            loader: ({ params }) => loadSession(Number(params.sessionId))
+          },
+          {
             element: <MatchesListPage />,
             path: '/sessions/:sessionId/matches/:page?/:limit?',
             loader: ({ params }) =>
-              GetMatches(
+              loadSession(
                 Number(params.sessionId),
-                '',
                 Number(params.page ?? 0),
                 Number(params.limit ?? 0)
               )

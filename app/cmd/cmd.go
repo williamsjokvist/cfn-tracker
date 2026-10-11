@@ -73,6 +73,14 @@ func (ch *CommandHandler) GetSessions(userId, date string, limit uint8, offset u
 	return sessions, nil
 }
 
+func (ch *CommandHandler) GetSession(sessionId uint16) (*model.Session, error) {
+	session, err := ch.sqlDb.GetSession(context.Background(), sessionId)
+	if err != nil {
+		return nil, model.WrapError(model.ErrGetSessions, err)
+	}
+	return session, nil
+}
+
 func (ch *CommandHandler) GetSessionsStatistics(userId string) (*model.SessionsStatistics, error) {
 	sessionStatistics, err := ch.sqlDb.GetSessionsStatistics(context.Background(), userId)
 	if err != nil {

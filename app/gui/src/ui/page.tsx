@@ -1,5 +1,7 @@
-import { JSX } from 'react'
+import React, { JSX } from 'react'
+import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
+import { Icon } from '@iconify/react'
 
 import { cn } from '@/helpers/cn'
 
@@ -46,6 +48,37 @@ export function Title(props: React.PropsWithChildren) {
     >
       {props.children}
     </motion.h2>
+  )
+}
+
+export function Breadcrumbs({ items }: { items: { label: string; to?: string }[] }) {
+  return (
+    <motion.nav
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ delay: 0.125 }}
+      className='flex items-center gap-2 text-sm tracking-widest whitespace-nowrap uppercase'
+    >
+      {items.map((item, i) => (
+        <React.Fragment key={item.label}>
+          {i > 0 && (
+            <Icon icon='material-symbols:chevron-right' className='opacity-50 rtl:rotate-180' />
+          )}
+          {item.to ? (
+            <Link
+              to={item.to}
+              className='opacity-60 transition-opacity hover:opacity-100'
+              // The header is a window drag region, which would swallow the click.
+              style={{ '--draggable': 'no-drag' } as React.CSSProperties}
+            >
+              {item.label}
+            </Link>
+          ) : (
+            <span>{item.label}</span>
+          )}
+        </React.Fragment>
+      ))}
+    </motion.nav>
   )
 }
 

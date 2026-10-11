@@ -10,11 +10,12 @@ import type { model } from '@model'
 import { Button } from '@/ui/button'
 import { type LocalizationKey } from '@/main/i18n'
 import { Tooltip } from '@/ui/tooltip'
+import { SessionBreadcrumbs, type SessionData } from '@/pages/session'
 
 export function MatchesListPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const totalMatches = (useLoaderData() ?? []) as model.Match[]
+  const { session, matches: totalMatches } = useLoaderData() as SessionData
   const [matches, setMatches] = React.useState(totalMatches)
   const [totalWinRate, setTotalWinRate] = React.useState(0)
 
@@ -32,7 +33,7 @@ export function MatchesListPage() {
     return (
       <Page.Root>
         <Page.Header>
-          <Page.Title>{t('history')}</Page.Title>
+          <SessionBreadcrumbs session={session} matchLog />
         </Page.Header>
       </Page.Root>
     )
@@ -41,7 +42,7 @@ export function MatchesListPage() {
   return (
     <Page.Root>
       <Page.Header>
-        <Page.Title>{t('history')}</Page.Title>
+        <SessionBreadcrumbs session={session} matchLog />
       </Page.Header>
 
       <div className='relative w-full'>
@@ -53,7 +54,7 @@ export function MatchesListPage() {
               if (matches.length != totalMatches.length) {
                 setMatches(totalMatches)
               } else {
-                navigate('/sessions')
+                navigate(`/sessions/${session.id}`)
               }
             }}
           >

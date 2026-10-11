@@ -3,6 +3,12 @@ bun = "latest"
 go = "1.26"
 "go:github.com/wailsapp/wails/v2/cmd/wails" = "2.16.0"
 golangci-lint = "2.14.0"
+jq = "latest"
+
+[bootstrap.packages]
+"apt:webp" = "latest"
+"apk:libwebp-tools" = "latest"
+"brew:webp" = "latest"
 
 [tasks.dev]
 description = "Run the dev server without generating bindings, hot reloading, go mod sync"
@@ -47,6 +53,18 @@ run = "golangci-lint run ./..."
 [tasks."lint:gui"]
 description = "Type check the GUI code"
 run = "bun run --cwd gui tsc"
+
+[tasks.sync-portraits]
+description = "Download the bundled character portraits"
+depends = ["sync-portraits:sf6", "sync-portraits:t8"]
+
+[tasks."sync-portraits:sf6"]
+description = "Download the bundled SF6 character portraits from Buckler"
+run = "../scripts/sf6-portraits.sh"
+
+[tasks."sync-portraits:t8"]
+description = "Download the bundled Tekken 8 character portraits from Wavu Wiki"
+run = "../scripts/t8-portraits.sh"
 
 [tasks."build-windows-amd64"]
 description = "Build for Windows (x86)"
