@@ -239,7 +239,6 @@ func (ch *CommandHandler) ReportIssue(report model.IssueReport) (string, error) 
 	if strings.TrimSpace(report.Title) == "" || strings.TrimSpace(report.Description) == "" {
 		return "", model.WrapError(model.ErrReportIssue, errors.New("title and description are required"))
 	}
-	// A report is still worth sending without the log.
 	appLog, err := applog.Today()
 	if err != nil {
 		slog.Warn("read today's log for issue report", slog.Any("error", err))

@@ -13,7 +13,6 @@ import (
 // GitHub caps issue bodies at 65536 characters, which the report text also has to fit in.
 const maxTodayBytes = 48 * 1024
 
-// Today returns the lines logged today, keeping the latest ones if there are too many.
 func Today() (string, error) {
 	f, err := os.Open(fileName)
 	if errors.Is(err, os.ErrNotExist) {
