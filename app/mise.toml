@@ -95,3 +95,7 @@ run = "wails build"
 description = "Build for Mac (arm)"
 env = { GOOS = "darwin", GOARCH = "arm64" }
 run = "wails build"
+
+[tasks."build-mac-universal"]
+description = "Build for Mac (x86 and arm in one app)"
+run = "wails build -platform darwin/universal"

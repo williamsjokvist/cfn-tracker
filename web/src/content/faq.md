@@ -6,8 +6,12 @@ This is a false positive, caused by the app not being signed by a certificate au
 ## Can I use this for my own without streaming?
 Yes! Quite a few people have also told me that peeking at their stats, during or after they play has helped them improve.
 
-## Why was the Mac version removed?
-There are many issues releasing apps on Mac, so I spared myself the headache of supporting it. You can still download it [here](https://github.com/williamsjokvist/cfn-tracker/releases/download/v5.0.0/cfn-tracker-darwin-arm64.zip) and try to get it to work, or build from source which works fine.
+## The Mac version says it's damaged or can't be opened.
+The Mac app isn't signed with an Apple Developer ID, so macOS blocks it the first time. Download [the Mac version](https://github.com/williamsjokvist/cfn-tracker/releases/latest/download/cfn-tracker-macos.zip), unzip it and move it to Applications. Then either try to open it and click "Open Anyway" under System Settings → Privacy & Security, or run this in Terminal:
+
+```sh
+xattr -dr com.apple.quarantine "/Applications/CFN Tracker.app"
+```
 
 ## What is the future of CFN Tracker?
 Adding more statistics overall, especially related to sessions, character and player matchups over time

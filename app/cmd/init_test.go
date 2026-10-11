@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/williamsjokvist/cfn-tracker/cmd"
@@ -36,7 +37,7 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		log.Fatalf("init nosql storage: %v", err)
 	}
-	txtDb, err := txt.NewStorage()
+	txtDb, err := txt.NewStorage(filepath.Join(cfgDir, "results"))
 	if err != nil {
 		log.Fatalf("init txt storage: %v", err)
 	}

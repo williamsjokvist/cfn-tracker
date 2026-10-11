@@ -7,6 +7,7 @@ import (
 	"log/slog"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"runtime"
 	"strings"
 
@@ -25,6 +26,7 @@ import (
 type CommandHandler struct {
 	sqlDb            *sql.Storage
 	cfgDb            *cfgDb.Storage
+	txtDb            *txt.Storage
 	cfg              *config.BuildConfig
 	browserSrcServer *server.BrowserSourceServer
 	issues           *issues.Client
@@ -35,6 +37,7 @@ func NewCommandHandler(sqlDb *sql.Storage, cfgDb *cfgDb.Storage, txtDb *txt.Stor
 	return &CommandHandler{
 		sqlDb:            sqlDb,
 		cfgDb:            cfgDb,
+		txtDb:            txtDb,
 		cfg:              cfg,
 		browserSrcServer: browserSrcServer,
 		issues:           issues.NewClient(cfg.AppVersion),
@@ -55,13 +58,17 @@ func (ch *CommandHandler) GetAppVersion() string {
 }
 
 func (ch *CommandHandler) OpenResultsDirectory() error {
+	dir, err := filepath.Abs(ch.txtDb.Dir())
+	if err != nil {
+		return model.WrapError(model.ErrOpenResultsDirectory, err)
+	}
 	switch runtime.GOOS {
 	case "darwin":
-		if err := exec.Command("Open", "./results").Run(); err != nil {
+		if err := exec.Command("open", dir).Run(); err != nil {
 			return model.WrapError(model.ErrOpenResultsDirectory, err)
 		}
 	case "windows":
-		if err := exec.Command("explorer.exe", ".\results").Run(); err != nil {
+		if err := exec.Command("explorer.exe", dir).Run(); err != nil {
 			return model.WrapError(model.ErrOpenResultsDirectory, err)
 		}
 	}
