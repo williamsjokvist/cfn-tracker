@@ -27,7 +27,12 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		log.Fatalf("init sql storage: %v", err)
 	}
-	cfgDb, err := cfgDb.NewStorage()
+	// A temp dir, so tracking test users aren't remembered in the real config.
+	cfgDir, err := os.MkdirTemp("", "cfn-tracker-test")
+	if err != nil {
+		log.Fatalf("create config dir: %v", err)
+	}
+	cfgDb, err := cfgDb.NewStorageIn(cfgDir)
 	if err != nil {
 		log.Fatalf("init nosql storage: %v", err)
 	}
@@ -54,5 +59,9 @@ func TestMain(m *testing.M) {
 	testSuite.trackingHandler.SetEventEmitter(func(eventName string, optionalData ...interface{}) {
 		log.Println(fmt.Sprintf("[EVENT] %s", eventName), optionalData)
 	})
-	os.Exit(m.Run())
+	code := m.Run()
+	if err := os.RemoveAll(cfgDir); err != nil {
+		log.Printf("remove config dir: %v", err)
+	}
+	os.Exit(code)
 }

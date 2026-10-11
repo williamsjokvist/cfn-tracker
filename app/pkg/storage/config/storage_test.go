@@ -1,8 +1,11 @@
 package config
 
 import (
+	"maps"
 	"path/filepath"
 	"testing"
+
+	"github.com/williamsjokvist/cfn-tracker/pkg/model"
 )
 
 // isolate points the user cache directory at a temp dir, so tests don't touch
@@ -84,5 +87,39 @@ func TestSaveRuntimeConfigKeepsDataDir(t *testing.T) {
 	}
 	if got, err := storage.DataDir(); err != nil || got != custom {
 		t.Errorf("DataDir() = %q, %v after saving the GUI config, want %q", got, err, custom)
+	}
+}
+
+func TestLastGameAndUsers(t *testing.T) {
+	storage := isolate(t)
+	if err := storage.SaveLastGame(model.GameTypeSF6); err != nil {
+		t.Fatalf("SaveLastGame() error = %v", err)
+	}
+	if err := storage.SaveLastUser(model.GameTypeSF6, "1234567890"); err != nil {
+		t.Fatalf("SaveLastUser() error = %v", err)
+	}
+	if err := storage.SaveLastUser(model.GameTypeT8, "abcd1234"); err != nil {
+		t.Fatalf("SaveLastUser() error = %v", err)
+	}
+
+	// Saving the rest of the config must keep them.
+	cfg, err := storage.GetRuntimeConfig()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := storage.SaveRuntimeConfig(cfg); err != nil {
+		t.Fatal(err)
+	}
+
+	cfg, err = storage.GetRuntimeConfig()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if cfg.GUI.LastGame != model.GameTypeSF6 {
+		t.Errorf("LastGame = %q, want %q", cfg.GUI.LastGame, model.GameTypeSF6)
+	}
+	want := map[model.GameType]string{model.GameTypeSF6: "1234567890", model.GameTypeT8: "abcd1234"}
+	if !maps.Equal(cfg.GUI.LastUsers, want) {
+		t.Errorf("LastUsers = %v, want %v", cfg.GUI.LastUsers, want)
 	}
 }

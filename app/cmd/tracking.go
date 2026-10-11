@@ -59,6 +59,7 @@ type TrackingHandler struct {
 	cancelPolling context.CancelFunc
 	forcePollChan chan struct{}
 	gameTracker   tracker.GameTracker
+	game          model.GameType
 	eventEmitter  EventEmitFn
 	// A pointer so a finished login can tell whether it's still the current one.
 	cancelAuth *context.CancelFunc
@@ -106,6 +107,7 @@ func (ch *TrackingHandler) StartTracking(userCodeInput string, restore bool) err
 	if err := ch.sqlDb.SaveUser(ctx, *user); err != nil {
 		return ch.terminalError(model.WrapError(model.ErrSaveUser, err))
 	}
+	ch.rememberLastUser(user.Code)
 	var session *model.Session
 	if restore {
 		session, err = ch.sqlDb.GetLatestSession(ctx, user.Code)
@@ -357,6 +359,7 @@ func (ch *TrackingHandler) SelectGame(game model.GameType) error {
 	default:
 		return model.WrapError(model.ErrSelectGame, fmt.Errorf("game does not exist"))
 	}
+	ch.game = game
 
 	ctx, cancel := context.WithCancel(context.Background())
 	ch.mu.Lock()
@@ -386,9 +389,30 @@ func (ch *TrackingHandler) SelectGame(game model.GameType) error {
 		ch.emit("info", "authInterrupted")
 	}
 	if done {
+		ch.rememberLastGame(game)
 		ch.emit("auth-success")
 	}
 	return err
+}
+
+// Remembering is a convenience for the next start, so failing to save it
+// shouldn't stop the login or the tracking.
+func (ch *TrackingHandler) rememberLastGame(game model.GameType) {
+	if ch.nosqlDb == nil {
+		return
+	}
+	if err := ch.nosqlDb.SaveLastGame(game); err != nil {
+		slog.Warn("save last game", slog.Any("error", err))
+	}
+}
+
+func (ch *TrackingHandler) rememberLastUser(code string) {
+	if ch.nosqlDb == nil || ch.game == "" {
+		return
+	}
+	if err := ch.nosqlDb.SaveLastUser(ch.game, code); err != nil {
+		slog.Warn("save last user", slog.Any("error", err))
+	}
 }
 
 // authenticate returns false without an error if the login stopped without finishing.

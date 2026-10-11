@@ -8,13 +8,14 @@ import { TrackingMachineContext } from '@/state/tracking-machine'
 import { Button } from '@/ui/button'
 import { Checkbox } from '@/ui/checkbox'
 import * as Page from '@/ui/page'
+import { cn } from '@/helpers/cn'
 
 import { model } from '@model'
 import { AuthMachineContext } from '@/state/auth-machine'
 import { useSelector } from '@xstate/react'
 
 import { TrackingBreadcrumbs } from './tracking-breadcrumbs'
-import { GetUsers } from '@cmd/CommandHandler'
+import { GetGuiConfig, GetUsers } from '@cmd/CommandHandler'
 import { useErrorPopup } from '@/main/error-popup'
 
 export function TrackingForm() {
@@ -25,16 +26,26 @@ export function TrackingForm() {
   const setError = useErrorPopup()
 
   const [users, setUsers] = React.useState<model.User[]>([])
+  const playerIdInputRef = React.useRef<HTMLInputElement>(null)
+  const restoreRef = React.useRef<HTMLInputElement>(null)
+  const [playerIdInput, setPlayerIdInput] = React.useState('')
+
   React.useEffect(() => {
     if (!game) return
     GetUsers(game)
       .then(users => setUsers(users ?? []))
       .catch(setError)
+    // Fetched rather than taken from the config context, which is only loaded at startup.
+    GetGuiConfig()
+      .then(cfg => {
+        const lastUser = cfg.lastUsers?.[game]
+        if (lastUser && playerIdInputRef.current && playerIdInputRef.current.value === '') {
+          playerIdInputRef.current.value = lastUser
+          setPlayerIdInput(lastUser)
+        }
+      })
+      .catch(setError)
   }, [game])
-
-  const playerIdInputRef = React.useRef<HTMLInputElement>(null)
-  const restoreRef = React.useRef<HTMLInputElement>(null)
-  const [playerIdInput, setPlayerIdInput] = React.useState('')
   // Tekken IDs are often shared as 1234-5678-9abc, but are stored without dashes
   const userCode =
     game === model.GameType.TEKKEN_8 ? playerIdInput.replaceAll('-', '') : playerIdInput
@@ -111,7 +122,11 @@ export function TrackingForm() {
                 key={player.displayName}
                 type='button'
                 onClick={() => playerChipClicked(player)}
-                className='items-center rounded-2xl bg-[rgb(255,255,255,0.075)] px-3 pt-1 text-base whitespace-nowrap transition-all hover:bg-[rgb(255,255,255,0.125)]'
+                aria-pressed={player.code === userCode}
+                className={cn(
+                  'items-center rounded-2xl border border-transparent bg-[rgb(255,255,255,0.075)] px-3 pt-1 text-base whitespace-nowrap transition-all hover:bg-[rgb(255,255,255,0.125)]',
+                  player.code === userCode && 'border-white/60 bg-[rgb(255,255,255,0.125)]'
+                )}
               >
                 {player.displayName}
               </button>
