@@ -119,12 +119,9 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-go@v5
+      - uses: jdx/mise-action@v4
         with:
-          go-version-file: "app/go.mod"
-          cache-dependency-path: "app/go.sum"
-
-      - uses: oven-sh/setup-bun@v1
+          working_directory: app
 
       - name: Install GUI dependencies
         working-directory: ./app/gui
