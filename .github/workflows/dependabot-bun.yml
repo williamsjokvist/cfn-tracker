@@ -17,11 +17,14 @@ jobs:
       run:
         working-directory: ./app/gui
     steps:
-      - uses: oven-sh/setup-bun@v1
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.ref }}
+      - uses: jdx/mise-action@v4
+        with:
+          working_directory: app
+          install_args: bun
       - run: |
           bun install
           git add bun.lockb
