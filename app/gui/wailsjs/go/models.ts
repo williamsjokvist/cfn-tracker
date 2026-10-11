@@ -12,8 +12,10 @@ export namespace model {
 	    errGetSessions = "errGetSessions",
 	    errGetTranslations = "errGetTranslations",
 	    errGetUser = "errGetUser",
+	    errInvalidBrowserSourcePort = "errInvalidBrowserSourcePort",
 	    errOpenResultsDirectory = "errOpenResultsDirectory",
 	    errReadThemeCSS = "errReadThemeCSS",
+	    errSaveBrowserSourcePort = "errSaveBrowserSourcePort",
 	    errSaveLocale = "errSaveLocale",
 	    errSaveLogFile = "errSaveLogFile",
 	    errSaveSidebar = "errSaveSidebar",
@@ -40,6 +42,7 @@ export namespace model {
 	    theme: ThemeName;
 	    sidebar: boolean;
 	    logFile: boolean;
+	    browserSourcePort: number;
 	}
 	export interface Localization {
 	    appVersion: string;
@@ -80,6 +83,7 @@ export namespace model {
 	    date: string;
 	    minimize: string;
 	    writeLogFile: string;
+	    browserSourcePort: string;
 	    restoreSession: string;
 	    exportLog: string;
 	    league: string;
@@ -157,6 +161,8 @@ export namespace model {
 	    errCreateSession: string;
 	    errOpenResultsDirectory: string;
 	    errReadThemeCSS: string;
+	    errInvalidBrowserSourcePort: string;
+	    errSaveBrowserSourcePort: string;
 	    retrying: string;
 	    retryingDetail: string;
 	    reconnected: string;

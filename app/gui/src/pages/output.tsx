@@ -14,6 +14,7 @@ import { model } from '@model'
 import { GetThemes, OpenResultsDirectory } from '@cmd/CommandHandler'
 
 import { useErrorPopup } from '@/main/error-popup'
+import { ConfigContext } from '@/main/config'
 import { cn } from '@/helpers/cn'
 
 type StatOptions = Omit<Record<keyof model.Match, boolean>, 'replayId' | 'sessionId'> & {
@@ -47,11 +48,12 @@ export function OutputPage() {
   const { t } = useTranslation()
   const [options, setOptions] = React.useState(defaultOptions)
   const [scope, animate] = useAnimate()
+  const [cfg] = React.useContext(ConfigContext)
 
   const { theme: _, ...statOptions } = options
 
   function copyUrlToClipBoard() {
-    let url = `http://localhost:4242?theme=${options.theme}`
+    let url = `http://localhost:${cfg.browserSourcePort}?theme=${options.theme}`
     for (const [key, value] of Object.entries(options)) {
       if (key === 'theme') {
         continue

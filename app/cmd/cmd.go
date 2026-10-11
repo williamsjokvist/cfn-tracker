@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -20,16 +21,18 @@ import (
 
 // The CommandHandler is the interface between the GUI and the core
 type CommandHandler struct {
-	sqlDb *sql.Storage
-	cfgDb *cfgDb.Storage
-	cfg   *config.BuildConfig
+	sqlDb            *sql.Storage
+	cfgDb            *cfgDb.Storage
+	cfg              *config.BuildConfig
+	browserSrcServer *server.BrowserSourceServer
 }
 
-func NewCommandHandler(sqlDb *sql.Storage, cfgDb *cfgDb.Storage, txtDb *txt.Storage, cfg *config.BuildConfig) *CommandHandler {
+func NewCommandHandler(sqlDb *sql.Storage, cfgDb *cfgDb.Storage, txtDb *txt.Storage, cfg *config.BuildConfig, browserSrcServer *server.BrowserSourceServer) *CommandHandler {
 	return &CommandHandler{
-		sqlDb: sqlDb,
-		cfgDb: cfgDb,
-		cfg:   cfg,
+		sqlDb:            sqlDb,
+		cfgDb:            cfgDb,
+		cfg:              cfg,
+		browserSrcServer: browserSrcServer,
 	}
 }
 
@@ -170,6 +173,30 @@ func (ch *CommandHandler) SaveLogFile(enabled bool) error {
 	}
 	if err := applog.SetFileLogging(enabled); err != nil {
 		return model.WrapError(model.ErrSaveLogFile, err)
+	}
+	return nil
+}
+
+func (ch *CommandHandler) SaveBrowserSourcePort(port uint16) error {
+	// Ports below 1024 need elevated privileges on macOS and Linux.
+	if port < 1024 {
+		return model.WrapError(model.ErrInvalidBrowserSourcePort, fmt.Errorf("port %d", port))
+	}
+	runtimeCfg, err := ch.cfgDb.GetRuntimeConfig()
+	if err != nil {
+		return model.WrapError(model.ErrGetGUIConfig, err)
+	}
+	previousPort := runtimeCfg.GUI.BrowserSourcePort
+	if err := ch.browserSrcServer.Listen(port); err != nil {
+		return model.WrapError(model.ErrSaveBrowserSourcePort, err)
+	}
+	runtimeCfg.GUI.BrowserSourcePort = port
+	if err := ch.cfgDb.SaveRuntimeConfig(runtimeCfg); err != nil {
+		// Move back so the server matches the saved setting.
+		if rollbackErr := ch.browserSrcServer.Listen(previousPort); rollbackErr != nil {
+			err = errors.Join(err, fmt.Errorf("restore port %d: %w", previousPort, rollbackErr))
+		}
+		return model.WrapError(model.ErrSaveBrowserSourcePort, err)
 	}
 	return nil
 }

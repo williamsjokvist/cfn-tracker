@@ -56,7 +56,7 @@ func (s *Storage) GetRuntimeConfig() (*model.RuntimeConfig, error) {
 		return nil, fmt.Errorf("get config file: %w", err)
 	}
 	// MapTo leaves fields without a key untouched, so this sets the defaults.
-	cfg := model.RuntimeConfig{GUI: model.GUIConfig{LogFile: true}}
+	cfg := model.RuntimeConfig{GUI: model.GUIConfig{LogFile: true, BrowserSourcePort: 4242}}
 	err = iniData.MapTo(&cfg)
 	if err != nil {
 		return nil, fmt.Errorf("map config to struct: %w", err)
@@ -73,6 +73,7 @@ func (s *Storage) SaveRuntimeConfig(cfg *model.RuntimeConfig) error {
 	iniData.Section("gui").Key("theme").SetValue(string(cfg.GUI.Theme))
 	iniData.Section("gui").Key("sidebar").SetValue(strconv.FormatBool(cfg.GUI.SideBar))
 	iniData.Section("gui").Key("log_file").SetValue(strconv.FormatBool(cfg.GUI.LogFile))
+	iniData.Section("gui").Key("browser_source_port").SetValue(strconv.FormatUint(uint64(cfg.GUI.BrowserSourcePort), 10))
 
 	appDataDir, err := getAppDataDir()
 	if err != nil {
