@@ -15,6 +15,14 @@ run = "wails dev -forcebuild"
 description = "Generate go->ts bindings"
 run = "wails generate module"
 
+[tasks.test]
+description = "Run the Go tests"
+run = "go test ./..."
+
+[tasks.fmt]
+description = "Format the Go and GUI code"
+run = ["go fmt ./...", "bun run --cwd gui fmt"]
+
 [tasks."build-windows-amd64"]
 description = "Build for Windows (x86)"
 env = { GOOS = "windows", GOARCH = "amd64" }

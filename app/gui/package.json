@@ -4,8 +4,8 @@
   "type": "module",
   "scripts": {
     "build": "vite build",
-    "format": "prettier src --write",
-    "format:check": "prettier src --check",
+    "fmt": "prettier src --write",
+    "fmt:check": "prettier src --check",
     "tsc": "tsc --project . --noEmit",
     "dev": "vite"
   },
