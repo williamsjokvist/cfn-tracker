@@ -60,7 +60,14 @@ type Localization struct {
 	CFNError                    string `json:"cfnError"`
 	Output                      string `json:"output"`
 	Theme                       string `json:"theme"`
-	DefaultTheme                string `json:"defaultTheme"`
+	ThemeDefault                string `json:"themeDefault"`
+	ThemeEnth                   string `json:"themeEnth"`
+	ThemeTekken                 string `json:"themeTekken"`
+	ThemeJade                   string `json:"themeJade"`
+	ThemeEmber                  string `json:"themeEmber"`
+	ThemeTide                   string `json:"themeTide"`
+	ThemeDusk                   string `json:"themeDusk"`
+	ThemeSakura                 string `json:"themeSakura"`
 	PickTheme                   string `json:"pickTheme"`
 	UsingBrowserSource          string `json:"usingBrowserSource"`
 	CopyBrowserSourceLink       string `json:"copyBrowserSourceLink"`

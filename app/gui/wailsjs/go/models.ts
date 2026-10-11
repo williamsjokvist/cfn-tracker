@@ -115,7 +115,14 @@ export namespace model {
 	    cfnError: string;
 	    output: string;
 	    theme: string;
-	    defaultTheme: string;
+	    themeDefault: string;
+	    themeEnth: string;
+	    themeTekken: string;
+	    themeJade: string;
+	    themeEmber: string;
+	    themeTide: string;
+	    themeDusk: string;
+	    themeSakura: string;
 	    pickTheme: string;
 	    usingBrowserSource: string;
 	    copyBrowserSourceLink: string;
