@@ -78,7 +78,7 @@ function Nav() {
             to={href}
             className={cn(
               'flex items-center justify-between',
-              'group flex items-center justify-between',
+              'group relative flex items-center justify-between',
               'transition-colors hover:bg-slate-50/5 hover:text-white! active:bg-white/[0.075]',
               'rounded-sm px-1 py-2 text-lg text-[#bfbcff]/80'
             )}
@@ -94,7 +94,17 @@ function Nav() {
               />
               <span>{t(href)}</span>
             </div>
-            {!cfg.sidebar && (
+            {cfg.sidebar ? (
+              <div
+                className={cn(
+                  'pointer-events-none invisible absolute top-1/2 left-full ml-3 -translate-y-1/2',
+                  'rounded-full border bg-white px-2.5 pt-1 pb-0.5 text-sm font-semibold text-black',
+                  'opacity-0 transition-all group-hover:visible group-hover:opacity-100'
+                )}
+              >
+                {t(href)}
+              </div>
+            ) : (
               <Icon
                 icon='fa6-solid:chevron-left'
                 className='h-3 w-3 rotate-180 opacity-0 transition-opacity group-hover:opacity-100'
