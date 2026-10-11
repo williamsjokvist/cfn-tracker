@@ -1,21 +1,17 @@
 import React from 'react'
-import { useLoaderData, useNavigate, useSearchParams } from 'react-router-dom'
+import { useLoaderData, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Icon } from '@iconify/react'
 
 import * as Page from '@/ui/page'
 import * as Table from '@/ui/table'
 
 import type { model } from '@model'
-import { Button } from '@/ui/button'
 import { type LocalizationKey } from '@/main/i18n'
 import { Tooltip } from '@/ui/tooltip'
-import { SessionBreadcrumbs, useSessionBackTo, type SessionData } from '@/pages/session'
+import { SessionBreadcrumbs, type SessionData } from '@/pages/session'
 
 export function MatchesListPage() {
   const { t } = useTranslation()
-  const navigate = useNavigate()
-  const { state } = useSessionBackTo()
   const { session, matches: sessionMatches } = useLoaderData() as SessionData
   const [searchParams] = useSearchParams()
   const character = searchParams.get('character') ?? undefined
@@ -23,17 +19,18 @@ export function MatchesListPage() {
     () => (character ? sessionMatches.filter(m => m.character === character) : sessionMatches),
     [sessionMatches, character]
   )
-  const [matches, setMatches] = React.useState(totalMatches)
-  const [totalWinRate, setTotalWinRate] = React.useState(0)
+  const [filters, setFilters] = React.useState<Partial<Record<keyof model.Match, string>>>({})
+  const matches = totalMatches.filter(m =>
+    Object.entries(filters).every(
+      ([property, value]) => String(m[property as keyof model.Match]).toLowerCase() === value
+    )
+  )
 
-  React.useEffect(() => {
-    const wonMatches = matches.filter(log => log.victory === true).length
-    const winRate = Math.floor((wonMatches / matches.length) * 100)
-    !isNaN(winRate) && setTotalWinRate(winRate)
-  }, [matches])
-
-  const filterLog = (property: string, value: string) => {
-    setMatches(matches.filter(ml => ml[property].toLowerCase() === value.toLowerCase()))
+  const filterLog = (property: keyof model.Match, value: string) => {
+    const { [property]: active, ...rest } = filters
+    setFilters(
+      active === value.toLowerCase() ? rest : { ...filters, [property]: value.toLowerCase() }
+    )
   }
 
   if (matches.length === 0) {
@@ -53,30 +50,6 @@ export function MatchesListPage() {
       </Page.Header>
 
       <div className='relative w-full'>
-        <div className='mb-2 flex h-10 items-center justify-between border-b border-slate-50/10 px-8 pt-1'>
-          <Button
-            className='flex items-center gap-1 px-1 py-[2px]'
-            style={{ filter: 'hue-rotate(-65deg)' }}
-            onClick={() => {
-              if (matches.length != totalMatches.length) {
-                setMatches(totalMatches)
-              } else {
-                navigate(`/sessions/${session.id}`, { state })
-              }
-            }}
-          >
-            <Icon
-              width={20}
-              height={20}
-              icon='material-symbols:chevron-left'
-              className='rtl:rotate-180'
-            />
-            <span className='relative top-[2px]'>{t('goBack')}</span>
-          </Button>
-          <span>
-            {t('winRate')}: <b>{totalWinRate}</b>%
-          </span>
-        </div>
         <Table.Page>
           <Table.Content>
             <thead>

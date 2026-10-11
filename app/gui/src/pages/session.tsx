@@ -2,16 +2,17 @@ import React from 'react'
 import { useLoaderData, useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
-import { Icon } from '@iconify/react'
 
 import type { model } from '@model'
 
 import * as Page from '@/ui/page'
-import { Button } from '@/ui/button'
+import { SettingButton } from '@/ui/setting-button'
 import { BigStat } from '@/ui/stat'
 import { CharacterStatsCard } from '@/ui/character-stats'
 import { cn } from '@/helpers/cn'
 import { signed, winRate } from '@/helpers/stats'
+
+import { HistoryChart } from './statistics/history-chart'
 
 type CharacterStats = {
   character: string
@@ -74,12 +75,9 @@ export function SessionBreadcrumbs({
   return (
     <Page.Breadcrumbs
       items={[
-        ...(backTo.startsWith('/statistics')
-          ? [{ label: t('statistics'), to: backTo }]
-          : [
-              { label: t('statistics'), to: '/statistics' },
-              { label: t('sessions'), to: '/sessions' }
-            ]),
+        backTo.startsWith('/statistics')
+          ? { label: t('statistics'), to: backTo }
+          : { label: t('sessions'), to: '/sessions' },
         { label: started, to: matchLog ? `/sessions/${session.id}` : undefined, state },
         ...(matchLog
           ? [{ label: character ? `${t('history')} · ${character}` : t('history') }]
@@ -92,8 +90,8 @@ export function SessionBreadcrumbs({
 export function SessionOverviewPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const { state } = useSessionBackTo()
   const { session, matches } = useLoaderData() as SessionData
-  const { backTo } = useSessionBackTo()
 
   const characters = statsByCharacter(matches)
   const wins = characters.reduce((sum, c) => sum + c.wins, 0)
@@ -105,37 +103,26 @@ export function SessionOverviewPage() {
     <Page.Root>
       <Page.Header>
         <SessionBreadcrumbs session={session} />
+        <SettingButton
+          icon='material-symbols:list-alt-outline'
+          // Clickable although the header is the window's drag region.
+          style={{ '--draggable': 'no-drag' } as React.CSSProperties}
+          onClick={() => navigate(`/sessions/${session.id}/matches`, { state })}
+        >
+          {t('history')}
+        </SettingButton>
       </Page.Header>
 
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.125 }}
-        className='relative w-full'
+        className='relative flex min-h-0 w-full min-w-0 flex-col'
       >
-        <div className='mb-2 flex h-10 items-center justify-between border-b border-slate-50/10 px-8 pt-1'>
-          <Button
-            className='flex items-center gap-1 px-1 py-[2px]'
-            style={{ filter: 'hue-rotate(-65deg)' }}
-            onClick={() => navigate(backTo)}
-          >
-            <Icon
-              width={20}
-              height={20}
-              icon='material-symbols:chevron-left'
-              className='rtl:rotate-180'
-            />
-            <span className='relative top-[2px]'>{t('goBack')}</span>
-          </Button>
-        </div>
-
-        <div className='flex max-h-[340px] flex-col gap-4 overflow-y-auto px-8 pt-2 pb-4'>
+        <div className='flex flex-col gap-2 overflow-y-auto px-8 pt-2 pb-2'>
           {characters.length > 1 && (
             <section className='-mx-8 border-b border-slate-50/10 px-8 pb-4'>
-              <SectionHeading
-                title={t('statistics')}
-                matchLog={`/sessions/${session.id}/matches`}
-              />
+              <SectionHeading title={t('statistics')} />
               <dl className='grid grid-cols-3 gap-2 [&>div]:mb-0'>
                 <BigStat text={t('wins')} value={wins} />
                 <BigStat text={t('losses')} value={losses} />
@@ -149,28 +136,39 @@ export function SessionOverviewPage() {
               sessionId={session.id}
               stats={c}
               hasPoints={hasPoints}
+              // With one character its match log is the whole session's, which the header opens.
+              matchLog={characters.length > 1}
             />
           ))}
+          {characters.length > 0 && (
+            <HistoryChart
+              history={matches.toReversed()}
+              mainCharacter={characters[0].character}
+              timeSpans={false}
+            />
+          )}
         </div>
       </motion.div>
     </Page.Root>
   )
 }
 
-function SectionHeading({ title, matchLog }: { title: string; matchLog: string }) {
+function SectionHeading({ title, matchLog }: { title: string; matchLog?: string }) {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const { state } = useSessionBackTo()
   return (
     <div className='mb-2 flex items-center justify-between gap-4'>
       <h3 className='text-lg font-bold'>{title}</h3>
-      <Button
-        className='flex shrink-0 items-center gap-2 px-2 py-[2px]'
-        onClick={() => navigate(matchLog, { state })}
-      >
-        <Icon width={18} height={18} icon='material-symbols:list-alt-outline' />
-        <span className='relative top-[2px]'>{t('history')}</span>
-      </Button>
+      {matchLog && (
+        <SettingButton
+          icon='material-symbols:list-alt-outline'
+          className='shrink-0'
+          onClick={() => navigate(matchLog, { state })}
+        >
+          {t('history')}
+        </SettingButton>
+      )}
     </div>
   )
 }
@@ -178,11 +176,13 @@ function SectionHeading({ title, matchLog }: { title: string; matchLog: string }
 function CharacterSection({
   sessionId,
   stats,
-  hasPoints
+  hasPoints,
+  matchLog
 }: {
   sessionId: number
   stats: CharacterStats
   hasPoints: boolean
+  matchLog: boolean
 }) {
   const { t } = useTranslation()
   return (
@@ -191,7 +191,11 @@ function CharacterSection({
       heading={
         <SectionHeading
           title={stats.character}
-          matchLog={`/sessions/${sessionId}/matches?${new URLSearchParams({ character: stats.character })}`}
+          matchLog={
+            matchLog
+              ? `/sessions/${sessionId}/matches?${new URLSearchParams({ character: stats.character })}`
+              : undefined
+          }
         />
       }
     >

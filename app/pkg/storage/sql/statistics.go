@@ -8,7 +8,10 @@ import (
 )
 
 func (s *Storage) GetUserStatistics(ctx context.Context, userId string) (*model.UserStatistics, error) {
-	stats := &model.UserStatistics{Characters: []*model.CharacterStatistics{}}
+	stats := &model.UserStatistics{
+		Characters: []*model.CharacterStatistics{},
+		History:    []*model.HistoryMatch{},
+	}
 	// SQLite takes the bare lp and mr columns from the row picked by MAX, which
 	// is the character's latest match.
 	err := s.db.SelectContext(ctx, &stats.Characters, `
@@ -42,6 +45,14 @@ func (s *Storage) GetUserStatistics(ctx context.Context, userId string) (*model.
 	`, userId)
 	if err != nil {
 		return nil, fmt.Errorf("count sessions: %w", err)
+	}
+	err = s.db.SelectContext(ctx, &stats.History, `
+		SELECT date, time, character, victory, lp, mr FROM matches
+		WHERE user_id = ?
+		ORDER BY date, time
+	`, userId)
+	if err != nil {
+		return nil, fmt.Errorf("get match history: %w", err)
 	}
 	for _, c := range stats.Characters {
 		stats.Wins += c.Wins

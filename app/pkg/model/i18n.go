@@ -47,6 +47,10 @@ type Localization struct {
 	Unpause                     string `json:"unpause"`
 	Statistics                  string `json:"statistics"`
 	RecentSessions              string `json:"recentSessions"`
+	StatOverTime                string `json:"statOverTime"`
+	NetWins                     string `json:"netWins"`
+	NotEnoughMatches            string `json:"notEnoughMatches"`
+	AllTime                     string `json:"allTime"`
 	CompareWithTopPlayers       string `json:"compareWithTopPlayers"`
 	NoStatistics                string `json:"noStatistics"`
 	Date                        string `json:"date"`

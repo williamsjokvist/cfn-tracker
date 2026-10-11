@@ -20,10 +20,13 @@ import { useErrorPopup } from '@/main/error-popup'
 import * as Page from '@/ui/page'
 import * as Select from '@/ui/select'
 import { Button } from '@/ui/button'
+import { SettingButton } from '@/ui/setting-button'
 import { BigStat } from '@/ui/stat'
 import { CharacterStatsCard } from '@/ui/character-stats'
 import { cn } from '@/helpers/cn'
 import { signed, winRate } from '@/helpers/stats'
+
+import { HistoryChart } from './history-chart'
 
 const recentSessionCount = 5
 
@@ -71,65 +74,44 @@ export function StatisticsPage() {
   return (
     <Page.Root>
       <Page.Header>
-        <Page.Title>{t('statistics')}</Page.Title>
+        <Page.Title>
+          {user ? `${t('statistics')} · ${user.displayName}` : t('statistics')}
+        </Page.Title>
+        <div className='flex items-center gap-2'>
+          {user && stats && stats.sessions > 0 && (
+            <SettingButton
+              icon='material-symbols:download'
+              // Clickable although the header is the window's drag region.
+              style={{ '--draggable': 'no-drag' } as React.CSSProperties}
+              onClick={() => ExportUserMatches(user.code).catch(setError)}
+            >
+              {t('export')}
+            </SettingButton>
+          )}
+          {users && users.length > 1 && (
+            <div style={{ '--draggable': 'no-drag' } as React.CSSProperties}>
+              <Select.Root
+                size='sm'
+                value={user?.code}
+                onValueChange={code => setSearchParams({ user: code }, { replace: true })}
+              >
+                {users.map(u => (
+                  <Select.Item key={u.code} value={u.code}>
+                    {u.displayName}
+                  </Select.Item>
+                ))}
+              </Select.Root>
+            </div>
+          )}
+        </div>
       </Page.Header>
 
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.125 }}
-        className='relative flex min-h-0 w-full flex-col'
+        className='relative flex min-h-0 w-full min-w-0 flex-col'
       >
-        <div className='flex min-h-14 items-center justify-between gap-4 border-b border-slate-50/10 px-8 py-2'>
-          {users && users.length > 1 ? (
-            <Select.Root
-              size='sm'
-              value={user?.code}
-              onValueChange={code => setSearchParams({ user: code }, { replace: true })}
-            >
-              {users.map(u => (
-                <Select.Item key={u.code} value={u.code}>
-                  {u.displayName}
-                </Select.Item>
-              ))}
-            </Select.Root>
-          ) : (
-            <h3 className='text-lg font-bold'>{user?.displayName}</h3>
-          )}
-          <div className='flex items-center gap-2'>
-            {user?.game === model.GameType.STREET_FIGHTER_6 && stats?.mainCharacter && (
-              <Button
-                className='flex items-center gap-2 px-2 py-[2px]'
-                onClick={() =>
-                  navigate(`/statistics/comparison?${new URLSearchParams({ user: user.code })}`)
-                }
-              >
-                <Icon width={18} height={18} icon='mdi:compare-horizontal' />
-                <span className='relative top-[2px]'>
-                  {t('compareWithTopPlayers', { character: stats.mainCharacter })}
-                </span>
-              </Button>
-            )}
-            <Button
-              className='flex items-center gap-2 px-2 py-[2px]'
-              onClick={() => navigate('/sessions')}
-            >
-              <Icon width={18} height={18} icon='ion:document-text-outline' />
-              <span className='relative top-[2px]'>{t('sessions')}</span>
-            </Button>
-            {user && stats && stats.sessions > 0 && (
-              <Button
-                className='flex items-center gap-2 px-2 py-[2px]'
-                style={{ filter: 'hue-rotate(145deg)' }}
-                onClick={() => ExportUserMatches(user.code).catch(setError)}
-              >
-                <Icon width={18} height={18} icon='material-symbols:download' />
-                <span className='relative top-[2px]'>{t('export')}</span>
-              </Button>
-            )}
-          </div>
-        </div>
-
         {users?.length === 0 && <p className='px-8 py-6 text-lg'>{t('noStatistics')}</p>}
 
         {stats && (
@@ -140,7 +122,23 @@ export function StatisticsPage() {
               <BigStat text={t('losses')} value={stats.losses} />
               <BigStat text={t('winRate')} value={`${winRate(stats.wins, stats.losses)}%`} />
             </dl>
-            <CharacterList characters={stats.characters} />
+            {stats.history.length > 0 && (
+              <HistoryChart history={stats.history} mainCharacter={stats.mainCharacter} />
+            )}
+            <CharacterList
+              characters={stats.characters}
+              comparison={
+                user?.game === model.GameType.STREET_FIGHTER_6 && stats.mainCharacter
+                  ? {
+                      character: stats.mainCharacter,
+                      onClick: () =>
+                        navigate(
+                          `/statistics/comparison?${new URLSearchParams({ user: user.code })}`
+                        )
+                    }
+                  : undefined
+              }
+            />
             {sessions.length > 0 && (
               <RecentSessions
                 sessions={sessions}
@@ -214,7 +212,14 @@ function Gain({ value, unit }: { value: number; unit: string }) {
   )
 }
 
-function CharacterList({ characters }: { characters: model.CharacterStatistics[] }) {
+function CharacterList({
+  characters,
+  comparison
+}: {
+  characters: model.CharacterStatistics[]
+  // Only the main character can be compared with top players.
+  comparison?: { character: string; onClick: () => void }
+}) {
   const { t } = useTranslation()
   // Tekken has no LP or MR.
   const hasPoints = characters.some(c => c.lp !== 0 || c.mr !== 0)
@@ -222,7 +227,19 @@ function CharacterList({ characters }: { characters: model.CharacterStatistics[]
     <CharacterStatsCard
       key={c.character}
       character={c.character}
-      heading={<h3 className='mb-2 text-lg font-bold'>{c.character}</h3>}
+      heading={
+        <div className='mb-2 flex items-center justify-between gap-4'>
+          <h3 className='text-lg font-bold'>{c.character}</h3>
+          {comparison?.character === c.character && (
+            <Button className='flex items-center gap-2 px-2 py-[2px]' onClick={comparison.onClick}>
+              <Icon width={18} height={18} icon='mdi:compare-horizontal' />
+              <span className='relative top-[2px]'>
+                {t('compareWithTopPlayers', { character: c.character })}
+              </span>
+            </Button>
+          )}
+        </div>
+      }
     >
       <BigStat text={t('wins')} value={c.wins} />
       <BigStat text={t('losses')} value={c.losses} />
