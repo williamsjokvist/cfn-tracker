@@ -178,9 +178,8 @@ func sendMatch(ctx context.Context, out chan<- model.Match, match model.Match) b
 	}
 }
 
-// poll ticks the session until ctx is done or polling fails for good. It runs on the
-// caller's goroutine, so a forced poll can never see the session before the previous
-// match has been recorded on it.
+// Runs on the caller's goroutine, so a forced poll can never see the session before
+// the previous match has been recorded on it.
 func (ch *TrackingHandler) poll(ctx context.Context, force <-chan struct{}, session *tracker.Session, onMatch func(model.Match) error) error {
 	ticker := time.NewTicker(pollInterval)
 	defer ticker.Stop()

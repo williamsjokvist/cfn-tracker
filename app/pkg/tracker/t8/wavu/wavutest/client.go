@@ -1,4 +1,3 @@
-// Package wavutest provides a fake Wavu client for playing matches in tests.
 package wavutest
 
 import (
@@ -9,17 +8,14 @@ import (
 	"github.com/williamsjokvist/cfn-tracker/pkg/tracker/t8/wavu"
 )
 
-// Match describes a match from the player's point of view.
 type Match struct {
 	Won               bool
 	Opponent          string
 	Character         uint8
 	OpponentCharacter uint8
 	OpponentRank      wavu.Rank
-	// At defaults to now, or a minute after the previous match since matches are
-	// stored by the minute.
-	At time.Time
-	// AsP2 puts the player on the right side of the replay.
+	// Matches are stored by the minute, so this defaults to a minute after the previous one.
+	At   time.Time
 	AsP2 bool
 }
 
@@ -37,7 +33,6 @@ func NewClient(polarisId, name string) *Client {
 	return &Client{PolarisId: polarisId, Name: name}
 }
 
-// Play adds a match to the player's replays and returns the replay Wavu would serve.
 func (c *Client) Play(m Match) wavu.Replay {
 	c.mu.Lock()
 	defer c.mu.Unlock()

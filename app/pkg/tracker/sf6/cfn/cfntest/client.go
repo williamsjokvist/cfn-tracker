@@ -1,4 +1,3 @@
-// Package cfntest provides a fake CFN client for playing matches in tests.
 package cfntest
 
 import (
@@ -11,22 +10,17 @@ import (
 	"github.com/williamsjokvist/cfn-tracker/pkg/tracker/sf6/cfn"
 )
 
-// Match describes a match from the player's point of view.
 type Match struct {
 	Won               bool
 	Opponent          string
 	OpponentCharacter string
 	OpponentLP        int
 	OpponentMR        int
-	// Character switches the player's character before the match. Empty keeps the current one.
-	Character string
-	// LPChange and MRChange are applied to the character's points after the match.
-	LPChange int
-	MRChange int
-	// At defaults to now, or a minute after the previous match since matches are
-	// stored by the minute.
-	At time.Time
-	// AsP2 puts the player on the right side of the replay.
+	Character         string
+	LPChange          int
+	MRChange          int
+	// Matches are stored by the minute, so this defaults to a minute after the previous one.
+	At   time.Time
 	AsP2 bool
 }
 
@@ -41,7 +35,6 @@ type points struct{ lp, mr int }
 
 var _ cfn.CFNClient = (*Client)(nil)
 
-// NewClient returns a client for a player with no matches yet.
 func NewClient(fighterId, character string, lp, mr int) *Client {
 	c := &Client{points: map[string]points{}}
 	c.log.FighterBannerInfo.PersonalInfo.FighterID = fighterId
@@ -51,7 +44,6 @@ func NewClient(fighterId, character string, lp, mr int) *Client {
 	return c
 }
 
-// SetPoints sets a character's LP and MR. Characters start at 0 unless set.
 func (c *Client) SetPoints(character string, lp, mr int) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
@@ -69,7 +61,6 @@ func (c *Client) switchTo(character string) {
 	banner.FavoriteCharacterLeagueInfo.MasterRating = c.points[character].mr
 }
 
-// Play adds a match to the battle log and returns the replay CFN would serve.
 func (c *Client) Play(m Match) cfn.Replay {
 	c.mu.Lock()
 	defer c.mu.Unlock()

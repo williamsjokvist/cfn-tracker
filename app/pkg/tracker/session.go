@@ -6,11 +6,8 @@ import (
 	"github.com/williamsjokvist/cfn-tracker/pkg/model"
 )
 
-// Session owns the state of a tracking session and applies new matches to it.
-// All matches belong to the one session, but stats are kept per character: each
-// character's latest match carries its running stats, so switching back to a
-// character continues where it left off.
-// It is not safe for concurrent use: the next Tick must see the previous match.
+// Stats are kept per character, since both games rank each character separately.
+// Not safe for concurrent use, since each Tick must see the match recorded before it.
 type Session struct {
 	game  GameTracker
 	state *model.Session
@@ -22,8 +19,6 @@ func NewSession(game GameTracker, state *model.Session) *Session {
 
 func (s *Session) State() *model.Session { return s.state }
 
-// Tick polls the game once. A new match is recorded on the session and returned
-// with its stats filled in; nil means there was nothing new.
 func (s *Session) Tick(ctx context.Context) (*model.Match, error) {
 	outcome, err := s.game.Poll(ctx, s.state)
 	if err != nil || outcome == nil {
@@ -33,8 +28,6 @@ func (s *Session) Tick(ctx context.Context) (*model.Match, error) {
 	return &match, nil
 }
 
-// Record fills in the session stats of a match outcome and adds it to the session.
-// Stats are counted per character, since both games rank each character separately.
 func (s *Session) Record(outcome model.Match) model.Match {
 	match := outcome
 	prev, hasPrev := s.Character(match.Character)
@@ -67,8 +60,7 @@ func (s *Session) Record(outcome model.Match) model.Match {
 	return match
 }
 
-// Character returns the latest match played on a character, which holds that
-// character's stats in this session.
+// A character's latest match carries its running stats for the session.
 func (s *Session) Character(character string) (model.Match, bool) {
 	for _, match := range s.state.Matches {
 		if match.Character == character {

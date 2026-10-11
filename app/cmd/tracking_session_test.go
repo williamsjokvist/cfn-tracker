@@ -13,8 +13,6 @@ import (
 	"github.com/williamsjokvist/cfn-tracker/pkg/tracker/t8/wavu/wavutest"
 )
 
-// liveTracking runs StartTracking against fake game clients and hands back each
-// match event, which is only emitted once the match has been saved.
 type liveTracking struct {
 	t       *testing.T
 	handler *cmd.TrackingHandler
@@ -31,8 +29,6 @@ func newGameHandler(t *testing.T, wavuClient *wavutest.Client, cfnClient *cfntes
 	return handler
 }
 
-// startLiveTracking returns once tracking has started, after the session start event
-// and, when restoring, the event for the restored session's latest match.
 func startLiveTracking(t *testing.T, handler *cmd.TrackingHandler, userCode string, restore bool) *liveTracking {
 	t.Helper()
 	lt := &liveTracking{t: t, handler: handler, matches: make(chan model.Match, 16), done: make(chan error, 1)}
@@ -44,6 +40,7 @@ func startLiveTracking(t *testing.T, handler *cmd.TrackingHandler, userCode stri
 	go func() { lt.done <- handler.StartTracking(userCode, restore) }()
 	t.Cleanup(lt.stop)
 
+	// Tracking announces the session, and when restoring its latest match, before any new match.
 	lt.waitForMatch()
 	if restore {
 		lt.waitForMatch()
@@ -51,7 +48,6 @@ func startLiveTracking(t *testing.T, handler *cmd.TrackingHandler, userCode stri
 	return lt
 }
 
-// next polls right away and returns the match it records.
 func (lt *liveTracking) next() model.Match {
 	lt.t.Helper()
 	lt.handler.ForcePoll()
@@ -146,7 +142,6 @@ func TestTrackingSF6(t *testing.T) {
 	handler.ForcePoll()
 	cfnClient.Play(cfntest.Match{Opponent: "Punk", LPChange: -80, AsP2: true})
 	assertStats(t, lt.next(), wantStats{"Ryu", 1, 1, 0, 20})
-	// Ken starts fresh, and Ryu picks up where he left off.
 	cfnClient.Play(cfntest.Match{Won: true, Opponent: "Punk", Character: "Ken", LPChange: 20})
 	assertStats(t, lt.next(), wantStats{"Ken", 1, 0, 1, 0})
 	cfnClient.Play(cfntest.Match{Won: true, Opponent: "Punk", Character: "Ryu", LPChange: 50})

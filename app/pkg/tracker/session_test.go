@@ -168,7 +168,6 @@ func TestCharacterSwitch(t *testing.T) {
 		t.Fatalf("Ryu = %+v, want %+v", got, ryu)
 	}
 
-	// Switching starts Ken from scratch and leaves Ryu's stats as they were.
 	if got := statsOf(session.Record(win("Ken", 5000, 0))); got != (stats{1, 0, 1, 100, 0, 0}) {
 		t.Fatalf("Ken's first match = %+v, want a fresh start", got)
 	}
@@ -181,7 +180,6 @@ func TestCharacterSwitch(t *testing.T) {
 		t.Fatalf("Ryu after switching = %+v, want %+v", got, ryu)
 	}
 
-	// Switching back continues Ryu where he left off.
 	if got := statsOf(session.Record(win("Ryu", 10250, 0))); got != (stats{3, 1, 1, 75, 250, 0}) {
 		t.Fatalf("back on Ryu = %+v, want his stats to continue", got)
 	}
@@ -189,7 +187,6 @@ func TestCharacterSwitch(t *testing.T) {
 		t.Fatalf("Ken after switching back = %+v, want %+v", got, ken)
 	}
 
-	// Every match stays in the one session, newest first.
 	var played []string
 	for _, match := range state.Matches {
 		played = append(played, match.Character)
