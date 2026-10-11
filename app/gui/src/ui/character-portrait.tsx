@@ -6,14 +6,21 @@ const portraits = Object.fromEntries(
 
 export function CharacterPortrait({
   character,
-  className
+  className,
+  style
 }: {
   character: string
   className?: string
+  style?: React.CSSProperties
 }) {
   const src = portraits[character.toLowerCase().replace(/[^a-z0-9]/g, '')]
   if (!src) {
     return null
   }
-  return <img className={className} src={src} alt='' />
+  return (
+    <div className={className} style={style}>
+      {/* Absolute, so the image takes the size of its box instead of setting it. */}
+      <img className='absolute inset-0 h-full w-full object-cover' src={src} alt='' />
+    </div>
+  )
 }

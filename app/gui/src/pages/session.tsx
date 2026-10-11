@@ -1,4 +1,5 @@
-import { useLoaderData, useNavigate, useParams } from 'react-router-dom'
+import React from 'react'
+import { useLoaderData, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
 import { Icon } from '@iconify/react'
@@ -47,11 +48,35 @@ const signed = (value: number) => (value > 0 ? `+${value}` : value)
 const winRate = (wins: number, losses: number) =>
   wins + losses === 0 ? 0 : Math.floor((wins / (wins + losses)) * 100)
 
+export type SessionData = { session: model.Session; matches: model.Match[] }
+
+export function SessionBreadcrumbs({
+  session,
+  matchLog
+}: {
+  session: model.Session
+  matchLog?: boolean
+}) {
+  const { t, i18n } = useTranslation()
+  const started = Intl.DateTimeFormat(i18n.resolvedLanguage, {
+    dateStyle: 'medium',
+    timeStyle: 'short'
+  }).format(new Date(session.createdAt))
+  return (
+    <Page.Breadcrumbs
+      items={[
+        { label: t('sessions'), to: '/sessions' },
+        { label: started, to: matchLog ? `/sessions/${session.id}` : undefined },
+        ...(matchLog ? [{ label: t('history') }] : [])
+      ]}
+    />
+  )
+}
+
 export function SessionOverviewPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const { sessionId } = useParams()
-  const matches = (useLoaderData() ?? []) as model.Match[]
+  const { session, matches } = useLoaderData() as SessionData
 
   const characters = statsByCharacter(matches)
   const wins = characters.reduce((sum, c) => sum + c.wins, 0)
@@ -62,7 +87,7 @@ export function SessionOverviewPage() {
   return (
     <Page.Root>
       <Page.Header>
-        <Page.Title>{t('statistics')}</Page.Title>
+        <SessionBreadcrumbs session={session} />
       </Page.Header>
 
       <motion.div
@@ -88,7 +113,7 @@ export function SessionOverviewPage() {
           <Button
             className='flex items-center gap-2 px-2 py-[2px]'
             disabled={matches.length === 0}
-            onClick={() => navigate(`/sessions/${sessionId}/matches`)}
+            onClick={() => navigate(`/sessions/${session.id}/matches`)}
           >
             <Icon width={18} height={18} icon='material-symbols:list-alt-outline' />
             <span className='relative top-[2px]'>{t('history')}</span>
@@ -104,29 +129,46 @@ export function SessionOverviewPage() {
             </dl>
           )}
           {characters.map(c => (
-            <section key={c.character} className='flex gap-4'>
-              <CharacterPortrait
-                character={c.character}
-                className='h-[136px] w-[136px] shrink-0 rounded-xl bg-slate-50/5 object-cover'
-              />
-              <div className='flex-1'>
-                <h3 className='mb-2 text-lg font-bold'>{c.character}</h3>
-                <dl className='grid grid-cols-3 gap-x-2'>
-                  <BigStat text={t('wins')} value={c.wins} />
-                  <BigStat text={t('losses')} value={c.losses} />
-                  <BigStat text={t('winRate')} value={`${winRate(c.wins, c.losses)}%`} />
-                  {hasPoints && (
-                    <>
-                      <BigStat text={t('lpGain')} value={signed(c.lpGain)} />
-                      <BigStat text={t('mrGain')} value={signed(c.mrGain)} />
-                    </>
-                  )}
-                </dl>
-              </div>
-            </section>
+            <CharacterSection key={c.character} stats={c} hasPoints={hasPoints} />
           ))}
         </div>
       </motion.div>
     </Page.Root>
+  )
+}
+
+function CharacterSection({ stats, hasPoints }: { stats: CharacterStats; hasPoints: boolean }) {
+  const { t } = useTranslation()
+  // The portrait is a square as tall as the stats, which CSS can't size from a sibling.
+  const statsRef = React.useRef<HTMLDivElement>(null)
+  const [size, setSize] = React.useState(0)
+  React.useLayoutEffect(() => {
+    const observer = new ResizeObserver(([entry]) => setSize(entry.borderBoxSize[0].blockSize))
+    observer.observe(statsRef.current!)
+    return () => observer.disconnect()
+  }, [])
+
+  return (
+    <section className='flex items-start gap-4'>
+      <CharacterPortrait
+        character={stats.character}
+        className='relative shrink-0 overflow-hidden rounded-xl bg-slate-50/5'
+        style={{ width: size, height: size }}
+      />
+      <div ref={statsRef} className='flex-1'>
+        <h3 className='mb-2 text-lg font-bold'>{stats.character}</h3>
+        <dl className='grid grid-cols-3 gap-2 [&>div]:mb-0'>
+          <BigStat text={t('wins')} value={stats.wins} />
+          <BigStat text={t('losses')} value={stats.losses} />
+          <BigStat text={t('winRate')} value={`${winRate(stats.wins, stats.losses)}%`} />
+          {hasPoints && (
+            <>
+              <BigStat text={t('lpGain')} value={signed(stats.lpGain)} />
+              <BigStat text={t('mrGain')} value={signed(stats.mrGain)} />
+            </>
+          )}
+        </dl>
+      </div>
+    </section>
   )
 }
