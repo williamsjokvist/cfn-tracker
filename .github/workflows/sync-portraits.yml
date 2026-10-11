@@ -42,5 +42,5 @@ jobs:
           fi
           git config user.name 'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
-          git commit -m "chore: sync character portraits"
+          git commit -m "chore(automatic): sync character portraits"
           git push
