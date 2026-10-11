@@ -71,9 +71,15 @@ func init() {
 	cfg.AppVersion = wailsCfg.Info.ProductVersion
 }
 
+func closeBrowser() {
+	if err := appBrowser.Page.Browser().Close(); err != nil {
+		slog.Warn("close browser", slog.Any("error", err))
+	}
+}
+
 func closeWithError(err error) {
 	if appBrowser != nil {
-		appBrowser.Page.Browser().Close()
+		closeBrowser()
 	}
 	slog.Error("closing with error", slog.Any("error", err))
 
@@ -122,9 +128,13 @@ func main() {
 	if err := applog.SetFileLogging(runtimeCfg.GUI.LogFile); err != nil {
 		slog.Error("enable log file", slog.Any("error", err))
 	}
-	defer applog.Close()
+	defer func() {
+		if err := applog.Close(); err != nil {
+			slog.Warn("close log file", slog.Any("error", err))
+		}
+	}()
 
-	appBrowser, err := browser.NewBrowser()
+	appBrowser, err = browser.NewBrowser()
 	if err != nil {
 		closeWithError(fmt.Errorf("launch browser: %w", err))
 	}
@@ -178,7 +188,7 @@ func main() {
 	var onSecondInstanceLaunch func(secondInstanceData options.SecondInstanceData)
 	err = wails.Run(&options.App{
 		Title:              fmt.Sprintf("CFN Tracker v%s", appVersion),
-		Assets:             assets,
+		AssetServer:        &assetserver.Options{Assets: assets},
 		Width:              920,
 		Height:             450,
 		MinWidth:           800,
@@ -226,10 +236,10 @@ func main() {
 			}
 		},
 		OnShutdown: func(_ context.Context) {
-			appBrowser.Page.Browser().Close()
+			closeBrowser()
 		},
 		OnBeforeClose: func(_ context.Context) (prevent bool) {
-			appBrowser.Page.Browser().Close()
+			closeBrowser()
 			return false
 		},
 		SingleInstanceLock: &options.SingleInstanceLock{
@@ -308,9 +318,7 @@ func handleAutoUpdate(versionStr string) {
 		}
 	} else {
 		err := update.HandleAutoUpdateTo(versionStr)
-		if err != nil {
-			slog.Error(fmt.Sprintf("update to latest version: %v", err))
-		}
+		slog.Error(fmt.Sprintf("update to latest version: %v", err))
 	}
 
 }

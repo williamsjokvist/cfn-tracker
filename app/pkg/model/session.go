@@ -16,6 +16,8 @@ type Session struct {
 	StartingMR  int      `db:"starting_mr" json:"startingMr"`
 	LPGain      int      `db:"lp_gain" json:"lpGain"`
 	MRGain      int      `db:"mr_gain" json:"mrGain"`
+	// The character LP and MR belong to.
+	Character string `db:"-" json:"-"`
 }
 
 type SessionMonth struct {

@@ -43,15 +43,13 @@ func NewStorage(useInMemoryDb bool) (*Storage, error) {
 		// so hold one open to survive the migration connection closing.
 		db.SetMaxOpenConns(1)
 		if err := db.Ping(); err != nil {
-			db.Close()
-			return nil, fmt.Errorf("open in-memory sqlite: %w", err)
+			return nil, errors.Join(fmt.Errorf("open in-memory sqlite: %w", err), db.Close())
 		}
 	}
 
 	// Migrate the data source that is actually used, not always the on-disk one.
 	if err := migrateSchemaAt(dataSource, nil); err != nil {
-		db.Close()
-		return nil, fmt.Errorf("perform sql migrations: %w", err)
+		return nil, errors.Join(fmt.Errorf("perform sql migrations: %w", err), db.Close())
 	}
 
 	return &Storage{
@@ -97,8 +95,12 @@ func migrateSchemaAt(dataSource string, nSteps *int) error {
 		return fmt.Errorf("create migration tooling instance: %w", err)
 	}
 	defer func() {
-		preparedMigrations.Close()
-		db.Close()
+		if srcErr, dbErr := preparedMigrations.Close(); srcErr != nil || dbErr != nil {
+			slog.Warn("close migrations", slog.Any("source_error", srcErr), slog.Any("database_error", dbErr))
+		}
+		if err := db.Close(); err != nil {
+			slog.Warn("close migration connection", slog.Any("error", err))
+		}
 	}()
 	if nSteps != nil {
 		fmt.Printf("stepping migrations %d...\n", *nSteps)

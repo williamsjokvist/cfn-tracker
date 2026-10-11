@@ -6,7 +6,9 @@ import (
 	"time"
 
 	"github.com/williamsjokvist/cfn-tracker/pkg/model"
+	"github.com/williamsjokvist/cfn-tracker/pkg/tracker"
 	"github.com/williamsjokvist/cfn-tracker/pkg/tracker/t8/wavu"
+	"github.com/williamsjokvist/cfn-tracker/pkg/tracker/t8/wavu/wavutest"
 )
 
 type fakeWavuClient struct {
@@ -83,31 +85,21 @@ func TestPoll(t *testing.T) {
 }
 
 func TestPollMapsReplayFromPlayerSide(t *testing.T) {
-	at := time.Now().Add(-time.Minute)
-	replay := replayAt(at, "bilol")
-	replay.P1PolarisId, replay.P2PolarisId = replay.P2PolarisId, replay.P1PolarisId
-	replay.P1Name, replay.P2Name = replay.P2Name, replay.P1Name
-	replay.P1CharaId, replay.P2CharaId = replay.P2CharaId, replay.P1CharaId
-	replay.P1Rank = 33
-	replay.Winner = 2
+	client := wavutest.NewClient("4amNGJ6EdB6J", "Tekk!")
+	replay := client.Play(wavutest.Match{Won: true, Opponent: "bilol", Character: 9, OpponentCharacter: 8, OpponentRank: 33, AsP2: true})
 
-	session := &model.Session{Id: 7, UserId: "4amNGJ6EdB6J", Matches: []*model.Match{{Wins: 2, Losses: 1, WinStreak: 1}}}
-	match, err := NewT8Tracker(fakeWavuClient{replay}).Poll(context.Background(), session)
+	match, err := NewT8Tracker(client).Poll(context.Background(), &model.Session{UserId: "4amNGJ6EdB6J"})
 	if err != nil || match == nil {
 		t.Fatalf("Poll() = %+v, %v, want a match", match, err)
 	}
 
+	at := time.Unix(replay.BattleAt, 0)
 	want := model.Match{
-		SessionId:         7,
 		UserName:          "Tekk!",
 		UserId:            "4amNGJ6EdB6J",
 		Opponent:          "bilol",
 		Victory:           true,
 		ReplayID:          replay.ID(),
-		Wins:              3,
-		Losses:            1,
-		WinStreak:         2,
-		WinRate:           75,
 		Character:         wavu.ConvCharaIdToName(9),
 		OpponentCharacter: wavu.ConvCharaIdToName(8),
 		OpponentLeague:    wavu.ConvRankToName(33),
@@ -119,16 +111,38 @@ func TestPollMapsReplayFromPlayerSide(t *testing.T) {
 	}
 }
 
-func TestPollResetsStreakOnLoss(t *testing.T) {
-	replay := replayAt(time.Now().Add(-time.Minute), "bilol")
-	replay.Winner = 2
-	session := &model.Session{UserId: "4amNGJ6EdB6J", Matches: []*model.Match{{Wins: 2, WinStreak: 2}}}
-
-	match, err := NewT8Tracker(fakeWavuClient{replay}).Poll(context.Background(), session)
-	if err != nil || match == nil {
-		t.Fatalf("Poll() = %+v, %v, want a match", match, err)
+func TestSession(t *testing.T) {
+	client := wavutest.NewClient("4amNGJ6EdB6J", "Tekk!")
+	session := tracker.NewSession(NewT8Tracker(client), &model.Session{UserId: "4amNGJ6EdB6J"})
+	tick := func() *model.Match {
+		t.Helper()
+		match, err := session.Tick(context.Background())
+		if err != nil {
+			t.Fatalf("Tick() error = %v", err)
+		}
+		return match
 	}
-	if match.Victory || match.Losses != 1 || match.WinStreak != 0 || match.WinRate != 66 {
-		t.Fatalf("Poll() match = %+v, want a loss with the streak reset", match)
+
+	client.Play(wavutest.Match{Won: true, Opponent: "bilol", Character: 9})
+	client.Play(wavutest.Match{Won: true, Opponent: "lowhigh", Character: 9, AsP2: true})
+	// Only the latest replay is served, so the first match is never seen.
+	if m := tick(); m == nil || m.Opponent != "lowhigh" || m.Wins != 1 || m.WinStreak != 1 {
+		t.Fatalf("first match = %+v, want a win against lowhigh", m)
+	}
+	if m := tick(); m != nil {
+		t.Fatalf("polling again recorded %+v, want nothing new", m)
+	}
+
+	client.Play(wavutest.Match{Opponent: "bilol", Character: 9})
+	if m := tick(); m == nil || m.Wins != 1 || m.Losses != 1 || m.WinStreak != 0 || m.WinRate != 50 {
+		t.Fatalf("second match = %+v, want a loss resetting the streak", m)
+	}
+
+	client.Play(wavutest.Match{Won: true, Opponent: "bilol", Character: 8})
+	if m := tick(); m == nil || m.Character != "Kazuya" || m.Wins != 1 || m.Losses != 0 {
+		t.Fatalf("Kazuya match = %+v, want Kazuya's first win", m)
+	}
+	if got := len(session.State().Matches); got != 3 {
+		t.Fatalf("session has %d matches, want 3", got)
 	}
 }

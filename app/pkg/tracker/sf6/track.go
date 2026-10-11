@@ -32,6 +32,7 @@ func (t *SF6Tracker) GetUser(ctx context.Context, userCode string) (*model.User,
 		Code:        userCode,
 		LP:          bl.GetLP(),
 		MR:          bl.GetMR(),
+		Character:   bl.GetCharacter(),
 	}, nil
 }
 
@@ -44,13 +45,11 @@ func (t *SF6Tracker) Poll(ctx context.Context, session *model.Session) (*model.M
 		return nil, nil
 	}
 	lastReplay := bl.ReplayList[0]
-	var prevMatch model.Match
-	if len(session.Matches) > 0 {
-		prevMatch = getPreviousMatchForCharacter(session, bl.GetCharacter())
-	}
-
 	battleAt := time.Unix(lastReplay.UploadedAt, 0)
-	if time.Since(battleAt).Minutes() >= 15 || prevMatch.ReplayID == lastReplay.ReplayID {
+	if time.Since(battleAt).Minutes() >= 15 {
+		return nil, nil
+	}
+	if len(session.Matches) > 0 && session.Matches[0].ReplayID == lastReplay.ReplayID {
 		return nil, nil
 	}
 
@@ -60,18 +59,6 @@ func (t *SF6Tracker) Poll(ctx context.Context, session *model.Session) (*model.M
 	} else {
 		opponent = lastReplay.Player1Info
 	}
-	victory := !isVictory(opponent.RoundResults)
-	wins := prevMatch.Wins
-	losses := prevMatch.Losses
-	winStreak := prevMatch.WinStreak
-	if victory {
-		wins++
-		winStreak++
-	} else {
-		losses++
-		winStreak = 0
-	}
-
 	return &model.Match{
 		Character:         bl.GetCharacter(),
 		LP:                bl.GetLP(),
@@ -81,30 +68,13 @@ func (t *SF6Tracker) Poll(ctx context.Context, session *model.Session) (*model.M
 		OpponentLP:        opponent.LeaguePoint,
 		OpponentLeague:    getLeagueFromLP(opponent.LeaguePoint),
 		OpponentMR:        opponent.MasterRating,
-		Victory:           victory,
-		Wins:              wins,
-		Losses:            losses,
-		WinStreak:         winStreak,
-		Date:              time.Now().Format(`2006-01-02`),
-		Time:              time.Now().Format(`15:04`),
-		LPGain:            prevMatch.LPGain + bl.GetLP() - session.LP,
-		MRGain:            prevMatch.MRGain + bl.GetMR() - session.MR,
-		WinRate:           int((float64(wins) / float64(wins+losses)) * 100),
+		Victory:           !isVictory(opponent.RoundResults),
+		Date:              battleAt.Format(`2006-01-02`),
+		Time:              battleAt.Format(`15:04`),
 		UserId:            session.UserId,
 		UserName:          session.UserName,
-		SessionId:         session.Id,
 		ReplayID:          lastReplay.ReplayID,
 	}, nil
-}
-
-func getPreviousMatchForCharacter(sesh *model.Session, character string) model.Match {
-	for i := 0; i < len(sesh.Matches); i++ {
-		match := sesh.Matches[i]
-		if match.Character == character {
-			return *match
-		}
-	}
-	return model.Match{}
 }
 
 func isVictory(roundResults []int) bool {

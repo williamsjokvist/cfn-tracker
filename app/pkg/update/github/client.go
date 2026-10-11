@@ -47,7 +47,7 @@ func (g *client) GetLastRelease() (*Release, error) {
 	if err != nil {
 		return nil, fmt.Errorf("fetch latest github release: %w", err)
 	}
-	defer res.Body.Close()
+	defer func() { _ = res.Body.Close() }()
 
 	resBody, err := io.ReadAll(res.Body)
 	if err != nil {

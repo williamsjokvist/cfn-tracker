@@ -146,7 +146,7 @@ jobs:
                surrounding code. Add or update tests when it makes sense.
             3. Verify your change:
                - Go (`app/`): `go build ./...` and `go test ./... -count=1`
-               - GUI (`app/gui/`): `bun tsc` and `bun format:check` (run `bun format` to fix formatting)
+               - GUI (`app/gui/`): `bun tsc` and `bun fmt:check` (run `bun fmt` to fix formatting)
             4. Commit using conventional commits (e.g. `fix(gui): ...`, `fix: ...`) and push the branch.
             5. Open a PR against master with `gh pr create`. The body must include
                `Closes #${{ github.event.issue.number }}`, a short summary of the change and how it was verified.

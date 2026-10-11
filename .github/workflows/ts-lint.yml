@@ -2,6 +2,7 @@ name: Lint typescript
 on:
   pull_request:
     paths:
+      - "app/mise.toml"
       - "app/gui/**"
 
 jobs:
@@ -9,17 +10,15 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./app/gui
+        working-directory: ./app
 
     steps:
       - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v1
-      - uses: actions/cache@v4
+      - uses: jdx/mise-action@v2
         with:
-          path: node_modules
-          key: ${{ runner.os }}-${{ hashFiles('bun.lockb') }}
-        if: steps.cache-deps.outputs.cache-hit != 'true'
-      - run: bun install
+          working_directory: app
 
-      - run: bun tsc
-      - run: bun format:check
+      - run: bun install
+        working-directory: ./app/gui
+      - run: mise lint:gui
+      - run: mise fmt:check:gui
