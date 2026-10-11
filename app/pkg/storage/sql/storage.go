@@ -5,8 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
-	"os"
-	"path/filepath"
 
 	migrate "github.com/golang-migrate/migrate/v4"
 	sqlitex "github.com/golang-migrate/migrate/v4/database/sqlite"
@@ -27,12 +25,17 @@ type Storage struct {
 // connection its own DB, so migrations wouldn't be visible to other connections.
 const inMemoryDataSource = "file:cfn-tracker-mem?mode=memory&cache=shared"
 
-func NewStorage(useInMemoryDb bool) (*Storage, error) {
-	dataSource := getDataSource()
-	if useInMemoryDb {
-		dataSource = inMemoryDataSource
-	}
+const DBFileName = "cfn-tracker.db"
 
+func NewStorage(path string) (*Storage, error) {
+	return open(path, false)
+}
+
+func NewInMemoryStorage() (*Storage, error) {
+	return open(inMemoryDataSource, true)
+}
+
+func open(dataSource string, useInMemoryDb bool) (*Storage, error) {
 	db, err := sqlx.Open("sqlite", dataSource)
 	if err != nil {
 		return nil, fmt.Errorf("open sqlite connection: %w", err)
@@ -55,16 +58,6 @@ func NewStorage(useInMemoryDb bool) (*Storage, error) {
 	return &Storage{
 		db,
 	}, nil
-}
-
-func getDataSource() string {
-	cacheDir, _ := os.UserCacheDir()
-	dataDir := filepath.Join(cacheDir, "cfn-tracker")
-	if err := os.MkdirAll(dataDir, os.FileMode(0755)); err != nil {
-		return "cfn-tracker.db"
-	}
-
-	return filepath.Join(dataDir, "cfn-tracker.db")
 }
 
 func migrateSchemaAt(dataSource string, nSteps *int) error {
@@ -115,4 +108,8 @@ func migrateSchemaAt(dataSource string, nSteps *int) error {
 
 	slog.Debug("applied db migrations")
 	return nil
+}
+
+func (s *Storage) Close() error {
+	return s.db.Close()
 }

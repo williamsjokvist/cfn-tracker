@@ -32,6 +32,13 @@ const (
 	tKeyErrSaveBrowserSourcePort    ErrorLocalizationKey = "errSaveBrowserSourcePort"
 	tKeyErrReportIssue              ErrorLocalizationKey = "errReportIssue"
 	tKeyErrExport                   ErrorLocalizationKey = "errExport"
+	tKeyErrTrackingInProgress       ErrorLocalizationKey = "errTrackingInProgress"
+	tKeyErrGetDataLocation          ErrorLocalizationKey = "errGetDataLocation"
+	tKeyErrSaveDataDirectory        ErrorLocalizationKey = "errSaveDataDirectory"
+	tKeyErrOpenDataDirectory        ErrorLocalizationKey = "errOpenDataDirectory"
+	tKeyErrBackupData               ErrorLocalizationKey = "errBackupData"
+	tKeyErrImportBackup             ErrorLocalizationKey = "errImportBackup"
+	tKeyErrInvalidBackup            ErrorLocalizationKey = "errInvalidBackup"
 )
 
 var AllErrorKeys = []struct {
@@ -62,6 +69,13 @@ var AllErrorKeys = []struct {
 	{tKeyErrSaveBrowserSourcePort, string(tKeyErrSaveBrowserSourcePort)},
 	{tKeyErrReportIssue, string(tKeyErrReportIssue)},
 	{tKeyErrExport, string(tKeyErrExport)},
+	{tKeyErrTrackingInProgress, string(tKeyErrTrackingInProgress)},
+	{tKeyErrGetDataLocation, string(tKeyErrGetDataLocation)},
+	{tKeyErrSaveDataDirectory, string(tKeyErrSaveDataDirectory)},
+	{tKeyErrOpenDataDirectory, string(tKeyErrOpenDataDirectory)},
+	{tKeyErrBackupData, string(tKeyErrBackupData)},
+	{tKeyErrImportBackup, string(tKeyErrImportBackup)},
+	{tKeyErrInvalidBackup, string(tKeyErrInvalidBackup)},
 }
 
 var (
@@ -88,6 +102,13 @@ var (
 	ErrSaveBrowserSourcePort    = newError(tKeyErrSaveBrowserSourcePort, errors.New("save browser source port"))
 	ErrReportIssue              = newError(tKeyErrReportIssue, errors.New("report issue"))
 	ErrExport                   = newError(tKeyErrExport, errors.New("export"))
+	ErrTrackingInProgress       = newError(tKeyErrTrackingInProgress, errors.New("tracking in progress"))
+	ErrGetDataLocation          = newError(tKeyErrGetDataLocation, errors.New("get data location"))
+	ErrSaveDataDirectory        = newError(tKeyErrSaveDataDirectory, errors.New("save data directory"))
+	ErrOpenDataDirectory        = newError(tKeyErrOpenDataDirectory, errors.New("open data directory"))
+	ErrBackupData               = newError(tKeyErrBackupData, errors.New("back up data"))
+	ErrImportBackup             = newError(tKeyErrImportBackup, errors.New("import backup"))
+	ErrInvalidBackup            = newError(tKeyErrInvalidBackup, errors.New("invalid backup"))
 
 	ErrAuthManualLoginFailed = newError(tKeyErrAuthManualLoginFailed, errors.New("manual login did not establish a buckler session"))
 )

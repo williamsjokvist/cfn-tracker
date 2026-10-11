@@ -23,7 +23,7 @@ var testSuite = struct {
 }{}
 
 func TestMain(m *testing.M) {
-	sqlDb, err := sql.NewStorage(true)
+	sqlDb, err := sql.NewInMemoryStorage()
 	if err != nil {
 		log.Fatalf("init sql storage: %v", err)
 	}

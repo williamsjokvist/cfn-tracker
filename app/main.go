@@ -11,6 +11,7 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"syscall"
@@ -155,7 +156,15 @@ func main() {
 		handleAutoUpdate(lastRelease.Version.Original())
 	}
 
-	sqlDb, err := sql.NewStorage(false)
+	dataDir, err := noSqlDb.DataDir()
+	if err != nil {
+		closeWithError(fmt.Errorf("find save data: %w", err))
+	}
+	dbPath := filepath.Join(dataDir, sql.DBFileName)
+	if err := sql.ApplyStagedImport(dbPath); err != nil {
+		closeWithError(fmt.Errorf("import backup: %w", err))
+	}
+	sqlDb, err := sql.NewStorage(dbPath)
 	if err != nil {
 		closeWithError(fmt.Errorf("initalize database: %w", err))
 	}
@@ -188,6 +197,8 @@ func main() {
 		browserSrcMatchChan,
 	)
 	sf6ComparisonHandler := cmd.NewSF6ComparisonHandler(cfnClient, exporter)
+	dialogs := &cmd.Dialogs{}
+	dataHandler := cmd.NewDataHandler(sqlDb, noSqlDb, trackingHandler, dialogs, dataDir)
 
 	var onSecondInstanceLaunch func(secondInstanceData options.SecondInstanceData)
 	err = wails.Run(&options.App{
@@ -235,12 +246,26 @@ func main() {
 			}
 			trackingHandler.SetEventEmitter(emit)
 			sf6ComparisonHandler.SetEventEmitter(emit)
+			dataHandler.SetEventEmitter(emit)
 			exporter.SetSaveFileDialog(func(defaultFilename string) (string, error) {
 				return runtime.SaveFileDialog(ctx, runtime.SaveDialogOptions{
 					DefaultFilename: defaultFilename,
 					Filters:         []runtime.FileFilter{{DisplayName: "CSV", Pattern: "*.csv"}},
 				})
 			})
+			backupFilter := []runtime.FileFilter{{DisplayName: "CFN Tracker backup", Pattern: "*.bak;*.db"}}
+			dialogs.SaveBackup = func(defaultFilename string) (string, error) {
+				return runtime.SaveFileDialog(ctx, runtime.SaveDialogOptions{
+					DefaultFilename: defaultFilename,
+					Filters:         backupFilter,
+				})
+			}
+			dialogs.OpenBackup = func() (string, error) {
+				return runtime.OpenFileDialog(ctx, runtime.OpenDialogOptions{Filters: backupFilter})
+			}
+			dialogs.OpenDirectory = func() (string, error) {
+				return runtime.OpenDirectoryDialog(ctx, runtime.OpenDialogOptions{CanCreateDirectories: true})
+			}
 		},
 		OnStartup: func(ctx context.Context) {
 			if err := browserSrcServer.Start(ctx, runtimeCfg.GUI.BrowserSourcePort); err != nil {
@@ -262,6 +287,7 @@ func main() {
 			cmdHandler,
 			trackingHandler,
 			sf6ComparisonHandler,
+			dataHandler,
 		},
 		EnumBind: []interface{}{
 			model.AllThemes,

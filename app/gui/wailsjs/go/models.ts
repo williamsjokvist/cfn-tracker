@@ -3,9 +3,11 @@ export namespace model {
 	export enum ErrorLocalizationKey {
 	    errAuth = "errAuth",
 	    errAuthManualLoginFailed = "errAuthManualLoginFailed",
+	    errBackupData = "errBackupData",
 	    errCheckForUpdate = "errCheckForUpdate",
 	    errCreateSession = "errCreateSession",
 	    errExport = "errExport",
+	    errGetDataLocation = "errGetDataLocation",
 	    errGetGuiConfig = "errGetGuiConfig",
 	    errGetLatestSession = "errGetLatestSession",
 	    errGetMatches = "errGetMatches",
@@ -13,17 +15,22 @@ export namespace model {
 	    errGetSessions = "errGetSessions",
 	    errGetTranslations = "errGetTranslations",
 	    errGetUser = "errGetUser",
+	    errImportBackup = "errImportBackup",
+	    errInvalidBackup = "errInvalidBackup",
 	    errInvalidBrowserSourcePort = "errInvalidBrowserSourcePort",
+	    errOpenDataDirectory = "errOpenDataDirectory",
 	    errOpenResultsDirectory = "errOpenResultsDirectory",
 	    errReadThemeCSS = "errReadThemeCSS",
 	    errReportIssue = "errReportIssue",
 	    errSaveBrowserSourcePort = "errSaveBrowserSourcePort",
+	    errSaveDataDirectory = "errSaveDataDirectory",
 	    errSaveLocale = "errSaveLocale",
 	    errSaveLogFile = "errSaveLogFile",
 	    errSaveSidebar = "errSaveSidebar",
 	    errSaveTheme = "errSaveTheme",
 	    errSaveUser = "errSaveUser",
 	    errSelectGame = "errSelectGame",
+	    errTrackingInProgress = "errTrackingInProgress",
 	    errUnknown = "errUnknown",
 	}
 	export enum GameType {
@@ -46,6 +53,11 @@ export namespace model {
 	    losses: number;
 	    lp: number;
 	    mr: number;
+	}
+	export interface DataLocation {
+	    dir: string;
+	    defaultDir: string;
+	    restartRequired: boolean;
 	}
 	export interface FGCTrackerError {
 	    localizationKey: ErrorLocalizationKey;
@@ -225,6 +237,13 @@ export namespace model {
 	    errSaveBrowserSourcePort: string;
 	    errReportIssue: string;
 	    errExport: string;
+	    errTrackingInProgress: string;
+	    errGetDataLocation: string;
+	    errSaveDataDirectory: string;
+	    errOpenDataDirectory: string;
+	    errBackupData: string;
+	    errImportBackup: string;
+	    errInvalidBackup: string;
 	    retrying: string;
 	    retryingDetail: string;
 	    reconnected: string;
@@ -238,6 +257,20 @@ export namespace model {
 	    authVerifyingLogin: string;
 	    authInterrupted: string;
 	    errAuthManualLoginFailed: string;
+	    saveData: string;
+	    changeFolder: string;
+	    openFolder: string;
+	    resetToDefault: string;
+	    backUp: string;
+	    importBackup: string;
+	    backupSaved: string;
+	    restartToApply: string;
+	    folderHasSaveData: string;
+	    folderHasSaveDataDescription: string;
+	    useExisting: string;
+	    replace: string;
+	    importBackupDescription: string;
+	    import: string;
 	}
 	export interface Match {
 	    userId: string;

@@ -9,7 +9,7 @@ import (
 
 func TestGetSession(t *testing.T) {
 	ctx := context.Background()
-	storage, err := NewStorage(true)
+	storage, err := NewInMemoryStorage()
 	if err != nil {
 		t.Fatalf("NewStorage() error = %v", err)
 	}
@@ -36,7 +36,7 @@ func TestGetSession(t *testing.T) {
 
 func TestGetSessionsGains(t *testing.T) {
 	ctx := context.Background()
-	storage, err := NewStorage(true)
+	storage, err := NewInMemoryStorage()
 	if err != nil {
 		t.Fatalf("NewStorage() error = %v", err)
 	}

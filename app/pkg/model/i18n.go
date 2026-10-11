@@ -162,19 +162,40 @@ type Localization struct {
 	ErrSaveBrowserSourcePort    string `json:"errSaveBrowserSourcePort"`
 	ErrReportIssue              string `json:"errReportIssue"`
 	ErrExport                   string `json:"errExport"`
+	ErrTrackingInProgress       string `json:"errTrackingInProgress"`
+	ErrGetDataLocation          string `json:"errGetDataLocation"`
+	ErrSaveDataDirectory        string `json:"errSaveDataDirectory"`
+	ErrOpenDataDirectory        string `json:"errOpenDataDirectory"`
+	ErrBackupData               string `json:"errBackupData"`
+	ErrImportBackup             string `json:"errImportBackup"`
+	ErrInvalidBackup            string `json:"errInvalidBackup"`
 	// Retry/recovery keys. Keys missing from this struct are silently dropped
 	// even if they exist in the locale JSON.
-	Retrying                 string `json:"retrying"`
-	RetryingDetail           string `json:"retryingDetail"`
-	Reconnected              string `json:"reconnected"`
-	ErrNetwork               string `json:"errNetwork"`
-	ErrThrottled             string `json:"errThrottled"`
-	ErrStructureChanged      string `json:"errStructureChanged"`
-	AuthNeedRelogin          string `json:"authNeedRelogin"`
-	AuthNeedReloginHint      string `json:"authNeedReloginHint"`
-	AuthCheckingSession      string `json:"authCheckingSession"`
-	AuthRestartingBrowser    string `json:"authRestartingBrowser"`
-	AuthVerifyingLogin       string `json:"authVerifyingLogin"`
-	AuthInterrupted          string `json:"authInterrupted"`
-	ErrAuthManualLoginFailed string `json:"errAuthManualLoginFailed"`
+	Retrying                     string `json:"retrying"`
+	RetryingDetail               string `json:"retryingDetail"`
+	Reconnected                  string `json:"reconnected"`
+	ErrNetwork                   string `json:"errNetwork"`
+	ErrThrottled                 string `json:"errThrottled"`
+	ErrStructureChanged          string `json:"errStructureChanged"`
+	AuthNeedRelogin              string `json:"authNeedRelogin"`
+	AuthNeedReloginHint          string `json:"authNeedReloginHint"`
+	AuthCheckingSession          string `json:"authCheckingSession"`
+	AuthRestartingBrowser        string `json:"authRestartingBrowser"`
+	AuthVerifyingLogin           string `json:"authVerifyingLogin"`
+	AuthInterrupted              string `json:"authInterrupted"`
+	ErrAuthManualLoginFailed     string `json:"errAuthManualLoginFailed"`
+	SaveData                     string `json:"saveData"`
+	ChangeFolder                 string `json:"changeFolder"`
+	OpenFolder                   string `json:"openFolder"`
+	ResetToDefault               string `json:"resetToDefault"`
+	BackUp                       string `json:"backUp"`
+	ImportBackup                 string `json:"importBackup"`
+	BackupSaved                  string `json:"backupSaved"`
+	RestartToApply               string `json:"restartToApply"`
+	FolderHasSaveData            string `json:"folderHasSaveData"`
+	FolderHasSaveDataDescription string `json:"folderHasSaveDataDescription"`
+	UseExisting                  string `json:"useExisting"`
+	Replace                      string `json:"replace"`
+	ImportBackupDescription      string `json:"importBackupDescription"`
+	Import                       string `json:"import"`
 }

@@ -11,10 +11,21 @@ import (
 	"gopkg.in/ini.v1"
 )
 
-type Storage struct{}
+type Storage struct {
+	// The ini stays here even when the database moves, as it stores where the database is.
+	dir string
+}
 
 func NewStorage() (*Storage, error) {
-	storage := &Storage{}
+	dir, err := DefaultDataDir()
+	if err != nil {
+		return nil, fmt.Errorf("get app data directory: %w", err)
+	}
+	return NewStorageIn(dir)
+}
+
+func NewStorageIn(dir string) (*Storage, error) {
+	storage := &Storage{dir: dir}
 	_, err := storage.GetRuntimeConfig()
 	if err != nil {
 		return nil, fmt.Errorf("get runtime config: %w", err)
@@ -22,28 +33,31 @@ func NewStorage() (*Storage, error) {
 	return storage, nil
 }
 
-func getAppDataDir() (string, error) {
-	cacheDir, _ := os.UserCacheDir()
+func DefaultDataDir() (string, error) {
+	cacheDir, err := os.UserCacheDir()
+	if err != nil {
+		return "", fmt.Errorf("get user cache directory: %w", err)
+	}
 	dataDir := filepath.Join(cacheDir, "cfn-tracker")
-	err := os.MkdirAll(dataDir, os.FileMode(0755))
+	err = os.MkdirAll(dataDir, os.FileMode(0755))
 	if err != nil {
 		return "", fmt.Errorf("create directories: %w", err)
 	}
 	return dataDir, nil
 }
 
+func (s *Storage) iniPath() string {
+	return filepath.Join(s.dir, "cfn-tracker.ini")
+}
+
 func (s *Storage) getIniFile() (*ini.File, error) {
-	appDataDir, err := getAppDataDir()
-	if err != nil {
-		return nil, fmt.Errorf("get app data directory: %w", err)
-	}
-	path := filepath.Join(appDataDir, "cfn-tracker.ini")
+	path := s.iniPath()
 	if _, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
 		if _, err = os.Create(path); err != nil {
 			return nil, fmt.Errorf("create config file: %w", err)
 		}
 	}
-	iniData, err := ini.Load(filepath.Join(appDataDir, "cfn-tracker.ini"))
+	iniData, err := ini.Load(path)
 	if err != nil {
 		return nil, fmt.Errorf("load config data: %w", err)
 	}
@@ -75,13 +89,48 @@ func (s *Storage) SaveRuntimeConfig(cfg *model.RuntimeConfig) error {
 	iniData.Section("gui").Key("log_file").SetValue(strconv.FormatBool(cfg.GUI.LogFile))
 	iniData.Section("gui").Key("browser_source_port").SetValue(strconv.FormatUint(uint64(cfg.GUI.BrowserSourcePort), 10))
 
-	appDataDir, err := getAppDataDir()
+	if err := iniData.SaveTo(s.iniPath()); err != nil {
+		return fmt.Errorf("save ini config file: %w", err)
+	}
+	return nil
+}
+
+// DataDir is the folder the database is in. A configured folder that's missing
+// (e.g. an unplugged drive) is an error rather than a fallback to the default,
+// since a new empty database there would look like the data was lost.
+func (s *Storage) DataDir() (string, error) {
+	cfg, err := s.GetRuntimeConfig()
+	if err != nil {
+		return "", fmt.Errorf("get runtime config: %w", err)
+	}
+	if cfg.Data.Dir == "" {
+		return DefaultDataDir()
+	}
+	info, err := os.Stat(cfg.Data.Dir)
+	if err != nil {
+		return "", fmt.Errorf("save data folder %s not found, reconnect it or remove the [data] dir setting in %s: %w", cfg.Data.Dir, s.iniPath(), err)
+	}
+	if !info.IsDir() {
+		return "", fmt.Errorf("save data folder %s is not a folder", cfg.Data.Dir)
+	}
+	return cfg.Data.Dir, nil
+}
+
+// SaveDataDir stores the default folder as empty, so it follows the default if that changes.
+func (s *Storage) SaveDataDir(dir string) error {
+	iniData, err := s.getIniFile()
+	if err != nil {
+		return fmt.Errorf("get config file: %w", err)
+	}
+	defaultDir, err := DefaultDataDir()
 	if err != nil {
 		return fmt.Errorf("get app data directory: %w", err)
 	}
-	iniDir := filepath.Join(appDataDir, "cfn-tracker.ini")
-	err = iniData.SaveTo(iniDir)
-	if err != nil {
+	if filepath.Clean(dir) == filepath.Clean(defaultDir) {
+		dir = ""
+	}
+	iniData.Section("data").Key("dir").SetValue(dir)
+	if err := iniData.SaveTo(s.iniPath()); err != nil {
 		return fmt.Errorf("save ini config file: %w", err)
 	}
 	return nil
