@@ -86,7 +86,6 @@ export function ComparisonPage() {
     return withDelta
   }, [report])
 
-  // Leaving the page cancels the run, so ask first.
   const leaveBlocker = useBlocker(
     ({ currentLocation, nextLocation }) =>
       loading && currentLocation.pathname !== nextLocation.pathname
