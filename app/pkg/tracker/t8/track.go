@@ -29,7 +29,7 @@ func NewT8Tracker(wavuClient wavu.WavuClient) *T8Tracker {
 }
 
 func (t *T8Tracker) GetUser(ctx context.Context, polarisId string) (*model.User, error) {
-	parsedId := strings.Replace(polarisId, "-", "", -1)
+	parsedId := strings.ReplaceAll(polarisId, "-", "")
 	userName, err := t.wavuClient.GetUserName(ctx, parsedId)
 	if err != nil {
 		return nil, fmt.Errorf("get user info: %w", err)

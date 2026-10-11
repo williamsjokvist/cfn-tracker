@@ -2,26 +2,25 @@ name: Lint go code
 on:
   pull_request:
     paths:
+      - "app/mise.toml"
       - "**.go"
+      - "app/.golangci.yml"
 
 permissions:
   contents: read
-  checks: write
 
 jobs:
   go-lint:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./app
 
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: jdx/mise-action@v2
         with:
-          go-version-file: 'app/go.mod'
-          cache-dependency-path: 'app/go.sum'
+          working_directory: app
 
-      - name: golangci-lint
-        uses: golangci/golangci-lint-action@v6
-        with:
-          version: latest
-          install-mode: "goinstall"
-          working-directory: app
+      - run: mise run lint:go
+      - run: mise run fmt:check:go

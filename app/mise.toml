@@ -2,6 +2,7 @@
 bun = "latest"
 go = "1.26"
 "go:github.com/wailsapp/wails/v2/cmd/wails" = "2.16.0"
+golangci-lint = "2.14.0"
 
 [tasks.dev]
 description = "Run the dev server without generating bindings, hot reloading, go mod sync"
@@ -17,7 +18,7 @@ run = "wails generate module"
 
 [tasks.test]
 description = "Run the Go tests"
-run = "go test ./..."
+run = "go test -race ./..."
 
 [tasks.fmt]
 description = "Format the Go and GUI code"
@@ -25,10 +26,27 @@ run = ["go fmt ./...", "bun run --cwd gui fmt"]
 
 [tasks."fmt:check"]
 description = "Check the Go and GUI code is formatted"
-run = [
-  '''files=$(gofmt -l $(find . -name '*.go' -not -path './gui/*')); if [ -n "$files" ]; then echo "$files"; exit 1; fi''',
-  "bun run --cwd gui fmt:check",
-]
+depends = ["fmt:check:go", "fmt:check:gui"]
+
+[tasks."fmt:check:go"]
+description = "Check the Go code is formatted"
+run = '''files=$(gofmt -l $(find . -name '*.go' -not -path './gui/*')); if [ -n "$files" ]; then echo "$files"; exit 1; fi'''
+
+[tasks."fmt:check:gui"]
+description = "Check the GUI code is formatted"
+run = "bun run --cwd gui fmt:check"
+
+[tasks.lint]
+description = "Lint the Go and GUI code"
+depends = ["lint:go", "lint:gui"]
+
+[tasks."lint:go"]
+description = "Lint the Go code"
+run = "golangci-lint run ./..."
+
+[tasks."lint:gui"]
+description = "Type check the GUI code"
+run = "bun run --cwd gui tsc"
 
 [tasks."build-windows-amd64"]
 description = "Build for Windows (x86)"

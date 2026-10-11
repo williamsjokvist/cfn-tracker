@@ -178,7 +178,7 @@ func main() {
 	var onSecondInstanceLaunch func(secondInstanceData options.SecondInstanceData)
 	err = wails.Run(&options.App{
 		Title:              fmt.Sprintf("CFN Tracker v%s", appVersion),
-		Assets:             assets,
+		AssetServer:        &assetserver.Options{Assets: assets},
 		Width:              920,
 		Height:             450,
 		MinWidth:           800,
@@ -308,9 +308,7 @@ func handleAutoUpdate(versionStr string) {
 		}
 	} else {
 		err := update.HandleAutoUpdateTo(versionStr)
-		if err != nil {
-			slog.Error(fmt.Sprintf("update to latest version: %v", err))
-		}
+		slog.Error(fmt.Sprintf("update to latest version: %v", err))
 	}
 
 }
