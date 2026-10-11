@@ -49,6 +49,14 @@ const (
 	RankTekkenGod
 	RankTekkenGodSupreme
 	RankGodOfDestruction
+	RankGodOfDestructionI
+	RankGodOfDestructionII
+	RankGodOfDestructionIII
+	RankGodOfDestructionIV
+	RankGodOfDestructionV
+	RankGodOfDestructionVI
+	RankGodOfDestructionVII
+	RankGodOfDestructionInfinity
 )
 
 type Replay struct {

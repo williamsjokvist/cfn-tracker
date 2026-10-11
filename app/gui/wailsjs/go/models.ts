@@ -170,6 +170,14 @@ export namespace model {
 	    T8_TEKKEN_GOD: string;
 	    T8_TEKKEN_GOD_SUPREME: string;
 	    T8_GOD_OF_DESTRUCTION: string;
+	    T8_GOD_OF_DESTRUCTION_1: string;
+	    T8_GOD_OF_DESTRUCTION_2: string;
+	    T8_GOD_OF_DESTRUCTION_3: string;
+	    T8_GOD_OF_DESTRUCTION_4: string;
+	    T8_GOD_OF_DESTRUCTION_5: string;
+	    T8_GOD_OF_DESTRUCTION_6: string;
+	    T8_GOD_OF_DESTRUCTION_7: string;
+	    T8_GOD_OF_DESTRUCTION_INFINITY: string;
 	    errUnknown: string;
 	    errSelectGame: string;
 	    errAuth: string;
