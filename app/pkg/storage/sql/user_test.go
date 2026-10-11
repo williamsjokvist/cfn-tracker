@@ -2,6 +2,7 @@ package sql
 
 import (
 	"context"
+	"maps"
 	"path/filepath"
 	"slices"
 	"testing"
@@ -87,8 +88,19 @@ func TestMigrationGivesExistingUsersAGame(t *testing.T) {
 		t.Fatalf("open db: %v", err)
 	}
 	t.Cleanup(func() { _ = db.Close() })
-	if _, err := db.Exec(`INSERT INTO users (code, display_name) VALUES ('3141592653', 'Kakeru'), ('4amNGJ6EdB6J', 'Tekk!')`); err != nil {
-		t.Fatalf("insert users: %v", err)
+	_, err = db.Exec(`
+		INSERT INTO users (code, display_name) VALUES
+			('3141592653', 'Kakeru'),
+			('4amNGJ6EdB6J', 'Tekk!'),
+			('2718281828', 'Digits'),
+			('sf6PlayerX1', 'Letters');
+		-- Matches decide over the code, so these contradict it.
+		INSERT INTO matches (user_id, session_id, character, opponent_league, date, time) VALUES
+			('2718281828', 1, 'Law', 'T8_GARYU', '2026-10-11', '12:00'),
+			('sf6PlayerX1', 2, 'Ryu', 'Master', '2026-10-11', '12:00');
+	`)
+	if err != nil {
+		t.Fatalf("insert users and matches: %v", err)
 	}
 
 	if err := migrateSchemaAt(dataSource, nil); err != nil {
@@ -108,7 +120,13 @@ func TestMigrationGivesExistingUsersAGame(t *testing.T) {
 		}
 		games[code] = game
 	}
-	if games["3141592653"] != "sf6" || games["4amNGJ6EdB6J"] != "t8" {
-		t.Fatalf("games after migration = %v, want the CFN code on sf6 and the Polaris ID on t8", games)
+	want := map[string]string{
+		"3141592653":   "sf6",
+		"4amNGJ6EdB6J": "t8",
+		"2718281828":   "t8",
+		"sf6PlayerX1":  "sf6",
+	}
+	if !maps.Equal(games, want) {
+		t.Fatalf("games after migration = %v, want %v", games, want)
 	}
 }
