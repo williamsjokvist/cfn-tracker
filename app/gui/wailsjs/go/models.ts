@@ -99,6 +99,7 @@ export namespace model {
 	    comparisonFetchingRanking: string;
 	    comparisonFetchingTopPlayer: string;
 	    comparisonComparing: string;
+	    comparisonInterrupted: string;
 	    result: string;
 	    replayId: string;
 	    copy: string;
@@ -109,7 +110,6 @@ export namespace model {
 	    unpause: string;
 	    statistics: string;
 	    recentSessions: string;
-	    viewSessions: string;
 	    compareWithTopPlayers: string;
 	    noStatistics: string;
 	    date: string;
@@ -231,6 +231,10 @@ export namespace model {
 	    errStructureChanged: string;
 	    authNeedRelogin: string;
 	    authNeedReloginHint: string;
+	    authCheckingSession: string;
+	    authRestartingBrowser: string;
+	    authVerifyingLogin: string;
+	    authInterrupted: string;
 	    errAuthManualLoginFailed: string;
 	}
 	export interface Match {

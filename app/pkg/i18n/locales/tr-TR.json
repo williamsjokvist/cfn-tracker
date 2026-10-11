@@ -34,6 +34,7 @@
   "comparisonFetchingRanking": "En iyi {{character}} oyuncuları alınıyor",
   "comparisonFetchingTopPlayer": "En iyi oyuncuların istatistikleri alınıyor {{current}}/{{total}}",
   "comparisonComparing": "İstatistikler karşılaştırılıyor",
+  "comparisonInterrupted": "Karşılaştırma yarıda kesildi",
   "result": "Sonuç",
   "replayId": "Tekrar ID",
   "copy": "Kopyala",
@@ -44,7 +45,6 @@
   "unpause": "Devam et",
   "statistics": "İstatistikler",
   "recentSessions": "Son oturumlar",
-  "viewSessions": "Oturumları gör",
   "compareWithTopPlayers": "En iyi {{character}} oyuncularıyla karşılaştır",
   "noStatistics": "İstatistiklerini burada görmek için bir kullanıcıyı takip etmeye başla.",
   "date": "Tarih",
@@ -169,5 +169,6 @@
   "authCheckingSession": "Kayıtlı Capcom girişi kontrol ediliyor",
   "authRestartingBrowser": "Tarayıcı yeniden başlatılıyor",
   "authVerifyingLogin": "Capcom girişi doğrulanıyor",
+  "authInterrupted": "Giriş yarıda kesildi",
   "errAuthManualLoginFailed": "Tarayıcı girişi doğrulanamadı. Lütfen tekrar dene"
 }

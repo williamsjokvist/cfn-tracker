@@ -34,6 +34,7 @@
   "comparisonFetchingRanking": "Hämtar de bästa {{character}}-spelarna",
   "comparisonFetchingTopPlayer": "Hämtar toppspelarnas statistik {{current}}/{{total}}",
   "comparisonComparing": "Jämför statistik",
+  "comparisonInterrupted": "Jämförelse avbruten",
   "result": "Resultat",
   "replayId": "Repris-ID",
   "copy": "Kopiera",
@@ -44,7 +45,6 @@
   "unpause": "Återuppta",
   "statistics": "Statistik",
   "recentSessions": "Senaste sessioner",
-  "viewSessions": "Visa sessioner",
   "compareWithTopPlayers": "Jämför med de bästa {{character}}-spelarna",
   "noStatistics": "Börja spåra en användare för att se deras statistik här.",
   "date": "Datum",
@@ -169,5 +169,6 @@
   "authCheckingSession": "Kontrollerar sparad Capcom-inloggning",
   "authRestartingBrowser": "Startar om webbläsaren",
   "authVerifyingLogin": "Verifierar Capcom-inloggning",
+  "authInterrupted": "Inloggning avbruten",
   "errAuthManualLoginFailed": "Kunde inte bekräfta inloggningen i webbläsaren. Försök igen"
 }

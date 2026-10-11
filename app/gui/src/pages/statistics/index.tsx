@@ -5,7 +5,7 @@ import { useSelector } from '@xstate/react'
 import { motion } from 'framer-motion'
 import { Icon } from '@iconify/react'
 
-import { GetSessions, GetUsers, GetUserStatistics } from '@cmd/CommandHandler'
+import { ExportUserMatches, GetSessions, GetUsers, GetUserStatistics } from '@cmd/CommandHandler'
 import { model } from '@model'
 
 import { AuthMachineContext } from '@/state/auth-machine'
@@ -104,8 +104,18 @@ export function StatisticsPage() {
               onClick={() => navigate('/sessions')}
             >
               <Icon width={18} height={18} icon='ion:document-text-outline' />
-              <span className='relative top-[2px]'>{t('viewSessions')}</span>
+              <span className='relative top-[2px]'>{t('sessions')}</span>
             </Button>
+            {user && stats && stats.sessions > 0 && (
+              <Button
+                className='flex items-center gap-2 px-2 py-[2px]'
+                style={{ filter: 'hue-rotate(145deg)' }}
+                onClick={() => ExportUserMatches(user.code).catch(setError)}
+              >
+                <Icon width={18} height={18} icon='material-symbols:download' />
+                <span className='relative top-[2px]'>{t('export')}</span>
+              </Button>
+            )}
           </div>
         </div>
 

@@ -34,6 +34,7 @@
   "comparisonFetchingRanking": "Top-{{character}}-spelers ophalen",
   "comparisonFetchingTopPlayer": "Statistieken van topspelers ophalen {{current}}/{{total}}",
   "comparisonComparing": "Statistieken vergelijken",
+  "comparisonInterrupted": "Vergelijking onderbroken",
   "result": "Resultaat",
   "replayId": "Replay-ID",
   "copy": "Kopiëren",
@@ -44,7 +45,6 @@
   "unpause": "Hervatten",
   "statistics": "Statistieken",
   "recentSessions": "Recente sessies",
-  "viewSessions": "Sessies bekijken",
   "compareWithTopPlayers": "Vergelijken met top-{{character}}-spelers",
   "noStatistics": "Begin met het tracken van een gebruiker om hier zijn statistieken te zien.",
   "date": "Datum",
@@ -169,5 +169,6 @@
   "authCheckingSession": "Opgeslagen Capcom-login controleren",
   "authRestartingBrowser": "Browser opnieuw starten",
   "authVerifyingLogin": "Capcom-login verifiëren",
+  "authInterrupted": "Inloggen onderbroken",
   "errAuthManualLoginFailed": "Kan de login in de browser niet bevestigen. Probeer het opnieuw"
 }

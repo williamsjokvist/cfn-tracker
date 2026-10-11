@@ -34,6 +34,7 @@
   "comparisonFetchingRanking": "{{character}}のトッププレイヤーを取得中",
   "comparisonFetchingTopPlayer": "トッププレイヤーのスタッツを取得中 {{current}}/{{total}}",
   "comparisonComparing": "スタッツを比較中",
+  "comparisonInterrupted": "比較を中断しました",
   "result": "結果",
   "replayId": "リプレイ",
   "copy": "コピー",
@@ -44,7 +45,6 @@
   "unpause": "続く",
   "statistics": "統計",
   "recentSessions": "最近のセッション",
-  "viewSessions": "セッションを見る",
   "compareWithTopPlayers": "{{character}}のトッププレイヤーと比較",
   "noStatistics": "ユーザーのトラッキングを開始すると、ここに統計が表示されます。",
   "date": "日付",
@@ -169,5 +169,6 @@
   "authCheckingSession": "保存されたCapcomのログインを確認中",
   "authRestartingBrowser": "ブラウザを再起動中",
   "authVerifyingLogin": "Capcomのログインを確認中",
+  "authInterrupted": "ログインを中断しました",
   "errAuthManualLoginFailed": "ブラウザでのログインを確認できませんでした。もう一度お試しください"
 }

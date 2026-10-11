@@ -3,6 +3,8 @@
 import {model} from '../models';
 import {cmd} from '../models';
 
+export function CancelAuthentication():Promise<void>;
+
 export function ForcePoll():Promise<void>;
 
 export function SelectGame(arg1:model.GameType):Promise<void>;

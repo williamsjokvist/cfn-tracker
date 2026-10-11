@@ -1,7 +1,9 @@
 package cmd_test
 
 import (
+	"context"
 	"encoding/csv"
+	"errors"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -61,5 +63,19 @@ func TestExportCancelled(t *testing.T) {
 	handler := cmd.NewSF6ComparisonHandler(nil, exporter)
 	if err := handler.ExportSF6BattleStatsComparison(model.SF6BattleStatsComparisonReport{}); err != nil {
 		t.Fatalf("ExportSF6BattleStatsComparison() after cancelling = %v, want no error", err)
+	}
+}
+
+func TestGetSF6BattleStatsComparisonCancelledBeforeStart(t *testing.T) {
+	handler := cmd.NewSF6ComparisonHandler(nil, cmd.NewExporter())
+	handler.CancelSF6BattleStatsComparison("run")
+
+	if _, err := handler.GetSF6BattleStatsComparison("123456789", "run"); !errors.Is(err, context.Canceled) {
+		t.Fatalf("GetSF6BattleStatsComparison() error = %v, want context.Canceled", err)
+	}
+	// The early cancel is used up, so the same id runs again. Without a browser
+	// it fails at opening a tab instead.
+	if _, err := handler.GetSF6BattleStatsComparison("123456789", "run"); errors.Is(err, context.Canceled) {
+		t.Fatalf("GetSF6BattleStatsComparison() error = %v, want it to not be cancelled", err)
 	}
 }

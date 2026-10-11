@@ -34,6 +34,7 @@
   "comparisonFetchingRanking": "正在取得頂尖{{character}}玩家",
   "comparisonFetchingTopPlayer": "正在取得頂尖玩家數據 {{current}}/{{total}}",
   "comparisonComparing": "正在比較數據",
+  "comparisonInterrupted": "比較已中斷",
   "result": "結果",
   "replayId": "重播 ID",
   "copy": "複製",
@@ -44,7 +45,6 @@
   "unpause": "繼續",
   "statistics": "統計",
   "recentSessions": "最近的工作階段",
-  "viewSessions": "查看工作階段",
   "compareWithTopPlayers": "與頂尖{{character}}玩家比較",
   "noStatistics": "開始追蹤一位使用者，即可在這裡查看其統計資料。",
   "date": "日期",
@@ -169,5 +169,6 @@
   "authCheckingSession": "正在檢查已儲存的 Capcom 登入",
   "authRestartingBrowser": "正在重新啟動瀏覽器",
   "authVerifyingLogin": "正在驗證 Capcom 登入",
+  "authInterrupted": "登入已中斷",
   "errAuthManualLoginFailed": "無法確認瀏覽器登入，請再試一次"
 }

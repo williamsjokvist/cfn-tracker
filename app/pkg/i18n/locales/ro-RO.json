@@ -34,6 +34,7 @@
   "comparisonFetchingRanking": "Se preiau cei mai buni jucători {{character}}",
   "comparisonFetchingTopPlayer": "Se preiau statisticile celor mai buni jucători {{current}}/{{total}}",
   "comparisonComparing": "Se compară statisticile",
+  "comparisonInterrupted": "Comparație întreruptă",
   "result": "Rezultat",
   "replayId": "ID reluare",
   "copy": "Copiază",
@@ -44,7 +45,6 @@
   "unpause": "Continuă",
   "statistics": "Statistici",
   "recentSessions": "Sesiuni recente",
-  "viewSessions": "Vezi sesiunile",
   "compareWithTopPlayers": "Compară cu cei mai buni jucători {{character}}",
   "noStatistics": "Începe să urmărești un utilizator pentru a-i vedea statisticile aici.",
   "date": "Data",
@@ -169,5 +169,6 @@
   "authCheckingSession": "Se verifică autentificarea Capcom salvată",
   "authRestartingBrowser": "Se repornește browserul",
   "authVerifyingLogin": "Se confirmă autentificarea Capcom",
+  "authInterrupted": "Autentificare întreruptă",
   "errAuthManualLoginFailed": "Autentificarea din browser nu a putut fi confirmată. Încearcă din nou"
 }

@@ -60,6 +60,8 @@ type TrackingHandler struct {
 	forcePollChan chan struct{}
 	gameTracker   tracker.GameTracker
 	eventEmitter  EventEmitFn
+	// A pointer so a finished login can tell whether it's still the current one.
+	cancelAuth *context.CancelFunc
 }
 
 func NewTrackingHandler(wavuClient wavu.WavuClient, cfnClient cfn.CFNClient, sqlDb *sql.Storage, nosqlDb *cfgDb.Storage, txtDb *txt.Storage, cfg *config.BuildConfig, matchChans ...chan model.Match) *TrackingHandler {
@@ -330,6 +332,16 @@ func (ch *TrackingHandler) StopTracking() {
 	}
 }
 
+// CancelAuthentication stops the login SelectGame started, as the GUI stops
+// listening for it once the user goes back to pick a game.
+func (ch *TrackingHandler) CancelAuthentication() {
+	ch.mu.Lock()
+	defer ch.mu.Unlock()
+	if ch.cancelAuth != nil {
+		(*ch.cancelAuth)()
+	}
+}
+
 func (ch *TrackingHandler) SelectGame(game model.GameType) error {
 	switch game {
 	case model.GameTypeT8:
@@ -339,11 +351,34 @@ func (ch *TrackingHandler) SelectGame(game model.GameType) error {
 	default:
 		return model.WrapError(model.ErrSelectGame, fmt.Errorf("game does not exist"))
 	}
-	done, err := authenticate(ch.gameTracker.Authenticate, func(action tracker.AuthAction) {
+
+	ctx, cancel := context.WithCancel(context.Background())
+	ch.mu.Lock()
+	// The client allows one login at a time, so an older one would hold up this one.
+	if ch.cancelAuth != nil {
+		(*ch.cancelAuth)()
+	}
+	ch.cancelAuth = &cancel
+	ch.mu.Unlock()
+	started := time.Now()
+	defer func() {
+		cancel()
+		ch.mu.Lock()
+		if ch.cancelAuth == &cancel {
+			ch.cancelAuth = nil
+		}
+		ch.mu.Unlock()
+	}()
+
+	done, err := authenticate(ctx, ch.gameTracker.Authenticate, func(action tracker.AuthAction) {
 		ch.emit("auth-action-required", action)
 	}, func(step string) {
 		ch.emit("auth-progress", step)
 	})
+	if !done && errors.Is(ctx.Err(), context.Canceled) {
+		slog.Info("auth: interrupted", slog.String("game", string(game)), slog.Duration("after", time.Since(started)))
+		ch.emit("info", "authInterrupted")
+	}
 	if done {
 		ch.emit("auth-success")
 	}
@@ -351,9 +386,9 @@ func (ch *TrackingHandler) SelectGame(game model.GameType) error {
 }
 
 // authenticate returns false without an error if the login stopped without finishing.
-func authenticate(auth func(context.Context, chan tracker.AuthStatus), onAction func(tracker.AuthAction), onStep func(string)) (bool, error) {
+func authenticate(ctx context.Context, auth func(context.Context, chan tracker.AuthStatus), onAction func(tracker.AuthAction), onStep func(string)) (bool, error) {
 	authChan := make(chan tracker.AuthStatus)
-	ctx, cancel := context.WithTimeout(context.Background(), selectGameTimeout)
+	ctx, cancel := context.WithTimeout(ctx, selectGameTimeout)
 	defer cancel()
 	go auth(ctx, authChan)
 	for {

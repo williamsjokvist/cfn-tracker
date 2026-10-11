@@ -4,7 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log/slog"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/williamsjokvist/cfn-tracker/pkg/model"
@@ -16,13 +18,52 @@ type ComparisonHandler struct {
 	cfnClient    *cfn.Client
 	exporter     *Exporter
 	eventEmitter EventEmitFn
+
+	mu   sync.Mutex
+	runs map[string]context.CancelFunc
+	// Wails runs each call in its own goroutine, so a cancel can arrive before
+	// the comparison it cancels has started. The GUI only cancels unfinished
+	// runs, so ids are rarely left behind here.
+	cancelledEarly map[string]struct{}
 }
 
 func NewSF6ComparisonHandler(cfnClient *cfn.Client, exporter *Exporter) *ComparisonHandler {
 	return &ComparisonHandler{
-		cfnClient: cfnClient,
-		exporter:  exporter,
+		cfnClient:      cfnClient,
+		exporter:       exporter,
+		runs:           map[string]context.CancelFunc{},
+		cancelledEarly: map[string]struct{}{},
 	}
+}
+
+// CancelSF6BattleStatsComparison stops the comparison started with runId, as
+// it keeps a browser tab busy for a minute or more after the page is left.
+func (h *ComparisonHandler) CancelSF6BattleStatsComparison(runId string) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	if cancel, ok := h.runs[runId]; ok {
+		cancel()
+		return
+	}
+	h.cancelledEarly[runId] = struct{}{}
+}
+
+func (h *ComparisonHandler) startRun(runId string) (context.Context, func(), error) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	if _, ok := h.cancelledEarly[runId]; ok {
+		delete(h.cancelledEarly, runId)
+		slog.Info("comparison: cancelled before it started", slog.String("run_id", runId))
+		return nil, nil, context.Canceled
+	}
+	ctx, cancel := context.WithCancel(context.Background())
+	h.runs[runId] = cancel
+	return ctx, func() {
+		cancel()
+		h.mu.Lock()
+		delete(h.runs, runId)
+		h.mu.Unlock()
+	}, nil
 }
 
 type ComparisonProgress struct {
@@ -64,11 +105,25 @@ func (h *ComparisonHandler) emit(name string, data ...interface{}) {
 	}
 }
 
-func (h *ComparisonHandler) GetSF6BattleStatsComparison(userCode string) (*model.SF6BattleStatsComparisonReport, error) {
+func (h *ComparisonHandler) GetSF6BattleStatsComparison(userCode, runId string) (_ *model.SF6BattleStatsComparisonReport, err error) {
 	if userCode == "" {
 		return nil, fmt.Errorf("userCode is empty")
 	}
 	const topN = 5
+
+	runCtx, endRun, err := h.startRun(runId)
+	if err != nil {
+		return nil, err
+	}
+	defer endRun()
+	started := time.Now()
+	defer func() {
+		// Checked before endRun, which cancels the context too.
+		if err != nil && errors.Is(runCtx.Err(), context.Canceled) {
+			slog.Info("comparison: interrupted", slog.String("user_code", userCode), slog.Duration("after", time.Since(started)))
+			h.emit("info", "comparisonInterrupted")
+		}
+	}()
 
 	tabClient, cleanup, err := h.cfnClient.NewTabClient()
 	if err != nil {
@@ -78,10 +133,13 @@ func (h *ComparisonHandler) GetSF6BattleStatsComparison(userCode string) (*model
 
 	// The tab shares the tracking browser's profile and so its buckler cookie.
 	h.progress("comparisonCheckingLogin", nil)
-	if !tabClient.HasSession(context.Background()) {
+	if !tabClient.HasSession(runCtx) {
+		if runCtx.Err() != nil {
+			return nil, runCtx.Err()
+		}
 		// Logging in closes and relaunches the browser, which takes the tab with it.
 		cleanup()
-		done, err := authenticate(h.cfnClient.Authenticate, func(action tracker.AuthAction) {
+		done, err := authenticate(runCtx, h.cfnClient.Authenticate, func(action tracker.AuthAction) {
 			h.emit("comparison-auth-action-required", action)
 		}, func(step string) {
 			h.progress(step, nil)
@@ -99,7 +157,7 @@ func (h *ComparisonHandler) GetSF6BattleStatsComparison(userCode string) (*model
 		}
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+	ctx, cancel := context.WithTimeout(runCtx, 60*time.Second)
 	defer cancel()
 
 	h.progress("comparisonFetchingBattleLog", nil)
@@ -143,6 +201,9 @@ func (h *ComparisonHandler) GetSF6BattleStatsComparison(userCode string) (*model
 		}
 		h.progress("comparisonFetchingTopPlayer", map[string]any{"current": len(topStats) + 1, "total": topN})
 		pd, err := tabClient.GetPlayData(ctx, profileID)
+		if ctx.Err() != nil {
+			return nil, ctx.Err()
+		}
 		if err != nil {
 			continue
 		}

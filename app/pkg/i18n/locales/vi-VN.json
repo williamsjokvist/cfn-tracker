@@ -34,6 +34,7 @@
   "comparisonFetchingRanking": "Đang tải người chơi {{character}} hàng đầu",
   "comparisonFetchingTopPlayer": "Đang tải chỉ số người chơi hàng đầu {{current}}/{{total}}",
   "comparisonComparing": "Đang so sánh chỉ số",
+  "comparisonInterrupted": "So sánh đã bị gián đoạn",
   "result": "Kết quả",
   "replayId": "ID phát lại",
   "copy": "Sao chép",
@@ -44,7 +45,6 @@
   "unpause": "Tiếp tục",
   "statistics": "Thống kê",
   "recentSessions": "Phiên gần đây",
-  "viewSessions": "Xem các phiên",
   "compareWithTopPlayers": "So sánh với người chơi {{character}} hàng đầu",
   "noStatistics": "Bắt đầu theo dõi một người dùng để xem thống kê của họ tại đây.",
   "date": "Ngày",
@@ -169,5 +169,6 @@
   "authCheckingSession": "Đang kiểm tra đăng nhập Capcom đã lưu",
   "authRestartingBrowser": "Đang khởi động lại trình duyệt",
   "authVerifyingLogin": "Đang xác minh đăng nhập Capcom",
+  "authInterrupted": "Đăng nhập đã bị gián đoạn",
   "errAuthManualLoginFailed": "Không thể xác nhận đăng nhập trên trình duyệt. Vui lòng thử lại"
 }

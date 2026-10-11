@@ -36,6 +36,7 @@ type Localization struct {
 	ComparisonFetchingRanking   string `json:"comparisonFetchingRanking"`
 	ComparisonFetchingTopPlayer string `json:"comparisonFetchingTopPlayer"`
 	ComparisonComparing         string `json:"comparisonComparing"`
+	ComparisonInterrupted       string `json:"comparisonInterrupted"`
 	Result                      string `json:"result"`
 	ReplayId                    string `json:"replayId"`
 	Copy                        string `json:"copy"`
@@ -46,7 +47,6 @@ type Localization struct {
 	Unpause                     string `json:"unpause"`
 	Statistics                  string `json:"statistics"`
 	RecentSessions              string `json:"recentSessions"`
-	ViewSessions                string `json:"viewSessions"`
 	CompareWithTopPlayers       string `json:"compareWithTopPlayers"`
 	NoStatistics                string `json:"noStatistics"`
 	Date                        string `json:"date"`
@@ -173,5 +173,6 @@ type Localization struct {
 	AuthCheckingSession      string `json:"authCheckingSession"`
 	AuthRestartingBrowser    string `json:"authRestartingBrowser"`
 	AuthVerifyingLogin       string `json:"authVerifyingLogin"`
+	AuthInterrupted          string `json:"authInterrupted"`
 	ErrAuthManualLoginFailed string `json:"errAuthManualLoginFailed"`
 }

@@ -34,6 +34,7 @@
   "comparisonFetchingRanking": "शीर्ष {{character}} खिलाड़ी लाए जा रहे हैं",
   "comparisonFetchingTopPlayer": "शीर्ष खिलाड़ियों के आँकड़े लाए जा रहे हैं {{current}}/{{total}}",
   "comparisonComparing": "आँकड़ों की तुलना की जा रही है",
+  "comparisonInterrupted": "तुलना बाधित हुई",
   "result": "नतीजा",
   "replayId": "रीप्ले ID",
   "copy": "कॉपी करें",
@@ -44,7 +45,6 @@
   "unpause": "जारी रखें",
   "statistics": "आँकड़े",
   "recentSessions": "हाल के सेशन",
-  "viewSessions": "सेशन देखें",
   "compareWithTopPlayers": "शीर्ष {{character}} खिलाड़ियों से तुलना करें",
   "noStatistics": "किसी यूज़र को ट्रैक करना शुरू करें, फिर उसके आँकड़े यहाँ दिखेंगे।",
   "date": "तारीख",
@@ -169,5 +169,6 @@
   "authCheckingSession": "सहेजा गया Capcom लॉगिन जाँचा जा रहा है",
   "authRestartingBrowser": "ब्राउज़र फिर से शुरू किया जा रहा है",
   "authVerifyingLogin": "Capcom लॉगिन सत्यापित किया जा रहा है",
+  "authInterrupted": "लॉगिन बाधित हुआ",
   "errAuthManualLoginFailed": "ब्राउज़र लॉग इन की पुष्टि नहीं हो सकी। कृपया फिर से कोशिश करें"
 }
