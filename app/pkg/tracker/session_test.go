@@ -52,8 +52,10 @@ func TestRecord(t *testing.T) {
 			steps: []step{
 				{win("Ryu", 10100, 0), stats{1, 0, 1, 100, 100, 0}},
 				{win("Ryu", 10200, 0), stats{2, 0, 2, 100, 200, 0}},
+				// Ken has no baseline, so his first match gains nothing.
 				{loss("Ken", 5000, 0), stats{0, 1, 0, 0, 0, 0}},
 				{win("Ken", 5100, 0), stats{1, 1, 1, 50, 100, 0}},
+				// Ryu's gain continues from his own last LP, not Ken's.
 				{win("Ryu", 10300, 0), stats{3, 0, 3, 100, 300, 0}},
 			},
 		},

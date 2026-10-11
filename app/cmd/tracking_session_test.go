@@ -40,6 +40,7 @@ func startLiveTracking(t *testing.T, handler *cmd.TrackingHandler, userCode stri
 	go func() { lt.done <- handler.StartTracking(userCode, restore) }()
 	t.Cleanup(lt.stop)
 
+	// Tracking announces the session, and when restoring its latest match, before any new match.
 	lt.waitForMatch()
 	if restore {
 		lt.waitForMatch()
