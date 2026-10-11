@@ -9,7 +9,7 @@ import (
 
 func TestGetUserStatistics(t *testing.T) {
 	ctx := context.Background()
-	storage, err := NewStorage(true)
+	storage, err := NewInMemoryStorage()
 	if err != nil {
 		t.Fatalf("NewStorage() error = %v", err)
 	}

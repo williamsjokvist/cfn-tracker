@@ -16,12 +16,25 @@ import {
   SaveSidebarMinimized,
   SaveTheme
 } from '@cmd/CommandHandler'
+import {
+  BackupData,
+  ChooseBackup,
+  ChooseDataDirectory,
+  GetDataLocation,
+  HasSaveData,
+  ImportBackup,
+  OpenDataDirectory,
+  SaveDataDirectory
+} from '@cmd/DataHandler'
 import { BrowserOpenURL } from '@runtime'
 
 import * as Page from '@/ui/page'
+import * as Dialog from '@/ui/dialog'
+import { Button } from '@/ui/button'
 import * as Select from '@/ui/select'
 import { Switch } from '@/ui/switch'
 import { Input } from '@/ui/input'
+import { SettingButton } from '@/ui/setting-button'
 import { Flag } from '@/ui/flag'
 import { cn } from '@/helpers/cn'
 import { model } from '@model'
@@ -48,6 +61,11 @@ export function SettingsPage() {
             <BrowserSourcePortInput />
             <SideBarToggle />
             <LogFileToggle />
+          </div>
+        </div>
+        <div className='border-b-divider border-b-[1px] border-solid px-8 py-6'>
+          <div className='mx-auto max-w-xl'>
+            <SaveDataSettings />
           </div>
         </div>
         <div className='relative mx-auto grid max-w-xl gap-4 py-6'>
@@ -186,6 +204,7 @@ function BrowserSourcePortInput() {
         {t('browserSourcePort')}
       </label>
       <Input
+        size='sm'
         id='browser-source-port'
         disabled={saving}
         type='number'
@@ -198,6 +217,158 @@ function BrowserSourcePortInput() {
         onKeyDown={e => e.key === 'Enter' && e.currentTarget.blur()}
       />
     </div>
+  )
+}
+
+function SaveDataSettings() {
+  const { t } = useTranslation()
+  const setError = useErrorPopup()
+  const [location, setLocation] = React.useState<model.DataLocation | null>(null)
+  const [busy, setBusy] = React.useState(false)
+  const [folderWithSaveData, setFolderWithSaveData] = React.useState<string | null>(null)
+  const [backupToImport, setBackupToImport] = React.useState<string | null>(null)
+
+  function refresh() {
+    GetDataLocation().then(setLocation).catch(setError)
+  }
+  React.useEffect(refresh, [])
+
+  // Moving and importing copy the whole database, so disable the buttons until they finish.
+  function run<T>(action: () => Promise<T>) {
+    setBusy(true)
+    return action()
+      .catch(err => {
+        setError(err)
+        return undefined
+      })
+      .finally(() => setBusy(false))
+  }
+
+  function moveTo(dir: string) {
+    if (!dir) {
+      return
+    }
+    HasSaveData(dir)
+      .then(hasSaveData =>
+        hasSaveData ? setFolderWithSaveData(dir) : saveDataDirectory(dir, false)
+      )
+      .catch(setError)
+  }
+
+  function saveDataDirectory(dir: string, useExisting: boolean) {
+    setFolderWithSaveData(null)
+    run(() => SaveDataDirectory(dir, useExisting)).then(refresh)
+  }
+
+  function importBackup(path: string) {
+    setBackupToImport(null)
+    run(() => ImportBackup(path)).then(refresh)
+  }
+
+  return (
+    <div className='grid gap-3'>
+      <div>
+        <h3 className='font-bold'>{t('saveData')}</h3>
+        {/* Paths read left to right in every locale. */}
+        <p
+          dir='ltr'
+          title={location?.dir}
+          className='truncate text-start text-base font-extralight text-[#d6d4ff]'
+        >
+          {location?.dir}
+        </p>
+      </div>
+      <div className='flex flex-wrap gap-2'>
+        <SettingButton
+          icon='mdi:folder-move-outline'
+          disabled={busy}
+          onClick={() => ChooseDataDirectory().then(moveTo).catch(setError)}
+        >
+          {t('changeFolder')}
+        </SettingButton>
+        <SettingButton
+          icon='mdi:folder-open-outline'
+          onClick={() => OpenDataDirectory().catch(setError)}
+        >
+          {t('openFolder')}
+        </SettingButton>
+        <SettingButton
+          icon='mdi:restore'
+          disabled={busy || !location || location.dir === location.defaultDir}
+          onClick={() => location && moveTo(location.defaultDir)}
+        >
+          {t('resetToDefault')}
+        </SettingButton>
+      </div>
+      <div className='flex flex-wrap gap-2'>
+        <SettingButton
+          icon='mdi:content-save-outline'
+          disabled={busy}
+          onClick={() => run(BackupData)}
+        >
+          {t('backUp')}
+        </SettingButton>
+        <SettingButton
+          icon='mdi:database-import-outline'
+          disabled={busy}
+          onClick={() =>
+            ChooseBackup()
+              .then(path => path && setBackupToImport(path))
+              .catch(setError)
+          }
+        >
+          {t('importBackup')}
+        </SettingButton>
+      </div>
+      {location?.restartRequired && (
+        <p className='text-base text-yellow-300'>{t('restartToApply')}</p>
+      )}
+
+      <ConfirmDialog
+        open={folderWithSaveData !== null}
+        onClose={() => setFolderWithSaveData(null)}
+        title='folderHasSaveData'
+        text={t('folderHasSaveDataDescription')}
+      >
+        <Button onClick={() => saveDataDirectory(folderWithSaveData!, true)}>
+          {t('useExisting')}
+        </Button>
+        <Button onClick={() => saveDataDirectory(folderWithSaveData!, false)}>
+          {t('replace')}
+        </Button>
+      </ConfirmDialog>
+      <ConfirmDialog
+        open={backupToImport !== null}
+        onClose={() => setBackupToImport(null)}
+        title='importBackup'
+        text={t('importBackupDescription')}
+      >
+        <Button onClick={() => importBackup(backupToImport!)}>{t('import')}</Button>
+      </ConfirmDialog>
+    </div>
+  )
+}
+
+function ConfirmDialog(
+  props: React.PropsWithChildren<{
+    open: boolean
+    onClose: () => void
+    title: LocalizationKey
+    text: string
+  }>
+) {
+  return (
+    <Dialog.Root open={props.open} onOpenChange={open => !open && props.onClose()}>
+      {/* A style, as the class can't reliably override the dialog's fixed height. */}
+      <Dialog.Content
+        title={props.title}
+        className='flex flex-col gap-6'
+        style={{ height: 'auto' }}
+      >
+        <p>{props.text}</p>
+        <div className='flex justify-end gap-3'>{props.children}</div>
+      </Dialog.Content>
+    </Dialog.Root>
   )
 }
 
@@ -253,6 +424,7 @@ function ThemeSelect() {
     <div className='flex items-center justify-between'>
       <h3 className='font-bold'>{t('theme')}</h3>
       <Select.Root
+        size='sm'
         value={cfg.theme}
         onValueChange={(theme: model.ThemeName) => {
           SaveTheme(theme)
@@ -293,6 +465,7 @@ function LanguageSelect(props: React.PropsWithChildren) {
     <div className='flex w-full items-center justify-between'>
       <h3 className='font-bold'>{t('language')}</h3>
       <Select.Root
+        size='sm'
         onValueChange={code => {
           i18n
             .changeLanguage(code)

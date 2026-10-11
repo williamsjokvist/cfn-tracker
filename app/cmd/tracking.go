@@ -332,6 +332,12 @@ func (ch *TrackingHandler) StopTracking() {
 	}
 }
 
+func (ch *TrackingHandler) isTracking() bool {
+	ch.mu.Lock()
+	defer ch.mu.Unlock()
+	return ch.cancelPolling != nil
+}
+
 // CancelAuthentication stops the login SelectGame started, as the GUI stops
 // listening for it once the user goes back to pick a game.
 func (ch *TrackingHandler) CancelAuthentication() {

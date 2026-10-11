@@ -18,7 +18,7 @@ import (
 
 func TestExportUserMatches(t *testing.T) {
 	ctx := context.Background()
-	sqlDb, err := sql.NewStorage(true)
+	sqlDb, err := sql.NewInMemoryStorage()
 	if err != nil {
 		t.Fatalf("NewStorage() error = %v", err)
 	}

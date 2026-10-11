@@ -22,7 +22,7 @@ func userCodes(users []*model.User) []string {
 
 func TestGetUsersByGame(t *testing.T) {
 	ctx := context.Background()
-	storage, err := NewStorage(true)
+	storage, err := NewInMemoryStorage()
 	if err != nil {
 		t.Fatalf("NewStorage() error = %v", err)
 	}
@@ -56,7 +56,7 @@ func TestGetUsersByGame(t *testing.T) {
 
 func TestSaveUserMovesExistingUserToGame(t *testing.T) {
 	ctx := context.Background()
-	storage, err := NewStorage(true)
+	storage, err := NewInMemoryStorage()
 	if err != nil {
 		t.Fatalf("NewStorage() error = %v", err)
 	}
