@@ -1,0 +1,46 @@
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@300;600&display=swap");
+
+body {
+  background:
+    radial-gradient(circle at 20% 20%, #ff6ab0 0, transparent 40%),
+    radial-gradient(circle at 80% 70%, #4f8bff 0, transparent 45%),
+    #241a4a;
+  background-attachment: fixed;
+}
+
+.stat-list {
+  display: grid;
+  gap: 10px;
+  max-width: 400px;
+
+  font-family: "Outfit", "Segoe UI", sans-serif;
+  white-space: nowrap;
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.06));
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 18px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    0 8px 24px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(16px) saturate(160%);
+}
+
+.stat-title {
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 300;
+  font-size: 1.3rem;
+  letter-spacing: 0.04em;
+}
+
+.stat-value {
+  color: #fff;
+  font-weight: 600;
+  font-size: 2rem;
+}

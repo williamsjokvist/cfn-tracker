@@ -1,0 +1,49 @@
+@import url("https://fonts.googleapis.com/css2?family=Russo+One&display=swap");
+
+body {
+  background: #120d0a;
+}
+
+.stat-list {
+  display: grid;
+  gap: 8px;
+  max-width: 480px;
+  padding: 0 10px;
+
+  font-family: "Russo One", Impact, sans-serif;
+  white-space: nowrap;
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  padding: 6px 22px;
+  background:
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.35), transparent 50%),
+    linear-gradient(to right, #b3000c, #ff5a00 60%, #ffd000);
+  border: 3px solid #ffd76a;
+  box-shadow:
+    0 0 0 3px #3a2410,
+    0 4px 10px rgba(0, 0, 0, 0.6);
+  transform: skewX(-14deg);
+}
+
+.stat-title,
+.stat-value {
+  color: #fff;
+  -webkit-text-stroke: 2px #2a0a00;
+  paint-order: stroke fill;
+}
+
+.stat-title {
+  font-size: 1.4rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.stat-value {
+  font-size: 2.2rem;
+  text-shadow: 0 3px 0 #2a0a00;
+}

@@ -1,0 +1,57 @@
+@import url("https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap");
+
+body {
+  background: #050b12;
+}
+
+.stat-list {
+  display: grid;
+  gap: 10px;
+  max-width: 420px;
+
+  font-family: "Share Tech Mono", "Courier New", monospace;
+  white-space: nowrap;
+}
+
+.stat-item {
+  --hud: #5ce1ff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  padding: 10px 18px;
+  background:
+    linear-gradient(var(--hud), var(--hud)) top left / 14px 2px no-repeat,
+    linear-gradient(var(--hud), var(--hud)) top left / 2px 14px no-repeat,
+    linear-gradient(var(--hud), var(--hud)) top right / 14px 2px no-repeat,
+    linear-gradient(var(--hud), var(--hud)) top right / 2px 14px no-repeat,
+    linear-gradient(var(--hud), var(--hud)) bottom left / 14px 2px no-repeat,
+    linear-gradient(var(--hud), var(--hud)) bottom left / 2px 14px no-repeat,
+    linear-gradient(var(--hud), var(--hud)) bottom right / 14px 2px no-repeat,
+    linear-gradient(var(--hud), var(--hud)) bottom right / 2px 14px no-repeat,
+    linear-gradient(to right, rgba(92, 225, 255, 0.14), rgba(92, 225, 255, 0.03));
+}
+
+.stat-title {
+  color: rgba(92, 225, 255, 0.75);
+  font-size: 1rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+}
+
+.stat-title::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-right: 10px;
+  vertical-align: 0.15em;
+  background: #ffb547;
+  box-shadow: 0 0 6px #ffb547;
+}
+
+.stat-value {
+  color: #e8fbff;
+  font-size: 1.9rem;
+  text-shadow: 0 0 8px rgba(92, 225, 255, 0.8);
+}

@@ -1,0 +1,61 @@
+@font-face {
+  font-family: "Pixelated MS Sans Serif";
+  font-weight: 400;
+  src: url("https://cdn.jsdelivr.net/npm/98.css@0.1.21/dist/ms_sans_serif.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Pixelated MS Sans Serif";
+  font-weight: 700;
+  src: url("https://cdn.jsdelivr.net/npm/98.css@0.1.21/dist/ms_sans_serif_bold.woff2") format("woff2");
+}
+
+body {
+  background: #008080;
+}
+
+.stat-list {
+  display: grid;
+  gap: 8px;
+  max-width: 380px;
+
+  font-family: "Pixelated MS Sans Serif", Tahoma, sans-serif;
+  -webkit-font-smoothing: none;
+  white-space: nowrap;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px;
+  background: #c0c0c0;
+  box-shadow:
+    inset -1px -1px 0 #0a0a0a,
+    inset 1px 1px 0 #fff,
+    inset -2px -2px 0 #808080,
+    inset 2px 2px 0 #dfdfdf;
+}
+
+.stat-title {
+  flex: 1;
+  padding: 4px 8px;
+  color: #fff;
+  background: linear-gradient(to right, #000080, #1084d0);
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.stat-value {
+  min-width: 80px;
+  padding: 4px 10px;
+  text-align: right;
+  color: #000;
+  background: #fff;
+  font-size: 18px;
+  box-shadow:
+    inset 1px 1px 0 #808080,
+    inset -1px -1px 0 #fff,
+    inset 2px 2px 0 #0a0a0a,
+    inset -2px -2px 0 #dfdfdf;
+}

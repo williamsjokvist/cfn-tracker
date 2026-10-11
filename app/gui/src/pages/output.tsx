@@ -28,9 +28,24 @@ type StatOptions = Omit<Record<keyof model.Match, boolean>, 'replayId' | 'sessio
 const themeLabels: Record<string, LocalizationKey> = {
   default: 'themeDefault',
   blades: 'browserSourceThemeBlades',
+  broadcast: 'browserSourceThemeBroadcast',
+  chalkboard: 'browserSourceThemeChalkboard',
+  comic: 'browserSourceThemeComic',
+  deco: 'browserSourceThemeDeco',
+  glass: 'browserSourceThemeGlass',
+  hud: 'browserSourceThemeHud',
+  ink: 'browserSourceThemeInk',
   jaeger: 'browserSourceThemeJaeger',
+  minimal: 'browserSourceThemeMinimal',
+  'minimal-dark': 'browserSourceThemeMinimalDark',
+  neon: 'browserSourceThemeNeon',
   nord: 'browserSourceThemeNord',
-  pills: 'browserSourceThemePills'
+  notebook: 'browserSourceThemeNotebook',
+  pills: 'browserSourceThemePills',
+  retro: 'browserSourceThemeRetro',
+  synthwave: 'browserSourceThemeSynthwave',
+  terminal: 'browserSourceThemeTerminal',
+  versus: 'browserSourceThemeVersus'
 }
 
 const defaultOptions: StatOptions = {
@@ -239,8 +254,8 @@ function ThemeSelect(props: { value: string; onSelect: (theme: string) => void }
           {themeLabels[props.value] ? t(themeLabels[props.value]) : props.value}
         </SettingButton>
       </Dialog.Trigger>
-      <Dialog.Content title='selectTheme'>
-        <ul className='my-4 w-full overflow-y-scroll'>
+      <Dialog.Content title='selectTheme' className='flex flex-col'>
+        <ul className='my-4 min-h-0 w-full flex-1 overflow-y-auto'>
           {themes.map(theme => (
             <li
               key={theme.name}
@@ -261,7 +276,7 @@ function ThemeSelect(props: { value: string; onSelect: (theme: string) => void }
             </li>
           ))}
         </ul>
-        <div className='relative mx-auto h-[60px] w-[350px]'>
+        <div className='relative mx-auto h-[60px] w-[350px] shrink-0'>
           {themes.map(theme => (
             <div
               key={theme.name}
@@ -272,7 +287,7 @@ function ThemeSelect(props: { value: string; onSelect: (theme: string) => void }
                 'pointer-events-none mx-auto h-[60px] w-[350px] select-none'
               )}
             >
-              <style>{theme.css.match(/@import.*;/g)}</style>
+              <style>{theme.css.match(/@import.*;|@font-face\s*{[^}]*}/g)}</style>
             </div>
           ))}
         </div>

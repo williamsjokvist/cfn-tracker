@@ -1,0 +1,42 @@
+@import url("https://fonts.googleapis.com/css2?family=Bangers&display=swap");
+
+body {
+  background: #fff4d6;
+}
+
+.stat-list {
+  display: grid;
+  gap: 10px;
+  max-width: 420px;
+  padding: 4px 8px 8px 4px;
+
+  font-family: "Bangers", Impact, sans-serif;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  padding: 4px 16px;
+  border: 3px solid #1b1b1b;
+  box-shadow: 4px 4px 0 #1b1b1b;
+  background:
+    linear-gradient(to right, #fffaf0 35%, rgba(255, 250, 240, 0)),
+    radial-gradient(circle, rgba(255, 90, 60, 0.3) 1.5px, transparent 2px) 0 0 / 7px 7px,
+    #fffaf0;
+}
+
+.stat-title {
+  color: #1b1b1b;
+  font-size: 1.6rem;
+  text-transform: uppercase;
+}
+
+.stat-value {
+  color: #e63323;
+  font-size: 2.25rem;
+  text-shadow: 2px 2px 0 #1b1b1b;
+}

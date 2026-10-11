@@ -1,0 +1,47 @@
+@import url("https://fonts.googleapis.com/css2?family=Neonderthaw&family=Tilt+Neon&display=swap");
+
+body {
+  background: #120f12;
+}
+
+.stat-list {
+  display: grid;
+  gap: 8px;
+  max-width: 420px;
+  white-space: nowrap;
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  padding: 4px 22px;
+  background:
+    linear-gradient(rgba(0, 0, 0, 0.55) 2px, transparent 2px) 0 0 / 100% 22px,
+    linear-gradient(90deg, rgba(0, 0, 0, 0.55) 2px, transparent 2px) 0 0 / 44px 22px,
+    radial-gradient(ellipse at center, #3a1f1f, #1e1212);
+  border-radius: 6px;
+}
+
+.stat-title {
+  color: #fff0fb;
+  font-family: "Neonderthaw", cursive;
+  font-size: 2.6rem;
+  text-shadow:
+    0 0 4px #fff,
+    0 0 10px #ff3fd0,
+    0 0 22px #ff3fd0,
+    0 0 40px #ff3fd0;
+}
+
+.stat-value {
+  color: #f2fffd;
+  font-family: "Tilt Neon", sans-serif;
+  font-size: 2.2rem;
+  text-shadow:
+    0 0 4px #fff,
+    0 0 10px #2bffe0,
+    0 0 22px #2bffe0,
+    0 0 40px #2bffe0;
+}
