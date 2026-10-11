@@ -69,10 +69,10 @@
         document.body.appendChild(hint)
       }
 
-      // Falls back to the raw stat names if the labels can't be fetched, rather than drawing nothing.
-      async function getStatLabels(locale) {
+      // Falls back to the raw stat names if the translations can't be fetched, rather than drawing nothing.
+      async function getTranslation(locale) {
         try {
-          const res = await fetch(`/stat-labels/${encodeURIComponent(locale)}`)
+          const res = await fetch(`/translations/${encodeURIComponent(locale)}`)
           if (res.ok) return await res.json()
         } catch {}
         return {}
@@ -82,7 +82,7 @@
         const searchParams = new URLSearchParams(window.location.search);
         const locale = searchParams.get("lang") ?? "en-GB"
         document.documentElement.lang = locale
-        const statLabels = await getStatLabels(locale)
+        const translation = await getTranslation(locale)
 
         // apply theme
         const cssEl = document.getElementById("theme-css")
@@ -97,7 +97,7 @@
 
           const title = document.createElement("dt")
           title.classList.add("stat-title")
-          title.textContent = statLabels[stat] ?? stat
+          title.textContent = translation[stat] || stat
 
           const el = document.createElement("div")
           el.classList.add("stat-item")

@@ -90,6 +90,8 @@ type Localization struct {
 	BrowserSourceThemePills     string `json:"browserSourceThemePills"`
 	CreateYourOwnTheme          string `json:"createYourOwnTheme"`
 	UserId                      string `json:"userId"`
+	UserName                    string `json:"userName"`
+	Victory                     string `json:"victory"`
 	LP                          string `json:"lp"`
 	MR                          string `json:"mr"`
 	OpponentCharacter           string `json:"opponentCharacter"`

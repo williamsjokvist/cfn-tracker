@@ -167,6 +167,8 @@ export namespace model {
 	    browserSourceThemePills: string;
 	    createYourOwnTheme: string;
 	    userId: string;
+	    userName: string;
+	    victory: string;
 	    lp: string;
 	    mr: string;
 	    opponentCharacter: string;

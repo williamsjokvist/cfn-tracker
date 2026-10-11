@@ -33,28 +33,6 @@ const themeLabels: Record<string, LocalizationKey> = {
   pills: 'browserSourceThemePills'
 }
 
-const statLabels: Record<keyof Omit<StatOptions, 'theme'>, LocalizationKey> = {
-  userName: 'user',
-  userId: 'userId',
-  character: 'character',
-  lp: 'lp',
-  lpGain: 'lpGain',
-  mr: 'mr',
-  mrGain: 'mrGain',
-  opponent: 'opponent',
-  opponentCharacter: 'opponentCharacter',
-  opponentLp: 'opponentLp',
-  opponentMr: 'opponentMr',
-  opponentLeague: 'opponentLeague',
-  victory: 'result',
-  date: 'date',
-  time: 'time',
-  winStreak: 'winStreak',
-  wins: 'wins',
-  losses: 'losses',
-  winRate: 'winRate'
-}
-
 const defaultOptions: StatOptions = {
   theme: 'default',
   userName: false,
@@ -208,7 +186,9 @@ function StatSelect(props: {
                 onClick={() => props.onSelect(opt, !checked)}
               >
                 <Checkbox checked={props.options[opt] === true} readOnly />
-                <span className='ms-4 cursor-pointer text-center'>{t(statLabels[opt])}</span>
+                <span className='ms-4 cursor-pointer text-center'>
+                  {t(opt as keyof typeof props.options)}
+                </span>
               </button>
             </li>
           ))}
