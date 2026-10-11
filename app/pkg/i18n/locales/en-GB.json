@@ -1,6 +1,6 @@
 {
   "appVersion": "App version {{appVersion}}",
-  "source": "Source code",
+  "source": "Source",
   "about": "About",
   "settings": "Settings",
   "tracking": "Tracking",
@@ -187,6 +187,7 @@
   "replace": "Replace",
   "importBackupDescription": "This replaces all your current data with the backup.",
   "import": "Import",
+  "generalSettings": "General settings",
   "errTrackingInProgress": "Stop tracking first",
   "errGetDataLocation": "Couldn't find the save data",
   "errSaveDataDirectory": "Couldn't change the save data folder",

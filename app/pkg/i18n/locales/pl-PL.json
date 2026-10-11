@@ -1,6 +1,6 @@
 {
   "appVersion": "Wersja aplikacji {{appVersion}}",
-  "source": "Kod źródłowy",
+  "source": "Źródło",
   "about": "O aplikacji",
   "settings": "Ustawienia",
   "tracking": "Śledzenie",
@@ -187,6 +187,7 @@
   "replace": "Zastąp",
   "importBackupDescription": "To zastąpi wszystkie bieżące dane kopią zapasową.",
   "import": "Importuj",
+  "generalSettings": "Ustawienia ogólne",
   "errTrackingInProgress": "Najpierw zatrzymaj śledzenie",
   "errGetDataLocation": "Nie znaleziono zapisanych danych",
   "errSaveDataDirectory": "Nie udało się zmienić folderu danych",

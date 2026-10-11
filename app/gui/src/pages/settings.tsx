@@ -1,5 +1,4 @@
 import React from 'react'
-import { Icon } from '@iconify/react'
 import { motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 
@@ -55,12 +54,15 @@ export function SettingsPage() {
         className='overflow-y-scroll text-xl'
       >
         <div className='border-b-divider border-b-[1px] border-solid px-8 py-6'>
-          <div className='mx-auto grid max-w-xl auto-rows-fr gap-4'>
-            <ThemeSelect />
-            <LanguageSelect />
-            <BrowserSourcePortInput />
-            <SideBarToggle />
-            <LogFileToggle />
+          <div className='mx-auto grid max-w-xl gap-3'>
+            <h3 className='font-bold'>{t('generalSettings')}</h3>
+            <div className='grid auto-rows-fr gap-2'>
+              <ThemeSelect />
+              <LanguageSelect />
+              <BrowserSourcePortInput />
+              <SideBarToggle />
+              <LogFileToggle />
+            </div>
           </div>
         </div>
         <div className='border-b-divider border-b-[1px] border-solid px-8 py-6'>
@@ -68,46 +70,40 @@ export function SettingsPage() {
             <SaveDataSettings />
           </div>
         </div>
-        <div className='relative mx-auto grid max-w-xl gap-4 py-6'>
-          <h3 className='font-bold'>{t('about')}</h3>
-          <AppVersion />
-          <div className='flex gap-8'>
-            <Link
-              icon={
-                <Icon
-                  icon='mdi:scroll'
-                  className='me-2 h-6 w-6 text-stone-300 transition-colors group-hover:text-white'
-                />
-              }
-              text={t('changelog')}
-              url='https://cfn.williamsjokvist.se/changelog'
-            />
-            <Link
-              icon={
-                <Icon
-                  icon='fa6-brands:github'
-                  className='me-2 h-6 w-6 text-orange-300 transition-colors group-hover:text-white'
-                />
-              }
-              text={t('source')}
-              url='https://github.com/williamsjokvist/cfn-tracker'
-            />
-            <Link
-              icon={
-                <Icon
-                  icon='fa6-brands:twitter'
-                  className='me-2 h-6 w-6 text-[#49b3f5] transition-colors group-hover:text-white'
-                />
-              }
-              text={t('follow')}
-              url='https://x.com/greensoap_'
-            />
+        <div className='px-8 py-6'>
+          <div className='mx-auto grid max-w-xl gap-3'>
+            <div>
+              <h3 className='font-bold'>{t('about')}</h3>
+              <AppVersion />
+            </div>
+            <div className='flex flex-wrap gap-2'>
+              <SettingButton
+                icon='mdi:scroll'
+                onClick={() => BrowserOpenURL('https://cfn.williamsjokvist.se/changelog')}
+              >
+                {t('changelog')}
+              </SettingButton>
+              <SettingButton
+                icon='fa6-brands:github'
+                onClick={() => BrowserOpenURL('https://github.com/williamsjokvist/cfn-tracker')}
+              >
+                {t('source')}
+              </SettingButton>
+              <SettingButton
+                icon='fa6-brands:twitter'
+                onClick={() => BrowserOpenURL('https://x.com/greensoap_')}
+              >
+                {t('follow')}
+              </SettingButton>
+            </div>
           </div>
         </div>
       </motion.section>
     </Page.Root>
   )
 }
+
+const settingTextClass = 'text-base font-extralight text-[#d6d4ff]'
 
 function AppVersion() {
   const { t } = useTranslation()
@@ -119,7 +115,7 @@ function AppVersion() {
         .then(v => setAppVersion(v))
         .catch(setError)
   }, [appVersion])
-  return <span>{t('appVersion', { appVersion: `v${appVersion}` })}</span>
+  return <p className={settingTextClass}>{t('appVersion', { appVersion: `v${appVersion}` })}</p>
 }
 
 function SideBarToggle() {
@@ -128,7 +124,7 @@ function SideBarToggle() {
   const [cfg, setCfg] = React.useContext(ConfigContext)
   return (
     <div className='flex w-full items-center justify-between'>
-      <h3 className='font-bold'>{t('minimize')}</h3>
+      <span className={settingTextClass}>{t('minimize')}</span>
       <Switch
         checked={cfg.sidebar}
         onCheckedChange={checked => {
@@ -147,7 +143,7 @@ function LogFileToggle() {
   const [cfg, setCfg] = React.useContext(ConfigContext)
   return (
     <div className='flex w-full items-center justify-between'>
-      <h3 className='font-bold'>{t('writeLogFile')}</h3>
+      <span className={settingTextClass}>{t('writeLogFile')}</span>
       <Switch
         checked={cfg.logFile}
         onCheckedChange={checked => {
@@ -200,7 +196,7 @@ function BrowserSourcePortInput() {
 
   return (
     <div className='flex w-full items-center justify-between'>
-      <label htmlFor='browser-source-port' className='font-bold'>
+      <label htmlFor='browser-source-port' className={settingTextClass}>
         {t('browserSourcePort')}
       </label>
       <Input
@@ -270,11 +266,7 @@ function SaveDataSettings() {
       <div>
         <h3 className='font-bold'>{t('saveData')}</h3>
         {/* Paths read left to right in every locale. */}
-        <p
-          dir='ltr'
-          title={location?.dir}
-          className='truncate text-start text-base font-extralight text-[#d6d4ff]'
-        >
+        <p dir='ltr' title={location?.dir} className={cn('truncate text-start', settingTextClass)}>
           {location?.dir}
         </p>
       </div>
@@ -422,7 +414,7 @@ function ThemeSelect() {
 
   return (
     <div className='flex items-center justify-between'>
-      <h3 className='font-bold'>{t('theme')}</h3>
+      <span className={settingTextClass}>{t('theme')}</span>
       <Select.Root
         size='sm'
         value={cfg.theme}
@@ -441,9 +433,13 @@ function ThemeSelect() {
             value={theme.name}
             className='flex items-center justify-between gap-2'
           >
-            {theme.colors.map(color => (
-              <i key={color} style={{ background: color }} className={`h-4 w-3 rounded-md`} />
-            ))}
+            {/* The ring keeps the darker half visible against the dark dropdown. */}
+            <i
+              style={{
+                background: `linear-gradient(135deg, ${theme.colors[0]} 50%, ${theme.colors[1]} 50%)`
+              }}
+              className='h-5 w-5 shrink-0 rounded-full ring-1 ring-white/30'
+            />
             <span>{t(theme.label)}</span>
           </Select.Item>
         ))}
@@ -463,7 +459,7 @@ function LanguageSelect(props: React.PropsWithChildren) {
 
   return (
     <div className='flex w-full items-center justify-between'>
-      <h3 className='font-bold'>{t('language')}</h3>
+      <span className={settingTextClass}>{t('language')}</span>
       <Select.Root
         size='sm'
         onValueChange={code => {
@@ -496,40 +492,12 @@ function LanguageSelect(props: React.PropsWithChildren) {
                 }
               })}
             >
-              <Flag code={code} className='w-8 rounded-md' />
+              <Flag code={code} className='w-5 rounded-sm' />
               <span className='first-letter:uppercase'>{nativeName}</span>
             </Select.Item>
           )
         })}
       </Select.Root>
     </div>
-  )
-}
-
-function Link(props: {
-  url: string
-  icon: React.ReactNode
-  text: React.ReactNode
-  className?: string
-}) {
-  return (
-    <button
-      onClick={() => BrowserOpenURL(props.url)}
-      className={cn(
-        'group mt-1 flex h-[28px] items-center justify-between',
-        'font-extralight text-[#d6d4ff] transition-colors',
-        'hover:text-white'
-      )}
-    >
-      <div className='flex items-center justify-between whitespace-nowrap lowercase'>
-        {props.icon}
-        <span>{props.text}</span>
-      </div>
-      <Icon
-        icon='fa6-solid:arrow-up'
-        className='relative -end-2 h-3 w-3 opacity-0 transition-opacity group-hover:opacity-100'
-        style={{ transform: 'rotate(45deg)' }}
-      />
-    </button>
   )
 }

@@ -1,6 +1,6 @@
 {
   "appVersion": "Versi aplikasi {{appVersion}}",
-  "source": "Kode sumber",
+  "source": "Sumber",
   "about": "Tentang",
   "settings": "Pengaturan",
   "tracking": "Pelacakan",
@@ -187,6 +187,7 @@
   "replace": "Ganti",
   "importBackupDescription": "Ini akan mengganti semua data Anda saat ini dengan cadangan.",
   "import": "Impor",
+  "generalSettings": "Pengaturan umum",
   "errTrackingInProgress": "Hentikan pelacakan terlebih dahulu",
   "errGetDataLocation": "Data tersimpan tidak ditemukan",
   "errSaveDataDirectory": "Tidak dapat mengubah folder data",

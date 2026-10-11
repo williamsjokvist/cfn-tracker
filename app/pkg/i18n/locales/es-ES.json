@@ -1,6 +1,6 @@
 {
   "appVersion": "Versión de la app {{appVersion}}",
-  "source": "Código fuente",
+  "source": "Fuente",
   "about": "Acerca de",
   "settings": "Ajustes",
   "tracking": "Seguimiento",
@@ -187,6 +187,7 @@
   "replace": "Reemplazar",
   "importBackupDescription": "Esto reemplaza todos tus datos actuales con la copia de seguridad.",
   "import": "Importar",
+  "generalSettings": "Ajustes generales",
   "errTrackingInProgress": "Detén el seguimiento primero",
   "errGetDataLocation": "No se encontraron los datos guardados",
   "errSaveDataDirectory": "No se pudo cambiar la carpeta de datos",

@@ -271,6 +271,7 @@ export namespace model {
 	    replace: string;
 	    importBackupDescription: string;
 	    import: string;
+	    generalSettings: string;
 	}
 	export interface Match {
 	    userId: string;

@@ -1,6 +1,6 @@
 {
   "appVersion": "アプリバージョン {{appVersion}}",
-  "source": "ソースコード",
+  "source": "ソース",
   "about": "約",
   "settings": "設定",
   "tracking": "追跡",
@@ -187,6 +187,7 @@
   "replace": "置き換える",
   "importBackupDescription": "現在のデータはすべてバックアップで置き換えられます。",
   "import": "インポート",
+  "generalSettings": "一般設定",
   "errTrackingInProgress": "先にトラッキングを停止してください",
   "errGetDataLocation": "セーブデータが見つかりませんでした",
   "errSaveDataDirectory": "データフォルダを変更できませんでした",

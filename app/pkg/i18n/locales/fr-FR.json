@@ -1,6 +1,6 @@
 {
   "appVersion": "Version {{appVersion}} de l'application",
-  "source": "Code",
+  "source": "Source",
   "about": "Environ",
   "settings": "Paramètres",
   "tracking": "Suivie",
@@ -187,6 +187,7 @@
   "replace": "Remplacer",
   "importBackupDescription": "Cela remplace toutes vos données actuelles par la sauvegarde.",
   "import": "Importer",
+  "generalSettings": "Paramètres généraux",
   "errTrackingInProgress": "Arrêtez d'abord le suivi",
   "errGetDataLocation": "Impossible de trouver les données",
   "errSaveDataDirectory": "Impossible de changer le dossier des données",

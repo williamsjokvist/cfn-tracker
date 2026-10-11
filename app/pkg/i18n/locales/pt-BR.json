@@ -1,6 +1,6 @@
 {
   "appVersion": "Versão do app {{appVersion}}",
-  "source": "Código-fonte",
+  "source": "Fonte",
   "about": "Sobre",
   "settings": "Configurações",
   "tracking": "Rastreamento",
@@ -187,6 +187,7 @@
   "replace": "Substituir",
   "importBackupDescription": "Isso substitui todos os seus dados atuais pelo backup.",
   "import": "Importar",
+  "generalSettings": "Configurações gerais",
   "errTrackingInProgress": "Pare o rastreamento primeiro",
   "errGetDataLocation": "Não foi possível encontrar os dados salvos",
   "errSaveDataDirectory": "Não foi possível alterar a pasta de dados",

@@ -1,6 +1,6 @@
 {
   "appVersion": "Версия приложения {{appVersion}}",
-  "source": "Исходный код",
+  "source": "Исходники",
   "about": "О программе",
   "settings": "Настройки",
   "tracking": "Отслеживание",
@@ -187,6 +187,7 @@
   "replace": "Заменить",
   "importBackupDescription": "Все текущие данные будут заменены резервной копией.",
   "import": "Импортировать",
+  "generalSettings": "Общие настройки",
   "errTrackingInProgress": "Сначала остановите отслеживание",
   "errGetDataLocation": "Не удалось найти сохранённые данные",
   "errSaveDataDirectory": "Не удалось изменить папку данных",

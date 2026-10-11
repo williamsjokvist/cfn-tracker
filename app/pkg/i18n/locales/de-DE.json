@@ -1,6 +1,6 @@
 {
   "appVersion": "App-Version {{appVersion}}",
-  "source": "Quellcode",
+  "source": "Quelle",
   "about": "Über",
   "settings": "Einstellungen",
   "tracking": "Tracking",
@@ -187,6 +187,7 @@
   "replace": "Ersetzen",
   "importBackupDescription": "Dadurch werden alle deine aktuellen Daten durch die Sicherung ersetzt.",
   "import": "Importieren",
+  "generalSettings": "Allgemeine Einstellungen",
   "errTrackingInProgress": "Beende zuerst das Tracking",
   "errGetDataLocation": "Die gespeicherten Daten wurden nicht gefunden",
   "errSaveDataDirectory": "Der Speicherordner konnte nicht geändert werden",
