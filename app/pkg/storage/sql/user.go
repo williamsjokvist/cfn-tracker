@@ -14,7 +14,7 @@ import (
 
 type UserStorage interface {
 	GetUserByCode(ctx context.Context, code string) (*model.User, error)
-	GetUsers(ctx context.Context) ([]*model.User, error)
+	GetUsers(ctx context.Context, game model.GameType) ([]*model.User, error)
 	SaveUser(ctx context.Context, user model.User) error
 	RemoveUser(ctx context.Context, code string) error
 }
@@ -43,9 +43,9 @@ func (s *Storage) GetUserByCode(ctx context.Context, code string) (*model.User, 
 	return &user, nil
 }
 
-func (s *Storage) GetUsers(ctx context.Context) ([]*model.User, error) {
+func (s *Storage) GetUsers(ctx context.Context, game model.GameType) ([]*model.User, error) {
 	var users []*model.User
-	err := s.db.SelectContext(ctx, &users, "SELECT * FROM users")
+	err := s.db.SelectContext(ctx, &users, "SELECT * FROM users WHERE game = ?", game)
 	if err != nil {
 		return nil, fmt.Errorf("select sql users: %w", err)
 	}
@@ -54,8 +54,9 @@ func (s *Storage) GetUsers(ctx context.Context) ([]*model.User, error) {
 
 func (s *Storage) SaveUser(ctx context.Context, user model.User) error {
 	query := `
-		INSERT OR IGNORE INTO users (display_name, code)
-		VALUES (:display_name, :code)
+		INSERT INTO users (display_name, code, game)
+		VALUES (:display_name, :code, :game)
+		ON CONFLICT (code) DO UPDATE SET game = excluded.game
 	`
 	_, err := s.db.NamedExecContext(ctx, query, user)
 	if err != nil {

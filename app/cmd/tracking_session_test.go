@@ -3,6 +3,7 @@ package cmd_test
 import (
 	"context"
 	"fmt"
+	"slices"
 	"testing"
 	"time"
 
@@ -98,6 +99,17 @@ func assertStats(t *testing.T, match model.Match, want wantStats) {
 	}
 }
 
+func assertSavedForGame(t *testing.T, userCode string, game model.GameType) {
+	t.Helper()
+	users, err := testSuite.sqlDb.GetUsers(context.Background(), game)
+	if err != nil {
+		t.Fatalf("GetUsers(%s) error = %v", game, err)
+	}
+	if !slices.ContainsFunc(users, func(u *model.User) bool { return u.Code == userCode }) {
+		t.Fatalf("user %s not saved for %s", userCode, game)
+	}
+}
+
 func uniqueUserCode(prefix string) string {
 	return fmt.Sprintf("%s%d", prefix, time.Now().UnixNano())
 }
@@ -119,6 +131,7 @@ func TestTrackingT8(t *testing.T) {
 	assertStats(t, lt.next(), wantStats{"Kazuya", 1, 0, 1, 0})
 	lt.stop()
 
+	assertSavedForGame(t, polarisId, model.GameTypeT8)
 	stored, err := testSuite.sqlDb.GetLatestSession(context.Background(), polarisId)
 	if err != nil || stored == nil || len(stored.Matches) != 3 {
 		t.Fatalf("GetLatestSession() = %+v, %v, want 3 matches", stored, err)
@@ -148,6 +161,7 @@ func TestTrackingSF6(t *testing.T) {
 	assertStats(t, lt.next(), wantStats{"Ryu", 2, 1, 1, 70})
 	lt.stop()
 
+	assertSavedForGame(t, userCode, model.GameTypeSF6)
 	stored, err := testSuite.sqlDb.GetLatestSession(context.Background(), userCode)
 	if err != nil || stored == nil || len(stored.Matches) != 4 || stored.EndingLP != 10070 {
 		t.Fatalf("GetLatestSession() = %+v, %v, want 4 matches ending at 10070 LP", stored, err)

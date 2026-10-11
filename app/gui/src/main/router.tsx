@@ -10,7 +10,7 @@ import { TrackingPage } from '@/pages/tracking'
 import { AppWrapper } from './app-wrapper'
 import { AppErrorBoundary, PageErrorBoundary } from './app-error'
 
-import { GetUsers, GetSession, GetMatches } from '@cmd/CommandHandler'
+import { GetSession, GetMatches } from '@cmd/CommandHandler'
 
 async function loadSession(sessionId: number, page = 0, limit = 0): Promise<SessionData> {
   const [session, matches] = await Promise.all([
@@ -34,8 +34,7 @@ const router = createHashRouter([
           },
           {
             element: <TrackingPage />,
-            path: '/tracking',
-            loader: GetUsers
+            path: '/tracking'
           },
           {
             element: <OutputPage />,

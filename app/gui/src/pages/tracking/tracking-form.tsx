@@ -1,5 +1,4 @@
 import React from 'react'
-import { useLoaderData } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
 import { Icon } from '@iconify/react'
@@ -13,13 +12,23 @@ import * as Page from '@/ui/page'
 import { model } from '@model'
 import { AuthMachineContext } from '@/state/auth-machine'
 import { useSelector } from '@xstate/react'
+import { GetUsers } from '@cmd/CommandHandler'
+import { useErrorPopup } from '@/main/error-popup'
 
 export function TrackingForm() {
   const { t } = useTranslation()
-  const users = (useLoaderData() ?? []) as model.User[]
   const trackingActor = TrackingMachineContext.useActorRef()
   const authActor = AuthMachineContext.useActorRef()
   const game = useSelector(authActor, ({ context }) => context.game)
+  const setError = useErrorPopup()
+
+  const [users, setUsers] = React.useState<model.User[]>([])
+  React.useEffect(() => {
+    if (!game) return
+    GetUsers(game)
+      .then(users => setUsers(users ?? []))
+      .catch(setError)
+  }, [game])
 
   const playerIdInputRef = React.useRef<HTMLInputElement>(null)
   const restoreRef = React.useRef<HTMLInputElement>(null)

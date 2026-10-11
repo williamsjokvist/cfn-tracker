@@ -248,6 +248,7 @@ export namespace model {
 	    id: number;
 	    displayName: string;
 	    code: string;
+	    game: GameType;
 	    LP: number;
 	    MR: number;
 	}

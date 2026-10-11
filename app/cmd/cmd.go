@@ -97,8 +97,8 @@ func (ch *CommandHandler) GetMatches(sessionId uint16, userId string, limit uint
 	return matches, nil
 }
 
-func (ch *CommandHandler) GetUsers() ([]*model.User, error) {
-	users, err := ch.sqlDb.GetUsers(context.Background())
+func (ch *CommandHandler) GetUsers(game model.GameType) ([]*model.User, error) {
+	users, err := ch.sqlDb.GetUsers(context.Background(), game)
 	if err != nil {
 		return nil, model.WrapError(model.ErrGetUser, err)
 	}
