@@ -19,7 +19,6 @@ export function CharacterPortrait({
   }
   return (
     <div className={className} style={style}>
-      {/* Absolute, so the image takes the size of its box instead of setting it. */}
       <img className='absolute inset-0 h-full w-full object-cover' src={src} alt='' />
     </div>
   )
