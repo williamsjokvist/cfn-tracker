@@ -15,6 +15,7 @@
 - Storing match logs and statistics
 - Support for displaying live stats to OBS via Browser Source and Text Labels
 - Support for both SF6 and Tekken 8
+- SF6 comparison view that compares your character's battle stats against the Top 5 players for that character
 - Ability to create own OBS Browser theme with CSS
 
   [Streamer showcase](SHOWCASE.md)

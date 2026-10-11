@@ -153,7 +153,6 @@ func main() {
 	newUpdateAvailable := appVersion.LessThan(lastRelease.Version)
 	if newUpdateAvailable {
 		handleAutoUpdate(lastRelease.Version.Original())
-		return
 	}
 
 	sqlDb, err := sql.NewStorage(false)
@@ -175,15 +174,18 @@ func main() {
 		&cfg,
 		browserSrcServer,
 	)
+
+	cfnClient := cfn.NewClient(appBrowser)
 	trackingHandler := cmd.NewTrackingHandler(
 		wavu.NewClient(),
-		cfn.NewClient(appBrowser),
+		cfnClient,
 		sqlDb,
 		noSqlDb,
 		txtDb,
 		&cfg,
 		browserSrcMatchChan,
 	)
+	sf6ComparisonHandler := cmd.NewSF6ComparisonHandler(cfnClient)
 
 	var onSecondInstanceLaunch func(secondInstanceData options.SecondInstanceData)
 	err = wails.Run(&options.App{
@@ -249,6 +251,7 @@ func main() {
 		Bind: []interface{}{
 			cmdHandler,
 			trackingHandler,
+			sf6ComparisonHandler,
 		},
 		EnumBind: []interface{}{
 			model.AllThemes,
