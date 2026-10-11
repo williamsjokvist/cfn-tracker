@@ -6,7 +6,6 @@ import MockTracker from "./MockTracker.astro";
 import defaultTheme from "../../../app/pkg/server/static/themes/default.css?raw";
 import pillsTheme from "../../../app/pkg/server/static/themes/pills.css?raw";
 import inkTheme from "../../../app/pkg/server/static/themes/ink.css?raw";
-import synthwaveTheme from "../../../app/pkg/server/static/themes/synthwave.css?raw";
 import terminalTheme from "../../../app/pkg/server/static/themes/terminal.css?raw";
 import decoTheme from "../../../app/pkg/server/static/themes/deco.css?raw";
 import notebookTheme from "../../../app/pkg/server/static/themes/notebook.css?raw";
@@ -15,6 +14,7 @@ import minimalDarkTheme from "../../../app/pkg/server/static/themes/minimal-dark
 import retroTheme from "../../../app/pkg/server/static/themes/retro.css?raw";
 import glassTheme from "../../../app/pkg/server/static/themes/glass.css?raw";
 import versusTheme from "../../../app/pkg/server/static/themes/versus.css?raw";
+import comicTheme from "../../../app/pkg/server/static/themes/comic.css?raw";
 
 const portraits = import.meta.glob<{ default: ImageMetadata }>(
   "../../../app/gui/src/assets/characters/{sf6,t8}/*.webp",
@@ -89,7 +89,6 @@ const themes = [
   { id: "default", name: "Default", css: defaultTheme },
   { id: "pills", name: "Pills", css: pillsTheme },
   { id: "ink", name: "Ink", css: inkTheme },
-  { id: "synthwave", name: "Synthwave", css: synthwaveTheme },
   { id: "terminal", name: "Terminal", css: terminalTheme },
   { id: "deco", name: "Art Deco", css: decoTheme },
   { id: "notebook", name: "Notebook", css: notebookTheme },
@@ -98,6 +97,7 @@ const themes = [
   { id: "retro", name: "Retro Desktop", css: retroTheme },
   { id: "glass", name: "Glass", css: glassTheme },
   { id: "versus", name: "Versus", css: versusTheme },
+  { id: "comic", name: "Comic", css: comicTheme },
 ].map((theme) => ({
   ...theme,
   srcdoc: `<!doctype html><html><head><style>*{margin:0}body{padding:24px;overflow:hidden}</style><style>${theme.css}</style></head><body>${statListHtml}</body></html>`,

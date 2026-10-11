@@ -104,6 +104,8 @@
   "browserSourceThemeGlass": "Verre",
   "browserSourceThemeMinimal": "Minimaliste",
   "browserSourceThemeMinimalDark": "Minimaliste sombre",
+  "browserSourceThemeTicker": "Bandeau",
+  "browserSourceThemeTextOnly": "Texte seul",
   "createYourOwnTheme": "Créer votre propre thème",
   "userId": "ID utilisateur",
   "userName": "Nom",

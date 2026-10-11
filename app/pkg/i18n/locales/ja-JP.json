@@ -104,6 +104,8 @@
   "browserSourceThemeGlass": "ガラス",
   "browserSourceThemeMinimal": "ミニマル",
   "browserSourceThemeMinimalDark": "ミニマルダーク",
+  "browserSourceThemeTicker": "ティッカー",
+  "browserSourceThemeTextOnly": "テキストのみ",
   "createYourOwnTheme": "テーマを自作する",
   "userId": "ユーザーID",
   "userName": "ユーザー",

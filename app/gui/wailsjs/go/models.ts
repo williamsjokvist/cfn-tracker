@@ -191,6 +191,8 @@ export namespace model {
 	    browserSourceThemeGlass: string;
 	    browserSourceThemeMinimal: string;
 	    browserSourceThemeMinimalDark: string;
+	    browserSourceThemeTicker: string;
+	    browserSourceThemeTextOnly: string;
 	    createYourOwnTheme: string;
 	    userId: string;
 	    userName: string;

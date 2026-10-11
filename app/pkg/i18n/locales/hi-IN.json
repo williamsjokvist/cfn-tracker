@@ -104,6 +104,8 @@
   "browserSourceThemeGlass": "कांच",
   "browserSourceThemeMinimal": "न्यूनतम",
   "browserSourceThemeMinimalDark": "न्यूनतम डार्क",
+  "browserSourceThemeTicker": "टिकर",
+  "browserSourceThemeTextOnly": "केवल टेक्स्ट",
   "createYourOwnTheme": "अपनी थीम बनाएँ",
   "userId": "यूज़र ID",
   "userName": "यूज़र",

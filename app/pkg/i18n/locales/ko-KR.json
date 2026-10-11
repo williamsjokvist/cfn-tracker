@@ -104,6 +104,8 @@
   "browserSourceThemeGlass": "유리",
   "browserSourceThemeMinimal": "미니멀",
   "browserSourceThemeMinimalDark": "미니멀 다크",
+  "browserSourceThemeTicker": "티커",
+  "browserSourceThemeTextOnly": "텍스트만",
   "createYourOwnTheme": "나만의 테마 만들기",
   "userId": "사용자 ID",
   "userName": "사용자",

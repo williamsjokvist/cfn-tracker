@@ -104,6 +104,8 @@
   "browserSourceThemeGlass": "Скло",
   "browserSourceThemeMinimal": "Мінімалізм",
   "browserSourceThemeMinimalDark": "Мінімалізм темний",
+  "browserSourceThemeTicker": "Біжучий рядок",
+  "browserSourceThemeTextOnly": "Лише текст",
   "createYourOwnTheme": "Створити свою тему",
   "userId": "ID користувача",
   "userName": "Користувач",

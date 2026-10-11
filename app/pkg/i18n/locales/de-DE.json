@@ -104,6 +104,8 @@
   "browserSourceThemeGlass": "Glas",
   "browserSourceThemeMinimal": "Minimal",
   "browserSourceThemeMinimalDark": "Minimal Dunkel",
+  "browserSourceThemeTicker": "Laufband",
+  "browserSourceThemeTextOnly": "Nur Text",
   "createYourOwnTheme": "Eigenes Design erstellen",
   "userId": "Benutzer-ID",
   "userName": "Benutzer",

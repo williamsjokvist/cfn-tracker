@@ -45,6 +45,8 @@ const themeLabels: Record<string, LocalizationKey> = {
   retro: 'browserSourceThemeRetro',
   synthwave: 'browserSourceThemeSynthwave',
   terminal: 'browserSourceThemeTerminal',
+  'text-only': 'browserSourceThemeTextOnly',
+  ticker: 'browserSourceThemeTicker',
   versus: 'browserSourceThemeVersus'
 }
 

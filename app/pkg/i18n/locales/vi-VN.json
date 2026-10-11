@@ -104,6 +104,8 @@
   "browserSourceThemeGlass": "Kính",
   "browserSourceThemeMinimal": "Tối giản",
   "browserSourceThemeMinimalDark": "Tối giản tối",
+  "browserSourceThemeTicker": "Dải tin",
+  "browserSourceThemeTextOnly": "Chỉ văn bản",
   "createYourOwnTheme": "Tự tạo giao diện",
   "userId": "ID người dùng",
   "userName": "Người dùng",

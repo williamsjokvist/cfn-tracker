@@ -104,6 +104,8 @@
   "browserSourceThemeGlass": "Szkło",
   "browserSourceThemeMinimal": "Minimalistyczny",
   "browserSourceThemeMinimalDark": "Minimalistyczny ciemny",
+  "browserSourceThemeTicker": "Pasek",
+  "browserSourceThemeTextOnly": "Tylko tekst",
   "createYourOwnTheme": "Stwórz własny motyw",
   "userId": "ID użytkownika",
   "userName": "Użytkownik",

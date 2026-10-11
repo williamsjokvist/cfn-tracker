@@ -104,6 +104,8 @@
   "browserSourceThemeGlass": "Glas",
   "browserSourceThemeMinimal": "Minimal",
   "browserSourceThemeMinimalDark": "Minimal mörk",
+  "browserSourceThemeTicker": "Ticker",
+  "browserSourceThemeTextOnly": "Endast text",
   "createYourOwnTheme": "Skapa ditt eget tema",
   "userId": "Användar-ID",
   "userName": "Användare",

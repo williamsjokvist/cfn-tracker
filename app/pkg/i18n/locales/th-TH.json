@@ -104,6 +104,8 @@
   "browserSourceThemeGlass": "กระจก",
   "browserSourceThemeMinimal": "มินิมอล",
   "browserSourceThemeMinimalDark": "มินิมอลมืด",
+  "browserSourceThemeTicker": "แถบข่าว",
+  "browserSourceThemeTextOnly": "ข้อความเท่านั้น",
   "createYourOwnTheme": "สร้างธีมของคุณเอง",
   "userId": "ID ผู้ใช้",
   "userName": "ผู้ใช้",

@@ -104,6 +104,8 @@
   "browserSourceThemeGlass": "Glas",
   "browserSourceThemeMinimal": "Minimaal",
   "browserSourceThemeMinimalDark": "Minimaal donker",
+  "browserSourceThemeTicker": "Ticker",
+  "browserSourceThemeTextOnly": "Alleen tekst",
   "createYourOwnTheme": "Maak je eigen thema",
   "userId": "Gebruikers-ID",
   "userName": "Gebruiker",

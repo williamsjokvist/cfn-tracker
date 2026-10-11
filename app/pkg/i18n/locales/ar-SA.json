@@ -104,6 +104,8 @@
   "browserSourceThemeGlass": "زجاج",
   "browserSourceThemeMinimal": "بسيط",
   "browserSourceThemeMinimalDark": "بسيط داكن",
+  "browserSourceThemeTicker": "شريط",
+  "browserSourceThemeTextOnly": "نص فقط",
   "createYourOwnTheme": "أنشئ مظهرك الخاص",
   "userId": "معرّف المستخدم",
   "userName": "المستخدم",

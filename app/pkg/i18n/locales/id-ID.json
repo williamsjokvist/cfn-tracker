@@ -104,6 +104,8 @@
   "browserSourceThemeGlass": "Kaca",
   "browserSourceThemeMinimal": "Minimalis",
   "browserSourceThemeMinimalDark": "Minimalis Gelap",
+  "browserSourceThemeTicker": "Ticker",
+  "browserSourceThemeTextOnly": "Hanya Teks",
   "createYourOwnTheme": "Buat tema sendiri",
   "userId": "ID pengguna",
   "userName": "Pengguna",

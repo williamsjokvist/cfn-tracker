@@ -104,6 +104,8 @@
   "browserSourceThemeGlass": "Cam",
   "browserSourceThemeMinimal": "Minimal",
   "browserSourceThemeMinimalDark": "Minimal Koyu",
+  "browserSourceThemeTicker": "Kayan Yazı",
+  "browserSourceThemeTextOnly": "Yalnızca Metin",
   "createYourOwnTheme": "Kendi temanı oluştur",
   "userId": "Kullanıcı ID",
   "userName": "Kullanıcı",

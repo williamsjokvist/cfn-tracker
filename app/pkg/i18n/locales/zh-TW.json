@@ -104,6 +104,8 @@
   "browserSourceThemeGlass": "玻璃",
   "browserSourceThemeMinimal": "極簡",
   "browserSourceThemeMinimalDark": "極簡深色",
+  "browserSourceThemeTicker": "跑馬燈",
+  "browserSourceThemeTextOnly": "純文字",
   "createYourOwnTheme": "建立自己的主題",
   "userId": "使用者 ID",
   "userName": "使用者",

@@ -104,6 +104,8 @@
   "browserSourceThemeGlass": "Cristal",
   "browserSourceThemeMinimal": "Minimalista",
   "browserSourceThemeMinimalDark": "Minimalista oscuro",
+  "browserSourceThemeTicker": "Cinta",
+  "browserSourceThemeTextOnly": "Solo texto",
   "createYourOwnTheme": "Crea tu propio tema",
   "userId": "ID de usuario",
   "userName": "Usuario",

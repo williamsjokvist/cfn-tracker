@@ -104,6 +104,8 @@
   "browserSourceThemeGlass": "Sticlă",
   "browserSourceThemeMinimal": "Minimalist",
   "browserSourceThemeMinimalDark": "Minimalist întunecat",
+  "browserSourceThemeTicker": "Bandă",
+  "browserSourceThemeTextOnly": "Doar text",
   "createYourOwnTheme": "Creează-ți propria temă",
   "userId": "ID utilizator",
   "userName": "Utilizator",

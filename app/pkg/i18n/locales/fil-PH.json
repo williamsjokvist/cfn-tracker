@@ -104,6 +104,8 @@
   "browserSourceThemeGlass": "Salamin",
   "browserSourceThemeMinimal": "Minimal",
   "browserSourceThemeMinimalDark": "Minimal Madilim",
+  "browserSourceThemeTicker": "Ticker",
+  "browserSourceThemeTextOnly": "Teksto Lang",
   "createYourOwnTheme": "Gumawa ng sariling tema",
   "userId": "User ID",
   "userName": "User",

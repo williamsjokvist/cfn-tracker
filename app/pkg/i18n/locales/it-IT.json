@@ -104,6 +104,8 @@
   "browserSourceThemeGlass": "Vetro",
   "browserSourceThemeMinimal": "Minimale",
   "browserSourceThemeMinimalDark": "Minimale scuro",
+  "browserSourceThemeTicker": "Ticker",
+  "browserSourceThemeTextOnly": "Solo testo",
   "createYourOwnTheme": "Crea il tuo tema",
   "userId": "ID utente",
   "userName": "Utente",
