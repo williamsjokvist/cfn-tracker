@@ -1,6 +1,6 @@
 [tools]
 bun = "latest"
-go = "1.26"
+go = "1.27"
 "go:github.com/wailsapp/wails/v2/cmd/wails" = "2.16.0"
 golangci-lint = "2.14.0"
 jq = "latest"
