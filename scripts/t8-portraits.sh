@@ -25,9 +25,9 @@ while :; do
     --data-urlencode ailimit=500 --data-urlencode aiprop='url|size' \
     ${continue_from:+--data-urlencode "aicontinue=$continue_from"})
 
-  jq -r '.query.allimages[] | select(.name | endswith("_portrait.png")) | [.name, .url, .width, .height] | @tsv' <<<"$page" |
+  jq -r '.query.allimages[] | select(.name | test("[._]portrait\\.png$")) | [.name, .url, .width, .height] | @tsv' <<<"$page" |
     while IFS=$'\t' read -r file url width height; do
-      name=$(tr '[:upper:]' '[:lower:]' <<<"${file%_portrait.png}" | tr -cd 'a-z0-9')
+      name=$(tr '[:upper:]' '[:lower:]' <<<"${file%[._]portrait.png}" | tr -cd 'a-z0-9')
       curl -fsS -A "$ua" -o "$tmp/$name.png" "$url"
       side=$(((width < height ? width : height) * 65 / 100))
       cwebp -quiet -crop $(((width - side) / 2)) 0 "$side" "$side" -resize 256 256 -q 80 \
