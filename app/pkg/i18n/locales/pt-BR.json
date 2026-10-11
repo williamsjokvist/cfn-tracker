@@ -66,6 +66,8 @@
   "pickGame": "Escolha o jogo",
   "stopTrackingTitle": "Parar o rastreamento?",
   "stopTrackingDescription": "Voltar para a seleção de jogo encerra a sessão atual.",
+  "stopComparisonTitle": "Parar a comparação?",
+  "stopComparisonDescription": "Sair desta página interrompe a busca da comparação.",
   "follow": "Seguir",
   "continueStep": "Continuar",
   "placement": "Partidas de classificação",

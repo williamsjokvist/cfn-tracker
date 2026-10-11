@@ -66,6 +66,8 @@
   "pickGame": "選擇遊戲",
   "stopTrackingTitle": "停止追蹤？",
   "stopTrackingDescription": "返回遊戲選擇將停止目前的工作階段。",
+  "stopComparisonTitle": "停止比較？",
+  "stopComparisonDescription": "離開此頁面將停止取得比較資料。",
   "follow": "追蹤",
   "continueStep": "繼續",
   "placement": "定級賽",

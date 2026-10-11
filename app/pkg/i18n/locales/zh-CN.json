@@ -66,6 +66,8 @@
   "pickGame": "选择游戏",
   "stopTrackingTitle": "停止追踪？",
   "stopTrackingDescription": "返回游戏选择将停止当前会话。",
+  "stopComparisonTitle": "停止比较？",
+  "stopComparisonDescription": "离开此页面将停止获取比较数据。",
   "follow": "关注",
   "continueStep": "继续",
   "placement": "定级赛",

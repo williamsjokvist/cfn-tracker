@@ -131,6 +131,8 @@ export namespace model {
 	    pickGame: string;
 	    stopTrackingTitle: string;
 	    stopTrackingDescription: string;
+	    stopComparisonTitle: string;
+	    stopComparisonDescription: string;
 	    follow: string;
 	    continueStep: string;
 	    placement: string;

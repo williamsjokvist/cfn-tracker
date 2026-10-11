@@ -66,6 +66,8 @@
   "pickGame": "ゲームを選択",
   "stopTrackingTitle": "トラッキングを停止しますか？",
   "stopTrackingDescription": "ゲーム選択に戻ると、現在のセッションが停止します。",
+  "stopComparisonTitle": "比較を停止しますか？",
+  "stopComparisonDescription": "このページを離れると、比較の取得が停止します。",
   "follow": "フォロー",
   "continueStep": "続ける",
   "placement": "Placement Matches",

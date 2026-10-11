@@ -66,6 +66,8 @@
   "pickGame": "Wybierz grę",
   "stopTrackingTitle": "Zatrzymać śledzenie?",
   "stopTrackingDescription": "Powrót do wyboru gry zatrzyma bieżącą sesję.",
+  "stopComparisonTitle": "Zatrzymać porównanie?",
+  "stopComparisonDescription": "Opuszczenie tej strony zatrzyma pobieranie porównania.",
   "follow": "Obserwuj",
   "continueStep": "Dalej",
   "placement": "Mecze kwalifikacyjne",

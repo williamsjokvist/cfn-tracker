@@ -66,6 +66,8 @@
   "pickGame": "Pumili ng laro",
   "stopTrackingTitle": "Itigil ang pag-track?",
   "stopTrackingDescription": "Ang pagbalik sa pagpili ng laro ay ititigil ang kasalukuyang session.",
+  "stopComparisonTitle": "Itigil ang paghahambing?",
+  "stopComparisonDescription": "Ang pag-alis sa pahinang ito ay ititigil ang pagkuha ng paghahambing.",
   "follow": "Sundan",
   "continueStep": "Magpatuloy",
   "placement": "Mga placement match",

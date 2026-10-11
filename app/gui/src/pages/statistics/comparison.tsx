@@ -1,6 +1,6 @@
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useSearchParams } from 'react-router-dom'
+import { useBlocker, useSearchParams } from 'react-router-dom'
 import { Icon } from '@iconify/react'
 
 import * as Page from '@/ui/page'
@@ -10,6 +10,7 @@ import type { LocalizationKey } from '@/main/i18n'
 import { useErrorPopup } from '@/main/error-popup'
 import * as Table from '@/ui/table'
 import { Button } from '@/ui/button'
+import * as Dialog from '@/ui/dialog'
 import { cn } from '@/helpers/cn'
 
 import {
@@ -84,6 +85,11 @@ export function ComparisonPage() {
     withDelta.sort((a, b) => b.absDelta - a.absDelta)
     return withDelta
   }, [report])
+
+  const leaveBlocker = useBlocker(
+    ({ currentLocation, nextLocation }) =>
+      loading && currentLocation.pathname !== nextLocation.pathname
+  )
 
   const run = React.useRef<ComparisonRun | null>(null)
   React.useEffect(() => {
@@ -215,6 +221,20 @@ export function ComparisonPage() {
               : t('loading')}
         </span>
       </Banner>
+      <Dialog.Root
+        open={leaveBlocker.state === 'blocked'}
+        onOpenChange={open => !open && leaveBlocker.reset?.()}
+      >
+        <Dialog.Content
+          title='stopComparisonTitle'
+          description='stopComparisonDescription'
+          className='h-auto!'
+        >
+          <div className='mt-8 flex justify-end'>
+            <Button onClick={() => leaveBlocker.proceed?.()}>{t('stop')}</Button>
+          </div>
+        </Dialog.Content>
+      </Dialog.Root>
     </Page.Root>
   )
 }

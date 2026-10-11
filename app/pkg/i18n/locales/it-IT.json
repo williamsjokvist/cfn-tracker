@@ -66,6 +66,8 @@
   "pickGame": "Scegli il gioco",
   "stopTrackingTitle": "Interrompere il tracciamento?",
   "stopTrackingDescription": "Tornare alla scelta del gioco interrompe la sessione in corso.",
+  "stopComparisonTitle": "Interrompere il confronto?",
+  "stopComparisonDescription": "Uscire da questa pagina interrompe il caricamento del confronto.",
   "follow": "Segui",
   "continueStep": "Continua",
   "placement": "Partite di piazzamento",

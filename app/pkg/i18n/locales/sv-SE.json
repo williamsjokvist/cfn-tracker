@@ -66,6 +66,8 @@
   "pickGame": "Välj spel",
   "stopTrackingTitle": "Sluta spåra?",
   "stopTrackingDescription": "Om du går tillbaka till spelvalet avslutas den pågående sessionen.",
+  "stopComparisonTitle": "Avbryta jämförelsen?",
+  "stopComparisonDescription": "Om du lämnar sidan avbryts hämtningen av jämförelsen.",
   "follow": "Följ",
   "continueStep": "Fortsätt",
   "placement": "Placeringsmatcher",

@@ -68,6 +68,8 @@ type Localization struct {
 	PickGame                    string `json:"pickGame"`
 	StopTrackingTitle           string `json:"stopTrackingTitle"`
 	StopTrackingDescription     string `json:"stopTrackingDescription"`
+	StopComparisonTitle         string `json:"stopComparisonTitle"`
+	StopComparisonDescription   string `json:"stopComparisonDescription"`
 	Follow                      string `json:"follow"`
 	ContinueStep                string `json:"continueStep"`
 	Placement                   string `json:"placement"`

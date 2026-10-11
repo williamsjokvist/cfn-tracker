@@ -66,6 +66,8 @@
   "pickGame": "게임 선택",
   "stopTrackingTitle": "추적을 중지할까요?",
   "stopTrackingDescription": "게임 선택으로 돌아가면 현재 세션이 중지됩니다.",
+  "stopComparisonTitle": "비교를 중지할까요?",
+  "stopComparisonDescription": "이 페이지를 떠나면 비교 불러오기가 중지됩니다.",
   "follow": "팔로우",
   "continueStep": "계속",
   "placement": "배치 매치",

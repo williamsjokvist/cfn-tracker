@@ -66,6 +66,8 @@
   "pickGame": "Choose game",
   "stopTrackingTitle": "Stop tracking?",
   "stopTrackingDescription": "Going back to game selection stops the current session.",
+  "stopComparisonTitle": "Stop comparison?",
+  "stopComparisonDescription": "Leaving this page stops fetching the comparison.",
   "follow": "Follow",
   "continueStep": "Continue",
   "placement": "Placement Matches",

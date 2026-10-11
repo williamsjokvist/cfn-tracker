@@ -66,6 +66,8 @@
   "pickGame": "Pilih game",
   "stopTrackingTitle": "Hentikan pelacakan?",
   "stopTrackingDescription": "Kembali ke pemilihan game akan menghentikan sesi saat ini.",
+  "stopComparisonTitle": "Hentikan perbandingan?",
+  "stopComparisonDescription": "Meninggalkan halaman ini akan menghentikan pengambilan perbandingan.",
   "follow": "Ikuti",
   "continueStep": "Lanjut",
   "placement": "Pertandingan penempatan",
