@@ -1,6 +1,6 @@
 {
   "appVersion": "应用版本 {{appVersion}}",
-  "source": "源代码",
+  "source": "源码",
   "about": "关于",
   "settings": "设置",
   "tracking": "追踪",
@@ -187,6 +187,7 @@
   "replace": "替换",
   "importBackupDescription": "这将用备份替换你当前的所有数据。",
   "import": "导入",
+  "generalSettings": "常规设置",
   "errTrackingInProgress": "请先停止追踪",
   "errGetDataLocation": "找不到存档数据",
   "errSaveDataDirectory": "无法更改数据文件夹",

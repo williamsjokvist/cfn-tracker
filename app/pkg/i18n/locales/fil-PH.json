@@ -1,6 +1,6 @@
 {
   "appVersion": "Bersyon ng app {{appVersion}}",
-  "source": "Source code",
+  "source": "Source",
   "about": "Tungkol",
   "settings": "Mga Setting",
   "tracking": "Pag-track",
@@ -187,6 +187,7 @@
   "replace": "Palitan",
   "importBackupDescription": "Papalitan nito ang lahat ng kasalukuyan mong data ng backup.",
   "import": "I-import",
+  "generalSettings": "Pangkalahatang setting",
   "errTrackingInProgress": "Ihinto muna ang pag-track",
   "errGetDataLocation": "Hindi mahanap ang naka-save na data",
   "errSaveDataDirectory": "Hindi mapalitan ang folder ng data",

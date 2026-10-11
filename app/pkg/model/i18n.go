@@ -198,4 +198,5 @@ type Localization struct {
 	Replace                      string `json:"replace"`
 	ImportBackupDescription      string `json:"importBackupDescription"`
 	Import                       string `json:"import"`
+	GeneralSettings              string `json:"generalSettings"`
 }

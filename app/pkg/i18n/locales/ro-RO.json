@@ -1,6 +1,6 @@
 {
   "appVersion": "Versiunea aplicației {{appVersion}}",
-  "source": "Cod sursă",
+  "source": "Sursă",
   "about": "Despre",
   "settings": "Setări",
   "tracking": "Urmărire",
@@ -187,6 +187,7 @@
   "replace": "Înlocuiește",
   "importBackupDescription": "Aceasta înlocuiește toate datele tale actuale cu backup-ul.",
   "import": "Importă",
+  "generalSettings": "Setări generale",
   "errTrackingInProgress": "Oprește mai întâi urmărirea",
   "errGetDataLocation": "Datele salvate nu au fost găsite",
   "errSaveDataDirectory": "Folderul de date nu a putut fi schimbat",

@@ -1,6 +1,6 @@
 {
   "appVersion": "앱 버전 {{appVersion}}",
-  "source": "소스 코드",
+  "source": "소스",
   "about": "정보",
   "settings": "설정",
   "tracking": "추적",
@@ -187,6 +187,7 @@
   "replace": "바꾸기",
   "importBackupDescription": "현재 데이터가 모두 백업으로 바뀝니다.",
   "import": "가져오기",
+  "generalSettings": "일반 설정",
   "errTrackingInProgress": "먼저 추적을 중지하세요",
   "errGetDataLocation": "저장 데이터를 찾을 수 없습니다",
   "errSaveDataDirectory": "데이터 폴더를 변경할 수 없습니다",

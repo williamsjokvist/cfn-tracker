@@ -1,6 +1,6 @@
 {
   "appVersion": "ऐप संस्करण {{appVersion}}",
-  "source": "सोर्स कोड",
+  "source": "सोर्स",
   "about": "परिचय",
   "settings": "सेटिंग्स",
   "tracking": "ट्रैकिंग",
@@ -187,6 +187,7 @@
   "replace": "बदलें",
   "importBackupDescription": "यह आपके सभी मौजूदा डेटा को बैकअप से बदल देगा।",
   "import": "इम्पोर्ट करें",
+  "generalSettings": "सामान्य सेटिंग्स",
   "errTrackingInProgress": "पहले ट्रैकिंग रोकें",
   "errGetDataLocation": "सहेजा गया डेटा नहीं मिला",
   "errSaveDataDirectory": "डेटा फ़ोल्डर नहीं बदला जा सका",

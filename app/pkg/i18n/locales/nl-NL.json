@@ -1,6 +1,6 @@
 {
   "appVersion": "App-versie {{appVersion}}",
-  "source": "Broncode",
+  "source": "Bron",
   "about": "Over",
   "settings": "Instellingen",
   "tracking": "Bijhouden",
@@ -187,6 +187,7 @@
   "replace": "Vervangen",
   "importBackupDescription": "Dit vervangt al je huidige gegevens door de back-up.",
   "import": "Importeren",
+  "generalSettings": "Algemene instellingen",
   "errTrackingInProgress": "Stop eerst met tracken",
   "errGetDataLocation": "Kon de opgeslagen gegevens niet vinden",
   "errSaveDataDirectory": "Kon de gegevensmap niet wijzigen",

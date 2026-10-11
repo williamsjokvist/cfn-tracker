@@ -1,6 +1,6 @@
 {
   "appVersion": "แอปเวอร์ชัน {{appVersion}}",
-  "source": "ซอร์สโค้ด",
+  "source": "ซอร์ส",
   "about": "เกี่ยวกับ",
   "settings": "การตั้งค่า",
   "tracking": "ติดตาม",
@@ -187,6 +187,7 @@
   "replace": "แทนที่",
   "importBackupDescription": "การดำเนินการนี้จะแทนที่ข้อมูลปัจจุบันทั้งหมดของคุณด้วยข้อมูลสำรอง",
   "import": "นำเข้า",
+  "generalSettings": "การตั้งค่าทั่วไป",
   "errTrackingInProgress": "หยุดการติดตามก่อน",
   "errGetDataLocation": "ไม่พบข้อมูลที่บันทึกไว้",
   "errSaveDataDirectory": "ไม่สามารถเปลี่ยนโฟลเดอร์ข้อมูลได้",

@@ -187,6 +187,7 @@
   "replace": "取代",
   "importBackupDescription": "這會以備份取代你目前的所有資料。",
   "import": "匯入",
+  "generalSettings": "一般設定",
   "errTrackingInProgress": "請先停止追蹤",
   "errGetDataLocation": "找不到存檔資料",
   "errSaveDataDirectory": "無法變更資料資料夾",

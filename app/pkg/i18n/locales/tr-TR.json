@@ -1,6 +1,6 @@
 {
   "appVersion": "Uygulama sürümü {{appVersion}}",
-  "source": "Kaynak kodu",
+  "source": "Kaynak",
   "about": "Hakkında",
   "settings": "Ayarlar",
   "tracking": "Takip",
@@ -187,6 +187,7 @@
   "replace": "Değiştir",
   "importBackupDescription": "Bu işlem tüm mevcut verilerinizi yedekle değiştirir.",
   "import": "İçe aktar",
+  "generalSettings": "Genel ayarlar",
   "errTrackingInProgress": "Önce takibi durdurun",
   "errGetDataLocation": "Kayıtlı veriler bulunamadı",
   "errSaveDataDirectory": "Veri klasörü değiştirilemedi",

@@ -1,6 +1,6 @@
 {
   "appVersion": "Appversion {{appVersion}}",
-  "source": "Källkod",
+  "source": "Källa",
   "about": "Om",
   "settings": "Inställningar",
   "tracking": "Spårning",
@@ -187,6 +187,7 @@
   "replace": "Ersätt",
   "importBackupDescription": "Det här ersätter all din nuvarande data med säkerhetskopian.",
   "import": "Importera",
+  "generalSettings": "Allmänna inställningar",
   "errTrackingInProgress": "Sluta spåra först",
   "errGetDataLocation": "Det gick inte att hitta den sparade datan",
   "errSaveDataDirectory": "Det gick inte att ändra mappen för sparad data",

@@ -1,6 +1,6 @@
 {
   "appVersion": "إصدار التطبيق {{appVersion}}",
-  "source": "الشيفرة المصدرية",
+  "source": "المصدر",
   "about": "حول",
   "settings": "الإعدادات",
   "tracking": "التتبع",
@@ -187,6 +187,7 @@
   "replace": "استبدال",
   "importBackupDescription": "سيؤدي هذا إلى استبدال جميع بياناتك الحالية بالنسخة الاحتياطية.",
   "import": "استيراد",
+  "generalSettings": "الإعدادات العامة",
   "errTrackingInProgress": "أوقف التتبع أولاً",
   "errGetDataLocation": "تعذّر العثور على البيانات المحفوظة",
   "errSaveDataDirectory": "تعذّر تغيير مجلد البيانات",

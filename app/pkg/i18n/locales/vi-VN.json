@@ -1,6 +1,6 @@
 {
   "appVersion": "Phiên bản ứng dụng {{appVersion}}",
-  "source": "Mã nguồn",
+  "source": "Nguồn",
   "about": "Giới thiệu",
   "settings": "Cài đặt",
   "tracking": "Theo dõi",
@@ -187,6 +187,7 @@
   "replace": "Thay thế",
   "importBackupDescription": "Thao tác này sẽ thay thế toàn bộ dữ liệu hiện tại của bạn bằng bản sao lưu.",
   "import": "Nhập",
+  "generalSettings": "Cài đặt chung",
   "errTrackingInProgress": "Hãy dừng theo dõi trước",
   "errGetDataLocation": "Không tìm thấy dữ liệu đã lưu",
   "errSaveDataDirectory": "Không thể thay đổi thư mục dữ liệu",

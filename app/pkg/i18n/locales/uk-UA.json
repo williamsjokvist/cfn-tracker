@@ -1,6 +1,6 @@
 {
   "appVersion": "Версія застосунку {{appVersion}}",
-  "source": "Вихідний код",
+  "source": "Код",
   "about": "Про застосунок",
   "settings": "Налаштування",
   "tracking": "Відстеження",
@@ -187,6 +187,7 @@
   "replace": "Замінити",
   "importBackupDescription": "Усі поточні дані буде замінено резервною копією.",
   "import": "Імпортувати",
+  "generalSettings": "Загальні налаштування",
   "errTrackingInProgress": "Спершу зупиніть відстеження",
   "errGetDataLocation": "Не вдалося знайти збережені дані",
   "errSaveDataDirectory": "Не вдалося змінити теку даних",
