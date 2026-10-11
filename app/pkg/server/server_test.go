@@ -2,11 +2,13 @@ package server
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net"
 	"net/http"
 	"net/http/httptest"
+	"reflect"
 	"strings"
 	"testing"
 	"time"
@@ -172,5 +174,52 @@ func TestListenEndsOpenStreams(t *testing.T) {
 	case <-closed:
 	case <-time.After(time.Second):
 		t.Fatal("stream is still open")
+	}
+}
+
+// The browser source looks up each stat's title by its JSON key, so a match field
+// without a localization key of the same name would show its raw key on stream.
+func TestMatchFieldsHaveLocalizationKeys(t *testing.T) {
+	localizationType := reflect.TypeOf(model.Localization{})
+	declared := make(map[string]struct{}, localizationType.NumField())
+	for i := range localizationType.NumField() {
+		declared[localizationType.Field(i).Tag.Get("json")] = struct{}{}
+	}
+	matchType := reflect.TypeOf(model.Match{})
+	for i := range matchType.NumField() {
+		stat := matchType.Field(i).Tag.Get("json")
+		if stat == "replayId" || stat == "sessionId" {
+			continue
+		}
+		if _, ok := declared[stat]; !ok {
+			t.Errorf("model.Match field %q has no localization key of the same name", stat)
+		}
+	}
+}
+
+func TestTranslations(t *testing.T) {
+	srv := httptest.NewServer(NewBrowserSourceServer(nil).mux)
+	defer srv.Close()
+
+	res, err := http.Get(srv.URL + "/translations/sv-SE")
+	if err != nil {
+		t.Fatalf("get translations: %v", err)
+	}
+	defer func() { _ = res.Body.Close() }()
+	var translation map[string]string
+	if err := json.NewDecoder(res.Body).Decode(&translation); err != nil {
+		t.Fatalf("decode translations: %v", err)
+	}
+	if got := translation["opponentCharacter"]; got != "Motståndarens karaktär" {
+		t.Errorf("opponentCharacter = %q, want %q", got, "Motståndarens karaktär")
+	}
+
+	res, err = http.Get(srv.URL + "/translations/xx-XX")
+	if err != nil {
+		t.Fatalf("get unknown translations: %v", err)
+	}
+	_ = res.Body.Close()
+	if res.StatusCode != http.StatusNotFound {
+		t.Errorf("unknown locale status = %d, want %d", res.StatusCode, http.StatusNotFound)
 	}
 }

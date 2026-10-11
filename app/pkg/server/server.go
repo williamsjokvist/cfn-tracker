@@ -14,6 +14,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/williamsjokvist/cfn-tracker/pkg/i18n"
 	"github.com/williamsjokvist/cfn-tracker/pkg/model"
 )
 
@@ -48,6 +49,7 @@ func NewBrowserSourceServer(matchChan chan model.Match) *BrowserSourceServer {
 	b.mux.HandleFunc("/", b.handleRoot)
 	b.mux.HandleFunc("GET /stream", b.handleStream)
 	b.mux.HandleFunc("GET /themes/{theme}", b.handleTheme)
+	b.mux.HandleFunc("GET /translations/{locale}", b.handleTranslations)
 
 	// serve custom themes through "themes" directory in the same directory as the user's executable
 	fs := http.FileServer(http.Dir("./themes"))
@@ -204,6 +206,18 @@ func (b *BrowserSourceServer) handleTheme(w http.ResponseWriter, req *http.Reque
 		if err != nil {
 			slog.Error("browser source: send css", slog.Any("error", err))
 		}
+	}
+}
+
+func (b *BrowserSourceServer) handleTranslations(w http.ResponseWriter, req *http.Request) {
+	translation, err := i18n.GetTranslation(req.PathValue("locale"))
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(translation); err != nil {
+		slog.Error("browser source: send translation", slog.Any("error", err))
 	}
 }
 

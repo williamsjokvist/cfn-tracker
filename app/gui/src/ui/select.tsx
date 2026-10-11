@@ -10,8 +10,8 @@ type Size = 'md' | 'sm'
 // Items render in a portal, so they get the size from context rather than a prop.
 const SizeContext = React.createContext<Size>('md')
 
-export function Root(props: SelectPrimitive.SelectProps & { size?: Size }) {
-  const { children, size = 'md', ...restProps } = props
+export function Root(props: SelectPrimitive.SelectProps & { size?: Size; className?: string }) {
+  const { children, size = 'md', className, ...restProps } = props
   return (
     <SelectPrimitive.Root {...restProps}>
       <SelectPrimitive.Trigger
@@ -21,7 +21,8 @@ export function Root(props: SelectPrimitive.SelectProps & { size?: Size }) {
           'rounded-2xl border-[1px] border-white/20',
           'inline-flex w-48 items-center justify-between rounded-lg font-normal',
           size === 'sm' ? 'px-3 py-1.5 text-base' : 'px-4 py-2 text-lg',
-          'data-[state=open]:[&>*:last-child]:rotate-180'
+          'data-[state=open]:[&>*:last-child]:rotate-180',
+          className
         )}
       >
         <SelectPrimitive.Value />

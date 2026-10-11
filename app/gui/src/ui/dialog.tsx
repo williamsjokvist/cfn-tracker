@@ -4,7 +4,6 @@ import * as DialogPrimitive from '@radix-ui/react-dialog'
 
 import type { LocalizationKey } from '@/main/i18n'
 import { cn } from '@/helpers/cn'
-import { motion } from 'framer-motion'
 
 type DialogContentProps = {
   title: LocalizationKey
@@ -33,12 +32,11 @@ export function Content(props: DialogContentProps) {
           restProps.onInteractOutside?.(e)
         }}
       >
-        <motion.div
-          initial={{ opacity: 0, top: '55%' }}
-          animate={{ opacity: 1, top: '50%' }}
-          transition={{ delay: 0.025 }}
+        {/* CSS animations rather than framer-motion, since Radix only waits for CSS ones before unmounting */}
+        <div
           className={cn(
             'fixed z-9999 h-[420px] w-[450px] p-4',
+            'data-[state=closed]:animate-dialog-out data-[state=open]:animate-dialog-in',
             'top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]',
             'text-lg text-white',
             'bg-black/60 backdrop-blur-xl',
@@ -68,15 +66,13 @@ export function Content(props: DialogContentProps) {
           </header>
 
           {children}
-        </motion.div>
+        </div>
       </DialogPrimitive.Content>
       <DialogPrimitive.Overlay asChild>
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.025 }}
+        <div
           className={cn(
             'grid place-items-center overflow-y-auto',
+            'data-[state=closed]:animate-fade-out data-[state=open]:animate-fade-in',
             'fixed top-0 right-0 bottom-0 left-0',
             'z-50 bg-black/40 backdrop-blur-xs'
           )}

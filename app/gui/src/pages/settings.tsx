@@ -5,10 +5,10 @@ import { useTranslation } from 'react-i18next'
 import { ConfigContext } from '@/main/config'
 import { useErrorPopup } from '@/main/error-popup'
 import type { LocalizationKey } from '@/main/i18n'
+import { LanguageSelect } from '@/main/language-select'
 
 import {
   GetAppVersion,
-  GetSupportedLanguages,
   SaveBrowserSourcePort,
   SaveLocale,
   SaveLogFile,
@@ -33,8 +33,7 @@ import { Button } from '@/ui/button'
 import * as Select from '@/ui/select'
 import { Switch } from '@/ui/switch'
 import { Input } from '@/ui/input'
-import { SettingButton } from '@/ui/setting-button'
-import { Flag } from '@/ui/flag'
+import { SettingButton, settingTextClass } from '@/ui/setting-button'
 import { cn } from '@/helpers/cn'
 import { model } from '@model'
 
@@ -58,7 +57,7 @@ export function SettingsPage() {
             <h3 className='font-bold'>{t('generalSettings')}</h3>
             <div className='grid auto-rows-fr gap-2'>
               <ThemeSelect />
-              <LanguageSelect />
+              <AppLanguageSelect />
               <BrowserSourcePortInput />
               <SideBarToggle />
               <LogFileToggle />
@@ -102,8 +101,6 @@ export function SettingsPage() {
     </Page.Root>
   )
 }
-
-const settingTextClass = 'text-base font-extralight text-[#d6d4ff]'
 
 function AppVersion() {
   const { t } = useTranslation()
@@ -448,56 +445,21 @@ function ThemeSelect() {
   )
 }
 
-function LanguageSelect(props: React.PropsWithChildren) {
+function AppLanguageSelect() {
   const { i18n, t } = useTranslation()
-  const [langs, setLangs] = React.useState<string[]>([])
   const setError = useErrorPopup()
-
-  React.useEffect(() => {
-    GetSupportedLanguages().then(setLangs).catch(setError)
-  }, [])
-
   return (
     <div className='flex w-full items-center justify-between'>
       <span className={settingTextClass}>{t('language')}</span>
-      <Select.Root
-        size='sm'
+      <LanguageSelect
+        value={i18n.resolvedLanguage}
         onValueChange={code => {
           i18n
             .changeLanguage(code)
             .then(() => SaveLocale(code).catch(setError))
             .catch(setError)
         }}
-        value={i18n.resolvedLanguage}
-      >
-        {langs.map(code => {
-          const locale = new Intl.Locale(code).maximize()
-          const sharesLanguage =
-            langs.filter(c => new Intl.Locale(c).language === locale.language).length > 1
-          const nativeName = new Intl.DisplayNames([code], {
-            type: 'language',
-            languageDisplay: 'standard',
-            style: 'narrow',
-            fallback: 'code'
-          }).of(sharesLanguage ? `${locale.language}-${locale.script}` : locale.language)!
-
-          return (
-            <Select.Item
-              key={code}
-              value={code}
-              className='flex items-center justify-between gap-2'
-              {...(i18n.resolvedLanguage === code && {
-                style: {
-                  fontWeight: 600
-                }
-              })}
-            >
-              <Flag code={code} className='w-5 rounded-sm' />
-              <span className='first-letter:uppercase'>{nativeName}</span>
-            </Select.Item>
-          )
-        })}
-      </Select.Root>
+      />
     </div>
   )
 }
