@@ -99,7 +99,7 @@ function Nav() {
                 className={cn(
                   'pointer-events-none invisible absolute top-1/2 left-full ml-3 -translate-y-1/2',
                   'rounded-full border bg-white px-2.5 pt-1 pb-0.5 text-sm font-semibold text-black',
-                  'opacity-0 transition-all group-hover:visible group-hover:opacity-100'
+                  'opacity-0 transition-all group-hover:visible group-hover:opacity-100 group-hover:delay-500'
                 )}
               >
                 {t(href)}
