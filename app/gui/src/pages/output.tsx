@@ -47,7 +47,6 @@ const themeLabels: Record<string, LocalizationKey> = {
   pills: 'browserSourceThemePills',
   retro: 'browserSourceThemeRetro',
   sticker: 'browserSourceThemeSticker',
-  synthwave: 'browserSourceThemeSynthwave',
   terminal: 'browserSourceThemeTerminal',
   'text-only': 'browserSourceThemeTextOnly',
   ticker: 'browserSourceThemeTicker',

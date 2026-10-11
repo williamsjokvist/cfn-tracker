@@ -176,7 +176,6 @@ export namespace model {
 	    browserSourceThemeJaeger: string;
 	    browserSourceThemeNord: string;
 	    browserSourceThemePills: string;
-	    browserSourceThemeSynthwave: string;
 	    browserSourceThemeComic: string;
 	    browserSourceThemeTerminal: string;
 	    browserSourceThemeInk: string;

@@ -91,7 +91,6 @@ type Localization struct {
 	BrowserSourceThemeJaeger      string `json:"browserSourceThemeJaeger"`
 	BrowserSourceThemeNord        string `json:"browserSourceThemeNord"`
 	BrowserSourceThemePills       string `json:"browserSourceThemePills"`
-	BrowserSourceThemeSynthwave   string `json:"browserSourceThemeSynthwave"`
 	BrowserSourceThemeComic       string `json:"browserSourceThemeComic"`
 	BrowserSourceThemeTerminal    string `json:"browserSourceThemeTerminal"`
 	BrowserSourceThemeInk         string `json:"browserSourceThemeInk"`
