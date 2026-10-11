@@ -5,10 +5,17 @@ import { useSelector } from '@xstate/react'
 import { motion } from 'framer-motion'
 import { Icon } from '@iconify/react'
 
-import { ExportUserMatches, GetSessions, GetUsers, GetUserStatistics } from '@cmd/CommandHandler'
+import {
+  ExportUserMatches,
+  GetGuiConfig,
+  GetSessions,
+  GetUsers,
+  GetUserStatistics
+} from '@cmd/CommandHandler'
 import { model } from '@model'
 
 import { TrackingMachineContext } from '@/state/tracking-machine'
+import { AuthMachineContext } from '@/state/auth-machine'
 import { useErrorPopup } from '@/main/error-popup'
 import * as Page from '@/ui/page'
 import * as Select from '@/ui/select'
@@ -28,17 +35,28 @@ export function StatisticsPage() {
 
   const trackingActor = TrackingMachineContext.useActorRef()
   const trackedCode = useSelector(trackingActor, ({ context }) => context.user?.code)
+  const authActor = AuthMachineContext.useActorRef()
+  const currentGame = useSelector(authActor, ({ context }) => context.game)
 
   const [users, setUsers] = React.useState<model.User[]>()
+  const [lastUserCode, setLastUserCode] = React.useState<string>()
   React.useEffect(() => {
-    Promise.all(Object.values(model.GameType).map(g => GetUsers(g)))
-      .then(results => setUsers(results.flatMap(users => users ?? [])))
+    Promise.all([
+      Promise.all(Object.values(model.GameType).map(g => GetUsers(g))),
+      GetGuiConfig()
+    ])
+      .then(([results, cfg]) => {
+        const game = currentGame ?? cfg.lastGame
+        setLastUserCode(game ? cfg.lastUsers?.[game] : undefined)
+        setUsers(results.flatMap(users => users ?? []))
+      })
       .catch(setError)
   }, [])
 
   const user =
     users?.find(u => u.code === searchParams.get('user')) ??
     users?.find(u => u.code === trackedCode) ??
+    users?.find(u => u.code === lastUserCode) ??
     users?.[0]
 
   const [stats, setStats] = React.useState<model.UserStatistics>()
