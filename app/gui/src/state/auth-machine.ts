@@ -1,7 +1,7 @@
 import { setup, assign } from 'xstate'
 import { createActorContext } from '@xstate/react'
 
-import { SelectGame } from '@cmd/TrackingHandler'
+import { CancelAuthentication, SelectGame } from '@cmd/TrackingHandler'
 import { model } from '@model'
 import { EventsOff, EventsOn } from '@runtime'
 
@@ -13,6 +13,10 @@ type AuthMachineContextProps = {
   action: { localizationKey: string; secondsLeft: number } | null
   step: string | null
 }
+// Only the latest login may report an error, as a cancelled one fails after the
+// user has already picked another game.
+let latestLogin = 0
+
 export const AUTH_MACHINE = setup({
   types: {
     context: <AuthMachineContextProps>{}
@@ -20,8 +24,15 @@ export const AUTH_MACHINE = setup({
   actions: {
     selectGame: ({ context, self }) => {
       if (context.game) {
-        SelectGame(context.game).catch(error => self.send({ type: 'error', error }))
+        const login = ++latestLogin
+        SelectGame(context.game).catch(
+          error => login === latestLogin && self.send({ type: 'error', error })
+        )
       }
+    },
+    cancelLogin: () => {
+      latestLogin++
+      CancelAuthentication()
     },
     subscribeToAuthEvents: ({ self }) => {
       EventsOn('auth-success', () => self.send({ type: 'finished' }))
@@ -102,9 +113,8 @@ export const AUTH_MACHINE = setup({
           ],
           target: 'gameForm'
         },
-        // The login keeps running in the backend, but nothing listens for it anymore.
         pickGame: {
-          actions: ['unsubscribeToAuthEvents', assign({ action: null, step: null })],
+          actions: ['cancelLogin', 'unsubscribeToAuthEvents', assign({ action: null, step: null })],
           target: 'gameForm'
         }
       }

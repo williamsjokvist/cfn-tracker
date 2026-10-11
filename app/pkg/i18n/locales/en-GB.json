@@ -34,6 +34,7 @@
   "comparisonFetchingRanking": "Fetching top {{character}} players",
   "comparisonFetchingTopPlayer": "Fetching top player stats {{current}}/{{total}}",
   "comparisonComparing": "Comparing stats",
+  "comparisonInterrupted": "Comparison interrupted",
   "result": "Result",
   "replayId": "Replay ID",
   "copy": "Copy",
@@ -44,7 +45,6 @@
   "unpause": "Unpause",
   "statistics": "Statistics",
   "recentSessions": "Recent sessions",
-  "viewSessions": "View sessions",
   "compareWithTopPlayers": "Compare with top {{character}} players",
   "noStatistics": "Start tracking a user to see their statistics here.",
   "date": "Date",
@@ -169,5 +169,6 @@
   "authCheckingSession": "Checking saved Capcom login",
   "authRestartingBrowser": "Restarting browser",
   "authVerifyingLogin": "Verifying Capcom login",
+  "authInterrupted": "Login interrupted",
   "errAuthManualLoginFailed": "Could not confirm the browser login. Please try again"
 }

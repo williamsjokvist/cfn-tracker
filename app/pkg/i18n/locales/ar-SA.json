@@ -34,6 +34,7 @@
   "comparisonFetchingRanking": "جارٍ جلب أفضل لاعبي {{character}}",
   "comparisonFetchingTopPlayer": "جارٍ جلب إحصائيات أفضل اللاعبين {{current}}/{{total}}",
   "comparisonComparing": "جارٍ مقارنة الإحصائيات",
+  "comparisonInterrupted": "تمت مقاطعة المقارنة",
   "result": "النتيجة",
   "replayId": "معرّف الإعادة",
   "copy": "نسخ",
@@ -44,7 +45,6 @@
   "unpause": "استئناف",
   "statistics": "الإحصائيات",
   "recentSessions": "الجلسات الأخيرة",
-  "viewSessions": "عرض الجلسات",
   "compareWithTopPlayers": "قارن مع أفضل لاعبي {{character}}",
   "noStatistics": "ابدأ بتتبع مستخدم لعرض إحصائياته هنا.",
   "date": "التاريخ",
@@ -169,5 +169,6 @@
   "authCheckingSession": "جارٍ التحقق من تسجيل الدخول المحفوظ إلى Capcom",
   "authRestartingBrowser": "جارٍ إعادة تشغيل المتصفح",
   "authVerifyingLogin": "جارٍ التحقق من تسجيل الدخول إلى Capcom",
+  "authInterrupted": "تمت مقاطعة تسجيل الدخول",
   "errAuthManualLoginFailed": "تعذّر تأكيد تسجيل الدخول عبر المتصفح. يرجى المحاولة مرة أخرى"
 }

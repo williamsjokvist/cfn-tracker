@@ -34,6 +34,7 @@
   "comparisonFetchingRanking": "Kinukuha ang mga nangungunang {{character}} player",
   "comparisonFetchingTopPlayer": "Kinukuha ang stats ng nangungunang player {{current}}/{{total}}",
   "comparisonComparing": "Inihahambing ang stats",
+  "comparisonInterrupted": "Naantala ang paghahambing",
   "result": "Resulta",
   "replayId": "Replay ID",
   "copy": "Kopyahin",
@@ -44,7 +45,6 @@
   "unpause": "Ituloy",
   "statistics": "Mga istatistika",
   "recentSessions": "Mga kamakailang session",
-  "viewSessions": "Tingnan ang mga session",
   "compareWithTopPlayers": "Ihambing sa mga nangungunang {{character}} player",
   "noStatistics": "Simulang i-track ang isang user para makita rito ang kanyang stats.",
   "date": "Petsa",
@@ -169,5 +169,6 @@
   "authCheckingSession": "Sinusuri ang naka-save na Capcom login",
   "authRestartingBrowser": "Nire-restart ang browser",
   "authVerifyingLogin": "Bine-verify ang Capcom login",
+  "authInterrupted": "Naantala ang pag-login",
   "errAuthManualLoginFailed": "Hindi makumpirma ang pag-log in sa browser. Pakisubukan ulit"
 }

@@ -199,3 +199,13 @@ func TestAuthenticateReturnsWhenCallerStopsListening(t *testing.T) {
 		t.Fatal("Authenticate blocked after the caller stopped listening")
 	}
 }
+
+func TestAuthenticateKeepsBrowserWhenCancelled(t *testing.T) {
+	f := &fakeAuthBrowser{sessions: []bool{false}}
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+	statuses := make(chan tracker.AuthStatus, 10)
+	(&Client{auth: f}).Authenticate(ctx, statuses)
+
+	assertCalls(t, f, "session")
+}

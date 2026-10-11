@@ -7,10 +7,16 @@
   --opacity-enth: var(--enth-only);
   --font-app: var(--app-font);
   --animate-blink: blink 1s linear infinite;
+  --animate-blink-dark: blink-dark 1s linear infinite;
 
   @keyframes blink {
     50% {
       color: white;
+    }
+  }
+  @keyframes blink-dark {
+    50% {
+      color: var(--color-gray-500);
     }
   }
 }

@@ -12,9 +12,34 @@ import * as Table from '@/ui/table'
 import { Button } from '@/ui/button'
 import { cn } from '@/helpers/cn'
 
-import { ExportSF6BattleStatsComparison, GetSF6BattleStatsComparison } from '@cmd/ComparisonHandler'
+import {
+  CancelSF6BattleStatsComparison,
+  ExportSF6BattleStatsComparison,
+  GetSF6BattleStatsComparison
+} from '@cmd/ComparisonHandler'
 import type { model } from '@model'
 import { EventsOff, EventsOn } from '@runtime'
+
+type ComparisonRun = {
+  userCode: string
+  runId: string
+  report: Promise<model.SF6BattleStatsComparisonReport>
+  settled: boolean
+  cancelTimer?: number
+}
+
+function startComparison(userCode: string): ComparisonRun {
+  const runId = crypto.randomUUID()
+  const run: ComparisonRun = {
+    userCode,
+    runId,
+    settled: false,
+    report: GetSF6BattleStatsComparison(userCode, runId).finally(() => {
+      run.settled = true
+    })
+  }
+  return run
+}
 
 export function ComparisonPage() {
   const { t } = useTranslation()
@@ -60,19 +85,38 @@ export function ComparisonPage() {
     return withDelta
   }, [report])
 
+  const run = React.useRef<ComparisonRun | null>(null)
   React.useEffect(() => {
     if (!userCode) return
-    setReport(null)
-    setProgress(null)
-    setLoading(true)
-    GetSF6BattleStatsComparison(userCode)
-      .then(setReport)
-      .catch(setError)
+    let current = run.current
+    if (current?.userCode === userCode && current.cancelTimer !== undefined) {
+      // StrictMode and Fast Refresh remount the page right away, so carry on with
+      // the run instead of interrupting it and starting over.
+      window.clearTimeout(current.cancelTimer)
+      current.cancelTimer = undefined
+    } else {
+      setReport(null)
+      setProgress(null)
+      setLoading(true)
+      current = startComparison(userCode)
+      run.current = current
+    }
+    const thisRun = current
+    let left = false
+    thisRun.report
+      .then(report => !left && setReport(report))
+      .catch(err => !left && setError(err))
       .finally(() => {
+        if (left) return
         setLoading(false)
         setAuthAction(null)
         setProgress(null)
       })
+    return () => {
+      left = true
+      if (thisRun.settled) return
+      thisRun.cancelTimer = window.setTimeout(() => CancelSF6BattleStatsComparison(thisRun.runId))
+    }
   }, [userCode])
 
   return (

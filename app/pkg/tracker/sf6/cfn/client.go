@@ -127,6 +127,11 @@ func (c *Client) Authenticate(ctx context.Context, statChan chan tracker.AuthSta
 		send(ctx, statChan, tracker.AuthStatus{Done: true})
 		return
 	}
+	// A cancelled check says nothing about the session, and logging in closes the
+	// browser, taking every other tab on it down too.
+	if ctx.Err() != nil {
+		return
+	}
 
 	send(ctx, statChan, tracker.AuthStatus{Action: &tracker.AuthAction{LocalizationKey: "authNeedRelogin"}})
 	if closeErr := c.auth.Close(); closeErr != nil {

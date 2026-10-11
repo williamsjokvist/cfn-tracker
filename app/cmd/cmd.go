@@ -27,15 +27,17 @@ type CommandHandler struct {
 	cfg              *config.BuildConfig
 	browserSrcServer *server.BrowserSourceServer
 	issues           *issues.Client
+	exporter         *Exporter
 }
 
-func NewCommandHandler(sqlDb *sql.Storage, cfgDb *cfgDb.Storage, txtDb *txt.Storage, cfg *config.BuildConfig, browserSrcServer *server.BrowserSourceServer) *CommandHandler {
+func NewCommandHandler(sqlDb *sql.Storage, cfgDb *cfgDb.Storage, txtDb *txt.Storage, cfg *config.BuildConfig, browserSrcServer *server.BrowserSourceServer, exporter *Exporter) *CommandHandler {
 	return &CommandHandler{
 		sqlDb:            sqlDb,
 		cfgDb:            cfgDb,
 		cfg:              cfg,
 		browserSrcServer: browserSrcServer,
 		issues:           issues.NewClient(cfg.AppVersion),
+		exporter:         exporter,
 	}
 }
 

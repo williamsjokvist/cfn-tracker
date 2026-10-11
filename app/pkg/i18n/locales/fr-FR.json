@@ -34,6 +34,7 @@
   "comparisonFetchingRanking": "Récupération des meilleurs joueurs {{character}}",
   "comparisonFetchingTopPlayer": "Récupération des statistiques des meilleurs joueurs {{current}}/{{total}}",
   "comparisonComparing": "Comparaison des statistiques",
+  "comparisonInterrupted": "Comparaison interrompue",
   "result": "Dossier",
   "replayId": "Rejouer ID",
   "copy": "Copie",
@@ -44,7 +45,6 @@
   "unpause": "Reprendre",
   "statistics": "Statistiques",
   "recentSessions": "Sessions récentes",
-  "viewSessions": "Voir les sessions",
   "compareWithTopPlayers": "Comparer aux meilleurs joueurs {{character}}",
   "noStatistics": "Commencez à suivre un utilisateur pour voir ses statistiques ici.",
   "date": "Date",
@@ -169,5 +169,6 @@
   "authCheckingSession": "Vérification de la connexion Capcom enregistrée",
   "authRestartingBrowser": "Redémarrage du navigateur",
   "authVerifyingLogin": "Vérification de la connexion Capcom",
+  "authInterrupted": "Connexion interrompue",
   "errAuthManualLoginFailed": "Impossible de confirmer la connexion dans le navigateur. Veuillez réessayer"
 }

@@ -3,8 +3,10 @@
 import {model} from '../models';
 import {cmd} from '../models';
 
+export function CancelSF6BattleStatsComparison(arg1:string):Promise<void>;
+
 export function ExportSF6BattleStatsComparison(arg1:model.SF6BattleStatsComparisonReport):Promise<void>;
 
-export function GetSF6BattleStatsComparison(arg1:string):Promise<model.SF6BattleStatsComparisonReport>;
+export function GetSF6BattleStatsComparison(arg1:string,arg2:string):Promise<model.SF6BattleStatsComparisonReport>;
 
 export function SetEventEmitter(arg1:cmd.EventEmitFn):Promise<void>;

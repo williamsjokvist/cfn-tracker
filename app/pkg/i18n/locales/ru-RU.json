@@ -34,6 +34,7 @@
   "comparisonFetchingRanking": "Загрузка лучших игроков за {{character}}",
   "comparisonFetchingTopPlayer": "Загрузка статистики лучших игроков {{current}}/{{total}}",
   "comparisonComparing": "Сравнение статистики",
+  "comparisonInterrupted": "Сравнение прервано",
   "result": "Результат",
   "replayId": "ID повтора",
   "copy": "Копировать",
@@ -44,7 +45,6 @@
   "unpause": "Продолжить",
   "statistics": "Статистика",
   "recentSessions": "Недавние сессии",
-  "viewSessions": "Сессии",
   "compareWithTopPlayers": "Сравнить с лучшими игроками за {{character}}",
   "noStatistics": "Начните отслеживать пользователя, чтобы увидеть здесь его статистику.",
   "date": "Дата",
@@ -169,5 +169,6 @@
   "authCheckingSession": "Проверка сохранённого входа в Capcom",
   "authRestartingBrowser": "Перезапуск браузера",
   "authVerifyingLogin": "Подтверждение входа в Capcom",
+  "authInterrupted": "Вход прерван",
   "errAuthManualLoginFailed": "Не удалось подтвердить вход через браузер. Попробуйте ещё раз"
 }

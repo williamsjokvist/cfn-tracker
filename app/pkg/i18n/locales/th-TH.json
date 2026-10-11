@@ -34,6 +34,7 @@
   "comparisonFetchingRanking": "กำลังดึงผู้เล่น {{character}} อันดับต้น",
   "comparisonFetchingTopPlayer": "กำลังดึงสถิติผู้เล่นอันดับต้น {{current}}/{{total}}",
   "comparisonComparing": "กำลังเปรียบเทียบสถิติ",
+  "comparisonInterrupted": "การเปรียบเทียบถูกขัดจังหวะ",
   "result": "ผลลัพธ์",
   "replayId": "รหัสรีเพลย์",
   "copy": "คัดลอก",
@@ -44,7 +45,6 @@
   "unpause": "เล่นต่อ",
   "statistics": "สถิติ",
   "recentSessions": "เซสชันล่าสุด",
-  "viewSessions": "ดูเซสชัน",
   "compareWithTopPlayers": "เปรียบเทียบกับผู้เล่น {{character}} อันดับต้น",
   "noStatistics": "เริ่มติดตามผู้ใช้เพื่อดูสถิติของเขาที่นี่",
   "date": "วันที่",
@@ -169,5 +169,6 @@
   "authCheckingSession": "กำลังตรวจสอบการเข้าสู่ระบบ Capcom ที่บันทึกไว้",
   "authRestartingBrowser": "กำลังรีสตาร์ทเบราว์เซอร์",
   "authVerifyingLogin": "กำลังยืนยันการเข้าสู่ระบบ Capcom",
+  "authInterrupted": "การเข้าสู่ระบบถูกขัดจังหวะ",
   "errAuthManualLoginFailed": "ยืนยันการเข้าสู่ระบบผ่านเบราว์เซอร์ไม่สำเร็จ กรุณาลองอีกครั้ง"
 }

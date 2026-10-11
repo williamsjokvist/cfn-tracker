@@ -7,6 +7,7 @@ import { AuthMachineContext } from '@/state/auth-machine'
 import { cn } from '@/helpers/cn'
 
 import { ErrorPopupProvider } from './error-popup'
+import { InfoPopup } from './info-popup'
 import { ConfigProvider } from './config'
 import { RouterProvider } from './router'
 import { I18nProvider } from './i18n'
@@ -37,6 +38,7 @@ createRoot(document.getElementById('root')!).render(
         <TrackingMachineContext.Provider>
           <React.Suspense fallback={<AppLoader />}>
             <ErrorPopupProvider>
+              <InfoPopup />
               <ConfigProvider>
                 <RouterProvider />
               </ConfigProvider>

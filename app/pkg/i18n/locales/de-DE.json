@@ -34,6 +34,7 @@
   "comparisonFetchingRanking": "Top-{{character}}-Spieler werden geladen",
   "comparisonFetchingTopPlayer": "Statistiken der Top-Spieler werden geladen {{current}}/{{total}}",
   "comparisonComparing": "Statistiken werden verglichen",
+  "comparisonInterrupted": "Vergleich abgebrochen",
   "result": "Ergebnis",
   "replayId": "Replay-ID",
   "copy": "Kopieren",
@@ -44,7 +45,6 @@
   "unpause": "Fortsetzen",
   "statistics": "Statistiken",
   "recentSessions": "Letzte Sessions",
-  "viewSessions": "Sessions anzeigen",
   "compareWithTopPlayers": "Mit Top-{{character}}-Spielern vergleichen",
   "noStatistics": "Starte das Tracking eines Nutzers, um hier seine Statistiken zu sehen.",
   "date": "Datum",
@@ -169,5 +169,6 @@
   "authCheckingSession": "Gespeicherter Capcom-Login wird geprüft",
   "authRestartingBrowser": "Browser wird neu gestartet",
   "authVerifyingLogin": "Capcom-Login wird überprüft",
+  "authInterrupted": "Anmeldung abgebrochen",
   "errAuthManualLoginFailed": "Die Anmeldung im Browser konnte nicht bestätigt werden. Bitte versuche es erneut"
 }

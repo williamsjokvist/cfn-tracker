@@ -15,6 +15,15 @@ const variants = {
     className:
       'end-0 top-0 rounded-es-xl bg-linear-to-r from-[#870e65] to-[#6c086d] backdrop-blur-xs'
   },
+  info: {
+    icon: (
+      <Icon
+        icon='material-symbols:info-outline'
+        className='animate-blink-dark h-7 w-7 text-gray-300'
+      />
+    ),
+    className: 'end-0 top-0 rounded-es-xl bg-black/60 backdrop-blur-xl'
+  },
   loading: {
     icon: (
       <i className='text-highlight inline-block h-6 w-6 animate-spin rounded-full border-[3px] border-current border-t-transparent' />

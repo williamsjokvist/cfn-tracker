@@ -34,6 +34,7 @@
   "comparisonFetchingRanking": "상위 {{character}} 플레이어 불러오는 중",
   "comparisonFetchingTopPlayer": "상위 플레이어 스탯 불러오는 중 {{current}}/{{total}}",
   "comparisonComparing": "스탯 비교 중",
+  "comparisonInterrupted": "비교가 중단되었습니다",
   "result": "결과",
   "replayId": "리플레이 ID",
   "copy": "복사",
@@ -44,7 +45,6 @@
   "unpause": "재개",
   "statistics": "통계",
   "recentSessions": "최근 세션",
-  "viewSessions": "세션 보기",
   "compareWithTopPlayers": "상위 {{character}} 플레이어와 비교",
   "noStatistics": "유저 트래킹을 시작하면 여기에서 통계를 볼 수 있습니다.",
   "date": "날짜",
@@ -169,5 +169,6 @@
   "authCheckingSession": "저장된 Capcom 로그인 확인 중",
   "authRestartingBrowser": "브라우저 다시 시작 중",
   "authVerifyingLogin": "Capcom 로그인 확인 중",
+  "authInterrupted": "로그인이 중단되었습니다",
   "errAuthManualLoginFailed": "브라우저 로그인을 확인하지 못했습니다. 다시 시도해 주세요"
 }

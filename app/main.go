@@ -167,12 +167,14 @@ func main() {
 	browserSrcMatchChan := make(chan model.Match, 1)
 	browserSrcServer := server.NewBrowserSourceServer(browserSrcMatchChan)
 
+	exporter := cmd.NewExporter()
 	cmdHandler := cmd.NewCommandHandler(
 		sqlDb,
 		noSqlDb,
 		txtDb,
 		&cfg,
 		browserSrcServer,
+		exporter,
 	)
 
 	cfnClient := cfn.NewClient(appBrowser)
@@ -185,7 +187,6 @@ func main() {
 		&cfg,
 		browserSrcMatchChan,
 	)
-	exporter := cmd.NewExporter()
 	sf6ComparisonHandler := cmd.NewSF6ComparisonHandler(cfnClient, exporter)
 
 	var onSecondInstanceLaunch func(secondInstanceData options.SecondInstanceData)
