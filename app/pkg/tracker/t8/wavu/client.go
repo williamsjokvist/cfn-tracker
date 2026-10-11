@@ -48,7 +48,7 @@ func (c *Client) getReplays(ctx context.Context) ([]Replay, error) {
 	if err != nil {
 		return nil, fmt.Errorf("call wavu: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	data, err := io.ReadAll(resp.Body)
 	if err != nil {
@@ -86,7 +86,7 @@ func (c *Client) GetUserName(ctx context.Context, polarisId string) (string, err
 	if err != nil {
 		return "", fmt.Errorf("call wavu: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		return "", &model.HTTPStatusError{Op: "fetch player", StatusCode: resp.StatusCode}

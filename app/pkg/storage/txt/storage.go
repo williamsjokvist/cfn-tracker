@@ -60,18 +60,8 @@ func (s *Storage) SaveMatch(match model.Match) error {
 }
 
 func (s *Storage) saveTxtFile(fileName string, text string) error {
-	var file *os.File
-	var err error
-
-	file, err = os.Create(fmt.Sprintf(`%s/%s`, s.directory, fileName))
-	if err != nil {
-		return fmt.Errorf(`create file: %w`, err)
-	}
-	_, err = file.WriteString(text)
-	defer file.Close()
-	if err != nil {
+	if err := os.WriteFile(fmt.Sprintf(`%s/%s`, s.directory, fileName), []byte(text), 0o666); err != nil {
 		return fmt.Errorf(`write to file: %w`, err)
 	}
-
 	return nil
 }

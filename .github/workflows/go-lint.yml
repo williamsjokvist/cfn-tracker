@@ -4,7 +4,6 @@ on:
     paths:
       - "app/mise.toml"
       - "**.go"
-      - "app/.golangci.yml"
 
 permissions:
   contents: read
