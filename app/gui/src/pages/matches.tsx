@@ -1,5 +1,5 @@
 import React from 'react'
-import { useLoaderData, useNavigate } from 'react-router-dom'
+import { useLoaderData, useNavigate, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Icon } from '@iconify/react'
 
@@ -15,7 +15,13 @@ import { SessionBreadcrumbs, type SessionData } from '@/pages/session'
 export function MatchesListPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const { session, matches: totalMatches } = useLoaderData() as SessionData
+  const { session, matches: sessionMatches } = useLoaderData() as SessionData
+  const [searchParams] = useSearchParams()
+  const character = searchParams.get('character') ?? undefined
+  const totalMatches = React.useMemo(
+    () => (character ? sessionMatches.filter(m => m.character === character) : sessionMatches),
+    [sessionMatches, character]
+  )
   const [matches, setMatches] = React.useState(totalMatches)
   const [totalWinRate, setTotalWinRate] = React.useState(0)
 
@@ -33,7 +39,7 @@ export function MatchesListPage() {
     return (
       <Page.Root>
         <Page.Header>
-          <SessionBreadcrumbs session={session} matchLog />
+          <SessionBreadcrumbs session={session} matchLog character={character} />
         </Page.Header>
       </Page.Root>
     )
@@ -42,7 +48,7 @@ export function MatchesListPage() {
   return (
     <Page.Root>
       <Page.Header>
-        <SessionBreadcrumbs session={session} matchLog />
+        <SessionBreadcrumbs session={session} matchLog character={character} />
       </Page.Header>
 
       <div className='relative w-full'>

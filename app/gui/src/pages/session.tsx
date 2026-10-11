@@ -53,10 +53,12 @@ export type SessionData = { session: model.Session; matches: model.Match[] }
 
 export function SessionBreadcrumbs({
   session,
-  matchLog
+  matchLog,
+  character
 }: {
   session: model.Session
   matchLog?: boolean
+  character?: string
 }) {
   const { t, i18n } = useTranslation()
   const started = Intl.DateTimeFormat(i18n.resolvedLanguage, {
@@ -68,7 +70,9 @@ export function SessionBreadcrumbs({
       items={[
         { label: t('sessions'), to: '/sessions' },
         { label: started, to: matchLog ? `/sessions/${session.id}` : undefined },
-        ...(matchLog ? [{ label: t('history') }] : [])
+        ...(matchLog
+          ? [{ label: character ? `${t('history')} · ${character}` : t('history') }]
+          : [])
       ]}
     />
   )
@@ -111,26 +115,29 @@ export function SessionOverviewPage() {
             />
             <span className='relative top-[2px]'>{t('goBack')}</span>
           </Button>
-          <Button
-            className='flex items-center gap-2 px-2 py-[2px]'
-            disabled={matches.length === 0}
-            onClick={() => navigate(`/sessions/${session.id}/matches`)}
-          >
-            <Icon width={18} height={18} icon='material-symbols:list-alt-outline' />
-            <span className='relative top-[2px]'>{t('history')}</span>
-          </Button>
         </div>
 
         <div className='flex max-h-[340px] flex-col gap-4 overflow-y-auto px-8 pt-2 pb-4'>
           {characters.length > 1 && (
-            <dl className='flex gap-2'>
-              <BigStat text={t('wins')} value={wins} />
-              <BigStat text={t('losses')} value={losses} />
-              <BigStat text={t('winRate')} value={`${winRate(wins, losses)}%`} />
-            </dl>
+            <section className='-mx-8 border-b border-slate-50/10 px-8 pb-4'>
+              <SectionHeading
+                title={t('statistics')}
+                matchLog={`/sessions/${session.id}/matches`}
+              />
+              <dl className='grid grid-cols-3 gap-2 [&>div]:mb-0'>
+                <BigStat text={t('wins')} value={wins} />
+                <BigStat text={t('losses')} value={losses} />
+                <BigStat text={t('winRate')} value={`${winRate(wins, losses)}%`} />
+              </dl>
+            </section>
           )}
           {characters.map(c => (
-            <CharacterSection key={c.character} stats={c} hasPoints={hasPoints} />
+            <CharacterSection
+              key={c.character}
+              sessionId={session.id}
+              stats={c}
+              hasPoints={hasPoints}
+            />
           ))}
         </div>
       </motion.div>
@@ -138,7 +145,32 @@ export function SessionOverviewPage() {
   )
 }
 
-function CharacterSection({ stats, hasPoints }: { stats: CharacterStats; hasPoints: boolean }) {
+function SectionHeading({ title, matchLog }: { title: string; matchLog: string }) {
+  const { t } = useTranslation()
+  const navigate = useNavigate()
+  return (
+    <div className='mb-2 flex items-center justify-between gap-4'>
+      <h3 className='text-lg font-bold'>{title}</h3>
+      <Button
+        className='flex shrink-0 items-center gap-2 px-2 py-[2px]'
+        onClick={() => navigate(matchLog)}
+      >
+        <Icon width={18} height={18} icon='material-symbols:list-alt-outline' />
+        <span className='relative top-[2px]'>{t('history')}</span>
+      </Button>
+    </div>
+  )
+}
+
+function CharacterSection({
+  sessionId,
+  stats,
+  hasPoints
+}: {
+  sessionId: number
+  stats: CharacterStats
+  hasPoints: boolean
+}) {
   const { t } = useTranslation()
   // The portrait is a square as tall as the stats, which CSS can't size from a sibling.
   const statsRef = React.useRef<HTMLDivElement>(null)
@@ -157,7 +189,10 @@ function CharacterSection({ stats, hasPoints }: { stats: CharacterStats; hasPoin
         style={{ width: size, height: size }}
       />
       <div ref={statsRef} className='flex-1'>
-        <h3 className='mb-2 text-lg font-bold'>{stats.character}</h3>
+        <SectionHeading
+          title={stats.character}
+          matchLog={`/sessions/${sessionId}/matches?${new URLSearchParams({ character: stats.character })}`}
+        />
         <dl className='grid grid-cols-3 gap-2 [&>div]:mb-0'>
           <BigStat text={t('wins')} value={stats.wins} />
           <BigStat text={t('losses')} value={stats.losses} />
