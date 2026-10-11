@@ -66,6 +66,8 @@
   "pickGame": "Chọn trò chơi",
   "stopTrackingTitle": "Dừng theo dõi?",
   "stopTrackingDescription": "Quay lại chọn game sẽ dừng phiên hiện tại.",
+  "stopComparisonTitle": "Dừng so sánh?",
+  "stopComparisonDescription": "Rời khỏi trang này sẽ dừng việc tải dữ liệu so sánh.",
   "follow": "Theo dõi",
   "continueStep": "Tiếp tục",
   "placement": "Trận xếp hạng",

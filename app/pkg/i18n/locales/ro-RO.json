@@ -66,6 +66,8 @@
   "pickGame": "Alege jocul",
   "stopTrackingTitle": "Oprești urmărirea?",
   "stopTrackingDescription": "Revenirea la alegerea jocului oprește sesiunea curentă.",
+  "stopComparisonTitle": "Oprești comparația?",
+  "stopComparisonDescription": "Părăsirea acestei pagini oprește încărcarea comparației.",
   "follow": "Urmărește",
   "continueStep": "Continuă",
   "placement": "Meciuri de plasare",

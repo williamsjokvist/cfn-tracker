@@ -66,6 +66,8 @@
   "pickGame": "Oyun seç",
   "stopTrackingTitle": "Takip durdurulsun mu?",
   "stopTrackingDescription": "Oyun seçimine dönmek mevcut oturumu durdurur.",
+  "stopComparisonTitle": "Karşılaştırma durdurulsun mu?",
+  "stopComparisonDescription": "Bu sayfadan ayrılmak karşılaştırmanın alınmasını durdurur.",
   "follow": "Takip et",
   "continueStep": "Devam",
   "placement": "Yerleştirme maçları",

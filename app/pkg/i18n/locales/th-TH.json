@@ -66,6 +66,8 @@
   "pickGame": "เลือกเกม",
   "stopTrackingTitle": "หยุดการติดตามหรือไม่?",
   "stopTrackingDescription": "การกลับไปเลือกเกมจะหยุดเซสชันปัจจุบัน",
+  "stopComparisonTitle": "หยุดการเปรียบเทียบหรือไม่?",
+  "stopComparisonDescription": "การออกจากหน้านี้จะหยุดการดึงข้อมูลการเปรียบเทียบ",
   "follow": "ติดตาม",
   "continueStep": "ดำเนินการต่อ",
   "placement": "แมตช์จัดอันดับ",

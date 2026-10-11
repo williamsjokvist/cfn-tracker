@@ -66,6 +66,8 @@
   "pickGame": "Spiel auswählen",
   "stopTrackingTitle": "Tracking beenden?",
   "stopTrackingDescription": "Wenn du zur Spielauswahl zurückkehrst, wird die aktuelle Session beendet.",
+  "stopComparisonTitle": "Vergleich beenden?",
+  "stopComparisonDescription": "Wenn du diese Seite verlässt, wird das Laden des Vergleichs abgebrochen.",
   "follow": "Folgen",
   "continueStep": "Weiter",
   "placement": "Platzierungsmatches",

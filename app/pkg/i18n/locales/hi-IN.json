@@ -66,6 +66,8 @@
   "pickGame": "गेम चुनें",
   "stopTrackingTitle": "ट्रैकिंग रोकें?",
   "stopTrackingDescription": "गेम चयन पर वापस जाने से मौजूदा सत्र रुक जाएगा।",
+  "stopComparisonTitle": "तुलना रोकें?",
+  "stopComparisonDescription": "इस पेज को छोड़ने से तुलना लाना रुक जाएगा।",
   "follow": "फ़ॉलो करें",
   "continueStep": "आगे बढ़ें",
   "placement": "प्लेसमेंट मैच",

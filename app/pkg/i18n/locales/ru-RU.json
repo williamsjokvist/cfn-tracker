@@ -66,6 +66,8 @@
   "pickGame": "Выберите игру",
   "stopTrackingTitle": "Остановить отслеживание?",
   "stopTrackingDescription": "Возврат к выбору игры остановит текущую сессию.",
+  "stopComparisonTitle": "Остановить сравнение?",
+  "stopComparisonDescription": "Если покинуть эту страницу, загрузка сравнения остановится.",
   "follow": "Подписаться",
   "continueStep": "Продолжить",
   "placement": "Квалификационные матчи",

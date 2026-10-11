@@ -66,6 +66,8 @@
   "pickGame": "Виберіть гру",
   "stopTrackingTitle": "Зупинити відстеження?",
   "stopTrackingDescription": "Повернення до вибору гри зупинить поточну сесію.",
+  "stopComparisonTitle": "Зупинити порівняння?",
+  "stopComparisonDescription": "Якщо залишити цю сторінку, завантаження порівняння зупиниться.",
   "follow": "Стежити",
   "continueStep": "Продовжити",
   "placement": "Кваліфікаційні матчі",

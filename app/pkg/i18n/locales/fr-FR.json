@@ -66,6 +66,8 @@
   "pickGame": "Choisir le jeu",
   "stopTrackingTitle": "Arrêter le suivi ?",
   "stopTrackingDescription": "Revenir au choix du jeu arrête la session en cours.",
+  "stopComparisonTitle": "Arrêter la comparaison ?",
+  "stopComparisonDescription": "Quitter cette page arrête le chargement de la comparaison.",
   "follow": "Suivre",
   "continueStep": "Continuer",
   "placement": "Placement Matches",
