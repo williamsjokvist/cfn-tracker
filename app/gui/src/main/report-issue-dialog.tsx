@@ -112,7 +112,7 @@ export function ReportIssueDialog() {
                 <p>{t('issueReported')}</p>
                 <Button onClick={() => BrowserOpenURL(status.issueUrl)}>
                   {t('viewIssue')}
-                  <Icon icon='fa6-solid:arrow-up' className='ml-2 h-3 w-3 rotate-45' />
+                  <Icon icon='fa6-solid:arrow-up' className='ms-2 h-3 w-3 rotate-45' />
                 </Button>
               </>
             )}

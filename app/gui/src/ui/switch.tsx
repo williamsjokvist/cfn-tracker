@@ -16,7 +16,7 @@ export function Switch(props: SwitchPrimitive.SwitchProps) {
       <SwitchPrimitive.Thumb
         className={cn(
           'block h-5 w-5 rounded-full bg-white',
-          'translate-x-1 transition-transform data-[state=checked]:translate-x-6'
+          'translate-x-1 transition-transform data-[state=checked]:translate-x-6 rtl:-translate-x-1 rtl:data-[state=checked]:-translate-x-6'
         )}
       >
         {children}

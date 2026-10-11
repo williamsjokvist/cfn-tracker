@@ -4,7 +4,7 @@ import eye from './enth-eye.jpg'
 export function EnthEye(props: React.ImgHTMLAttributes<HTMLImageElement>) {
   const { className, ...restProps } = props
   return (
-    <div className='absolute top-56 -right-20 -z-50'>
+    <div className='absolute -end-20 top-56 -z-50'>
       <span
         className={cn(
           'relative inline-block',

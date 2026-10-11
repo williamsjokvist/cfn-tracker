@@ -57,7 +57,12 @@ export function MatchesListPage() {
               }
             }}
           >
-            <Icon width={20} height={20} icon='material-symbols:chevron-left' />
+            <Icon
+              width={20}
+              height={20}
+              icon='material-symbols:chevron-left'
+              className='rtl:rotate-180'
+            />
             <span className='relative top-[2px]'>{t('goBack')}</span>
           </Button>
           <span>

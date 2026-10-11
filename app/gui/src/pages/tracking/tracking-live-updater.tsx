@@ -133,12 +133,12 @@ export function TrackingLiveUpdater() {
                     }
                   }}
                 >
-                  <Icon icon='fa6-solid:recycle' className='mr-3 h-5 w-5' />
+                  <Icon icon='fa6-solid:recycle' className='me-3 h-5 w-5' />
                   {t('refresh')}
                 </Button>
               </Tooltip>
               <Button onClick={() => trackingActor.send({ type: 'cease' })}>
-                <Icon icon='fa6-solid:stop' className='mr-3 h-5 w-5' />
+                <Icon icon='fa6-solid:stop' className='me-3 h-5 w-5' />
                 {t('stop')}
               </Button>
             </div>
@@ -162,7 +162,7 @@ function CharacterImage({ character }: { character: string }) {
   }
   return (
     <img
-      className='pointer-events-none absolute top-0 -right-20 z-[-1] h-full opacity-10 grayscale'
+      className='pointer-events-none absolute -end-20 top-0 z-[-1] h-full opacity-10 grayscale'
       src={src}
       alt=''
       onError={() => setFailedSrc(src)}
