@@ -33,7 +33,7 @@ import { Button } from '@/ui/button'
 import * as Select from '@/ui/select'
 import { Switch } from '@/ui/switch'
 import { Input } from '@/ui/input'
-import { SettingButton } from '@/ui/setting-button'
+import { SettingButton, settingTextClass } from '@/ui/setting-button'
 import { Flag } from '@/ui/flag'
 import { cn } from '@/helpers/cn'
 import { model } from '@model'
@@ -102,8 +102,6 @@ export function SettingsPage() {
     </Page.Root>
   )
 }
-
-const settingTextClass = 'text-base font-extralight text-[#d6d4ff]'
 
 function AppVersion() {
   const { t } = useTranslation()

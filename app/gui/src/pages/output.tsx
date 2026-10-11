@@ -6,7 +6,7 @@ import { motion, useAnimate } from 'framer-motion'
 
 import * as Page from '@/ui/page'
 import * as Dialog from '@/ui/dialog'
-import { Button } from '@/ui/button'
+import { SettingButton, settingTextClass } from '@/ui/setting-button'
 
 import { Checkbox } from '@/ui/checkbox'
 
@@ -82,40 +82,29 @@ export function OutputPage() {
   return (
     <Page.Root>
       <Page.Header>
-        <Page.Title>{t('output')}</Page.Title>
+        <div className='mx-auto w-full max-w-xl text-start'>
+          <Page.Title>{t('output')}</Page.Title>
+        </div>
       </Page.Header>
-
-      <div className='z-40 h-full w-full overflow-y-scroll'>
-        <motion.section
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.125 }}
-          className='border-b-divider grid w-full gap-4 border-b-[1px] border-solid px-8 py-6'
-        >
-          <div className='flex items-center justify-between gap-8'>
+      <motion.section
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.125 }}
+        className='overflow-y-scroll text-xl'
+      >
+        <div className='border-b-divider border-b-[1px] border-solid px-8 py-6'>
+          <div className='mx-auto grid max-w-xl gap-3'>
             <div>
-              <h2 className='text-2xl font-bold'>{t('usingBrowserSource')}</h2>
-              <p className='my-4 max-w-[340px]'>
+              <h3 className='font-bold'>{t('usingBrowserSource')}</h3>
+              <p className={settingTextClass}>
                 <Trans t={t} i18nKey='browserSourceDescription'>
                   The easiest way to display the stats in OBS is to use
                   <i className='whitespace-nowrap'>Browser Source</i>. After editing the options,
                   copy the browser source link.
                 </Trans>
               </p>
-              <div className='relative' ref={scope}>
-                <Icon
-                  icon='twemoji:ok-hand'
-                  width={45}
-                  id='ok'
-                  className='absolute end-7 top-0 opacity-0'
-                />
-              </div>
-              <Button onClick={copyUrlToClipBoard} style={{ filter: 'hue-rotate(-120deg)' }}>
-                <Icon icon='mdi:internet' className='me-3 h-6 w-6' />
-                {t('copyBrowserSourceLink')}
-              </Button>
             </div>
-            <div className='flex flex-col gap-4'>
+            <div className='flex flex-wrap gap-2'>
               <ThemeSelect
                 value={options.theme}
                 onSelect={theme => setOptions({ ...options, theme })}
@@ -124,41 +113,47 @@ export function OutputPage() {
                 options={statOptions}
                 onSelect={(opt, checked) => setOptions({ ...options, [opt]: checked })}
               />
-              <Button
+            </div>
+            <div className='flex flex-wrap gap-2'>
+              <div className='relative' ref={scope}>
+                <Icon
+                  icon='twemoji:ok-hand'
+                  width={36}
+                  id='ok'
+                  className='pointer-events-none absolute end-2 -top-10 opacity-0'
+                />
+                <SettingButton icon='mdi:internet' onClick={copyUrlToClipBoard}>
+                  {t('copyBrowserSourceLink')}
+                </SettingButton>
+              </div>
+              <SettingButton
+                icon='mdi:brush'
                 onClick={() => BrowserOpenURL('https://cfn.williamsjokvist.se/theme-guide/')}
-                style={{ filter: 'hue-rotate(35deg)', justifyContent: 'center' }}
               >
-                <Icon icon='mdi:brush' className='me-3 h-6 w-6' />
                 {t('createYourOwnTheme')}
-              </Button>
+              </SettingButton>
             </div>
           </div>
-        </motion.section>
-        <motion.section
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.125 }}
-          className='flex w-full items-center justify-between gap-8 px-8 py-6'
-        >
-          <header>
-            <h2 className='text-xl font-bold'>{t('importFiles')}</h2>
-            <p className='mt-2 max-w-[420px]'>
-              <Trans t={t} i18nKey='obsCustomize'>
-                If you want to customize through OBS, you can use
-                <i>Text Labels</i> and add the text files in the results folder as sources
-              </Trans>
-            </p>
-          </header>
-          <Button
-            onClick={OpenResultsDirectory}
-            style={{ filter: 'hue-rotate(-120deg)' }}
-            className='mx-auto'
-          >
-            <Icon icon='fa6-solid:folder-open' className='me-3 h-6 w-6' />
-            {t('files')}
-          </Button>
-        </motion.section>
-      </div>
+        </div>
+        <div className='px-8 py-6'>
+          <div className='mx-auto grid max-w-xl gap-3'>
+            <div>
+              <h3 className='font-bold'>{t('importFiles')}</h3>
+              <p className={settingTextClass}>
+                <Trans t={t} i18nKey='obsCustomize'>
+                  If you want to customize through OBS, you can use
+                  <i>Text Labels</i> and add the text files in the results folder as sources
+                </Trans>
+              </p>
+            </div>
+            <div className='flex flex-wrap gap-2'>
+              <SettingButton icon='mdi:folder-open-outline' onClick={OpenResultsDirectory}>
+                {t('files')}
+              </SettingButton>
+            </div>
+          </div>
+        </div>
+      </motion.section>
     </Page.Root>
   )
 }
@@ -171,10 +166,7 @@ function StatSelect(props: {
   return (
     <Dialog.Root>
       <Dialog.Trigger asChild>
-        <Button style={{ filter: 'hue-rotate(-45deg)' }}>
-          <Icon icon='bx:stats' className='me-3 h-6 w-6' />
-          {t('displayStats')}
-        </Button>
+        <SettingButton icon='bx:stats'>{t('displayStats')}</SettingButton>
       </Dialog.Trigger>
       <Dialog.Content title='displayStats' description='statsWillBeDisplayed'>
         <ul className='mt-4 h-72 overflow-y-scroll'>
@@ -232,13 +224,9 @@ function ThemeSelect(props: { value: string; onSelect: (theme: string) => void }
   return (
     <Dialog.Root onOpenChange={setOpen}>
       <Dialog.Trigger asChild>
-        <Button
-          className='capitalize'
-          style={{ filter: 'hue-rotate(-180deg)', justifyContent: 'center' }}
-        >
-          <Icon icon='ph:paint-bucket-fill' className='me-3 h-6 w-6' />
+        <SettingButton icon='ph:paint-bucket-fill' className='capitalize'>
           {themeLabels[props.value] ? t(themeLabels[props.value]) : props.value}
-        </Button>
+        </SettingButton>
       </Dialog.Trigger>
       <Dialog.Content title='selectTheme'>
         <ul className='my-4 w-full overflow-y-scroll'>
