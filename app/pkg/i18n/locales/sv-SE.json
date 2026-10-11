@@ -50,6 +50,8 @@
   "exportLog": "Exportera CSV",
   "league": "Liga",
   "pickGame": "Välj spel",
+  "stopTrackingTitle": "Sluta spåra?",
+  "stopTrackingDescription": "Om du går tillbaka till spelvalet avslutas den pågående sessionen.",
   "follow": "Följ",
   "continueStep": "Fortsätt",
   "placement": "Placeringsmatcher",

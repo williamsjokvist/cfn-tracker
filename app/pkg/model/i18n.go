@@ -52,6 +52,8 @@ type Localization struct {
 	ExportLog                   string `json:"exportLog"`
 	League                      string `json:"league"`
 	PickGame                    string `json:"pickGame"`
+	StopTrackingTitle           string `json:"stopTrackingTitle"`
+	StopTrackingDescription     string `json:"stopTrackingDescription"`
 	Follow                      string `json:"follow"`
 	ContinueStep                string `json:"continueStep"`
 	Placement                   string `json:"placement"`

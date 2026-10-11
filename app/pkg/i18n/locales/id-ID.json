@@ -50,6 +50,8 @@
   "exportLog": "Ekspor CSV",
   "league": "Liga",
   "pickGame": "Pilih game",
+  "stopTrackingTitle": "Hentikan pelacakan?",
+  "stopTrackingDescription": "Kembali ke pemilihan game akan menghentikan sesi saat ini.",
   "follow": "Ikuti",
   "continueStep": "Lanjut",
   "placement": "Pertandingan penempatan",

@@ -51,7 +51,15 @@ export function Title(props: React.PropsWithChildren) {
   )
 }
 
-export function Breadcrumbs({ items }: { items: { label: string; to?: string }[] }) {
+const crumbLinkClass = 'uppercase opacity-60 transition-opacity hover:opacity-100'
+// The header is a window drag region, which would swallow the click.
+const noDrag = { '--draggable': 'no-drag' } as React.CSSProperties
+
+export function Breadcrumbs({
+  items
+}: {
+  items: { label: string; to?: string; onClick?: () => void }[]
+}) {
   return (
     <motion.nav
       initial={{ opacity: 0 }}
@@ -65,14 +73,13 @@ export function Breadcrumbs({ items }: { items: { label: string; to?: string }[]
             <Icon icon='material-symbols:chevron-right' className='opacity-50 rtl:rotate-180' />
           )}
           {item.to ? (
-            <Link
-              to={item.to}
-              className='opacity-60 transition-opacity hover:opacity-100'
-              // The header is a window drag region, which would swallow the click.
-              style={{ '--draggable': 'no-drag' } as React.CSSProperties}
-            >
+            <Link to={item.to} className={crumbLinkClass} style={noDrag}>
               {item.label}
             </Link>
+          ) : item.onClick ? (
+            <button type='button' onClick={item.onClick} className={crumbLinkClass} style={noDrag}>
+              {item.label}
+            </button>
           ) : (
             <span>{item.label}</span>
           )}

@@ -50,6 +50,8 @@
   "exportLog": "ส่งออก CSV",
   "league": "ลีก",
   "pickGame": "เลือกเกม",
+  "stopTrackingTitle": "หยุดการติดตามหรือไม่?",
+  "stopTrackingDescription": "การกลับไปเลือกเกมจะหยุดเซสชันปัจจุบัน",
   "follow": "ติดตาม",
   "continueStep": "ดำเนินการต่อ",
   "placement": "แมตช์จัดอันดับ",

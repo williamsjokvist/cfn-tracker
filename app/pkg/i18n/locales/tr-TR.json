@@ -50,6 +50,8 @@
   "exportLog": "CSV olarak dışa aktar",
   "league": "Lig",
   "pickGame": "Oyun seç",
+  "stopTrackingTitle": "Takip durdurulsun mu?",
+  "stopTrackingDescription": "Oyun seçimine dönmek mevcut oturumu durdurur.",
   "follow": "Takip et",
   "continueStep": "Devam",
   "placement": "Yerleştirme maçları",

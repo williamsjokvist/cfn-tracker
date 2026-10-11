@@ -50,6 +50,8 @@
   "exportLog": "CSV exporteren",
   "league": "League",
   "pickGame": "Kies een game",
+  "stopTrackingTitle": "Tracking stoppen?",
+  "stopTrackingDescription": "Teruggaan naar de spelkeuze stopt de huidige sessie.",
   "follow": "Volgen",
   "continueStep": "Doorgaan",
   "placement": "Plaatsingswedstrijden",

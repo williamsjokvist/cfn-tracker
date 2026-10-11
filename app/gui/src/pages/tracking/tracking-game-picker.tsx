@@ -31,6 +31,8 @@ const GAMES = [
   }
 ] as const
 
+export const gameName = (game?: model.GameType) => GAMES.find(g => g.code === game)?.alt ?? ''
+
 export function TrackingGamePicker(props: { onSubmit: (game: model.GameType) => void }) {
   const { t } = useTranslation()
   const [selectedGame, setSelectedGame] = React.useState<model.GameType>()

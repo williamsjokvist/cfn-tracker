@@ -12,6 +12,8 @@ import * as Page from '@/ui/page'
 import { model } from '@model'
 import { AuthMachineContext } from '@/state/auth-machine'
 import { useSelector } from '@xstate/react'
+
+import { TrackingBreadcrumbs } from './tracking-breadcrumbs'
 import { GetUsers } from '@cmd/CommandHandler'
 import { useErrorPopup } from '@/main/error-popup'
 
@@ -64,7 +66,7 @@ export function TrackingForm() {
   return (
     <Page.Root>
       <Page.Header>
-        <Page.Title>{t('startTracking')}</Page.Title>
+        <TrackingBreadcrumbs />
       </Page.Header>
       <motion.form
         initial={{ opacity: 0 }}
