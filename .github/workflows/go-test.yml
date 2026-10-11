@@ -18,4 +18,4 @@ jobs:
         with:
           working_directory: app
 
-      - run: mise run test
+      - run: mise test

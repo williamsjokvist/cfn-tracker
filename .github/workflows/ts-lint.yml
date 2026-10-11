@@ -20,5 +20,5 @@ jobs:
 
       - run: bun install
         working-directory: ./app/gui
-      - run: mise run lint:gui
-      - run: mise run fmt:check:gui
+      - run: mise lint:gui
+      - run: mise fmt:check:gui
