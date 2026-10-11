@@ -9,17 +9,30 @@ import { motion } from 'framer-motion'
 type DialogContentProps = {
   title: LocalizationKey
   description?: LocalizationKey
+  dismissible?: boolean
 } & DialogPrimitive.DialogContentProps
 
 export const Root = DialogPrimitive.Root
 export const Trigger = DialogPrimitive.Trigger
 
 export function Content(props: DialogContentProps) {
-  const { title, description, className, children, ...restProps } = props
+  const { title, description, dismissible = true, className, children, ...restProps } = props
   const { t } = useTranslation()
+  const preventUnlessDismissible = (e: Event) => !dismissible && e.preventDefault()
   return (
     <DialogPrimitive.Portal>
-      <DialogPrimitive.Content asChild {...restProps}>
+      <DialogPrimitive.Content
+        asChild
+        {...restProps}
+        onEscapeKeyDown={e => {
+          preventUnlessDismissible(e)
+          restProps.onEscapeKeyDown?.(e)
+        }}
+        onInteractOutside={e => {
+          preventUnlessDismissible(e)
+          restProps.onInteractOutside?.(e)
+        }}
+      >
         <motion.div
           initial={{ opacity: 0, top: '55%' }}
           animate={{ opacity: 1, top: '50%' }}
@@ -44,12 +57,14 @@ export function Content(props: DialogContentProps) {
                 </DialogPrimitive.Description>
               )}
             </div>
-            <DialogPrimitive.Close
-              aria-label='Close'
-              className={cn('h-11 min-w-[44px] rounded-full', 'bg-[#202020] hover:bg-[#2b2a33]')}
-            >
-              <Icon icon='ci:close-big' width={28} className='mx-auto' />
-            </DialogPrimitive.Close>
+            {dismissible && (
+              <DialogPrimitive.Close
+                aria-label='Close'
+                className={cn('h-11 min-w-[44px] rounded-full', 'bg-[#202020] hover:bg-[#2b2a33]')}
+              >
+                <Icon icon='ci:close-big' width={28} className='mx-auto' />
+              </DialogPrimitive.Close>
+            )}
           </header>
 
           {children}

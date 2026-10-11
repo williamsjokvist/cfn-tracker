@@ -24,6 +24,8 @@ export function GetUsers():Promise<Array<model.User>>;
 
 export function OpenResultsDirectory():Promise<void>;
 
+export function ReportIssue(arg1:model.IssueReport):Promise<string>;
+
 export function SaveBrowserSourcePort(arg1:number):Promise<void>;
 
 export function SaveLocale(arg1:string):Promise<void>;

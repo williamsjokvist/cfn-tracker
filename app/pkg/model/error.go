@@ -30,6 +30,7 @@ const (
 	tKeyErrAuthManualLoginFailed    ErrorLocalizationKey = "errAuthManualLoginFailed"
 	tKeyErrInvalidBrowserSourcePort ErrorLocalizationKey = "errInvalidBrowserSourcePort"
 	tKeyErrSaveBrowserSourcePort    ErrorLocalizationKey = "errSaveBrowserSourcePort"
+	tKeyErrReportIssue              ErrorLocalizationKey = "errReportIssue"
 )
 
 var AllErrorKeys = []struct {
@@ -58,6 +59,7 @@ var AllErrorKeys = []struct {
 	{tKeyErrAuthManualLoginFailed, string(tKeyErrAuthManualLoginFailed)},
 	{tKeyErrInvalidBrowserSourcePort, string(tKeyErrInvalidBrowserSourcePort)},
 	{tKeyErrSaveBrowserSourcePort, string(tKeyErrSaveBrowserSourcePort)},
+	{tKeyErrReportIssue, string(tKeyErrReportIssue)},
 }
 
 var (
@@ -82,6 +84,7 @@ var (
 	ErrReadThemeCSS             = newError(tKeyErrReadThemeCSS, errors.New("read theme css"))
 	ErrInvalidBrowserSourcePort = newError(tKeyErrInvalidBrowserSourcePort, errors.New("invalid browser source port"))
 	ErrSaveBrowserSourcePort    = newError(tKeyErrSaveBrowserSourcePort, errors.New("save browser source port"))
+	ErrReportIssue              = newError(tKeyErrReportIssue, errors.New("report issue"))
 
 	ErrAuthManualLoginFailed = newError(tKeyErrAuthManualLoginFailed, errors.New("manual login did not establish a buckler session"))
 )

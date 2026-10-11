@@ -15,6 +15,7 @@ export namespace model {
 	    errInvalidBrowserSourcePort = "errInvalidBrowserSourcePort",
 	    errOpenResultsDirectory = "errOpenResultsDirectory",
 	    errReadThemeCSS = "errReadThemeCSS",
+	    errReportIssue = "errReportIssue",
 	    errSaveBrowserSourcePort = "errSaveBrowserSourcePort",
 	    errSaveLocale = "errSaveLocale",
 	    errSaveLogFile = "errSaveLogFile",
@@ -43,6 +44,11 @@ export namespace model {
 	    sidebar: boolean;
 	    logFile: boolean;
 	    browserSourcePort: number;
+	}
+	export interface IssueReport {
+	    title: string;
+	    description: string;
+	    contact: string;
 	}
 	export interface Localization {
 	    appVersion: string;
@@ -84,6 +90,14 @@ export namespace model {
 	    minimize: string;
 	    writeLogFile: string;
 	    browserSourcePort: string;
+	    reportIssue: string;
+	    reportIssueDescription: string;
+	    issueTitle: string;
+	    issueDescription: string;
+	    issueContact: string;
+	    send: string;
+	    issueReported: string;
+	    viewIssue: string;
 	    restoreSession: string;
 	    exportLog: string;
 	    league: string;
@@ -163,6 +177,7 @@ export namespace model {
 	    errReadThemeCSS: string;
 	    errInvalidBrowserSourcePort: string;
 	    errSaveBrowserSourcePort: string;
+	    errReportIssue: string;
 	    retrying: string;
 	    retryingDetail: string;
 	    reconnected: string;
