@@ -1,6 +1,7 @@
 package browser
 
 import (
+	"errors"
 	"fmt"
 	"log/slog"
 	"os"
@@ -18,6 +19,9 @@ import (
 // browserCleanupTimeout bounds how long we wait for a closed browser to clean up.
 // After that we move on, since a stuck authentication is worse than a leaked process.
 const browserCleanupTimeout = 5 * time.Second
+
+// ErrBrowserNotFound is returned instead of letting rod download Chromium.
+var ErrBrowserNotFound = errors.New("no installed Chrome, Chromium or Edge found")
 
 // Browser is the headless Chrome used to read buckler with the saved session.
 // Logging in happens separately, in a plain Chrome window (see LaunchManualLogin).
@@ -48,16 +52,33 @@ func UserDataDir() (string, error) {
 	return filepath.Join(userHomeDir, "cfn-tracker"), nil
 }
 
+func cookieKeyArgs() []string {
+	args := make([]string, 0, len(cookieKeyFlags))
+	for name, values := range cookieKeyFlags {
+		arg := "--" + string(name)
+		if len(values) > 0 {
+			arg += "=" + strings.Join(values, ",")
+		}
+		args = append(args, arg)
+	}
+	return args
+}
+
 func (b *Browser) launch() error {
 	userDataDir, err := UserDataDir()
 	if err != nil {
 		return err
 	}
-	l := launcher.New()
-	if path, found := launcher.LookPath(); found {
-		l.Bin(path)
+	path, found := launcher.LookPath()
+	if !found {
+		return ErrBrowserNotFound
 	}
+	// Without an explicit binary, rod downloads Chromium.
+	l := launcher.New().Bin(path)
 	l.Set(flags.UserDataDir, userDataDir)
+	for name, values := range cookieKeyFlags {
+		l.Set(name, values...)
+	}
 	l.Delete("enable-automation")
 	l.Set("disable-blink-features", "AutomationControlled")
 	l.RemoteDebuggingPort(6969)

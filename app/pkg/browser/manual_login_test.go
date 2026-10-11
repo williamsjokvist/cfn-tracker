@@ -3,6 +3,8 @@ package browser_test
 import (
 	"context"
 	"errors"
+	"runtime"
+	"slices"
 	"strings"
 	"testing"
 	"time"
@@ -86,5 +88,31 @@ func TestLaunchManualLoginRetriesWhileProfileIsLocked(t *testing.T) {
 	}
 	if attempts != 3 {
 		t.Fatalf("attempts = %d, want 3", attempts)
+	}
+}
+
+func TestLaunchManualLoginUsesHeadlessCookieKey(t *testing.T) {
+	want := map[string]string{
+		"darwin": "--use-mock-keychain",
+		"linux":  "--password-store=basic",
+	}[runtime.GOOS]
+	if want == "" {
+		t.Skipf("no cookie key flag on %s", runtime.GOOS)
+	}
+
+	var gotArgs []string
+	restore := browser.ReplaceManualLoginProcessForTest(
+		func() (string, bool) { return "fake-chrome", true },
+		func(_ context.Context, _ string, args ...string) (browser.ManualLoginProcessForTest, error) {
+			gotArgs = args
+			return fakeManualLoginProcess{wait: func() error { return errors.New("stop") }}, nil
+		},
+	)
+	t.Cleanup(restore)
+	t.Cleanup(browser.SetManualLoginTimingForTest(1, time.Millisecond, 10*time.Millisecond))
+
+	_ = browser.LaunchManualLogin(context.Background(), "https://example.com")
+	if !slices.Contains(gotArgs, want) {
+		t.Fatalf("manual login args = %v, want %s", gotArgs, want)
 	}
 }
