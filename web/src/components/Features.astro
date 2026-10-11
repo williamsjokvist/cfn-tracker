@@ -20,6 +20,7 @@ import parchmentTheme from "../../../app/pkg/server/static/themes/parchment.css?
 import stickerTheme from "../../../app/pkg/server/static/themes/sticker.css?raw";
 import glitchTheme from "../../../app/pkg/server/static/themes/glitch.css?raw";
 import ledTheme from "../../../app/pkg/server/static/themes/led.css?raw";
+import chipsTheme from "../../../app/pkg/server/static/themes/chips.css?raw";
 
 const portraits = import.meta.glob<{ default: ImageMetadata }>(
   "../../../app/gui/src/assets/characters/{sf6,t8}/*.webp",
@@ -94,6 +95,7 @@ const themes = [
   { id: "default", name: "Default", css: defaultTheme },
   { id: "ticker", name: "Ticker", css: tickerTheme },
   { id: "sticker", name: "Sticker", css: stickerTheme },
+  { id: "chips", name: "Chips", css: chipsTheme },
   { id: "pills", name: "Pills", css: pillsTheme },
   { id: "ink", name: "Ink", css: inkTheme },
   { id: "terminal", name: "Terminal", css: terminalTheme },
