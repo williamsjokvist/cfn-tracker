@@ -1,6 +1,7 @@
 package cmd_test
 
 import (
+	"bytes"
 	"context"
 	"encoding/csv"
 	"os"
@@ -63,12 +64,11 @@ func TestExportUserMatches(t *testing.T) {
 		t.Errorf("suggested filename = %q, want Kakeru-matches.csv", suggested)
 	}
 
-	f, err := os.Open(path)
+	exported, err := os.ReadFile(path)
 	if err != nil {
-		t.Fatalf("open exported csv: %v", err)
+		t.Fatalf("read exported csv: %v", err)
 	}
-	defer f.Close()
-	got, err := csv.NewReader(f).ReadAll()
+	got, err := csv.NewReader(bytes.NewReader(exported)).ReadAll()
 	if err != nil {
 		t.Fatalf("read exported csv: %v", err)
 	}
