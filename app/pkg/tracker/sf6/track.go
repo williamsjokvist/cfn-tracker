@@ -30,6 +30,7 @@ func (t *SF6Tracker) GetUser(ctx context.Context, userCode string) (*model.User,
 	return &model.User{
 		DisplayName: bl.GetCFN(),
 		Code:        userCode,
+		Game:        model.GameTypeSF6,
 		LP:          bl.GetLP(),
 		MR:          bl.GetMR(),
 		Character:   bl.GetCharacter(),

@@ -37,6 +37,7 @@ func (t *T8Tracker) GetUser(ctx context.Context, polarisId string) (*model.User,
 	return &model.User{
 		DisplayName: userName,
 		Code:        parsedId,
+		Game:        model.GameTypeT8,
 	}, nil
 }
 
