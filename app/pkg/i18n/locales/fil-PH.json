@@ -52,7 +52,7 @@
   "writeLogFile": "Magsulat ng log file ng app",
   "browserSourcePort": "Port ng browser source",
   "reportIssue": "Mag-ulat ng error",
-  "reportIssueDescription": "Ipo-post ito nang pampubliko sa GitHub",
+  "reportIssueDescription": "Ipo-post ito nang pampubliko sa GitHub kasama ang app log ngayong araw",
   "issueTitle": "Pamagat",
   "issueDescription": "Ano ang nangyari? Paano ito mauulit?",
   "issueContact": "Contact (opsyonal, pampubliko)",

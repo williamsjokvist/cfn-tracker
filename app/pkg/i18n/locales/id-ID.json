@@ -52,7 +52,7 @@
   "writeLogFile": "Tulis file log aplikasi",
   "browserSourcePort": "Port browser source",
   "reportIssue": "Laporkan kesalahan",
-  "reportIssueDescription": "Laporan akan diposting secara publik di GitHub",
+  "reportIssueDescription": "Laporan akan diposting secara publik di GitHub bersama log aplikasi hari ini",
   "issueTitle": "Judul",
   "issueDescription": "Apa yang terjadi? Bagaimana cara mengulanginya?",
   "issueContact": "Kontak (opsional, publik)",

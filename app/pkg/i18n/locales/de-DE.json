@@ -52,7 +52,7 @@
   "writeLogFile": "App-Logdatei schreiben",
   "browserSourcePort": "Port der Browserquelle",
   "reportIssue": "Fehler melden",
-  "reportIssueDescription": "Die Meldung wird öffentlich auf GitHub gepostet",
+  "reportIssueDescription": "Die Meldung wird zusammen mit dem heutigen App-Log öffentlich auf GitHub gepostet",
   "issueTitle": "Titel",
   "issueDescription": "Was ist passiert? Wie lässt es sich reproduzieren?",
   "issueContact": "Kontakt (optional, öffentlich)",

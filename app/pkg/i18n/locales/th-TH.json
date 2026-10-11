@@ -52,7 +52,7 @@
   "writeLogFile": "บันทึกไฟล์ล็อกของแอป",
   "browserSourcePort": "พอร์ตของ Browser Source",
   "reportIssue": "รายงานข้อผิดพลาด",
-  "reportIssueDescription": "รายงานจะถูกโพสต์แบบสาธารณะบน GitHub",
+  "reportIssueDescription": "รายงานจะถูกโพสต์แบบสาธารณะบน GitHub พร้อมกับบันทึกของแอปวันนี้",
   "issueTitle": "หัวข้อ",
   "issueDescription": "เกิดอะไรขึ้น? ทำซ้ำได้อย่างไร?",
   "issueContact": "ช่องทางติดต่อ (ไม่บังคับ, สาธารณะ)",

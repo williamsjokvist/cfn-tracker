@@ -33,15 +33,17 @@ type reportBody struct {
 	Contact     string `json:"contact,omitempty"`
 	AppVersion  string `json:"appVersion"`
 	OS          string `json:"os"`
+	Log         string `json:"log,omitempty"`
 }
 
-func (c *Client) Report(ctx context.Context, report model.IssueReport) (string, error) {
+func (c *Client) Report(ctx context.Context, report model.IssueReport, appLog string) (string, error) {
 	body, err := json.Marshal(reportBody{
 		Title:       report.Title,
 		Description: report.Description,
 		Contact:     report.Contact,
 		AppVersion:  c.appVersion,
 		OS:          fmt.Sprintf("%s/%s", runtime.GOOS, runtime.GOARCH),
+		Log:         appLog,
 	})
 	if err != nil {
 		return "", fmt.Errorf("marshal issue report: %w", err)

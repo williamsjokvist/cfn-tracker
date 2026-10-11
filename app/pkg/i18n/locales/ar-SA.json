@@ -52,7 +52,7 @@
   "writeLogFile": "كتابة ملف سجل التطبيق",
   "browserSourcePort": "منفذ مصدر المتصفح",
   "reportIssue": "الإبلاغ عن خطأ",
-  "reportIssueDescription": "سيُنشر بشكل علني على GitHub",
+  "reportIssueDescription": "سيُنشر بشكل علني على GitHub مع سجل التطبيق لهذا اليوم",
   "issueTitle": "العنوان",
   "issueDescription": "ماذا حدث؟ وكيف يمكن إعادة إنتاج المشكلة؟",
   "issueContact": "وسيلة التواصل (اختياري، علني)",

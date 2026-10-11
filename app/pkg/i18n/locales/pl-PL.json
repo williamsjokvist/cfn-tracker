@@ -52,7 +52,7 @@
   "writeLogFile": "Zapisuj plik dziennika aplikacji",
   "browserSourcePort": "Port źródła przeglądarki",
   "reportIssue": "Zgłoś błąd",
-  "reportIssueDescription": "Zgłoszenie zostanie opublikowane publicznie na GitHubie",
+  "reportIssueDescription": "Zgłoszenie zostanie opublikowane publicznie na GitHubie wraz z dzisiejszym logiem aplikacji",
   "issueTitle": "Tytuł",
   "issueDescription": "Co się stało? Jak można to odtworzyć?",
   "issueContact": "Kontakt (opcjonalny, publiczny)",
