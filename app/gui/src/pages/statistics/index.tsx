@@ -8,7 +8,6 @@ import { Icon } from '@iconify/react'
 import { ExportUserMatches, GetSessions, GetUsers, GetUserStatistics } from '@cmd/CommandHandler'
 import { model } from '@model'
 
-import { AuthMachineContext } from '@/state/auth-machine'
 import { TrackingMachineContext } from '@/state/tracking-machine'
 import { useErrorPopup } from '@/main/error-popup'
 import * as Page from '@/ui/page'
@@ -27,19 +26,15 @@ export function StatisticsPage() {
   const setError = useErrorPopup()
   const [searchParams, setSearchParams] = useSearchParams()
 
-  const authActor = AuthMachineContext.useActorRef()
-  const game = useSelector(authActor, ({ context }) => context.game)
   const trackingActor = TrackingMachineContext.useActorRef()
   const trackedCode = useSelector(trackingActor, ({ context }) => context.user?.code)
 
   const [users, setUsers] = React.useState<model.User[]>()
   React.useEffect(() => {
-    // Users are saved per game, so before a game is picked there's no reason to hide any.
-    const games = game ? [game] : Object.values(model.GameType)
-    Promise.all(games.map(g => GetUsers(g)))
+    Promise.all(Object.values(model.GameType).map(g => GetUsers(g)))
       .then(results => setUsers(results.flatMap(users => users ?? [])))
       .catch(setError)
-  }, [game])
+  }, [])
 
   const user =
     users?.find(u => u.code === searchParams.get('user')) ??
