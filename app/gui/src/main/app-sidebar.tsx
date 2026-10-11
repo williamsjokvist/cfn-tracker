@@ -8,6 +8,7 @@ import { cn } from '@/helpers/cn'
 
 import { ConfigContext } from './config'
 import { AppTitleBar } from './app-titlebar'
+import { ReportIssueDialog } from './report-issue-dialog'
 
 export function AppSidebar() {
   const [cfg] = React.useContext(ConfigContext)
@@ -40,6 +41,9 @@ export function AppSidebar() {
     >
       <AppTitleBar />
       <Nav />
+      <div className='flex px-1'>
+        <ReportIssueDialog />
+      </div>
     </div>
   )
 }

@@ -12,6 +12,7 @@ import (
 	"github.com/williamsjokvist/cfn-tracker/pkg/applog"
 	"github.com/williamsjokvist/cfn-tracker/pkg/config"
 	"github.com/williamsjokvist/cfn-tracker/pkg/i18n"
+	"github.com/williamsjokvist/cfn-tracker/pkg/issues"
 	"github.com/williamsjokvist/cfn-tracker/pkg/model"
 	"github.com/williamsjokvist/cfn-tracker/pkg/server"
 	cfgDb "github.com/williamsjokvist/cfn-tracker/pkg/storage/config"
@@ -25,6 +26,7 @@ type CommandHandler struct {
 	cfgDb            *cfgDb.Storage
 	cfg              *config.BuildConfig
 	browserSrcServer *server.BrowserSourceServer
+	issues           *issues.Client
 }
 
 func NewCommandHandler(sqlDb *sql.Storage, cfgDb *cfgDb.Storage, txtDb *txt.Storage, cfg *config.BuildConfig, browserSrcServer *server.BrowserSourceServer) *CommandHandler {
@@ -33,6 +35,7 @@ func NewCommandHandler(sqlDb *sql.Storage, cfgDb *cfgDb.Storage, txtDb *txt.Stor
 		cfgDb:            cfgDb,
 		cfg:              cfg,
 		browserSrcServer: browserSrcServer,
+		issues:           issues.NewClient(cfg.AppVersion),
 	}
 }
 
@@ -211,6 +214,17 @@ func (ch *CommandHandler) SaveTheme(theme model.ThemeName) error {
 		return model.WrapError(model.ErrSaveTheme, err)
 	}
 	return nil
+}
+
+func (ch *CommandHandler) ReportIssue(report model.IssueReport) (string, error) {
+	if strings.TrimSpace(report.Title) == "" || strings.TrimSpace(report.Description) == "" {
+		return "", model.WrapError(model.ErrReportIssue, errors.New("title and description are required"))
+	}
+	url, err := ch.issues.Report(context.Background(), report)
+	if err != nil {
+		return "", model.WrapError(model.ErrReportIssue, err)
+	}
+	return url, nil
 }
 
 func (ch *CommandHandler) GetFGCTrackerErrorModelUnused() *model.FGCTrackerError {

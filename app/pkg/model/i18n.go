@@ -40,6 +40,14 @@ type Localization struct {
 	Minimize                    string `json:"minimize"`
 	WriteLogFile                string `json:"writeLogFile"`
 	BrowserSourcePort           string `json:"browserSourcePort"`
+	ReportIssue                 string `json:"reportIssue"`
+	ReportIssueDescription      string `json:"reportIssueDescription"`
+	IssueTitle                  string `json:"issueTitle"`
+	IssueDescription            string `json:"issueDescription"`
+	IssueContact                string `json:"issueContact"`
+	Send                        string `json:"send"`
+	IssueReported               string `json:"issueReported"`
+	ViewIssue                   string `json:"viewIssue"`
 	RestoreSession              string `json:"restoreSession"`
 	ExportLog                   string `json:"exportLog"`
 	League                      string `json:"league"`
@@ -119,6 +127,7 @@ type Localization struct {
 	ErrReadThemeCSS             string `json:"errReadThemeCSS"`
 	ErrInvalidBrowserSourcePort string `json:"errInvalidBrowserSourcePort"`
 	ErrSaveBrowserSourcePort    string `json:"errSaveBrowserSourcePort"`
+	ErrReportIssue              string `json:"errReportIssue"`
 	// Retry/recovery keys. Keys missing from this struct are silently dropped
 	// even if they exist in the locale JSON.
 	Retrying                 string `json:"retrying"`
