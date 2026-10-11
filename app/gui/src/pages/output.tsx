@@ -139,7 +139,11 @@ export function OutputPage() {
                 options={statOptions}
                 onSelect={(opt, checked) => setOptions({ ...options, [opt]: checked })}
               />
-              <LanguageSelect value={statsLocale} onValueChange={setStatsLocale} />
+              <LanguageSelect
+                value={statsLocale}
+                onValueChange={setStatsLocale}
+                className='w-auto! gap-2'
+              />
             </div>
             <div className='flex flex-wrap gap-2'>
               <div className='relative' ref={scope}>

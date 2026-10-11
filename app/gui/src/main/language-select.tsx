@@ -6,7 +6,11 @@ import { useErrorPopup } from '@/main/error-popup'
 import * as Select from '@/ui/select'
 import { Flag } from '@/ui/flag'
 
-export function LanguageSelect(props: { value?: string; onValueChange: (code: string) => void }) {
+export function LanguageSelect(props: {
+  value?: string
+  onValueChange: (code: string) => void
+  className?: string
+}) {
   const [langs, setLangs] = React.useState<string[]>([])
   const setError = useErrorPopup()
 
@@ -15,7 +19,12 @@ export function LanguageSelect(props: { value?: string; onValueChange: (code: st
   }, [])
 
   return (
-    <Select.Root size='sm' onValueChange={props.onValueChange} value={props.value}>
+    <Select.Root
+      size='sm'
+      onValueChange={props.onValueChange}
+      value={props.value}
+      className={props.className}
+    >
       {langs.map(code => {
         const locale = new Intl.Locale(code).maximize()
         const sharesLanguage =
