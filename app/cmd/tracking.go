@@ -122,10 +122,6 @@ func (ch *TrackingHandler) StartTracking(userCodeInput string, restore bool) err
 	session.LP, session.MR, session.UserName = user.LP, user.MR, user.DisplayName
 	ch.emit("match", model.Match{UserName: session.UserName, LP: session.LP, MR: session.MR, SessionId: session.Id, UserId: session.UserId})
 
-	matchChan := make(chan model.Match)
-	pollErrChan := make(chan error, 1)
-	go ch.poll(ctx, forcePoll, session, matchChan, pollErrChan)
-
 	if len(session.Matches) > 0 {
 		match := *session.Matches[0]
 		ch.emit("match", match)
@@ -133,10 +129,7 @@ func (ch *TrackingHandler) StartTracking(userCodeInput string, restore bool) err
 			return ctx.Err()
 		}
 	}
-	for match := range matchChan {
-		ch.emit("match", match)
-		session.LP, session.MR = match.LP, match.MR
-		session.Matches = append([]*model.Match{&match}, session.Matches...)
+	return ch.poll(ctx, forcePoll, tracker.NewSession(ch.gameTracker, session), func(match model.Match) error {
 		if err := ch.sqlDb.UpdateSession(ctx, session); err != nil {
 			return ch.storageError(cancel, "update session", err)
 		}
@@ -146,13 +139,10 @@ func (ch *TrackingHandler) StartTracking(userCodeInput string, restore bool) err
 		if err := ch.txtDb.SaveMatch(match); err != nil {
 			return ch.storageError(cancel, "save to text files", err)
 		}
-	}
-	select {
-	case err := <-pollErrChan:
-		return err
-	default:
+		// Emitted once saved, so whoever sees the event can rely on the stored state.
+		ch.emit("match", match)
 		return nil
-	}
+	})
 }
 
 func (ch *TrackingHandler) terminalError(err error) error {
@@ -188,8 +178,10 @@ func sendMatch(ctx context.Context, out chan<- model.Match, match model.Match) b
 	}
 }
 
-func (ch *TrackingHandler) poll(ctx context.Context, force <-chan struct{}, session *model.Session, matches chan<- model.Match, result chan<- error) {
-	defer close(matches)
+// poll ticks the session until ctx is done or polling fails for good. It runs on the
+// caller's goroutine, so a forced poll can never see the session before the previous
+// match has been recorded on it.
+func (ch *TrackingHandler) poll(ctx context.Context, force <-chan struct{}, session *tracker.Session, onMatch func(model.Match) error) error {
 	ticker := time.NewTicker(pollInterval)
 	defer ticker.Stop()
 	attempt, parseFailures, authAttempts := 0, 0, 0
@@ -197,7 +189,7 @@ func (ch *TrackingHandler) poll(ctx context.Context, force <-chan struct{}, sess
 	for {
 		pollCtx, cancelPoll := context.WithTimeout(ctx, pollTimeout)
 		started := time.Now()
-		match, err := ch.gameTracker.Poll(pollCtx, session)
+		match, err := session.Tick(pollCtx)
 		cancelPoll()
 		if err == nil {
 			if match != nil {
@@ -210,13 +202,16 @@ func (ch *TrackingHandler) poll(ctx context.Context, force <-chan struct{}, sess
 			}
 			attempt, parseFailures, authAttempts, wasFailing = 0, 0, 0, false
 			if match != nil {
-				if !sendMatch(ctx, matches, *match) || !ch.sendMatches(ctx, *match) {
-					return
+				if err := onMatch(*match); err != nil {
+					return err
+				}
+				if !ch.sendMatches(ctx, *match) {
+					return nil
 				}
 			}
 		} else {
 			if ctx.Err() != nil {
-				return
+				return nil
 			}
 			class := model.ClassifyPollError(err)
 			attempt++
@@ -224,11 +219,7 @@ func (ch *TrackingHandler) poll(ctx context.Context, force <-chan struct{}, sess
 			slog.Error("poll failed", slog.Any("error", err), slog.Int("class", int(class)), slog.Int("attempt", attempt))
 			if class == model.ClassFatal {
 				ch.emit("tracking-error", model.FormatError(err))
-				select {
-				case result <- err:
-				case <-ctx.Done():
-				}
-				return
+				return err
 			}
 			if class == model.ClassAuth {
 				authAttempts++
@@ -237,16 +228,12 @@ func (ch *TrackingHandler) poll(ctx context.Context, force <-chan struct{}, sess
 				}
 				if authAttempts >= maxReauthAttempts {
 					ch.emit("tracking-error", model.FormatError(err))
-					select {
-					case result <- err:
-					case <-ctx.Done():
-					}
-					return
+					return err
 				}
 				delay := ch.retryDelay(err, attempt)
 				ch.emit("tracking-retrying", RetryStatus{Attempt: attempt, NextRetryInMs: delay.Milliseconds(), Reason: "errAuth"})
 				if !waitFor(ctx, delay) {
-					return
+					return nil
 				}
 				continue
 			}
@@ -263,7 +250,7 @@ func (ch *TrackingHandler) poll(ctx context.Context, force <-chan struct{}, sess
 			}
 			ch.emit("tracking-retrying", RetryStatus{Attempt: attempt, NextRetryInMs: delay.Milliseconds(), Reason: reason})
 			if !waitFor(ctx, delay) {
-				return
+				return nil
 			}
 			continue
 		}
@@ -271,7 +258,7 @@ func (ch *TrackingHandler) poll(ctx context.Context, force <-chan struct{}, sess
 		case <-ticker.C:
 		case <-force:
 		case <-ctx.Done():
-			return
+			return nil
 		}
 	}
 }

@@ -17,6 +17,9 @@ import (
 
 var testSuite = struct {
 	trackingHandler *cmd.TrackingHandler
+	sqlDb           *sql.Storage
+	cfgDb           *cfgDb.Storage
+	txtDb           *txt.Storage
 }{}
 
 func TestMain(m *testing.M) {
@@ -37,6 +40,7 @@ func TestMain(m *testing.M) {
 		AppVersion: "4.0.0",
 	}
 
+	testSuite.sqlDb, testSuite.cfgDb, testSuite.txtDb = sqlDb, cfgDb, txtDb
 	testSuite.trackingHandler = cmd.NewTrackingHandler(
 		// todo mock api clients
 		wavu.NewClient(),

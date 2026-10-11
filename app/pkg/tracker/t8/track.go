@@ -81,34 +81,12 @@ func (t *T8Tracker) Poll(ctx context.Context, session *model.Session) (*model.Ma
 		opponentRank = lastReplay.P1Rank
 	}
 
-	wins := prevMatch.Wins
-	losses := prevMatch.Losses
-	winStreak := prevMatch.WinStreak
-	if victory {
-		wins++
-		winStreak++
-	} else {
-		losses++
-		winStreak = 0
-	}
-
 	return &model.Match{
-		SessionId: session.Id,
-		UserName:  userName,
-		UserId:    polarisId,
-		Opponent:  opponent,
-		Victory:   victory,
-		ReplayID:  lastReplay.ID(),
-		Wins:      wins,
-		Losses:    losses,
-		WinStreak: winStreak,
-		WinRate: func() int {
-			totalGames := wins + losses
-			if totalGames == 0 {
-				return 0
-			}
-			return int((float64(wins) / float64(totalGames)) * 100)
-		}(),
+		UserName:          userName,
+		UserId:            polarisId,
+		Opponent:          opponent,
+		Victory:           victory,
+		ReplayID:          lastReplay.ID(),
 		Character:         wavu.ConvCharaIdToName(character),
 		OpponentCharacter: wavu.ConvCharaIdToName(opponentCharacter),
 		OpponentLeague:    wavu.ConvRankToName(opponentRank),
