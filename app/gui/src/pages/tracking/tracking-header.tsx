@@ -29,10 +29,10 @@ export function TrackingHeader() {
   return (
     <Page.Header>
       <div className='flex items-baseline gap-4'>
-        <TrackingBreadcrumbs current={retrying ? t('retrying') : t('tracking')} />
+        <TrackingBreadcrumbs />
         {retrying && (
           <span className='text-sm whitespace-nowrap text-amber-200' role='status'>
-            {t(retry.reason as LocalizationKey)}
+            {t('retrying')} · {t(retry.reason as LocalizationKey)}
             {retry.nextRetryInMs > 0 && (
               <> · {t('retryingDetail', { attempt: retry.attempt, seconds })}</>
             )}
