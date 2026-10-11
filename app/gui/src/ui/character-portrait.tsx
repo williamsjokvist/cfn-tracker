@@ -1,6 +1,6 @@
 const portraits = Object.fromEntries(
   Object.entries(
-    import.meta.glob<string>('../assets/characters/*.webp', { eager: true, import: 'default' })
+    import.meta.glob<string>('../assets/characters/*/*.webp', { eager: true, import: 'default' })
   ).map(([path, url]) => [path.slice(path.lastIndexOf('/') + 1, -'.webp'.length), url])
 )
 
