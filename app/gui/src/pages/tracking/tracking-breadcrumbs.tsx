@@ -10,7 +10,7 @@ import { Button } from '@/ui/button'
 
 import { gameName } from './tracking-game-picker'
 
-export function TrackingBreadcrumbs() {
+export function TrackingBreadcrumbs({ current }: { current?: string }) {
   const { t } = useTranslation()
   const authActor = AuthMachineContext.useActorRef()
   const trackingActor = TrackingMachineContext.useActorRef()
@@ -30,7 +30,8 @@ export function TrackingBreadcrumbs() {
       <Page.Breadcrumbs
         items={[
           { label: t('pickGame'), onClick: () => (isTracking ? setConfirming(true) : pickGame()) },
-          { label: gameName(game) }
+          { label: gameName(game) },
+          ...(current ? [{ label: current }] : [])
         ]}
       />
       <Dialog.Root open={confirming} onOpenChange={setConfirming}>
