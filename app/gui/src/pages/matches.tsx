@@ -1,5 +1,5 @@
 import React from 'react'
-import { useLoaderData, useNavigate } from 'react-router-dom'
+import { useLoaderData, useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Icon } from '@iconify/react'
 
@@ -14,6 +14,7 @@ import { Tooltip } from '@/ui/tooltip'
 export function MatchesListPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const { sessionId } = useParams()
   const totalMatches = (useLoaderData() ?? []) as model.Match[]
   const [matches, setMatches] = React.useState(totalMatches)
   const [totalWinRate, setTotalWinRate] = React.useState(0)
@@ -53,7 +54,7 @@ export function MatchesListPage() {
               if (matches.length != totalMatches.length) {
                 setMatches(totalMatches)
               } else {
-                navigate('/sessions')
+                navigate(`/sessions/${sessionId}`)
               }
             }}
           >

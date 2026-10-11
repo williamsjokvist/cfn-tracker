@@ -4,6 +4,7 @@ import { SettingsPage } from '@/pages/settings'
 import { OutputPage } from '@/pages/output'
 import { MatchesListPage } from '@/pages/matches'
 import { SessionsListPage } from '@/pages/sessions'
+import { SessionOverviewPage } from '@/pages/session'
 import { TrackingPage } from '@/pages/tracking'
 
 import { AppWrapper } from './app-wrapper'
@@ -39,6 +40,11 @@ const router = createHashRouter([
           {
             element: <SessionsListPage />,
             path: '/sessions'
+          },
+          {
+            element: <SessionOverviewPage />,
+            path: '/sessions/:sessionId',
+            loader: ({ params }) => GetMatches(Number(params.sessionId), '', 0, 0)
           },
           {
             element: <MatchesListPage />,
