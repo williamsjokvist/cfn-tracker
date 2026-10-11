@@ -7,7 +7,7 @@ This is a false positive, caused by the app not being signed by a certificate au
 Yes! Quite a few people have also told me that peeking at their stats, during or after they play has helped them improve.
 
 ## The Mac version says it's damaged or can't be opened.
-The Mac app isn't signed with an Apple Developer ID, so macOS blocks it the first time. Download [the Mac version](https://github.com/williamsjokvist/cfn-tracker/releases/latest/download/cfn-tracker-macos-universal.zip), unzip it and move it to Applications. Then either try to open it and click "Open Anyway" under System Settings → Privacy & Security, or run this in Terminal:
+The Mac app isn't signed with an Apple Developer ID, so macOS blocks it the first time. Download [the Mac version](https://github.com/williamsjokvist/cfn-tracker/releases/latest/download/cfn-tracker-macos.zip), unzip it and move it to Applications. Then either try to open it and click "Open Anyway" under System Settings → Privacy & Security, or run this in Terminal:
 
 ```sh
 xattr -dr com.apple.quarantine "/Applications/CFN Tracker.app"

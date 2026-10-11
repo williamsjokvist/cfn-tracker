@@ -45,12 +45,12 @@ jobs:
         run: codesign --force --deep --sign - "build/bin/CFN Tracker.app"
 
       - name: Zip build
-        run: ditto -c -k --keepParent "build/bin/CFN Tracker.app" cfn-tracker-macos-universal.zip
+        run: ditto -c -k --keepParent "build/bin/CFN Tracker.app" cfn-tracker-macos.zip
 
       - uses: actions/upload-artifact@v4
         with:
           name: macos
-          path: app/cfn-tracker-macos-universal.zip
+          path: app/cfn-tracker-macos.zip
           if-no-files-found: error
 
   build-and-release:
@@ -98,7 +98,7 @@ jobs:
           fail_on_unmatched_files: true
           files: |
             app/cfn-tracker-windows-amd64.zip
-            app/cfn-tracker-macos-universal.zip
+            app/cfn-tracker-macos.zip
 
       - name: Commit app config
         run: |
