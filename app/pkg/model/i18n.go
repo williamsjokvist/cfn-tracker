@@ -115,6 +115,14 @@ type Localization struct {
 	T8TekkenGod                 string `json:"T8_TEKKEN_GOD"`
 	T8TekkenGodSupreme          string `json:"T8_TEKKEN_GOD_SUPREME"`
 	T8GodOfDestruction          string `json:"T8_GOD_OF_DESTRUCTION"`
+	T8GodOfDestructionI         string `json:"T8_GOD_OF_DESTRUCTION_1"`
+	T8GodOfDestructionII        string `json:"T8_GOD_OF_DESTRUCTION_2"`
+	T8GodOfDestructionIII       string `json:"T8_GOD_OF_DESTRUCTION_3"`
+	T8GodOfDestructionIV        string `json:"T8_GOD_OF_DESTRUCTION_4"`
+	T8GodOfDestructionV         string `json:"T8_GOD_OF_DESTRUCTION_5"`
+	T8GodOfDestructionVI        string `json:"T8_GOD_OF_DESTRUCTION_6"`
+	T8GodOfDestructionVII       string `json:"T8_GOD_OF_DESTRUCTION_7"`
+	T8GodOfDestructionInfinity  string `json:"T8_GOD_OF_DESTRUCTION_INFINITY"`
 	ErrUnknown                  string `json:"errUnknown"`
 	ErrSelectGame               string `json:"errSelectGame"`
 	ErrAuth                     string `json:"errAuth"`
