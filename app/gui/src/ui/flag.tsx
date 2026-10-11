@@ -1,4 +1,19 @@
-import { FR, JP, GB, ES, SA, BR, KR, CN, DE, IT, RU, Props } from 'country-flag-icons/react/3x2'
+import {
+  FR,
+  JP,
+  GB,
+  ES,
+  SA,
+  PT,
+  KR,
+  CN,
+  DE,
+  IT,
+  RU,
+  TW,
+  TH,
+  Props
+} from 'country-flag-icons/react/3x2'
 
 const flagMap = {
   'fr-FR': FR,
@@ -6,12 +21,14 @@ const flagMap = {
   'en-GB': GB,
   'es-ES': ES,
   'ar-SA': SA,
-  'pt-BR': BR,
+  'pt-BR': PT,
   'ko-KR': KR,
   'zh-CN': CN,
   'de-DE': DE,
   'it-IT': IT,
-  'ru-RU': RU
+  'ru-RU': RU,
+  'zh-TW': TW,
+  'th-TH': TH
 }
 
 export function Flag(props: Props & { code: string }) {

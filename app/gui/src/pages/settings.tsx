@@ -293,12 +293,15 @@ function LanguageSelect(props: React.PropsWithChildren) {
         value={i18n.resolvedLanguage}
       >
         {langs.map(code => {
+          const locale = new Intl.Locale(code).maximize()
+          const sharesLanguage =
+            langs.filter(c => new Intl.Locale(c).language === locale.language).length > 1
           const nativeName = new Intl.DisplayNames([code], {
             type: 'language',
             languageDisplay: 'standard',
             style: 'narrow',
             fallback: 'code'
-          }).of(new Intl.Locale(code).language)!
+          }).of(sharesLanguage ? `${locale.language}-${locale.script}` : locale.language)!
 
           return (
             <Select.Item
