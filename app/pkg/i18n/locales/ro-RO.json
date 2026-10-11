@@ -50,6 +50,8 @@
   "exportLog": "Exportă CSV",
   "league": "Ligă",
   "pickGame": "Alege jocul",
+  "stopTrackingTitle": "Oprești urmărirea?",
+  "stopTrackingDescription": "Revenirea la alegerea jocului oprește sesiunea curentă.",
   "follow": "Urmărește",
   "continueStep": "Continuă",
   "placement": "Meciuri de plasare",

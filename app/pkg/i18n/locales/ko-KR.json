@@ -50,6 +50,8 @@
   "exportLog": "CSV 내보내기",
   "league": "리그",
   "pickGame": "게임 선택",
+  "stopTrackingTitle": "추적을 중지할까요?",
+  "stopTrackingDescription": "게임 선택으로 돌아가면 현재 세션이 중지됩니다.",
   "follow": "팔로우",
   "continueStep": "계속",
   "placement": "배치 매치",

@@ -50,6 +50,8 @@
   "exportLog": "匯出 CSV",
   "league": "段位",
   "pickGame": "選擇遊戲",
+  "stopTrackingTitle": "停止追蹤？",
+  "stopTrackingDescription": "返回遊戲選擇將停止目前的工作階段。",
   "follow": "追蹤",
   "continueStep": "繼續",
   "placement": "定級賽",

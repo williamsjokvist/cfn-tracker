@@ -50,6 +50,8 @@
   "exportLog": "تصدير CSV",
   "league": "الدوري",
   "pickGame": "اختر اللعبة",
+  "stopTrackingTitle": "إيقاف التتبع؟",
+  "stopTrackingDescription": "العودة إلى اختيار اللعبة ستوقف الجلسة الحالية.",
   "follow": "متابعة",
   "continueStep": "متابعة",
   "placement": "مباريات التصنيف",

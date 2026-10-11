@@ -50,6 +50,8 @@
   "exportLog": "CSVに保存",
   "league": "リーグ",
   "pickGame": "ゲームを選択",
+  "stopTrackingTitle": "トラッキングを停止しますか？",
+  "stopTrackingDescription": "ゲーム選択に戻ると、現在のセッションが停止します。",
   "follow": "フォロー",
   "continueStep": "続ける",
   "placement": "Placement Matches",

@@ -92,6 +92,9 @@ export const AUTH_MACHINE = setup({
       invoke: {
         id: 'cfn-tracker',
         src: TRACKING_MACHINE
+      },
+      on: {
+        pickGame: { target: 'gameForm' }
       }
     }
   }

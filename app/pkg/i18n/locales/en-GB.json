@@ -50,6 +50,8 @@
   "exportLog": "Export CSV",
   "league": "League",
   "pickGame": "Choose game",
+  "stopTrackingTitle": "Stop tracking?",
+  "stopTrackingDescription": "Going back to game selection stops the current session.",
   "follow": "Follow",
   "continueStep": "Continue",
   "placement": "Placement Matches",

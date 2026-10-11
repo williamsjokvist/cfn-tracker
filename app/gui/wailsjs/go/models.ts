@@ -107,6 +107,8 @@ export namespace model {
 	    exportLog: string;
 	    league: string;
 	    pickGame: string;
+	    stopTrackingTitle: string;
+	    stopTrackingDescription: string;
 	    follow: string;
 	    continueStep: string;
 	    placement: string;

@@ -50,6 +50,8 @@
   "exportLog": "I-export ang CSV",
   "league": "Liga",
   "pickGame": "Pumili ng laro",
+  "stopTrackingTitle": "Itigil ang pag-track?",
+  "stopTrackingDescription": "Ang pagbalik sa pagpili ng laro ay ititigil ang kasalukuyang session.",
   "follow": "Sundan",
   "continueStep": "Magpatuloy",
   "placement": "Mga placement match",

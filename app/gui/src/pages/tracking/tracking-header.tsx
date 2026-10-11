@@ -6,6 +6,8 @@ import { TrackingMachineContext } from '@/state/tracking-machine'
 import { type LocalizationKey } from '@/main/i18n'
 import * as Page from '@/ui/page'
 
+import { TrackingBreadcrumbs } from './tracking-breadcrumbs'
+
 export function TrackingHeader() {
   const { t } = useTranslation()
   const actor = TrackingMachineContext.useActorRef()
@@ -27,7 +29,7 @@ export function TrackingHeader() {
   return (
     <Page.Header>
       <div className='flex items-baseline gap-4'>
-        <Page.Title>{retrying ? t('retrying') : t('tracking')}</Page.Title>
+        <TrackingBreadcrumbs current={retrying ? t('retrying') : t('tracking')} />
         {retrying && (
           <span className='text-sm whitespace-nowrap text-amber-200' role='status'>
             {t(retry.reason as LocalizationKey)}

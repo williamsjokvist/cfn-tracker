@@ -50,6 +50,8 @@
   "exportLog": "Esporta CSV",
   "league": "Lega",
   "pickGame": "Scegli il gioco",
+  "stopTrackingTitle": "Interrompere il tracciamento?",
+  "stopTrackingDescription": "Tornare alla scelta del gioco interrompe la sessione in corso.",
   "follow": "Segui",
   "continueStep": "Continua",
   "placement": "Partite di piazzamento",
