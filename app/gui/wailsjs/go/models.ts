@@ -31,8 +31,13 @@ export namespace model {
 	}
 	export enum ThemeName {
 	    DEFAULT = "default",
+	    DUSK = "dusk",
+	    EMBER = "ember",
 	    ENTH = "enth",
+	    JADE = "jade",
+	    SAKURA = "sakura",
 	    TEKKEN = "tekken",
+	    TIDE = "tide",
 	}
 	export interface FGCTrackerError {
 	    localizationKey: ErrorLocalizationKey;

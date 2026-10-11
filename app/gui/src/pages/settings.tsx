@@ -212,6 +212,26 @@ const Themes = [
   {
     name: model.ThemeName.TEKKEN,
     colors: ['#dd1d5b', '#1e3c52']
+  },
+  {
+    name: model.ThemeName.JADE,
+    colors: ['#0c8f62', '#023a4d']
+  },
+  {
+    name: model.ThemeName.EMBER,
+    colors: ['#b8321f', '#3a0b2e']
+  },
+  {
+    name: model.ThemeName.TIDE,
+    colors: ['#1767b8', '#0b1a4f']
+  },
+  {
+    name: model.ThemeName.DUSK,
+    colors: ['#5b3fd1', '#1a1240']
+  },
+  {
+    name: model.ThemeName.SAKURA,
+    colors: ['#d14f8a', '#3b1450']
   }
 ]
 

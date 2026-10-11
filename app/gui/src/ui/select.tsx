@@ -26,7 +26,12 @@ export function Root(props: SelectPrimitive.SelectProps) {
       </SelectPrimitive.Trigger>
       <AnimatePresence>
         <SelectPrimitive.Portal>
-          <SelectPrimitive.Content position='popper' side='bottom' className='animate- z-50'>
+          <SelectPrimitive.Content
+            position='popper'
+            side='bottom'
+            collisionPadding={16}
+            className='animate- z-50'
+          >
             <motion.div
               key='modal'
               initial={{ y: 15, opacity: 0 }}
@@ -37,17 +42,18 @@ export function Root(props: SelectPrimitive.SelectProps) {
               }}
               exit={{ y: 50, opacity: 0, transition: { duration: 0.1 } }}
               className={cn(
-                'z-50 overflow-hidden text-white',
+                // Cap to the space Radix measured so the viewport scrolls instead of overflowing the window.
+                'z-50 flex max-h-[var(--radix-select-content-available-height)] flex-col overflow-hidden text-white',
                 'bg-black/60 backdrop-blur-xl',
                 'rounded-xl shadow-[0_3px_16px_rgba(0,0,0,.5)]'
               )}
             >
-              <SelectPrimitive.ScrollUpButton>
-                <ChevronUpIcon />
+              <SelectPrimitive.ScrollUpButton className='flex justify-center py-1'>
+                <ChevronUpIcon className='h-5 w-5' />
               </SelectPrimitive.ScrollUpButton>
               <SelectPrimitive.Viewport>{children}</SelectPrimitive.Viewport>
-              <SelectPrimitive.ScrollDownButton>
-                <ChevronDownIcon />
+              <SelectPrimitive.ScrollDownButton className='flex justify-center py-1'>
+                <ChevronDownIcon className='h-5 w-5' />
               </SelectPrimitive.ScrollDownButton>
             </motion.div>
           </SelectPrimitive.Content>
@@ -63,7 +69,7 @@ export function Item(props: SelectPrimitive.SelectItemProps & React.RefAttribute
     <SelectPrimitive.Item
       className={cn(
         'flex w-48 cursor-pointer justify-between px-4 py-3 text-lg',
-        'hover:bg-[rgba(255,255,255,0.075)] data-[state=checked]:bg-[rgba(255,255,255,0.075)]'
+        'outline-none data-[highlighted]:bg-[rgba(255,255,255,0.075)] data-[state=checked]:bg-[rgba(255,255,255,0.075)]'
       )}
       {...restProps}
     >
