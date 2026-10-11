@@ -38,9 +38,11 @@ jobs:
           jq '.info.productVersion = "${{ inputs.version }}"' wails.json > wails.tmp.json
           mv wails.tmp.json wails.json
 
-      # Wails only ad-hoc signs the app, so users have to let it past Gatekeeper once.
       - name: Build
         run: mise build-mac-universal
+
+      - name: Sign
+        run: codesign --force --deep --sign - "build/bin/CFN Tracker.app"
 
       - name: Zip build
         run: ditto -c -k --keepParent "build/bin/CFN Tracker.app" cfn-tracker-macos-universal.zip
