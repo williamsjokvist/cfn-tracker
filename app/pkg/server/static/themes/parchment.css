@@ -1,0 +1,41 @@
+@import url("https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=IM+Fell+English&display=swap");
+
+body {
+  background: #2a1d14;
+}
+
+.stat-list {
+  display: grid;
+  gap: 8px;
+  max-width: 420px;
+  white-space: nowrap;
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  padding: 8px 28px;
+  background:
+    radial-gradient(ellipse at 20% 30%, rgba(255, 255, 255, 0.25), transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(120, 70, 20, 0.25), transparent 60%),
+    linear-gradient(to right, #c9a66b, #ecd9a8 12%, #f1e2b8 50%, #ecd9a8 88%, #c9a66b);
+  clip-path: polygon(
+    0 4%, 2% 0, 98% 3%, 100% 0, 99% 20%, 100% 40%, 98.5% 60%, 100% 80%, 99% 100%,
+    3% 97%, 0 100%, 1% 80%, 0 60%, 1.5% 40%, 0 20%
+  );
+}
+
+.stat-title {
+  color: #3b2412;
+  font-family: "IM Fell English", Georgia, serif;
+  font-size: 1.6rem;
+}
+
+.stat-value {
+  color: #8b1a1a;
+  font-family: "Cinzel Decorative", Georgia, serif;
+  font-weight: 700;
+  font-size: 1.8rem;
+}

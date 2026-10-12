@@ -1,0 +1,60 @@
+@import url("https://fonts.googleapis.com/css2?family=Limelight&family=Poiret+One&display=swap");
+
+body {
+  background: #0d0d0d;
+}
+
+.stat-list {
+  display: grid;
+  gap: 10px;
+  max-width: 420px;
+  padding: 4px;
+  white-space: nowrap;
+}
+
+.stat-item {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  padding: 10px 22px;
+  background:
+    repeating-linear-gradient(90deg, rgba(212, 175, 55, 0.06) 0 1px, transparent 1px 14px),
+    linear-gradient(to bottom, #1a1712, #0f0e0b);
+  border: 2px solid #d4af37;
+  outline: 1px solid rgba(212, 175, 55, 0.55);
+  outline-offset: -7px;
+}
+
+.stat-item::before,
+.stat-item::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  background: #d4af37;
+  transform: translateY(-50%) rotate(45deg);
+}
+
+.stat-item::before { left: -7px; }
+.stat-item::after { right: -7px; }
+
+.stat-title {
+  color: #e9d8a6;
+  font-family: "Poiret One", "Didot", serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.stat-value {
+  font-family: "Limelight", "Didot", serif;
+  font-size: 2rem;
+  background: linear-gradient(to bottom, #fff3c4 0%, #d4af37 55%, #9c7a1e 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}

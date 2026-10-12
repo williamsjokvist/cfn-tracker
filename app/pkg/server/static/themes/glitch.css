@@ -1,0 +1,68 @@
+@import url("https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&display=swap");
+
+body {
+  background: #0a0a0f;
+}
+
+.stat-list {
+  display: grid;
+  gap: 8px;
+  max-width: 420px;
+
+  font-family: "Chakra Petch", "Arial Black", sans-serif;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  padding: 6px 18px 6px 0;
+  background: #111118;
+  border-right: 3px solid #00f0ff;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%);
+}
+
+.stat-title {
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  margin: -6px 0;
+  color: #0a0a0f;
+  background: #f3e600;
+  font-weight: 700;
+  font-size: 1.1rem;
+  letter-spacing: 0.08em;
+}
+
+.stat-value {
+  color: #fff;
+  font-weight: 700;
+  font-size: 2rem;
+  text-shadow:
+    -2px 0 #ff003c,
+    2px 0 #00f0ff;
+  animation: glitch-jitter 3s infinite steps(1);
+}
+
+@keyframes glitch-jitter {
+  0%, 92%, 100% {
+    transform: none;
+    text-shadow: -2px 0 #ff003c, 2px 0 #00f0ff;
+  }
+  93% {
+    transform: translateX(-2px) skewX(-8deg);
+    text-shadow: -4px 0 #ff003c, 3px 0 #00f0ff;
+  }
+  95% {
+    transform: translateX(2px);
+    text-shadow: 3px 0 #ff003c, -3px 0 #00f0ff;
+  }
+  97% {
+    transform: translateX(-1px) skewX(4deg);
+    text-shadow: -1px 0 #ff003c, 1px 0 #00f0ff;
+  }
+}

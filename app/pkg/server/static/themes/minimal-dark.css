@@ -1,0 +1,40 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@500;700&display=swap");
+
+body {
+  background: #0b0d12;
+}
+
+.stat-list {
+  display: grid;
+  gap: 8px;
+  max-width: 360px;
+  padding: 4px;
+
+  font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
+  white-space: nowrap;
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  padding: 12px 18px;
+  background: #171a21;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.stat-title {
+  color: #9aa1ad;
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+.stat-value {
+  color: #f3f4f6;
+  font-weight: 700;
+  font-size: 1.6rem;
+  font-variant-numeric: tabular-nums;
+}

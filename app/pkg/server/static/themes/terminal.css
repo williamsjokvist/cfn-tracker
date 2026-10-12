@@ -1,0 +1,60 @@
+@import url("https://fonts.googleapis.com/css2?family=VT323&display=swap");
+
+body {
+  background: #050805;
+}
+
+.stat-list {
+  display: grid;
+  gap: 2px;
+  max-width: 460px;
+  padding: 14px 18px;
+  background: radial-gradient(ellipse at center, #0c1a0c 0%, #040704 100%);
+  border: 2px solid #1f4d1f;
+  border-radius: 10px;
+
+  font-family: "VT323", "Courier New", monospace;
+  font-size: 2rem;
+  line-height: 1.15;
+  white-space: nowrap;
+  color: #39ff6a;
+  text-shadow: 0 0 4px rgba(57, 255, 106, 0.8), 0 0 12px rgba(57, 255, 106, 0.35);
+}
+
+.stat-item {
+  display: flex;
+  gap: 0.5ch;
+}
+
+.stat-title::before {
+  content: "> ";
+  color: #1fa83f;
+}
+
+.stat-title::after {
+  content: ":";
+}
+
+.stat-title {
+  color: #1fd14f;
+  text-transform: lowercase;
+}
+
+.stat-value {
+  color: #b6ffc8;
+}
+
+.stat-item:last-child .stat-value::after {
+  content: "";
+  display: inline-block;
+  width: 0.55em;
+  height: 0.9em;
+  margin-left: 0.25ch;
+  vertical-align: -0.1em;
+  background: currentColor;
+  animation: terminal-cursor 1s steps(1) infinite;
+}
+
+@keyframes terminal-cursor {
+  50% { opacity: 0; }
+}

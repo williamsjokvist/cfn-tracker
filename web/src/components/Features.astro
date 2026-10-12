@@ -4,10 +4,23 @@ import { Image } from "astro:assets";
 import MockTracker from "./MockTracker.astro";
 
 import defaultTheme from "../../../app/pkg/server/static/themes/default.css?raw";
-import bladesTheme from "../../../app/pkg/server/static/themes/blades.css?raw";
-import jaegerTheme from "../../../app/pkg/server/static/themes/jaeger.css?raw";
-import nordTheme from "../../../app/pkg/server/static/themes/nord.css?raw";
 import pillsTheme from "../../../app/pkg/server/static/themes/pills.css?raw";
+import inkTheme from "../../../app/pkg/server/static/themes/ink.css?raw";
+import terminalTheme from "../../../app/pkg/server/static/themes/terminal.css?raw";
+import decoTheme from "../../../app/pkg/server/static/themes/deco.css?raw";
+import notebookTheme from "../../../app/pkg/server/static/themes/notebook.css?raw";
+import minimalTheme from "../../../app/pkg/server/static/themes/minimal.css?raw";
+import minimalDarkTheme from "../../../app/pkg/server/static/themes/minimal-dark.css?raw";
+import retroTheme from "../../../app/pkg/server/static/themes/retro.css?raw";
+import glassTheme from "../../../app/pkg/server/static/themes/glass.css?raw";
+import versusTheme from "../../../app/pkg/server/static/themes/versus.css?raw";
+import comicTheme from "../../../app/pkg/server/static/themes/comic.css?raw";
+import tickerTheme from "../../../app/pkg/server/static/themes/ticker.css?raw";
+import parchmentTheme from "../../../app/pkg/server/static/themes/parchment.css?raw";
+import stickerTheme from "../../../app/pkg/server/static/themes/sticker.css?raw";
+import glitchTheme from "../../../app/pkg/server/static/themes/glitch.css?raw";
+import ledTheme from "../../../app/pkg/server/static/themes/led.css?raw";
+import chipsTheme from "../../../app/pkg/server/static/themes/chips.css?raw";
 
 const portraits = import.meta.glob<{ default: ImageMetadata }>(
   "../../../app/gui/src/assets/characters/{sf6,t8}/*.webp",
@@ -80,10 +93,23 @@ const statListHtml = `<dl class="stat-list">${outputStats
   .join("")}</dl>`;
 const themes = [
   { id: "default", name: "Default", css: defaultTheme },
-  { id: "blades", name: "Blades", css: bladesTheme },
-  { id: "jaeger", name: "Jaeger", css: jaegerTheme },
-  { id: "nord", name: "Nord", css: nordTheme },
+  { id: "ticker", name: "Ticker", css: tickerTheme },
+  { id: "sticker", name: "Sticker", css: stickerTheme },
+  { id: "chips", name: "Chips", css: chipsTheme },
   { id: "pills", name: "Pills", css: pillsTheme },
+  { id: "ink", name: "Ink", css: inkTheme },
+  { id: "terminal", name: "Terminal", css: terminalTheme },
+  { id: "deco", name: "Art Deco", css: decoTheme },
+  { id: "notebook", name: "Notebook", css: notebookTheme },
+  { id: "minimal", name: "Minimal", css: minimalTheme },
+  { id: "minimal-dark", name: "Minimal Dark", css: minimalDarkTheme },
+  { id: "retro", name: "Retro Desktop", css: retroTheme },
+  { id: "glass", name: "Glass", css: glassTheme },
+  { id: "versus", name: "Versus", css: versusTheme },
+  { id: "comic", name: "Comic", css: comicTheme },
+  { id: "parchment", name: "Parchment", css: parchmentTheme },
+  { id: "glitch", name: "Glitch", css: glitchTheme },
+  { id: "led", name: "LED", css: ledTheme },
 ].map((theme) => ({
   ...theme,
   srcdoc: `<!doctype html><html><head><style>*{margin:0}body{padding:24px;overflow:hidden}</style><style>${theme.css}</style></head><body>${statListHtml}</body></html>`,
