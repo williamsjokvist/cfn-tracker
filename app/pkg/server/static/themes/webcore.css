@@ -1,0 +1,84 @@
+@import url("https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;700&display=swap");
+
+body {
+  background: linear-gradient(120deg, #7ea6ff, #f59bdc);
+}
+
+/* A retro window: thick navy outline, hard drop shadow and a pastel body. */
+.stat-list {
+  --navy: #1f1d4f;
+  --box: linear-gradient(var(--navy), var(--navy));
+  --fill: linear-gradient(#ffd3f1, #ffd3f1);
+  position: relative;
+  display: inline-grid;
+  gap: 5px;
+  margin: 18px 22px 14px 10px;
+  padding: 32px 10px 10px;
+  background: linear-gradient(to bottom, #ffd3f1, #e6c8ff);
+  border: 2px solid var(--navy);
+  box-shadow: 5px 5px 0 var(--navy), inset 2px 2px 0 #fff;
+  font-family: "Pixelify Sans", "Courier New", monospace;
+  white-space: nowrap;
+}
+
+/* The title bar, with its three window boxes at the right. */
+.stat-list::before {
+  content: "stats.exe";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 22px;
+  padding-left: 8px;
+  line-height: 22px;
+  color: var(--navy);
+  font-size: 0.85rem;
+  font-weight: 700;
+  background:
+    var(--fill) right 7px center / 10px 10px no-repeat,
+    var(--box) right 5px center / 14px 14px no-repeat,
+    var(--fill) right 25px center / 10px 10px no-repeat,
+    var(--box) right 23px center / 14px 14px no-repeat,
+    var(--fill) right 43px center / 10px 10px no-repeat,
+    var(--box) right 41px center / 14px 14px no-repeat,
+    linear-gradient(90deg, #8fb0ff, #d99bff);
+  border-bottom: 2px solid var(--navy);
+}
+
+/* A sparkle poking out of the corner. */
+.stat-list::after {
+  content: "";
+  position: absolute;
+  top: -16px;
+  right: -16px;
+  width: 34px;
+  height: 34px;
+  background: #fff;
+  clip-path: polygon(50% 0, 55% 45%, 100% 50%, 55% 55%, 50% 100%, 45% 55%, 0 50%, 45% 45%);
+}
+
+/* Each row is a little canvas fading from periwinkle to pink. */
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 28px;
+  padding: 3px 10px;
+  background: linear-gradient(90deg, #a6bbff, #f2a8e0);
+  border: 2px solid var(--navy);
+}
+
+.stat-title {
+  color: var(--navy);
+  font-size: 1.05rem;
+  font-weight: 500;
+  text-shadow: 2px 2px 0 #ff7ad1;
+}
+
+/* Bold pixel numbers with a hard pink offset, like the repeated slogan. */
+.stat-value {
+  color: var(--navy);
+  font-size: 1.55rem;
+  font-weight: 700;
+  text-shadow: 2px 2px 0 #ff7ad1;
+}

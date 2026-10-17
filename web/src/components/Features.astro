@@ -1,47 +1,28 @@
 ---
 import { Icon } from "astro-icon/components";
-import { Image } from "astro:assets";
 import MockTracker from "./MockTracker.astro";
+import * as flagSvgs from "country-flag-icons/string/3x2";
 
-import defaultTheme from "../../../app/pkg/server/static/themes/default.css?raw";
-import pillsTheme from "../../../app/pkg/server/static/themes/pills.css?raw";
-import inkTheme from "../../../app/pkg/server/static/themes/ink.css?raw";
 import terminalTheme from "../../../app/pkg/server/static/themes/terminal.css?raw";
 import decoTheme from "../../../app/pkg/server/static/themes/deco.css?raw";
 import notebookTheme from "../../../app/pkg/server/static/themes/notebook.css?raw";
-import minimalTheme from "../../../app/pkg/server/static/themes/minimal.css?raw";
-import minimalDarkTheme from "../../../app/pkg/server/static/themes/minimal-dark.css?raw";
-import retroTheme from "../../../app/pkg/server/static/themes/retro.css?raw";
-import glassTheme from "../../../app/pkg/server/static/themes/glass.css?raw";
-import versusTheme from "../../../app/pkg/server/static/themes/versus.css?raw";
 import comicTheme from "../../../app/pkg/server/static/themes/comic.css?raw";
 import tickerTheme from "../../../app/pkg/server/static/themes/ticker.css?raw";
-import parchmentTheme from "../../../app/pkg/server/static/themes/parchment.css?raw";
 import stickerTheme from "../../../app/pkg/server/static/themes/sticker.css?raw";
-import glitchTheme from "../../../app/pkg/server/static/themes/glitch.css?raw";
-import ledTheme from "../../../app/pkg/server/static/themes/led.css?raw";
 import chipsTheme from "../../../app/pkg/server/static/themes/chips.css?raw";
-
-const portraits = import.meta.glob<{ default: ImageMetadata }>(
-  "../../../app/gui/src/assets/characters/{sf6,t8}/*.webp",
-  { eager: true },
-);
-const portrait = (game: string, character: string) =>
-  portraits[`../../../app/gui/src/assets/characters/${game}/${character}.webp`].default;
-const games = [
-  {
-    name: "Street Fighter 6",
-    source: "Buckler",
-    stats: "LP, MR and league",
-    characters: ["elena", "alex", "aki", "sagat", "deejay", "cammy", "mai", "blanka"].map((c) => portrait("sf6", c)),
-  },
-  {
-    name: "Tekken 8",
-    source: "Wavu Wank",
-    stats: "Rank and replays",
-    characters: ["leroy", "kazuya", "king", "paul", "nina", "dragunov", "lili", "lidia"].map((c) => portrait("t8", c)),
-  },
-];
+import mostWantedStripTheme from "../../../app/pkg/server/static/themes/most-wanted-strip.css?raw";
+import bannerTheme from "../../../app/pkg/server/static/themes/banner.css?raw";
+import flashPortalTheme from "../../../app/pkg/server/static/themes/flash-portal.css?raw";
+import linkTheme from "../../../app/pkg/server/static/themes/link.css?raw";
+import blackoutTheme from "../../../app/pkg/server/static/themes/blackout.css?raw";
+import silverTheme from "../../../app/pkg/server/static/themes/silver.css?raw";
+import zebraTheme from "../../../app/pkg/server/static/themes/zebra.css?raw";
+import crimsonTheme from "../../../app/pkg/server/static/themes/crimson.css?raw";
+import webcoreTheme from "../../../app/pkg/server/static/themes/webcore.css?raw";
+import top8Theme from "../../../app/pkg/server/static/themes/top-8.css?raw";
+import pivotTheme from "../../../app/pkg/server/static/themes/pivot.css?raw";
+import velvetTheme from "../../../app/pkg/server/static/themes/velvet.css?raw";
+import vaporTheme from "../../../app/pkg/server/static/themes/vapor.css?raw";
 
 const mrHistory = [1482, 1501, 1494, 1530, 1521, 1548, 1539, 1566, 1581, 1573, 1592, 1604];
 const chart = { width: 560, height: 80, pad: 6 };
@@ -91,90 +72,152 @@ const statListHtml = `<dl class="stat-list">${outputStats
       `<div class="stat-item" data-stat="${key}"><dt class="stat-title">${title}</dt><dd class="stat-value">${value}</dd></div>`,
   )
   .join("")}</dl>`;
+// Wide themes are scaled down to fit the preview rather than cut off. The list is measured
+// again whenever it resizes, since fonts loading in and the language picker both change it.
+const fitScript = `<script>
+const list = document.querySelector(".stat-list");
+new ResizeObserver(() => {
+  const style = getComputedStyle(list);
+  const width = list.offsetWidth + parseFloat(style.marginLeft) + parseFloat(style.marginRight);
+  const height = list.offsetHeight + parseFloat(style.marginTop) + parseFloat(style.marginBottom);
+  const scale = Math.min(1, (innerWidth - 48) / width, (innerHeight - 48) / height);
+  list.style.transformOrigin = "top left";
+  list.style.transform = scale < 1 ? \`scale(\${scale})\` : "";
+}).observe(list);
+<\/script>`;
 const themes = [
-  { id: "default", name: "Default", css: defaultTheme },
   { id: "ticker", name: "Ticker", css: tickerTheme },
   { id: "sticker", name: "Sticker", css: stickerTheme },
   { id: "chips", name: "Chips", css: chipsTheme },
-  { id: "pills", name: "Pills", css: pillsTheme },
-  { id: "ink", name: "Ink", css: inkTheme },
+  { id: "velvet", name: "Velvet", css: velvetTheme },
+  { id: "vapor", name: "Vapor", css: vaporTheme },
+  { id: "zebra", name: "Zebra", css: zebraTheme },
+  { id: "most-wanted-strip", name: "Most Wanted", css: mostWantedStripTheme },
+  { id: "pivot", name: "Pivot", css: pivotTheme },
+  { id: "flash-portal", name: "Flash Portal", css: flashPortalTheme },
   { id: "terminal", name: "Terminal", css: terminalTheme },
   { id: "deco", name: "Art Deco", css: decoTheme },
   { id: "notebook", name: "Notebook", css: notebookTheme },
-  { id: "minimal", name: "Minimal", css: minimalTheme },
-  { id: "minimal-dark", name: "Minimal Dark", css: minimalDarkTheme },
-  { id: "retro", name: "Retro Desktop", css: retroTheme },
-  { id: "glass", name: "Glass", css: glassTheme },
-  { id: "versus", name: "Versus", css: versusTheme },
+  { id: "banner", name: "Banner", css: bannerTheme },
+  { id: "link", name: "Link", css: linkTheme },
+  { id: "blackout", name: "Blackout", css: blackoutTheme },
+  { id: "silver", name: "Silver", css: silverTheme },
+  { id: "top-8", name: "Top 8", css: top8Theme },
+  { id: "crimson", name: "Crimson", css: crimsonTheme },
+  { id: "webcore", name: "Webcore", css: webcoreTheme },
   { id: "comic", name: "Comic", css: comicTheme },
-  { id: "parchment", name: "Parchment", css: parchmentTheme },
-  { id: "glitch", name: "Glitch", css: glitchTheme },
-  { id: "led", name: "LED", css: ledTheme },
 ].map((theme) => ({
   ...theme,
-  srcdoc: `<!doctype html><html><head><style>*{margin:0}body{padding:24px;overflow:hidden}</style><style>${theme.css}</style></head><body>${statListHtml}</body></html>`,
+  srcdoc: `<!doctype html><html><head><style>*{margin:0}body{padding:24px;overflow:hidden}</style><style>${theme.css}</style></head><body>${statListHtml}${fitScript}</body></html>`,
 }));
 const browserSourceQuery = outputStats.map(([key]) => `&${key}=true`).join("");
+
+const localeFiles = import.meta.glob<Record<string, string>>("../../../app/pkg/i18n/locales/*.json", {
+  eager: true,
+  import: "default",
+});
+// Named the way the app's own language picker names them, in each language's own words
+const languages = Object.entries(localeFiles)
+  .map(([path, strings]) => {
+    const code = path.match(/([\w-]+)\.json$/)![1];
+    const locale = new Intl.Locale(code).maximize();
+    const sharesLanguage =
+      Object.keys(localeFiles).filter((p) => p.includes(`/${locale.language}-`)).length > 1;
+    const name = new Intl.DisplayNames([code], { type: "language", style: "narrow", fallback: "code" }).of(
+      sharesLanguage ? `${locale.language}-${locale.script}` : locale.language,
+    )!;
+    return {
+      code,
+      name: name.charAt(0).toLocaleUpperCase(code) + name.slice(1),
+      flag: (flagSvgs as Record<string, string>)[locale.region!],
+      titles: Object.fromEntries(outputStats.map(([key, title]) => [key, strings[key] ?? title])),
+    };
+  })
+  .sort((a, b) => a.name.localeCompare(b.name));
+const defaultLanguage = languages.find((l) => l.code === "en-GB")!;
 ---
 
 <script>
-  import { gsap, Power2 } from "../lib/gsap";
-
   document.addEventListener("astro:page-load", () => {
     const themePicker = document.getElementById("theme-picker");
-    themePicker?.addEventListener("click", (e) => {
-      const button = (e.target as HTMLElement).closest<HTMLButtonElement>("button[data-theme]");
-      if (!button) return;
-      const theme = button.dataset.theme ?? "default";
-      for (const b of themePicker.querySelectorAll("button[data-theme]")) {
-        b.setAttribute("aria-pressed", String(b === button));
-      }
-      for (const frame of document.querySelectorAll<HTMLIFrameElement>("#theme-previews iframe")) {
-        frame.hidden = frame.dataset.theme !== theme;
-      }
+    const themeButtons = [...(themePicker?.querySelectorAll<HTMLButtonElement>("button[data-theme]") ?? [])];
+    const previews = document.querySelectorAll<HTMLIFrameElement>("#theme-previews iframe");
+
+    const showTheme = (theme: string) => {
+      for (const b of themeButtons) b.setAttribute("aria-pressed", String(b.dataset.theme === theme));
+      for (const frame of previews) frame.classList.toggle("active", frame.dataset.theme === theme);
       const url = document.getElementById("browser-source-theme");
       if (url) url.textContent = theme;
-    });
+    };
 
-    // respect users’ prefers-reduced-motion setting
-    const prefersReducedMotion = window
-      .matchMedia("(prefers-reduced-motion: reduce)")
-      .matches;
-
-    const features = document.querySelectorAll("#features>*");
-    if (features.length === 0) {
-      return;
+    // Cycles through the themes like a slideshow until someone picks one themselves. Skipped for
+    // people who prefer reduced motion.
+    let slideshow: ReturnType<typeof setInterval> | undefined;
+    if (themeButtons.length > 1 && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      let current = 0;
+      slideshow = setInterval(() => {
+        current = (current + 1) % themeButtons.length;
+        showTheme(themeButtons[current].dataset.theme!);
+      }, 2500);
+      document.addEventListener("astro:before-swap", () => clearInterval(slideshow), { once: true });
     }
 
-    for (const feature of features) {
-      gsap.from(feature.firstElementChild, {
-        autoAlpha: 0,
-        translateY: 50,
-        duration: 2,
-        ease: Power2.easeInOut,
-        immediateRender: prefersReducedMotion,
-        scrollTrigger: {
-          scroller: document.body,
-          trigger: feature,
-          start: "center bottom",
-          toggleActions: "play none none reverse",
-        },
+    themePicker?.addEventListener("click", (e) => {
+      const theme = (e.target as HTMLElement).closest<HTMLButtonElement>("button[data-theme]")?.dataset.theme;
+      if (!theme) return;
+      clearInterval(slideshow);
+      showTheme(theme);
+    });
+
+    const languageSelect = document.getElementById("language-select");
+    if (languageSelect) {
+      const titles: Record<string, Record<string, string>> = JSON.parse(languageSelect.dataset.titles ?? "{}");
+      const toggle = languageSelect.querySelector<HTMLButtonElement>("button[aria-haspopup]")!;
+      const list = languageSelect.querySelector("ul")!;
+      const frames = document.querySelectorAll<HTMLIFrameElement>("#theme-previews iframe");
+      let lang = "en-GB";
+
+      const setOpen = (open: boolean) => {
+        list.hidden = !open;
+        toggle.setAttribute("aria-expanded", String(open));
+      };
+      // The previews are srcdoc frames, so their documents can be relabelled in place
+      const relabel = (frame: HTMLIFrameElement) => {
+        const doc = frame.contentDocument;
+        if (!doc?.body) return;
+        doc.documentElement.lang = lang;
+        for (const item of doc.querySelectorAll<HTMLElement>(".stat-item")) {
+          const title = item.querySelector(".stat-title");
+          if (title && item.dataset.stat) title.textContent = titles[lang][item.dataset.stat];
+        }
+      };
+
+      // Frames load lazily, so ones that haven't loaded yet pick up the language when they do
+      for (const frame of frames) frame.addEventListener("load", () => relabel(frame));
+      toggle.addEventListener("click", () => setOpen(list.hidden));
+      languageSelect.addEventListener("focusout", (e) => {
+        if (!languageSelect.contains(e.relatedTarget as Node | null)) setOpen(false);
       });
-      if (feature.firstElementChild != feature.lastElementChild) {
-        gsap.from(feature.lastElementChild, {
-          autoAlpha: 0,
-          translateY: 50,
-          duration: 3,
-          ease: Power2.easeOut,
-          immediateRender: prefersReducedMotion,
-          scrollTrigger: {
-            scroller: document.body,
-            trigger: feature,
-            start: "center bottom",
-            toggleActions: "play none none reverse",
-          },
-        });
-      }
+      languageSelect.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+          setOpen(false);
+          toggle.focus();
+        }
+      });
+      list.addEventListener("click", (e) => {
+        const option = (e.target as HTMLElement).closest<HTMLButtonElement>("button[data-lang]");
+        if (!option?.dataset.lang) return;
+        lang = option.dataset.lang;
+        for (const o of list.querySelectorAll("button[data-lang]")) {
+          o.setAttribute("aria-selected", String(o === option));
+        }
+        toggle.querySelector(".flag")!.innerHTML = option.querySelector(".flag")!.innerHTML;
+        const url = document.getElementById("browser-source-lang");
+        if (url) url.textContent = lang;
+        frames.forEach(relabel);
+        setOpen(false);
+        toggle.focus();
+      });
     }
   });
 </script>
@@ -182,40 +225,6 @@ const browserSourceQuery = outputStats.map(([key]) => `&${key}=true`).join("");
   id="features"
   class="[&>*:nth-child(even)]:flex-row-reverse flex flex-col gap-60 px-4"
 >
-  <section class="flex flex-wrap items-center justify-around">
-    <header class="mb-8 max-w-[700px] w-full">
-      <h2 class="font-bold text-3xl md:text-5xl">
-        <Icon
-          name="mdi:gamepad-variant"
-          class="inline text-[#f85961] w-12 h-12 mr-1"
-        />
-        Street Fighter 6 & Tekken 8
-      </h2>
-      <p class="text-lg mt-8">
-        One app for both games. Pick a game, enter your player ID and every
-        ranked match gets tracked
-      </p>
-    </header>
-    <div class="tracker-container w-full md:w-auto overflow-auto md:overflow-visible">
-      <div class="games flex gap-4">
-        {
-          games.map((game) => (
-            <article class="game-card flex-1 rounded-xl p-5">
-              <h3 class="text-2xl font-bold">{game.name}</h3>
-              <p class="text-sm font-extralight tracking-wider mt-1">
-                {`${game.stats} via ${game.source}`}
-              </p>
-              <div class="grid grid-cols-4 gap-2 mt-4">
-                {game.characters.map((src) => (
-                  <Image src={src} alt="" width={72} height={72} class="rounded-lg bg-slate-50 bg-opacity-5" />
-                ))}
-              </div>
-            </article>
-          ))
-        }
-      </div>
-    </div>
-  </section>
 
   <section class="flex flex-wrap items-center justify-around">
     <header class="mb-8 max-w-[700px] w-full">
@@ -360,10 +369,104 @@ const browserSourceQuery = outputStats.map(([key]) => `&${key}=true`).join("");
     <header class="mb-8 max-w-[700px] w-full">
       <h2 class="font-bold text-3xl md:text-5xl">
         <Icon
+          name="clarity:sign-out-solid"
+          class="inline text-[#f85961] w-12 h-12 mr-1"
+        />
+        Stream overlay
+      </h2>
+      <p class="text-lg mt-8">
+        Add your stats to OBS as a browser source. Pick the stats to show,
+        choose one of the built-in themes or <a
+          href="/theme-guide"
+          class="underline">create your own with CSS</a
+        >, and they update live after every match
+      </p>
+    </header>
+    <div class="tracker-container w-full md:w-auto overflow-auto md:overflow-visible">
+      <figure class="browser-source">
+        <figcaption class="flex items-center gap-2 px-4 py-2 text-sm whitespace-nowrap overflow-hidden">
+          <Icon name="mdi:broadcast" class="w-5 h-5 shrink-0 text-[#f85961]" />
+          <span class="truncate">
+            http://localhost:4242?theme=<b id="browser-source-theme">{themes[0].id}</b>&lang=<b id="browser-source-lang">{defaultLanguage.code}</b>{browserSourceQuery}
+          </span>
+        </figcaption>
+        <div id="theme-previews">
+          {
+            themes.map((theme, i) => (
+              <iframe
+                data-theme={theme.id}
+                title={`${theme.name} browser source theme`}
+                srcdoc={theme.srcdoc}
+                class:list={[{ active: i === 0 }]}
+                loading="lazy"
+                tabindex="-1"
+              />
+            ))
+          }
+        </div>
+        <div class="flex items-start gap-2 px-4 py-3">
+        <div id="theme-picker" class="flex flex-1 flex-wrap gap-2" role="group" aria-label="Theme">
+          {
+            themes.map((theme, i) => (
+              <button
+                type="button"
+                data-theme={theme.id}
+                aria-pressed={String(i === 0)}
+                class="theme-button rounded-full px-4 py-1 text-sm"
+              >
+                {theme.name}
+              </button>
+            ))
+          }
+        </div>
+        <div id="language-select" class="relative shrink-0" data-titles={JSON.stringify(Object.fromEntries(languages.map((l) => [l.code, l.titles])))}>
+          <button
+            type="button"
+            aria-haspopup="listbox"
+            aria-expanded="false"
+            aria-label="Language"
+            class="theme-button flex items-center gap-1 rounded-full px-3 py-1 text-sm"
+          >
+            <span class="flag" set:html={defaultLanguage.flag} />
+            <Icon name="mdi:chevron-down" class="w-4 h-4" />
+          </button>
+          <ul
+            role="listbox"
+            aria-label="Language"
+            hidden
+            class="language-list absolute bottom-full right-0 mb-2 max-h-[300px] overflow-y-auto rounded-xl py-1 text-sm"
+          >
+            {
+              languages.map((l) => (
+                <li>
+                  <button
+                    type="button"
+                    role="option"
+                    data-lang={l.code}
+                    aria-selected={String(l === defaultLanguage)}
+                    class="flex w-full items-center gap-2 px-3 py-1 text-left whitespace-nowrap"
+                  >
+                    <span class="flag" set:html={l.flag} />
+                    {l.name}
+                  </button>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+        </div>
+      </figure>
+    </div>
+  </section>
+
+  <section class="flex flex-wrap items-center justify-around">
+    <header class="mb-8 max-w-[700px] w-full">
+      <h2 class="font-bold text-3xl md:text-5xl">
+        <Icon
           name="mdi:file-export"
           class="inline text-[#f85961] w-12 h-12 mr-1"
         />
-        Export your data
+        Data export
       </h2>
       <p class="text-lg mt-8">
         Export your whole match history, or a comparison with the top players,
@@ -402,63 +505,6 @@ const browserSourceQuery = outputStats.map(([key]) => `&${key}=true`).join("");
       </figure>
     </div>
   </section>
-
-  <section class="flex flex-wrap items-center justify-around">
-    <header class="mb-8 max-w-[700px] w-full">
-      <h2 class="font-bold text-3xl md:text-5xl">
-        <Icon
-          name="clarity:sign-out-solid"
-          class="inline text-[#f85961] w-12 h-12 mr-1"
-        />
-        Made for streamers
-      </h2>
-      <p class="text-lg mt-8">
-        Add your stats to OBS as a browser source. Pick the stats to show,
-        choose one of the built-in themes or <a
-          href="/theme-guide"
-          class="underline">create your own with CSS</a
-        >, and they update live after every match
-      </p>
-    </header>
-    <div class="tracker-container w-full md:w-auto overflow-auto md:overflow-visible">
-      <figure class="browser-source">
-        <figcaption class="flex items-center gap-2 px-4 py-2 text-sm whitespace-nowrap overflow-hidden">
-          <Icon name="mdi:broadcast" class="w-5 h-5 shrink-0 text-[#f85961]" />
-          <span class="truncate">
-            http://localhost:4242?theme=<b id="browser-source-theme">default</b>{browserSourceQuery}
-          </span>
-        </figcaption>
-        <div id="theme-previews">
-          {
-            themes.map((theme, i) => (
-              <iframe
-                data-theme={theme.id}
-                title={`${theme.name} browser source theme`}
-                srcdoc={theme.srcdoc}
-                hidden={i !== 0}
-                loading="lazy"
-                tabindex="-1"
-              />
-            ))
-          }
-        </div>
-        <div id="theme-picker" class="flex flex-wrap gap-2 px-4 py-3" role="group" aria-label="Theme">
-          {
-            themes.map((theme, i) => (
-              <button
-                type="button"
-                data-theme={theme.id}
-                aria-pressed={String(i === 0)}
-                class="theme-button rounded-full px-4 py-1 text-sm"
-              >
-                {theme.name}
-              </button>
-            ))
-          }
-        </div>
-      </figure>
-    </div>
-  </section>
 </section>
 
 <style lang="sass">
@@ -490,13 +536,6 @@ const browserSourceQuery = outputStats.map(([key]) => `&${key}=true`).join("");
     top: 28px
     z-index: -1
     border-radius: 24px
-
-  .games
-    width: 700px
-
-  .game-card
-    background: radial-gradient(circle at 52.1% -29.6%, rgb(144, 17, 105) 0%, rgb(51, 0, 131) 100.2%)
-    box-shadow: 0 2px 18px rgba(0,0,0,.25)
 
   .csv-window,
   .browser-source
@@ -539,15 +578,40 @@ const browserSourceQuery = outputStats.map(([key]) => `&${key}=true`).join("");
       color: #f85961
       font-weight: 700
 
-  .browser-source iframe
-    display: block
-    width: 100%
+  // The previews are stacked so the slideshow can crossfade between them
+  #theme-previews
+    position: relative
     height: 380px
-    border: 0
     background: #2e3440
 
-    &[hidden]
-      display: none
+  .browser-source iframe
+    position: absolute
+    inset: 0
+    display: block
+    width: 100%
+    height: 100%
+    border: 0
+    opacity: 0
+    transition: opacity .6s ease
+
+    &.active
+      opacity: 1
+
+  .flag :global(svg)
+    display: block
+    width: 20px
+    border-radius: 2px
+
+  .language-list
+    background: rgb(32 18 54)
+    box-shadow: 0 4px 18px rgba(0,0,0,.4)
+
+    button
+      &:hover
+        background: rgba(255,255,255,.1)
+
+      &[aria-selected="true"]
+        font-weight: 600
 
   .theme-button
     background: rgba(255,255,255,.08)

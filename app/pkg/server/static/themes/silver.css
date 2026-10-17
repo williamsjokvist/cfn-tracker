@@ -1,0 +1,54 @@
+@import url("https://fonts.googleapis.com/css2?family=Archivo+Black&family=Michroma&display=swap");
+
+body {
+  background: #000;
+}
+
+/* A white card with a thick black rounded line inset from its edge. */
+.stat-list {
+  display: inline-grid;
+  margin: 6px;
+  padding: 18px 22px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: inset 0 0 0 6px #fff, inset 0 0 0 11px #111;
+  white-space: nowrap;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 6px 0;
+}
+
+/* Double rules between rows, like the striped lines on the sleeve. */
+.stat-item + .stat-item {
+  background:
+    linear-gradient(#111, #111) 0 0 / 100% 3px no-repeat,
+    linear-gradient(#111, #111) 0 6px / 100% 1px no-repeat;
+  padding-top: 13px;
+}
+
+.stat-value {
+  flex: 1;
+  min-width: 70px;
+  text-align: right;
+  color: #111;
+  font-family: "Archivo Black", "Arial Black", sans-serif;
+  font-size: 2.2rem;
+  line-height: 1;
+  letter-spacing: -0.01em;
+}
+
+.stat-title {
+  min-width: 140px;
+  padding: 5px 12px 4px;
+  color: #fff;
+  background: #111;
+  border-radius: 7px;
+  font-family: "Michroma", "Eurostile", sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}

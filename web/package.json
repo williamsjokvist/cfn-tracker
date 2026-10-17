@@ -15,6 +15,7 @@
     "@iconify-json/teenyicons": "^1.2.2",
     "astro": "^6.1.8",
     "astro-icon": "^1.1.5",
+    "country-flag-icons": "^1.5.9",
     "gsap": "^3.12.4",
     "marked": "^16.1.2",
     "tailwindcss": "^3.2.7"

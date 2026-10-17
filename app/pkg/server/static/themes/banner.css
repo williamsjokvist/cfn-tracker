@@ -1,0 +1,45 @@
+@import url("https://fonts.googleapis.com/css2?family=Rammetto+One&family=Russo+One&display=swap");
+
+body {
+  background: #f8d3cb;
+}
+
+.stat-list {
+  display: inline-flex;
+  align-items: center;
+  gap: 18px;
+  margin: 18px 12px;
+  padding: 6px 18px;
+  background: #b3305b;
+  transform: rotate(-2deg);
+  white-space: nowrap;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.stat-title {
+  color: #fff;
+  font-family: "Rammetto One", "Arial Black", sans-serif;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+}
+
+/* The tile is tilted against the band and spills past it, like the selected level marker. */
+.stat-value {
+  margin: -12px 0;
+  padding: 2px 9px;
+  min-width: 2ch;
+  text-align: center;
+  color: #111;
+  font-family: "Russo One", "Arial Black", sans-serif;
+  font-size: 1.4rem;
+  background: #fff;
+  border: 3px solid #f08a80;
+  border-radius: 14px;
+  box-shadow: 0 3px 0 rgba(90, 20, 40, 0.25);
+  transform: rotate(-6deg);
+}

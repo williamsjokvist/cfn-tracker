@@ -1,0 +1,78 @@
+@import url("https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,600;1,800&display=swap");
+
+body {
+  background: #2a0404;
+}
+
+/* Layered crimson shapes, crossed by a long thin slanted line. */
+.stat-list {
+  --red: #e8452f;
+  position: relative;
+  isolation: isolate;
+  display: inline-grid;
+  margin: 6px;
+  padding: 10px 6px;
+  background:
+    linear-gradient(72deg, transparent calc(22% - 1px), var(--red) 22%, transparent calc(22% + 1px)),
+    linear-gradient(120deg, transparent 58%, rgba(210, 45, 32, 0.28) 58%),
+    linear-gradient(60deg, rgba(0, 0, 0, 0.22) 30%, transparent 30%),
+    linear-gradient(135deg, #8a130e, #520707);
+  border: 1px solid #a01c14;
+  font-family: "Exo 2", "Segoe UI", sans-serif;
+  white-space: nowrap;
+}
+
+/* Halftone dots fading in from the bottom left. */
+.stat-list::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(circle, rgba(255, 90, 70, 0.35) 1px, transparent 1.6px) 0 0 / 7px 7px;
+  -webkit-mask-image: linear-gradient(to top right, #000, transparent 45%);
+  mask-image: linear-gradient(to top right, #000, transparent 45%);
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+}
+
+.stat-item + .stat-item {
+  border-top: 1px solid rgba(232, 69, 47, 0.55);
+}
+
+/* Each name is followed by a stack of pinstripes with a slanted leading edge. */
+.stat-title {
+  position: relative;
+  flex: 1;
+  padding: 7px 92px 7px 14px;
+  color: #ff9d8a;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.stat-title::after {
+  content: "";
+  position: absolute;
+  top: 7px;
+  bottom: 7px;
+  right: 8px;
+  width: 70px;
+  background: repeating-linear-gradient(to bottom, var(--red) 0 2px, transparent 2px 5px);
+  clip-path: polygon(14px 0, 100% 0, 100% 100%, 0 100%);
+  opacity: 0.85;
+}
+
+.stat-value {
+  min-width: 60px;
+  padding: 4px 14px;
+  text-align: right;
+  color: #fff0ec;
+  font-size: 1.6rem;
+  font-style: italic;
+  font-weight: 800;
+  text-shadow: 0 0 10px rgba(255, 70, 50, 0.45);
+}

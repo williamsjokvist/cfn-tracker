@@ -1,0 +1,48 @@
+@import url("https://fonts.googleapis.com/css2?family=Rammetto+One&family=Russo+One&display=swap");
+
+body {
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56' viewBox='0 0 56 56'%3E%3Cg fill='%23f2b4aa' fill-opacity='0.7'%3E%3Cpath transform='translate(4 4) rotate(-18 10 10)' d='M10 18C4 14 0 10.5 0 6a5 5 0 0 1 10-1.5A5 5 0 0 1 20 6c0 4.5-4 8-10 12z'/%3E%3Cpath transform='translate(32 32) rotate(-18 10 10)' d='M10 18C4 14 0 10.5 0 6a5 5 0 0 1 10-1.5A5 5 0 0 1 20 6c0 4.5-4 8-10 12z'/%3E%3C/g%3E%3C/svg%3E"),
+    #f8d3cb;
+}
+
+.stat-list {
+  display: grid;
+  gap: 24px;
+  max-width: 440px;
+  padding: 18px 10px;
+  white-space: nowrap;
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  padding: 6px 16px 6px 22px;
+  background: #b3305b;
+  transform: rotate(-2deg);
+}
+
+.stat-title {
+  color: #fff;
+  font-family: "Rammetto One", "Arial Black", sans-serif;
+  font-size: 1.45rem;
+  text-transform: uppercase;
+}
+
+/* The tile is tilted against the band and spills past it, like the selected level marker. */
+.stat-value {
+  margin: -12px 0;
+  padding: 2px 14px;
+  min-width: 2ch;
+  text-align: center;
+  color: #111;
+  font-family: "Russo One", "Arial Black", sans-serif;
+  font-size: 1.9rem;
+  background: #fff;
+  border: 4px solid #f08a80;
+  border-radius: 14px;
+  box-shadow: 0 3px 0 rgba(90, 20, 40, 0.25);
+  transform: rotate(-6deg);
+}

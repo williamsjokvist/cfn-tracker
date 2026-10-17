@@ -27,32 +27,67 @@ type StatOptions = Omit<Record<keyof model.Match, boolean>, 'replayId' | 'sessio
 // Custom themes from the user's themes folder have no translation, so they show their file name
 const themeLabels: Record<string, LocalizationKey> = {
   default: 'themeDefault',
+  banner: 'browserSourceThemeBanner',
+  blackout: 'browserSourceThemeBlackout',
   blades: 'browserSourceThemeBlades',
   broadcast: 'browserSourceThemeBroadcast',
-  chalkboard: 'browserSourceThemeChalkboard',
   chips: 'browserSourceThemeChips',
   comic: 'browserSourceThemeComic',
+  crimson: 'browserSourceThemeCrimson',
   deco: 'browserSourceThemeDeco',
+  'flash-portal': 'browserSourceThemeFlashPortal',
   glass: 'browserSourceThemeGlass',
   glitch: 'browserSourceThemeGlitch',
-  hud: 'browserSourceThemeHud',
+  hearts: 'browserSourceThemeHearts',
   ink: 'browserSourceThemeInk',
   jaeger: 'browserSourceThemeJaeger',
-  led: 'browserSourceThemeLed',
+  link: 'browserSourceThemeLink',
   minimal: 'browserSourceThemeMinimal',
   'minimal-dark': 'browserSourceThemeMinimalDark',
+  'most-wanted': 'browserSourceThemeMostWanted',
+  'most-wanted-strip': 'browserSourceThemeMostWantedStrip',
   neon: 'browserSourceThemeNeon',
   nord: 'browserSourceThemeNord',
   notebook: 'browserSourceThemeNotebook',
   parchment: 'browserSourceThemeParchment',
   pills: 'browserSourceThemePills',
+  pivot: 'browserSourceThemePivot',
   retro: 'browserSourceThemeRetro',
+  silver: 'browserSourceThemeSilver',
   sticker: 'browserSourceThemeSticker',
   terminal: 'browserSourceThemeTerminal',
   'text-only': 'browserSourceThemeTextOnly',
   ticker: 'browserSourceThemeTicker',
-  versus: 'browserSourceThemeVersus'
+  'top-8': 'browserSourceThemeTop8',
+  vapor: 'browserSourceThemeVapor',
+  velvet: 'browserSourceThemeVelvet',
+  versus: 'browserSourceThemeVersus',
+  webcore: 'browserSourceThemeWebcore',
+  zebra: 'browserSourceThemeZebra'
 }
+
+// Custom themes aren't listed here, so they show under rows
+const sideBySideThemes = new Set([
+  'banner',
+  'chips',
+  'flash-portal',
+  'ink',
+  'link',
+  'most-wanted-strip',
+  'nord',
+  'sticker',
+  'ticker',
+  'top-8',
+  'velvet'
+])
+
+type ThemeLayout = 'rows' | 'sideBySide'
+const themeLayouts: { key: ThemeLayout; label: LocalizationKey }[] = [
+  { key: 'rows', label: 'themeLayoutRows' },
+  { key: 'sideBySide', label: 'themeLayoutSideBySide' }
+]
+const layoutOf = (theme: string): ThemeLayout =>
+  sideBySideThemes.has(theme) ? 'sideBySide' : 'rows'
 
 const defaultOptions: StatOptions = {
   theme: 'default',
@@ -219,13 +254,63 @@ function StatSelect(props: {
   )
 }
 
+// Strips are laid out on one line at their natural size, then scaled down to fit the preview box
+function StripPreview(props: { css: string; stats: [string, string][] }) {
+  const ref = React.useRef<HTMLDivElement>(null)
+  const [scale, setScale] = React.useState(1)
+
+  React.useLayoutEffect(() => {
+    const el = ref.current
+    if (!el) {
+      return
+    }
+    // Re-measures once the theme's web fonts arrive and change the strip's size
+    const observer = new ResizeObserver(() => {
+      setScale(Math.min(1, 350 / el.offsetWidth, 60 / el.offsetHeight))
+    })
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+
+  return (
+    <div
+      ref={ref}
+      style={{
+        position: 'absolute',
+        left: '50%',
+        top: 0,
+        display: 'flow-root',
+        width: 'max-content',
+        transform: `translateX(-50%) scale(${scale})`,
+        transformOrigin: 'top center'
+      }}
+    >
+      <style>{props.css}</style>
+      <div className='stat-list'>
+        {props.stats.map(([title, value]) => (
+          <div key={title} className='stat-item'>
+            <span className='stat-title'>{title}</span>
+            <span className='stat-value'>{value}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 function ThemeSelect(props: { value: string; onSelect: (theme: string) => void }) {
   const { t } = useTranslation()
   const [themes, setThemes] = React.useState<model.Theme[]>([])
   const [isOpen, setOpen] = React.useState(false)
+  const [layout, setLayout] = React.useState(layoutOf(props.value))
   const setError = useErrorPopup()
 
   const selectedTheme = themes.find(t => t.name === props.value) ?? themes[0]
+  const stripPreviewStats: [string, string][] = [
+    ['MR', '444'],
+    [t('wins'), '12'],
+    [t('losses'), '5']
+  ]
 
   React.useEffect(() => {
     GetThemes().then(setThemes).catch(setError)
@@ -242,45 +327,73 @@ function ThemeSelect(props: { value: string; onSelect: (theme: string) => void }
       }
       const shadowRoot = container.attachShadow({ mode: 'open' })
       createRoot(shadowRoot).render(
-        <div className='stat-list'>
-          <style>{theme.css}</style>
-          <div className='stat-item'>
-            <span className='stat-title'>MR</span>
-            <span className='stat-value'>444</span>
+        layoutOf(theme.name) === 'sideBySide' ? (
+          <StripPreview css={theme.css} stats={stripPreviewStats} />
+        ) : (
+          <div className='stat-list'>
+            <style>{theme.css}</style>
+            <div className='stat-item'>
+              <span className='stat-title'>MR</span>
+              <span className='stat-value'>444</span>
+            </div>
           </div>
-        </div>
+        )
       )
     }
   }, [isOpen, themes])
 
   return (
-    <Dialog.Root onOpenChange={setOpen}>
+    <Dialog.Root
+      onOpenChange={open => {
+        setOpen(open)
+        if (open) setLayout(layoutOf(props.value))
+      }}
+    >
       <Dialog.Trigger asChild>
         <SettingButton icon='ph:paint-bucket-fill' className='capitalize'>
           {themeLabels[props.value] ? t(themeLabels[props.value]) : props.value}
         </SettingButton>
       </Dialog.Trigger>
       <Dialog.Content title='selectTheme' className='flex flex-col'>
-        <ul className='my-4 min-h-0 w-full flex-1 overflow-y-auto'>
-          {themes.map(theme => (
-            <li
-              key={theme.name}
-              className='relative flex w-full cursor-pointer items-center text-lg hover:bg-white/[0.075]'
+        <div role='tablist' className='mt-3 grid grid-cols-2 border-b border-slate-50/10'>
+          {themeLayouts.map(l => (
+            <button
+              key={l.key}
+              type='button'
+              role='tab'
+              aria-selected={l.key === layout}
+              onClick={() => setLayout(l.key)}
+              className={cn(
+                '-mb-px border-b-2 border-transparent py-1 transition-colors hover:bg-slate-50/5',
+                l.key === layout && 'border-green-300 font-semibold'
+              )}
             >
-              <Checkbox
-                id={`${theme.name}-checkbox`}
-                checked={theme.name === props.value}
-                onChange={e => props.onSelect(theme.name)}
-                className='absolute start-2 top-1'
-              />
-              <label
-                htmlFor={`${theme.name}-checkbox`}
-                className='font-spartan w-full cursor-pointer py-1 ps-14 capitalize'
-              >
-                {themeLabels[theme.name] ? t(themeLabels[theme.name]) : theme.name}
-              </label>
-            </li>
+              {t(l.label)}
+            </button>
           ))}
+        </div>
+        <ul role='tabpanel' className='my-4 min-h-0 w-full flex-1 overflow-y-auto'>
+          {themes
+            .filter(theme => layoutOf(theme.name) === layout)
+            .map(theme => (
+              <li
+                key={theme.name}
+                className='relative flex w-full cursor-pointer items-center text-lg hover:bg-white/[0.075]'
+              >
+                <Checkbox
+                  id={`${theme.name}-checkbox`}
+                  checked={theme.name === props.value}
+                  onChange={e => props.onSelect(theme.name)}
+                  className='absolute start-2 top-1'
+                />
+                <label
+                  htmlFor={`${theme.name}-checkbox`}
+                  className='font-spartan w-full cursor-pointer py-1 ps-14 capitalize'
+                >
+                  {themeLabels[theme.name] ? t(themeLabels[theme.name]) : theme.name}
+                </label>
+              </li>
+            ))}
         </ul>
         <div className='relative mx-auto h-[60px] w-[350px] shrink-0'>
           {themes.map(theme => (

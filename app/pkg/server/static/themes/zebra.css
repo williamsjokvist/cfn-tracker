@@ -1,0 +1,46 @@
+@import url("https://fonts.googleapis.com/css2?family=Michroma&family=Syncopate:wght@700&display=swap");
+
+/* The record's grooves around the label. */
+body {
+  background: repeating-radial-gradient(circle at 50% 50%, #141414 0 1px, #0a0a0a 1px 3px);
+}
+
+/* The white label. */
+.stat-list {
+  --ink: #111;
+  --paper: #f2f2ef;
+  display: inline-grid;
+  gap: 6px;
+  margin: 6px;
+  padding: 14px 18px;
+  background: var(--paper);
+  white-space: nowrap;
+}
+
+/* Rows alternate between black bands with white text and plain label with black text. */
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 28px;
+  padding: 6px 16px;
+  color: var(--paper);
+  background: var(--ink);
+}
+
+.stat-item:nth-child(even) {
+  color: var(--ink);
+  background: none;
+}
+
+.stat-title {
+  font-family: "Michroma", "Eurostile", sans-serif;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+}
+
+.stat-value {
+  font-family: "Syncopate", "Eurostile", sans-serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+}

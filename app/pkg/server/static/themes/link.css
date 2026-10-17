@@ -1,0 +1,97 @@
+@import url("https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&display=swap");
+
+body {
+  background: #241634;
+}
+
+.stat-list {
+  --line: #9b00fb;
+  --glow: drop-shadow(0 0 1.5px rgba(201, 77, 255, 0.7)) drop-shadow(0 0 4px rgba(180, 0, 255, 0.35));
+  position: relative;
+  display: inline-flex;
+  gap: 12px;
+  margin: 6px;
+  padding: 4px 10px;
+  white-space: nowrap;
+}
+
+/* The loose ends of the chain on either side. */
+.stat-list::before,
+.stat-list::after {
+  content: "";
+  position: absolute;
+  top: calc(50% - 1px);
+  width: 10px;
+  height: 2px;
+  background: var(--line);
+  filter: var(--glow);
+}
+
+.stat-list::before { left: 0; }
+.stat-list::after { right: 0; }
+
+.stat-item {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 6px 14px;
+  background: repeating-linear-gradient(120deg,
+    rgba(159, 0, 248, 0.15) 0 14px, rgba(124, 0, 200, 0.15) 14px 28px);
+  box-shadow: inset 0 0 8px rgba(180, 0, 255, 0.35);
+}
+
+/* The outline, broken near each corner and in the middle of the sides where the links pass. */
+.stat-item::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  --h: linear-gradient(90deg,
+    var(--line) 0 10px, transparent 10px 15px,
+    var(--line) 15px calc(100% - 15px), transparent calc(100% - 15px) calc(100% - 10px),
+    var(--line) calc(100% - 10px));
+  --v: linear-gradient(to bottom,
+    var(--line) 0 calc(50% - 7px), transparent calc(50% - 7px) calc(50% + 7px),
+    var(--line) calc(50% + 7px));
+  background:
+    var(--h) top / 100% 2px no-repeat,
+    var(--h) bottom / 100% 2px no-repeat,
+    var(--v) left / 2px 100% no-repeat,
+    var(--v) right / 2px 100% no-repeat;
+  filter: var(--glow);
+}
+
+/* The line linking each box to the one before it. */
+.stat-item + .stat-item::before {
+  content: "";
+  position: absolute;
+  top: calc(50% - 1px);
+  left: -12px;
+  width: 12px;
+  height: 2px;
+  background: var(--line);
+  filter: var(--glow);
+}
+
+.stat-title,
+.stat-value {
+  position: relative;
+  font-family: "Rajdhani", "Segoe UI", sans-serif;
+  font-weight: 700;
+  color: #fba700;
+  text-shadow: 0 0 4px rgba(251, 167, 0, 0.8), 0 0 10px rgba(251, 167, 0, 0.45);
+}
+
+.stat-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.stat-value {
+  font-size: 1.6rem;
+  color: #fff;
+  text-shadow: 0 0 4px rgba(255, 255, 255, 0.6), 0 0 10px rgba(201, 77, 255, 0.6);
+}

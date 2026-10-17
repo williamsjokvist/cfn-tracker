@@ -1,0 +1,96 @@
+@import url("https://fonts.googleapis.com/css2?family=Teko:wght@400;600&display=swap");
+
+body {
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px) 0 0 / 24px 24px,
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px) 0 0 / 24px 24px,
+    #050505;
+}
+
+.stat-list {
+  --hairline: #4a4a4a;
+  display: inline-grid;
+  gap: 10px;
+  padding: 10px;
+  font-family: "Teko", "Arial Narrow", sans-serif;
+  white-space: nowrap;
+}
+
+/* A hairline panel with its top-left corner cut off, drawn with gradients so the cut edge gets
+   a line too. The hatching, slashes and value block all lean at the same 24 degrees. The white
+   value block forms the panel's right end, so the dark fill and the bottom line stop where the
+   block's slant meets the bottom edge. Everything leans from the top, so a fixed height pins down
+   where that is. */
+.stat-item {
+  --h: 44px;
+  --lean: calc(var(--h) * 0.4452); /* tan(24deg), matching the skew below */
+  --cut: 14px;
+  display: flex;
+  align-items: stretch;
+  height: var(--h);
+  background:
+    linear-gradient(to bottom right, transparent calc(50% - 1px), var(--hairline) 50%, transparent calc(50% + 1px)) 0 0 / var(--cut) var(--cut) no-repeat,
+    linear-gradient(var(--hairline), var(--hairline)) var(--cut) 0 / 100% 1px no-repeat,
+    linear-gradient(var(--hairline), var(--hairline)) 0 var(--cut) / 1px 100% no-repeat,
+    linear-gradient(var(--hairline), var(--hairline)) 0 100% / calc(100% - var(--lean)) 1px no-repeat,
+    linear-gradient(to bottom right, transparent 50%, #0b0b0b 50%) 0 0 / var(--cut) var(--cut) no-repeat,
+    linear-gradient(#0b0b0b, #0b0b0b) var(--cut) 0 / calc(100% - var(--cut) - var(--lean)) 100% no-repeat,
+    linear-gradient(#0b0b0b, #0b0b0b) 0 var(--cut) / var(--cut) 100% no-repeat;
+}
+
+/* Hatching towards the end of the name, cut off along the same slant as the slashes after it. */
+.stat-title {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  padding: 4px 84px 0 22px;
+  color: #8f8f8f;
+  font-size: 1.35rem;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: repeating-linear-gradient(-66deg, rgba(255, 255, 255, 0.07) 0 4px, transparent 4px 10px)
+    right / 72px calc(100% - 2px) no-repeat;
+  clip-path: polygon(0 0, 100% 0, calc(100% - var(--lean)) 100%, 0 100%);
+}
+
+/* The value sits on a slanted white block, led by three thin slashes. Both are pseudo-elements
+   so they can lean and glow while the number itself stays upright. */
+.stat-value {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 90px;
+  margin-left: 30px;
+  /* Extra room on the right keeps the number centred in the leaning block. */
+  padding: 4px calc(18px + var(--lean) / 2) 0 18px;
+  color: #000;
+  font-size: 1.75rem;
+  font-weight: 600;
+}
+
+.stat-value::before,
+.stat-value::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: -1;
+  transform: skewX(-24deg);
+  transform-origin: top;
+}
+
+.stat-value::before {
+  inset-inline: 0;
+  background: #f4f4f4;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.55), 0 0 24px rgba(255, 255, 255, 0.2);
+}
+
+.stat-value::after {
+  right: calc(100% + 6px);
+  width: 20px;
+  background: repeating-linear-gradient(90deg, #f4f4f4 0 3px, transparent 3px 7px);
+  filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.5));
+}

@@ -1,0 +1,63 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Pirata+One&display=swap");
+
+body {
+  background: #222;
+}
+
+.stat-list {
+  position: relative;
+  display: inline-flex;
+  margin: 16px;
+  background: #020203;
+  border: 1px solid #000;
+  outline: 5px solid #4b4b47;
+  white-space: nowrap;
+}
+
+/* The four white corner brackets around the card, drawn as one layer of L-shaped gradients. */
+.stat-list::before {
+  content: "";
+  position: absolute;
+  inset: -13px;
+  pointer-events: none;
+  --c: #fefeff;
+  background:
+    linear-gradient(var(--c), var(--c)) top left / 14px 2px,
+    linear-gradient(var(--c), var(--c)) top left / 2px 14px,
+    linear-gradient(var(--c), var(--c)) top right / 14px 2px,
+    linear-gradient(var(--c), var(--c)) top right / 2px 14px,
+    linear-gradient(var(--c), var(--c)) bottom left / 14px 2px,
+    linear-gradient(var(--c), var(--c)) bottom left / 2px 14px,
+    linear-gradient(var(--c), var(--c)) bottom right / 14px 2px,
+    linear-gradient(var(--c), var(--c)) bottom right / 2px 14px;
+  background-repeat: no-repeat;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  min-width: 90px;
+}
+
+.stat-item + .stat-item {
+  border-left: 5px solid #222221;
+}
+
+.stat-title {
+  padding: 2px 14px;
+  color: #fff;
+  font-family: "Pirata One", "Old English Text MT", serif;
+  font-size: 1.4rem;
+  line-height: 1.2;
+  background: repeating-linear-gradient(135deg, #222221 0 10px, transparent 10px 20px);
+  border-bottom: 5px solid #222221;
+}
+
+.stat-value {
+  padding: 6px 14px;
+  color: #fff;
+  font-family: "Montserrat", "Arial Black", sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  background: repeating-linear-gradient(135deg, rgba(34, 34, 33, 0.35) 0 10px, transparent 10px 20px);
+}
