@@ -229,7 +229,7 @@ export function OutputPage() {
                 <LanguageSelect value={statsLocale} onValueChange={lang => save(options, lang)} />
               </div>
             </div>
-            <div className='flex flex-wrap gap-2'>
+            <div className='flex flex-wrap justify-end gap-2'>
               <div className='relative' ref={scope}>
                 <Icon
                   icon='twemoji:ok-hand'
