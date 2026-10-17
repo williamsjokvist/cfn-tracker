@@ -54,8 +54,8 @@ export function SettingsPage() {
           <div className='mx-auto grid max-w-xl gap-3'>
             <h3 className='font-bold'>{t('generalSettings')}</h3>
             <div className='grid auto-rows-fr gap-2'>
-              <ThemeSelect />
               <AppLanguageSelect />
+              <ThemeSelect />
               <BrowserSourcePortInput />
               <SideBarToggle />
               <LogFileToggle />
@@ -120,11 +120,12 @@ function SideBarToggle() {
   return (
     <div className='flex w-full items-center justify-between'>
       <span className={settingTextClass}>{t('minimize')}</span>
+      {/* On shows the full sidebar, while the setting stores whether it's minimized */}
       <Switch
-        checked={cfg.sidebar}
-        onCheckedChange={checked => {
-          SaveSidebarMinimized(checked)
-            .then(() => setCfg({ ...cfg, sidebar: checked }))
+        checked={!cfg.sidebar}
+        onCheckedChange={expanded => {
+          SaveSidebarMinimized(!expanded)
+            .then(() => setCfg({ ...cfg, sidebar: !expanded }))
             .catch(setError)
         }}
       />

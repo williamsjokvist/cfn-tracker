@@ -1,5 +1,5 @@
 import React from 'react'
-import { createRoot } from 'react-dom/client'
+import { createRoot, type Root } from 'react-dom/client'
 import { Icon } from '@iconify/react'
 import { Trans, useTranslation } from 'react-i18next'
 import { motion, useAnimate } from 'framer-motion'
@@ -214,6 +214,7 @@ export function OutputPage() {
                 <span className={settingTextClass}>{t('theme')}</span>
                 <ThemeSelect
                   value={options.theme}
+                  lang={statsLocale}
                   onSelect={theme => save({ ...options, theme }, statsLocale)}
                 />
               </div>
@@ -352,18 +353,28 @@ function StripPreview(props: { css: string; stats: [string, string][] }) {
   )
 }
 
-function ThemeSelect(props: { value: string; onSelect: (theme: string) => void }) {
-  const { t } = useTranslation()
+const previewRoots = new WeakMap<Element, Root>()
+
+function ThemeSelect(props: { value: string; lang: string; onSelect: (theme: string) => void }) {
+  const { t, i18n } = useTranslation()
+  const setError = useErrorPopup()
+  // The previews are in the overlay's language, which only gets loaded if it's also the app's
+  const [statsT, setStatsT] = React.useState(() => i18n.getFixedT(props.lang))
+  React.useEffect(() => {
+    i18n
+      .loadLanguages(props.lang)
+      .then(() => setStatsT(() => i18n.getFixedT(props.lang)))
+      .catch(setError)
+  }, [props.lang])
   const [themes, setThemes] = React.useState<model.Theme[]>([])
   const [isOpen, setOpen] = React.useState(false)
   const [layout, setLayout] = React.useState(layoutOf(props.value))
-  const setError = useErrorPopup()
 
   const selectedTheme = themes.find(t => t.name === props.value) ?? themes[0]
   const stripPreviewStats: [string, string][] = [
-    ['MR', '444'],
-    [t('wins'), '12'],
-    [t('losses'), '5']
+    [statsT('mr'), '444'],
+    [statsT('wins'), '12'],
+    [statsT('losses'), '5']
   ]
 
   React.useEffect(() => {
@@ -379,22 +390,27 @@ function ThemeSelect(props: { value: string; onSelect: (theme: string) => void }
       if (!container) {
         continue
       }
-      const shadowRoot = container.attachShadow({ mode: 'open' })
-      createRoot(shadowRoot).render(
+      // Rendered again once the overlay language loads, and a shadow root can only be attached once
+      let root = previewRoots.get(container)
+      if (!root) {
+        root = createRoot(container.attachShadow({ mode: 'open' }))
+        previewRoots.set(container, root)
+      }
+      root.render(
         layoutOf(theme.name) === 'sideBySide' ? (
           <StripPreview css={theme.css} stats={stripPreviewStats} />
         ) : (
           <div className='stat-list'>
             <style>{theme.css}</style>
             <div className='stat-item'>
-              <span className='stat-title'>MR</span>
+              <span className='stat-title'>{statsT('mr')}</span>
               <span className='stat-value'>444</span>
             </div>
           </div>
         )
       )
     }
-  }, [isOpen, themes])
+  }, [isOpen, themes, statsT])
 
   return (
     <Dialog.Root
