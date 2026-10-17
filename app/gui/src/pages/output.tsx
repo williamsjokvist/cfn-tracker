@@ -211,12 +211,8 @@ export function OutputPage() {
             </div>
             <div className='grid auto-rows-fr gap-2'>
               <div className='flex items-center justify-between'>
-                <span className={settingTextClass}>{t('theme')}</span>
-                <ThemeSelect
-                  value={options.theme}
-                  lang={statsLocale}
-                  onSelect={theme => save({ ...options, theme }, statsLocale)}
-                />
+                <span className={settingTextClass}>{t('language')}</span>
+                <LanguageSelect value={statsLocale} onValueChange={lang => save(options, lang)} />
               </div>
               <div className='flex items-center justify-between'>
                 <span className={settingTextClass}>{t('displayStats')}</span>
@@ -226,8 +222,12 @@ export function OutputPage() {
                 />
               </div>
               <div className='flex items-center justify-between'>
-                <span className={settingTextClass}>{t('language')}</span>
-                <LanguageSelect value={statsLocale} onValueChange={lang => save(options, lang)} />
+                <span className={settingTextClass}>{t('theme')}</span>
+                <ThemeSelect
+                  value={options.theme}
+                  lang={statsLocale}
+                  onSelect={theme => save({ ...options, theme }, statsLocale)}
+                />
               </div>
             </div>
             <div className='flex flex-wrap justify-end gap-2'>
