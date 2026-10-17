@@ -33,6 +33,7 @@ func (s *Session) Record(outcome model.Match) model.Match {
 	prev, hasPrev := s.Character(match.Character)
 
 	match.SessionId = s.state.Id
+	match.GameId = s.state.GameId
 	match.Wins, match.Losses, match.WinStreak = prev.Wins, prev.Losses, prev.WinStreak
 	if match.Victory {
 		match.Wins++

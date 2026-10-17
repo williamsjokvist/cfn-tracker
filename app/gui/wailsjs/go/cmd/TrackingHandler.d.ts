@@ -7,10 +7,12 @@ export function CancelAuthentication():Promise<void>;
 
 export function ForcePoll():Promise<void>;
 
+export function GetPlayedGames(arg1:string):Promise<Array<model.PlayedGame>>;
+
 export function SelectGame(arg1:model.GameType):Promise<void>;
 
 export function SetEventEmitter(arg1:cmd.EventEmitFn):Promise<void>;
 
-export function StartTracking(arg1:string,arg2:boolean):Promise<void>;
+export function StartTracking(arg1:string,arg2:string,arg3:boolean):Promise<void>;
 
 export function StopTracking():Promise<void>;

@@ -188,7 +188,7 @@ func TestMatchFieldsHaveLocalizationKeys(t *testing.T) {
 	matchType := reflect.TypeOf(model.Match{})
 	for i := range matchType.NumField() {
 		stat := matchType.Field(i).Tag.Get("json")
-		if stat == "replayId" || stat == "sessionId" {
+		if stat == "replayId" || stat == "sessionId" || stat == "gameId" {
 			continue
 		}
 		if _, ok := declared[stat]; !ok {
