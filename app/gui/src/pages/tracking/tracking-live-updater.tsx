@@ -82,7 +82,10 @@ export function TrackingLiveUpdater() {
                     width={25}
                   />{' '}
                   vs
-                  <b>{opponent}</b> - {opponentCharacter} ({t(opponentLeague as LocalizationKey)})
+                  <b>{opponent}</b>
+                  {/* Fightcade reports no characters */}
+                  {opponentCharacter && ` - ${opponentCharacter}`}
+                  {opponentLeague && ` (${t(opponentLeague as LocalizationKey)})`}
                 </div>
               </div>
             )}

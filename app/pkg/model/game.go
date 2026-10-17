@@ -3,8 +3,9 @@ package model
 type GameType string
 
 const (
-	GameTypeSF6 GameType = "sf6"
-	GameTypeT8  GameType = "t8"
+	GameTypeSF6       GameType = "sf6"
+	GameTypeT8        GameType = "t8"
+	GameTypeFightcade GameType = "fightcade"
 )
 
 var AllGameTypes = []struct {
@@ -13,4 +14,5 @@ var AllGameTypes = []struct {
 }{
 	{GameTypeSF6, "STREET_FIGHTER_6"},
 	{GameTypeT8, "TEKKEN_8"},
+	{GameTypeFightcade, "FIGHTCADE"},
 }

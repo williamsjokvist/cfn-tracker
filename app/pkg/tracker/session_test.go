@@ -204,3 +204,11 @@ func TestCharacterSwitch(t *testing.T) {
 		t.Fatalf("session matches = %v, want [%s]", played, want)
 	}
 }
+
+func TestRecordTagsMatchWithSessionGame(t *testing.T) {
+	session := tracker.NewSession(nil, &model.Session{Id: 7, GameId: "sfiii3nr1"})
+	match := session.Record(win("Ryu", 0, 0))
+	if match.SessionId != 7 || match.GameId != "sfiii3nr1" {
+		t.Fatalf("match session %d game %q, want session 7 game sfiii3nr1", match.SessionId, match.GameId)
+	}
+}
