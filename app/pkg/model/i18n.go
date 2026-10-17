@@ -93,7 +93,6 @@ type Localization struct {
 	BrowserSourceThemePills           string `json:"browserSourceThemePills"`
 	BrowserSourceThemeComic           string `json:"browserSourceThemeComic"`
 	BrowserSourceThemeTerminal        string `json:"browserSourceThemeTerminal"`
-	BrowserSourceThemeInk             string `json:"browserSourceThemeInk"`
 	BrowserSourceThemeVersus          string `json:"browserSourceThemeVersus"`
 	BrowserSourceThemeDeco            string `json:"browserSourceThemeDeco"`
 	BrowserSourceThemeBroadcast       string `json:"browserSourceThemeBroadcast"`
@@ -105,7 +104,6 @@ type Localization struct {
 	BrowserSourceThemeMinimalDark     string `json:"browserSourceThemeMinimalDark"`
 	BrowserSourceThemeTicker          string `json:"browserSourceThemeTicker"`
 	BrowserSourceThemeTextOnly        string `json:"browserSourceThemeTextOnly"`
-	BrowserSourceThemeParchment       string `json:"browserSourceThemeParchment"`
 	BrowserSourceThemeSticker         string `json:"browserSourceThemeSticker"`
 	BrowserSourceThemeGlitch          string `json:"browserSourceThemeGlitch"`
 	BrowserSourceThemeChips           string `json:"browserSourceThemeChips"`
@@ -221,6 +219,7 @@ type Localization struct {
 	ErrBackupData                     string `json:"errBackupData"`
 	ErrImportBackup                   string `json:"errImportBackup"`
 	ErrInvalidBackup                  string `json:"errInvalidBackup"`
+	ErrSaveStreamOverlay              string `json:"errSaveStreamOverlay"`
 	// Retry/recovery keys. Keys missing from this struct are silently dropped
 	// even if they exist in the locale JSON.
 	Retrying                     string `json:"retrying"`

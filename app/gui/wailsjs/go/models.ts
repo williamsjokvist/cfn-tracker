@@ -27,6 +27,7 @@ export namespace model {
 	    errSaveLocale = "errSaveLocale",
 	    errSaveLogFile = "errSaveLogFile",
 	    errSaveSidebar = "errSaveSidebar",
+	    errSaveStreamOverlay = "errSaveStreamOverlay",
 	    errSaveTheme = "errSaveTheme",
 	    errSaveUser = "errSaveUser",
 	    errSelectGame = "errSelectGame",
@@ -178,7 +179,6 @@ export namespace model {
 	    browserSourceThemePills: string;
 	    browserSourceThemeComic: string;
 	    browserSourceThemeTerminal: string;
-	    browserSourceThemeInk: string;
 	    browserSourceThemeVersus: string;
 	    browserSourceThemeDeco: string;
 	    browserSourceThemeBroadcast: string;
@@ -190,7 +190,6 @@ export namespace model {
 	    browserSourceThemeMinimalDark: string;
 	    browserSourceThemeTicker: string;
 	    browserSourceThemeTextOnly: string;
-	    browserSourceThemeParchment: string;
 	    browserSourceThemeSticker: string;
 	    browserSourceThemeGlitch: string;
 	    browserSourceThemeChips: string;
@@ -306,6 +305,7 @@ export namespace model {
 	    errBackupData: string;
 	    errImportBackup: string;
 	    errInvalidBackup: string;
+	    errSaveStreamOverlay: string;
 	    retrying: string;
 	    retryingDetail: string;
 	    reconnected: string;
@@ -401,6 +401,11 @@ export namespace model {
 	}
 	export interface SessionsStatistics {
 	    Months: SessionMonth[];
+	}
+	export interface StreamOverlayConfig {
+	    theme: string;
+	    lang: string;
+	    stats: string[];
 	}
 	export interface Theme {
 	    name: string;

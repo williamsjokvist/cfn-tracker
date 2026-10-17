@@ -15,6 +15,14 @@ type GUIConfig struct {
 	LastUsers         map[GameType]string `ini:"-" json:"lastUsers"`
 }
 
+// StreamOverlayConfig is what the stream overlay page was last set to, so the copied link stays the same between launches.
+type StreamOverlayConfig struct {
+	Theme string `json:"theme"`
+	Lang  string `json:"lang"`
+	// The stats that are shown. Nil means they were never saved, so the page uses its defaults.
+	Stats []string `json:"stats"`
+}
+
 type DataConfig struct {
 	// Empty means the default app data directory.
 	Dir string `ini:"dir"`

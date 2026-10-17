@@ -3,6 +3,7 @@ package config
 import (
 	"maps"
 	"path/filepath"
+	"reflect"
 	"testing"
 
 	"github.com/williamsjokvist/cfn-tracker/pkg/model"
@@ -121,5 +122,33 @@ func TestLastGameAndUsers(t *testing.T) {
 	want := map[model.GameType]string{model.GameTypeSF6: "1234567890", model.GameTypeT8: "abcd1234"}
 	if !maps.Equal(cfg.GUI.LastUsers, want) {
 		t.Errorf("LastUsers = %v, want %v", cfg.GUI.LastUsers, want)
+	}
+}
+
+func TestStreamOverlayConfig(t *testing.T) {
+	storage := isolate(t)
+	got, err := storage.GetStreamOverlayConfig()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got.Theme != "default" || got.Lang != "en-GB" || got.Stats != nil {
+		t.Fatalf("GetStreamOverlayConfig() = %+v, want the defaults with nil stats", got)
+	}
+
+	for _, want := range []model.StreamOverlayConfig{
+		{Theme: "velvet", Lang: "ja-JP", Stats: []string{"mr", "wins"}},
+		// No stats picked is different from never having saved any.
+		{Theme: "velvet", Lang: "ja-JP", Stats: []string{}},
+	} {
+		if err := storage.SaveStreamOverlayConfig(&want); err != nil {
+			t.Fatalf("SaveStreamOverlayConfig() error = %v", err)
+		}
+		got, err := storage.GetStreamOverlayConfig()
+		if err != nil {
+			t.Fatal(err)
+		}
+		if !reflect.DeepEqual(*got, want) {
+			t.Fatalf("GetStreamOverlayConfig() = %+v, want %+v", *got, want)
+		}
 	}
 }

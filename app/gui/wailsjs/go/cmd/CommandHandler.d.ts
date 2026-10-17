@@ -18,6 +18,8 @@ export function GetSessions(arg1:string,arg2:string,arg3:number,arg4:number):Pro
 
 export function GetSessionsStatistics(arg1:string):Promise<model.SessionsStatistics>;
 
+export function GetStreamOverlayConfig():Promise<model.StreamOverlayConfig>;
+
 export function GetSupportedLanguages():Promise<Array<string>>;
 
 export function GetThemes():Promise<Array<model.Theme>>;
@@ -39,5 +41,7 @@ export function SaveLocale(arg1:string):Promise<void>;
 export function SaveLogFile(arg1:boolean):Promise<void>;
 
 export function SaveSidebarMinimized(arg1:boolean):Promise<void>;
+
+export function SaveStreamOverlayConfig(arg1:model.StreamOverlayConfig):Promise<void>;
 
 export function SaveTheme(arg1:model.ThemeName):Promise<void>;

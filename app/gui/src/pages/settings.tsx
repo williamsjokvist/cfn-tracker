@@ -42,9 +42,7 @@ export function SettingsPage() {
   return (
     <Page.Root>
       <Page.Header>
-        <div className='mx-auto w-full max-w-xl text-start'>
-          <Page.Title>{t('settings')}</Page.Title>
-        </div>
+        <Page.Title>{t('settings')}</Page.Title>
       </Page.Header>
       <motion.section
         initial={{ opacity: 0 }}
@@ -425,11 +423,7 @@ function ThemeSelect() {
         }}
       >
         {Themes.map(theme => (
-          <Select.Item
-            key={theme.name}
-            value={theme.name}
-            className='flex items-center justify-between gap-2'
-          >
+          <Select.Item key={theme.name} value={theme.name} className='flex items-center gap-2'>
             {/* The ring keeps the darker half visible against the dark dropdown. */}
             <i
               style={{

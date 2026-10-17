@@ -13,6 +13,8 @@
   --animate-dialog-out: dialog-out 0.15s ease-in forwards;
   --animate-fade-in: fade-in 0.25s ease-out;
   --animate-fade-out: fade-out 0.15s ease-in forwards;
+  --animate-select-in: select-in 0.25s ease-out;
+  --animate-select-out: select-out 0.15s ease-in forwards;
 
   @keyframes blink {
     50% {
@@ -44,6 +46,18 @@
   @keyframes fade-out {
     to {
       opacity: 0;
+    }
+  }
+  @keyframes select-in {
+    from {
+      opacity: 0;
+      translate: 0 10px;
+    }
+  }
+  @keyframes select-out {
+    to {
+      opacity: 0;
+      translate: 0 10px;
     }
   }
 }

@@ -11,7 +11,12 @@ import { SettingButton, settingTextClass } from '@/ui/setting-button'
 import { Checkbox } from '@/ui/checkbox'
 
 import { model } from '@model'
-import { GetThemes, OpenResultsDirectory } from '@cmd/CommandHandler'
+import {
+  GetStreamOverlayConfig,
+  GetThemes,
+  OpenResultsDirectory,
+  SaveStreamOverlayConfig
+} from '@cmd/CommandHandler'
 import { BrowserOpenURL } from '@runtime'
 
 import { useErrorPopup } from '@/main/error-popup'
@@ -39,7 +44,6 @@ const themeLabels: Record<string, LocalizationKey> = {
   glass: 'browserSourceThemeGlass',
   glitch: 'browserSourceThemeGlitch',
   hearts: 'browserSourceThemeHearts',
-  ink: 'browserSourceThemeInk',
   jaeger: 'browserSourceThemeJaeger',
   link: 'browserSourceThemeLink',
   minimal: 'browserSourceThemeMinimal',
@@ -49,7 +53,6 @@ const themeLabels: Record<string, LocalizationKey> = {
   neon: 'browserSourceThemeNeon',
   nord: 'browserSourceThemeNord',
   notebook: 'browserSourceThemeNotebook',
-  parchment: 'browserSourceThemeParchment',
   pills: 'browserSourceThemePills',
   pivot: 'browserSourceThemePivot',
   retro: 'browserSourceThemeRetro',
@@ -71,7 +74,6 @@ const sideBySideThemes = new Set([
   'banner',
   'chips',
   'flash-portal',
-  'ink',
   'link',
   'most-wanted-strip',
   'nord',
@@ -112,6 +114,20 @@ const defaultOptions: StatOptions = {
   date: false
 }
 
+// Saved stats are the ones that are on, so a stat added in a later version starts off
+function optionsFromConfig(cfg: model.StreamOverlayConfig): StatOptions {
+  if (!cfg.stats) {
+    return { ...defaultOptions, theme: cfg.theme }
+  }
+  const options: StatOptions = { ...defaultOptions, theme: cfg.theme }
+  for (const key of Object.keys(options) as (keyof StatOptions)[]) {
+    if (key !== 'theme') {
+      options[key] = cfg.stats.includes(key)
+    }
+  }
+  return options
+}
+
 export function OutputPage() {
   const { t } = useTranslation()
   const [options, setOptions] = React.useState(defaultOptions)
@@ -119,6 +135,29 @@ export function OutputPage() {
   const [statsLocale, setStatsLocale] = React.useState('en-GB')
   const [scope, animate] = useAnimate()
   const [cfg] = React.useContext(ConfigContext)
+  const setError = useErrorPopup()
+
+  React.useEffect(() => {
+    GetStreamOverlayConfig()
+      .then(overlay => {
+        setOptions(optionsFromConfig(overlay))
+        setStatsLocale(overlay.lang)
+      })
+      .catch(setError)
+  }, [])
+
+  function save(options: StatOptions, lang: string) {
+    setOptions(options)
+    setStatsLocale(lang)
+    const { theme, ...stats } = options
+    SaveStreamOverlayConfig({
+      theme,
+      lang,
+      stats: Object.entries(stats)
+        .filter(([, on]) => on)
+        .map(([key]) => key)
+    }).catch(setError)
+  }
 
   const { theme: _, ...statOptions } = options
 
@@ -142,9 +181,15 @@ export function OutputPage() {
   return (
     <Page.Root>
       <Page.Header>
-        <div className='mx-auto w-full max-w-xl text-start'>
-          <Page.Title>{t('output')}</Page.Title>
-        </div>
+        <Page.Title>{t('output')}</Page.Title>
+        <SettingButton
+          icon='mdi:brush'
+          // Clickable although the header is the window's drag region.
+          style={{ '--draggable': 'no-drag' } as React.CSSProperties}
+          onClick={() => BrowserOpenURL('https://cfn.williamsjokvist.se/theme-guide/')}
+        >
+          {t('createYourOwnTheme')}
+        </SettingButton>
       </Page.Header>
       <motion.section
         initial={{ opacity: 0 }}
@@ -164,20 +209,25 @@ export function OutputPage() {
                 </Trans>
               </p>
             </div>
-            <div className='flex flex-wrap gap-2'>
-              <ThemeSelect
-                value={options.theme}
-                onSelect={theme => setOptions({ ...options, theme })}
-              />
-              <StatSelect
-                options={statOptions}
-                onSelect={(opt, checked) => setOptions({ ...options, [opt]: checked })}
-              />
-              <LanguageSelect
-                value={statsLocale}
-                onValueChange={setStatsLocale}
-                className='w-auto! gap-2'
-              />
+            <div className='grid auto-rows-fr gap-2'>
+              <div className='flex items-center justify-between'>
+                <span className={settingTextClass}>{t('theme')}</span>
+                <ThemeSelect
+                  value={options.theme}
+                  onSelect={theme => save({ ...options, theme }, statsLocale)}
+                />
+              </div>
+              <div className='flex items-center justify-between'>
+                <span className={settingTextClass}>{t('displayStats')}</span>
+                <StatSelect
+                  options={statOptions}
+                  onSelect={(opt, checked) => save({ ...options, [opt]: checked }, statsLocale)}
+                />
+              </div>
+              <div className='flex items-center justify-between'>
+                <span className={settingTextClass}>{t('language')}</span>
+                <LanguageSelect value={statsLocale} onValueChange={lang => save(options, lang)} />
+              </div>
             </div>
             <div className='flex flex-wrap gap-2'>
               <div className='relative' ref={scope}>
@@ -191,12 +241,6 @@ export function OutputPage() {
                   {t('copyBrowserSourceLink')}
                 </SettingButton>
               </div>
-              <SettingButton
-                icon='mdi:brush'
-                onClick={() => BrowserOpenURL('https://cfn.williamsjokvist.se/theme-guide/')}
-              >
-                {t('createYourOwnTheme')}
-              </SettingButton>
             </div>
           </div>
         </div>
@@ -223,6 +267,9 @@ export function OutputPage() {
   )
 }
 
+// The same width as the language select next to them
+const rowControlClass = 'w-48 text-start'
+
 function StatSelect(props: {
   options: Omit<StatOptions, 'theme'>
   onSelect: (option: string, checked: boolean) => void
@@ -231,7 +278,14 @@ function StatSelect(props: {
   return (
     <Dialog.Root>
       <Dialog.Trigger asChild>
-        <SettingButton icon='bx:stats'>{t('displayStats')}</SettingButton>
+        <SettingButton icon='bx:stats' className={rowControlClass}>
+          <span className='truncate'>
+            {Object.entries(props.options)
+              .filter(([, on]) => on)
+              .map(([opt]) => t(opt as keyof typeof props.options))
+              .join(', ') || '–'}
+          </span>
+        </SettingButton>
       </Dialog.Trigger>
       <Dialog.Content title='displayStats' description='statsWillBeDisplayed'>
         <ul className='mt-4 h-72 overflow-y-scroll'>
@@ -350,8 +404,10 @@ function ThemeSelect(props: { value: string; onSelect: (theme: string) => void }
       }}
     >
       <Dialog.Trigger asChild>
-        <SettingButton icon='ph:paint-bucket-fill' className='capitalize'>
-          {themeLabels[props.value] ? t(themeLabels[props.value]) : props.value}
+        <SettingButton icon='ph:paint-bucket-fill' className={cn(rowControlClass, 'capitalize')}>
+          <span className='truncate'>
+            {themeLabels[props.value] ? t(themeLabels[props.value]) : props.value}
+          </span>
         </SettingButton>
       </Dialog.Trigger>
       <Dialog.Content title='selectTheme' className='flex flex-col'>

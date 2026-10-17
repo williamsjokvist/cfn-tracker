@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 
 	"github.com/williamsjokvist/cfn-tracker/pkg/model"
 	"gopkg.in/ini.v1"
@@ -162,6 +163,42 @@ func (s *Storage) SaveLastUser(game model.GameType, code string) error {
 		return fmt.Errorf("get config file: %w", err)
 	}
 	iniData.Section("last_user").Key(string(game)).SetValue(code)
+	if err := iniData.SaveTo(s.iniPath()); err != nil {
+		return fmt.Errorf("save ini config file: %w", err)
+	}
+	return nil
+}
+
+func (s *Storage) GetStreamOverlayConfig() (*model.StreamOverlayConfig, error) {
+	iniData, err := s.getIniFile()
+	if err != nil {
+		return nil, fmt.Errorf("get config file: %w", err)
+	}
+	section := iniData.Section("stream_overlay")
+	cfg := model.StreamOverlayConfig{
+		Theme: section.Key("theme").MustString("default"),
+		Lang:  section.Key("lang").MustString("en-GB"),
+	}
+	if section.HasKey("stats") {
+		cfg.Stats = []string{}
+		for _, stat := range strings.Split(section.Key("stats").String(), ",") {
+			if stat = strings.TrimSpace(stat); stat != "" {
+				cfg.Stats = append(cfg.Stats, stat)
+			}
+		}
+	}
+	return &cfg, nil
+}
+
+func (s *Storage) SaveStreamOverlayConfig(cfg *model.StreamOverlayConfig) error {
+	iniData, err := s.getIniFile()
+	if err != nil {
+		return fmt.Errorf("get config file: %w", err)
+	}
+	section := iniData.Section("stream_overlay")
+	section.Key("theme").SetValue(cfg.Theme)
+	section.Key("lang").SetValue(cfg.Lang)
+	section.Key("stats").SetValue(strings.Join(cfg.Stats, ","))
 	if err := iniData.SaveTo(s.iniPath()); err != nil {
 		return fmt.Errorf("save ini config file: %w", err)
 	}
