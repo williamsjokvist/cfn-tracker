@@ -12,6 +12,7 @@ import { ReportIssueDialog } from './report-issue-dialog'
 
 export function AppSidebar() {
   const [cfg] = React.useContext(ConfigContext)
+  const [expandedWidth, setExpandedWidth] = React.useState(175)
 
   const [scope, animate] = useAnimate()
   React.useEffect(() => {
@@ -26,6 +27,30 @@ export function AppSidebar() {
     )
   }, [cfg.sidebar])
 
+  // Label lengths vary a lot between languages, so it fits the widest one rather than having a set width.
+  // It watches the labels, since they change size after a language switch, once its translations
+  // have loaded, and again once the web font has.
+  React.useLayoutEffect(() => {
+    if (cfg.sidebar) {
+      return
+    }
+    const sidebar: HTMLElement = scope.current
+    const labels = [...sidebar.querySelectorAll<HTMLElement>('[data-sidebar-label]')]
+    const observer = new ResizeObserver(() => {
+      // The labels are hidden for a moment after expanding, which would measure too narrow
+      if (labels.some(label => label.querySelector<HTMLElement>('span')?.offsetParent === null)) {
+        return
+      }
+      // Each label's icon and text, plus the room around it: the chevron and the item and sidebar padding
+      const widest = Math.max(...labels.map(label => label.offsetWidth + 20 + 8 + 20))
+      setExpandedWidth(Math.ceil(widest))
+    })
+    for (const label of labels) {
+      observer.observe(label)
+    }
+    return () => observer.disconnect()
+  }, [cfg.sidebar])
+
   return (
     <div
       ref={scope}
@@ -36,7 +61,7 @@ export function AppSidebar() {
         'transition-[width_250ms_ease-out]'
       )}
       style={{
-        width: cfg.sidebar ? '76px' : '175px'
+        width: cfg.sidebar ? '76px' : `${expandedWidth}px`
       }}
     >
       <AppTitleBar />
@@ -95,12 +120,12 @@ function Nav() {
               color: selected ? '#d6d4ff' : '#bfbcff'
             }}
           >
-            <div className='flex items-center justify-between'>
+            <div data-sidebar-label className='flex items-center justify-between'>
               <Icon
                 icon={selected ? icons[1] : icons[0]}
                 className='text-highlight me-1 h-7 w-10 transition-colors'
               />
-              <span>{t(href)}</span>
+              <BoldWidthLabel>{t(href)}</BoldWidthLabel>
             </div>
             {cfg.sidebar ? (
               <div
@@ -122,5 +147,17 @@ function Nav() {
         )
       })}
     </nav>
+  )
+}
+
+// Reserves the label's bold width, so the sidebar doesn't change width when a different page is selected
+function BoldWidthLabel(props: { children: string }) {
+  return (
+    <span>
+      {props.children}
+      <span aria-hidden className='invisible block h-0 overflow-hidden font-semibold'>
+        {props.children}
+      </span>
+    </span>
   )
 }

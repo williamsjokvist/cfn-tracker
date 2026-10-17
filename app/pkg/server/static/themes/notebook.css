@@ -5,9 +5,8 @@ body {
 }
 
 .stat-list {
-  display: grid;
+  display: inline-grid;
   gap: 8px;
-  max-width: 380px;
 
   font-family: "Caveat", "Comic Sans MS", cursive;
   white-space: nowrap;

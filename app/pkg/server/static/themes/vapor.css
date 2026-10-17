@@ -1,0 +1,52 @@
+@import url("https://fonts.googleapis.com/css2?family=Arimo:wght@400;700&display=swap");
+
+body {
+  background: #111;
+}
+
+/* The window: dark with a faint diagonal weave and a light inner edge. */
+.stat-list {
+  position: relative;
+  isolation: isolate;
+  display: inline-grid;
+  min-width: 240px;
+  margin: 6px;
+  padding: 18px 24px;
+  background:
+    repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.018) 0 2px, transparent 2px 4px),
+    linear-gradient(to bottom, #3b3b3b, #272727 40%, #1d1d1d);
+  border: 1px solid #000;
+  box-shadow: inset 0 0 0 1px #4a4a4a, 0 4px 14px rgba(0, 0, 0, 0.6);
+  font-family: "Arimo", Tahoma, Arial, sans-serif;
+  font-size: 1.05rem;
+  white-space: nowrap;
+}
+
+/* The recessed chat panel the lines sit in. */
+.stat-list::before {
+  content: "";
+  position: absolute;
+  inset: 8px 8px 8px 10px;
+  z-index: -1;
+  background: linear-gradient(to bottom, #262626, #1b1b1b);
+  border: 1px solid #4b4b4b;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+
+.stat-item {
+  display: flex;
+  gap: 6px;
+  line-height: 1.75;
+}
+
+.stat-title {
+  color: #8bb9e8;
+}
+
+.stat-title::after {
+  content: ":";
+}
+
+.stat-value {
+  color: #e2e2e2;
+}

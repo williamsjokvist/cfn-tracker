@@ -39,6 +39,7 @@ const (
 	tKeyErrBackupData               ErrorLocalizationKey = "errBackupData"
 	tKeyErrImportBackup             ErrorLocalizationKey = "errImportBackup"
 	tKeyErrInvalidBackup            ErrorLocalizationKey = "errInvalidBackup"
+	tKeyErrSaveStreamOverlay        ErrorLocalizationKey = "errSaveStreamOverlay"
 )
 
 var AllErrorKeys = []struct {
@@ -76,6 +77,7 @@ var AllErrorKeys = []struct {
 	{tKeyErrBackupData, string(tKeyErrBackupData)},
 	{tKeyErrImportBackup, string(tKeyErrImportBackup)},
 	{tKeyErrInvalidBackup, string(tKeyErrInvalidBackup)},
+	{tKeyErrSaveStreamOverlay, string(tKeyErrSaveStreamOverlay)},
 }
 
 var (
@@ -109,6 +111,7 @@ var (
 	ErrBackupData               = newError(tKeyErrBackupData, errors.New("back up data"))
 	ErrImportBackup             = newError(tKeyErrImportBackup, errors.New("import backup"))
 	ErrInvalidBackup            = newError(tKeyErrInvalidBackup, errors.New("invalid backup"))
+	ErrSaveStreamOverlay        = newError(tKeyErrSaveStreamOverlay, errors.New("save stream overlay"))
 
 	ErrAuthManualLoginFailed = newError(tKeyErrAuthManualLoginFailed, errors.New("manual login did not establish a buckler session"))
 )

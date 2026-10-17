@@ -50,6 +50,7 @@ export function ReportIssueDialog() {
     <Dialog.Root open={open} onOpenChange={open => !sending && setOpen(open)}>
       <Dialog.Trigger asChild>
         <button
+          data-sidebar-label
           className={cn(
             'group relative flex h-9 items-center rounded-sm text-[#bfbcff]/60',
             'transition-colors hover:bg-slate-50/5 hover:text-white active:bg-white/[0.075]'

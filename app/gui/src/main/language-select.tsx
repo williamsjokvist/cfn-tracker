@@ -40,7 +40,7 @@ export function LanguageSelect(props: {
           <Select.Item
             key={code}
             value={code}
-            className='flex items-center justify-between gap-2'
+            className='flex items-center gap-2'
             {...(props.value === code && {
               style: {
                 fontWeight: 600

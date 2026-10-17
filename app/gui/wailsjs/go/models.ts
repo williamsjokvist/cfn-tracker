@@ -27,6 +27,7 @@ export namespace model {
 	    errSaveLocale = "errSaveLocale",
 	    errSaveLogFile = "errSaveLogFile",
 	    errSaveSidebar = "errSaveSidebar",
+	    errSaveStreamOverlay = "errSaveStreamOverlay",
 	    errSaveTheme = "errSaveTheme",
 	    errSaveUser = "errSaveUser",
 	    errSelectGame = "errSelectGame",
@@ -178,25 +179,35 @@ export namespace model {
 	    browserSourceThemePills: string;
 	    browserSourceThemeComic: string;
 	    browserSourceThemeTerminal: string;
-	    browserSourceThemeInk: string;
 	    browserSourceThemeVersus: string;
 	    browserSourceThemeDeco: string;
 	    browserSourceThemeBroadcast: string;
-	    browserSourceThemeHud: string;
 	    browserSourceThemeNeon: string;
 	    browserSourceThemeRetro: string;
 	    browserSourceThemeNotebook: string;
-	    browserSourceThemeChalkboard: string;
 	    browserSourceThemeGlass: string;
 	    browserSourceThemeMinimal: string;
 	    browserSourceThemeMinimalDark: string;
 	    browserSourceThemeTicker: string;
 	    browserSourceThemeTextOnly: string;
-	    browserSourceThemeParchment: string;
 	    browserSourceThemeSticker: string;
 	    browserSourceThemeGlitch: string;
-	    browserSourceThemeLed: string;
 	    browserSourceThemeChips: string;
+	    browserSourceThemeMostWanted: string;
+	    browserSourceThemeHearts: string;
+	    browserSourceThemeBanner: string;
+	    browserSourceThemeMostWantedStrip: string;
+	    browserSourceThemeFlashPortal: string;
+	    browserSourceThemeLink: string;
+	    browserSourceThemeBlackout: string;
+	    browserSourceThemeSilver: string;
+	    browserSourceThemeTop8: string;
+	    browserSourceThemePivot: string;
+	    browserSourceThemeVelvet: string;
+	    browserSourceThemeVapor: string;
+	    browserSourceThemeZebra: string;
+	    browserSourceThemeCrimson: string;
+	    browserSourceThemeWebcore: string;
 	    createYourOwnTheme: string;
 	    userId: string;
 	    userName: string;
@@ -217,6 +228,8 @@ export namespace model {
 	    lastMatch: string;
 	    statsWillBeDisplayed: string;
 	    selectTheme: string;
+	    themeLayoutRows: string;
+	    themeLayoutSideBySide: string;
 	    started: string;
 	    user: string;
 	    matchesWon: string;
@@ -292,6 +305,7 @@ export namespace model {
 	    errBackupData: string;
 	    errImportBackup: string;
 	    errInvalidBackup: string;
+	    errSaveStreamOverlay: string;
 	    retrying: string;
 	    retryingDetail: string;
 	    reconnected: string;
@@ -387,6 +401,11 @@ export namespace model {
 	}
 	export interface SessionsStatistics {
 	    Months: SessionMonth[];
+	}
+	export interface StreamOverlayConfig {
+	    theme: string;
+	    lang: string;
+	    stats: string[];
 	}
 	export interface Theme {
 	    name: string;

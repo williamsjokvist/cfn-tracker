@@ -5,9 +5,8 @@ body {
 }
 
 .stat-list {
-  display: grid;
+  display: inline-grid;
   gap: 2px;
-  max-width: 460px;
   padding: 14px 18px;
   background: radial-gradient(ellipse at center, #0c1a0c 0%, #040704 100%);
   border: 2px solid #1f4d1f;

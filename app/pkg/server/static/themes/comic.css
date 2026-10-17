@@ -5,9 +5,8 @@ body {
 }
 
 .stat-list {
-  display: grid;
+  display: inline-grid;
   gap: 10px;
-  max-width: 420px;
   padding: 4px 8px 8px 4px;
 
   font-family: "Bangers", Impact, sans-serif;

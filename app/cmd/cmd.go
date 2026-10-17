@@ -242,6 +242,21 @@ func (ch *CommandHandler) SaveTheme(theme model.ThemeName) error {
 	return nil
 }
 
+func (ch *CommandHandler) GetStreamOverlayConfig() (*model.StreamOverlayConfig, error) {
+	cfg, err := ch.cfgDb.GetStreamOverlayConfig()
+	if err != nil {
+		return nil, model.WrapError(model.ErrGetGUIConfig, err)
+	}
+	return cfg, nil
+}
+
+func (ch *CommandHandler) SaveStreamOverlayConfig(cfg model.StreamOverlayConfig) error {
+	if err := ch.cfgDb.SaveStreamOverlayConfig(&cfg); err != nil {
+		return model.WrapError(model.ErrSaveStreamOverlay, err)
+	}
+	return nil
+}
+
 func (ch *CommandHandler) ReportIssue(report model.IssueReport) (string, error) {
 	if strings.TrimSpace(report.Title) == "" || strings.TrimSpace(report.Description) == "" {
 		return "", model.WrapError(model.ErrReportIssue, errors.New("title and description are required"))

@@ -1,0 +1,70 @@
+@import url("https://fonts.googleapis.com/css2?family=Rubik:wght@800;900&display=swap");
+
+body {
+  background:
+    linear-gradient(90deg, #000 35%, rgba(0, 0, 0, 0.6)),
+    radial-gradient(circle, #ff3b1f 1.5px, transparent 1.8px) 0 0 / 9px 9px,
+    #000;
+}
+
+.stat-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  max-width: 600px;
+  padding: 10px;
+  font-family: "Rubik", "Arial Black", sans-serif;
+  white-space: nowrap;
+}
+
+/* Each card cycles through a gradient. --e1 and --e2 approximate the gradient where each echo
+   sits, so the echoes' fill blends into their own card. */
+.stat-item {
+  --top: #ff5a1f;
+  --bottom: #ff1f4f;
+  --e1: #ff3f3a;
+  --e2: #ff4a2c;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-width: 110px;
+  height: 130px;
+  padding: 10px 14px 12px;
+  overflow: hidden;
+  background: linear-gradient(to bottom, var(--top), var(--bottom));
+}
+
+.stat-item:nth-child(5n + 2) { --top: #2f8bff; --bottom: #6a3cff; --e1: #5060ff; --e2: #4473ff; }
+.stat-item:nth-child(5n + 3) { --top: #22d36f; --bottom: #0f9b8e; --e1: #18b37f; --e2: #1dc277; }
+.stat-item:nth-child(5n + 4) { --top: #b44dff; --bottom: #ff3cb4; --e1: #db44d6; --e2: #c94aea; }
+.stat-item:nth-child(5n + 5) { --top: #ffc21f; --bottom: #ff6a1f; --e1: #ff921f; --e2: #ffa61f; }
+
+.stat-title {
+  color: #fff;
+  font-size: 1.15rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+/* Two outlined echoes of the value stacked above it. Each is a copy in the card's colour
+   laid over four white copies nudged 1.5px apart, which reads as an outline. */
+.stat-value {
+  --o: 1.5px;
+  --w1: rgba(255, 255, 255, 0.55);
+  --w2: rgba(255, 255, 255, 0.3);
+  color: #fff;
+  font-size: 2.6rem;
+  font-weight: 900;
+  line-height: 0.9;
+  text-shadow:
+    0 -0.8em 0 var(--e1),
+    var(--o) -0.8em 0 var(--w1),
+    calc(var(--o) * -1) -0.8em 0 var(--w1),
+    0 calc(-0.8em + var(--o)) 0 var(--w1),
+    0 calc(-0.8em - var(--o)) 0 var(--w1),
+    0 -1.6em 0 var(--e2),
+    var(--o) -1.6em 0 var(--w2),
+    calc(var(--o) * -1) -1.6em 0 var(--w2),
+    0 calc(-1.6em + var(--o)) 0 var(--w2),
+    0 calc(-1.6em - var(--o)) 0 var(--w2);
+}

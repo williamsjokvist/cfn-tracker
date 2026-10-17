@@ -18,7 +18,7 @@ export function SettingButton(props: JSX.IntrinsicElements['button'] & { icon: s
         className
       )}
     >
-      <Icon icon={icon} className='text-icon h-5 w-5' />
+      <Icon icon={icon} className='text-icon h-5 w-5 shrink-0' />
       {children}
     </button>
   )
