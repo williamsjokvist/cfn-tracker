@@ -65,48 +65,63 @@ const outputStats = [
   ["mr", "MR", "1604"],
   ["mrGain", "MR Gain", "+12"],
 ];
-const statListHtml = `<dl class="stat-list">${outputStats
-  .map(
-    ([key, title, value]) =>
-      `<div class="stat-item" data-stat="${key}"><dt class="stat-title">${title}</dt><dd class="stat-value">${value}</dd></div>`,
-  )
-  .join("")}</dl>`;
-// Wide themes are scaled down to fit the preview rather than cut off. The list is measured
-// again whenever it resizes, since fonts loading in and the language picker both change it.
-const fitScript = `<script>
+const statListHtml = (stats: string[][]) =>
+  `<dl class="stat-list">${stats
+    .map(
+      ([key, title, value]) =>
+        `<div class="stat-item" data-stat="${key}"><dt class="stat-title">${title}</dt><dd class="stat-value">${value}</dd></div>`,
+    )
+    .join("")}</dl>`;
+// Each theme is scaled to fill its preview, down for wide themes rather than cutting them off and
+// up to maxScale for small ones, then centred. Lists that stretch to the page are shrunk to their
+// content first, so there's something to centre. The list is measured again whenever it resizes,
+// since fonts loading in and the language picker both change it.
+const fitScript = (maxScale: number) => `<script>
 const list = document.querySelector(".stat-list");
+list.style.width = "max-content";
+list.style.transformOrigin = "top left";
 new ResizeObserver(() => {
+  list.style.transform = "";
   const style = getComputedStyle(list);
+  const rect = list.getBoundingClientRect();
   const width = list.offsetWidth + parseFloat(style.marginLeft) + parseFloat(style.marginRight);
   const height = list.offsetHeight + parseFloat(style.marginTop) + parseFloat(style.marginBottom);
-  const scale = Math.min(1, (innerWidth - 48) / width, (innerHeight - 48) / height);
-  list.style.transformOrigin = "top left";
-  list.style.transform = scale < 1 ? \`scale(\${scale})\` : "";
+  const pad = parseFloat(getComputedStyle(document.body).paddingLeft) * 2;
+  const scale = Math.min(${maxScale}, (innerWidth - pad) / width, (innerHeight - pad) / height);
+  const x = (innerWidth - list.offsetWidth * scale) / 2 - rect.left;
+  const y = (innerHeight - list.offsetHeight * scale) / 2 - rect.top;
+  list.style.transform = \`translate(\${x}px, \${y}px) scale(\${scale})\`;
 }).observe(list);
 <\/script>`;
+const themeDoc = (css: string, padding: number, body: string) =>
+  `<!doctype html><html><head><style>*{margin:0}body{padding:${padding}px;overflow:hidden}</style><style>${css}</style></head><body>${body}</body></html>`;
+// The tiles show a single stat so each theme's look stays legible at thumbnail size
+const tileStat = outputStats.find(([key]) => key === "mr")!;
+// Grouped by layout, side-by-side themes before the ones that stack their stats in rows
 const themes = [
   { id: "chips", name: "Chips", css: chipsTheme },
   { id: "velvet", name: "Velvet", css: velvetTheme },
-  { id: "vapor", name: "Vapor", css: vaporTheme },
-  { id: "zebra", name: "Zebra", css: zebraTheme },
   { id: "most-wanted-strip", name: "Most Wanted", css: mostWantedStripTheme },
-  { id: "pivot", name: "Pivot", css: pivotTheme },
   { id: "flash-portal", name: "Flash Portal", css: flashPortalTheme },
   { id: "ultra", name: "Ultra", css: ultraTheme },
   { id: "prowess", name: "Prowess", css: prowessTheme },
-  { id: "webcore", name: "Webcore", css: webcoreTheme },
-  { id: "top-8", name: "Top 8", css: top8Theme },
-  { id: "terminal", name: "Terminal", css: terminalTheme },
   { id: "banner", name: "Banner", css: bannerTheme },
   { id: "link", name: "Link", css: linkTheme },
+  { id: "ticker", name: "Ticker", css: tickerTheme },
+  { id: "sticker", name: "Sticker", css: stickerTheme },
+  { id: "top-8", name: "Top 8", css: top8Theme },
+  { id: "vapor", name: "Vapor", css: vaporTheme },
+  { id: "zebra", name: "Zebra", css: zebraTheme },
+  { id: "pivot", name: "Pivot", css: pivotTheme },
+  { id: "webcore", name: "Webcore", css: webcoreTheme },
+  { id: "terminal", name: "Terminal", css: terminalTheme },
   { id: "blackout", name: "Blackout", css: blackoutTheme },
   { id: "crimson", name: "Crimson", css: crimsonTheme },
   { id: "comic", name: "Comic", css: comicTheme },
-  { id: "ticker", name: "Ticker", css: tickerTheme },
-  { id: "sticker", name: "Sticker", css: stickerTheme },
 ].map((theme) => ({
   ...theme,
-  srcdoc: `<!doctype html><html><head><style>*{margin:0}body{padding:24px;overflow:hidden}</style><style>${theme.css}</style></head><body>${statListHtml}${fitScript}</body></html>`,
+  srcdoc: themeDoc(theme.css, 24, statListHtml(outputStats) + fitScript(1.5)),
+  tileSrcdoc: themeDoc(theme.css, 8, statListHtml([tileStat]) + fitScript(2.5)),
 }));
 const browserSourceQuery = outputStats.map(([key]) => `&${key}=true`).join("");
 
@@ -139,7 +154,7 @@ const defaultLanguage = languages.find((l) => l.code === "en-GB")!;
   document.addEventListener("astro:page-load", () => {
     const themePicker = document.getElementById("theme-picker");
     const themeButtons = [...(themePicker?.querySelectorAll<HTMLButtonElement>("button[data-theme]") ?? [])];
-    const previews = document.querySelectorAll<HTMLIFrameElement>("#theme-previews iframe");
+    const previews = document.querySelectorAll<HTMLIFrameElement>("#theme-stage iframe");
 
     const showTheme = (theme: string) => {
       for (const b of themeButtons) b.setAttribute("aria-pressed", String(b.dataset.theme === theme));
@@ -148,8 +163,8 @@ const defaultLanguage = languages.find((l) => l.code === "en-GB")!;
       if (url) url.textContent = theme;
     };
 
-    // Cycles through the themes like a slideshow until someone picks one themselves. Skipped for
-    // people who prefer reduced motion.
+    // Cycles the big preview through the themes like a slideshow until someone picks one
+    // themselves. Skipped for people who prefer reduced motion.
     let slideshow: ReturnType<typeof setInterval> | undefined;
     if (themeButtons.length > 1 && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       let current = 0;
@@ -172,7 +187,7 @@ const defaultLanguage = languages.find((l) => l.code === "en-GB")!;
       const titles: Record<string, Record<string, string>> = JSON.parse(languageSelect.dataset.titles ?? "{}");
       const toggle = languageSelect.querySelector<HTMLButtonElement>("button[aria-haspopup]")!;
       const list = languageSelect.querySelector("ul")!;
-      const frames = document.querySelectorAll<HTMLIFrameElement>("#theme-previews iframe");
+      const frames = document.querySelectorAll<HTMLIFrameElement>(".browser-source iframe");
       let lang = "en-GB";
 
       const setOpen = (open: boolean) => {
@@ -367,100 +382,6 @@ const defaultLanguage = languages.find((l) => l.code === "en-GB")!;
     <header class="mb-8 max-w-[700px] w-full">
       <h2 class="font-bold text-3xl md:text-5xl">
         <Icon
-          name="clarity:sign-out-solid"
-          class="inline text-[#f85961] w-12 h-12 mr-1"
-        />
-        Stream overlay
-      </h2>
-      <p class="text-lg mt-8">
-        Add your stats to OBS as a browser source. Pick the stats to show,
-        choose one of the built-in themes or <a
-          href="/theme-guide"
-          class="underline">create your own with CSS</a
-        >, and they update live after every match
-      </p>
-    </header>
-    <div class="tracker-container w-full md:w-auto overflow-auto md:overflow-visible">
-      <figure class="browser-source">
-        <figcaption class="flex items-center gap-2 px-4 py-2 text-sm whitespace-nowrap overflow-hidden">
-          <Icon name="mdi:broadcast" class="w-5 h-5 shrink-0 text-[#f85961]" />
-          <span class="truncate">
-            http://localhost:4242?theme=<b id="browser-source-theme">{themes[0].id}</b>&lang=<b id="browser-source-lang">{defaultLanguage.code}</b>{browserSourceQuery}
-          </span>
-        </figcaption>
-        <div id="theme-previews">
-          {
-            themes.map((theme, i) => (
-              <iframe
-                data-theme={theme.id}
-                title={`${theme.name} browser source theme`}
-                srcdoc={theme.srcdoc}
-                class:list={[{ active: i === 0 }]}
-                loading="lazy"
-                tabindex="-1"
-              />
-            ))
-          }
-        </div>
-        <div class="flex items-start gap-2 px-4 py-3">
-        <div id="theme-picker" class="flex flex-1 flex-wrap gap-2" role="group" aria-label="Theme">
-          {
-            themes.map((theme, i) => (
-              <button
-                type="button"
-                data-theme={theme.id}
-                aria-pressed={String(i === 0)}
-                class="theme-button rounded-full px-4 py-1 text-sm"
-              >
-                {theme.name}
-              </button>
-            ))
-          }
-        </div>
-        <div id="language-select" class="relative shrink-0" data-titles={JSON.stringify(Object.fromEntries(languages.map((l) => [l.code, l.titles])))}>
-          <button
-            type="button"
-            aria-haspopup="listbox"
-            aria-expanded="false"
-            aria-label="Language"
-            class="theme-button flex items-center gap-1 rounded-full px-3 py-1 text-sm"
-          >
-            <span class="flag" set:html={defaultLanguage.flag} />
-            <Icon name="mdi:chevron-down" class="w-4 h-4" />
-          </button>
-          <ul
-            role="listbox"
-            aria-label="Language"
-            hidden
-            class="language-list absolute bottom-full right-0 mb-2 max-h-[300px] overflow-y-auto rounded-xl py-1 text-sm"
-          >
-            {
-              languages.map((l) => (
-                <li>
-                  <button
-                    type="button"
-                    role="option"
-                    data-lang={l.code}
-                    aria-selected={String(l === defaultLanguage)}
-                    class="flex w-full items-center gap-2 px-3 py-1 text-left whitespace-nowrap"
-                  >
-                    <span class="flag" set:html={l.flag} />
-                    {l.name}
-                  </button>
-                </li>
-              ))
-            }
-          </ul>
-        </div>
-        </div>
-      </figure>
-    </div>
-  </section>
-
-  <section class="flex flex-wrap items-center justify-around">
-    <header class="mb-8 max-w-[700px] w-full">
-      <h2 class="font-bold text-3xl md:text-5xl">
-        <Icon
           name="mdi:file-export"
           class="inline text-[#f85961] w-12 h-12 mr-1"
         />
@@ -500,6 +421,95 @@ const defaultLanguage = languages.find((l) => l.code === "en-GB")!;
             }
           </tbody>
         </table>
+      </figure>
+    </div>
+  </section>
+
+  <section class="flex flex-wrap items-center justify-around">
+    <header class="mb-8 max-w-[700px] w-full">
+      <h2 class="font-bold text-3xl md:text-5xl">
+        <Icon
+          name="clarity:sign-out-solid"
+          class="inline text-[#f85961] w-12 h-12 mr-1"
+        />
+        Stream overlay
+      </h2>
+      <p class="text-lg mt-8">
+        Add your stats to OBS as a browser source. Pick the stats to show,
+        choose one of the built-in themes or <a
+          href="/theme-guide"
+          class="underline">create your own with CSS</a
+        >, and they update live after every match
+      </p>
+    </header>
+    <div class="tracker-container w-full md:w-auto overflow-auto md:overflow-visible">
+      <figure class="browser-source">
+        <figcaption class="flex items-center gap-2 px-4 py-2 text-sm whitespace-nowrap">
+          <Icon name="mdi:broadcast" class="w-5 h-5 shrink-0 text-[#f85961]" />
+          <span class="truncate flex-1 min-w-0">
+            http://localhost:4242?theme=<b id="browser-source-theme">{themes[0].id}</b>&lang=<b id="browser-source-lang">{defaultLanguage.code}</b>{browserSourceQuery}
+          </span>
+        <div id="language-select" class="relative shrink-0" data-titles={JSON.stringify(Object.fromEntries(languages.map((l) => [l.code, l.titles])))}>
+          <button
+            type="button"
+            aria-haspopup="listbox"
+            aria-expanded="false"
+            aria-label="Language"
+            class="theme-button flex items-center gap-1 rounded-full px-3 py-1 text-sm"
+          >
+            <span class="flag" set:html={defaultLanguage.flag} />
+            <Icon name="mdi:chevron-down" class="w-4 h-4" />
+          </button>
+          <ul
+            role="listbox"
+            aria-label="Language"
+            hidden
+            class="language-list absolute top-full right-0 z-10 mt-2 max-h-[300px] overflow-y-auto rounded-xl py-1 text-sm"
+          >
+            {
+              languages.map((l) => (
+                <li>
+                  <button
+                    type="button"
+                    role="option"
+                    data-lang={l.code}
+                    aria-selected={String(l === defaultLanguage)}
+                    class="flex w-full items-center gap-2 px-3 py-1 text-left whitespace-nowrap"
+                  >
+                    <span class="flag" set:html={l.flag} />
+                    {l.name}
+                  </button>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+        </figcaption>
+        <div id="theme-stage">
+          {
+            themes.map((theme, i) => (
+              <iframe
+                data-theme={theme.id}
+                title={`${theme.name} browser source theme`}
+                srcdoc={theme.srcdoc}
+                class:list={[{ active: i === 0 }]}
+                loading="lazy"
+                tabindex="-1"
+              />
+            ))
+          }
+        </div>
+        <div id="theme-picker" role="group" aria-label="Theme">
+          {
+            themes.map((theme, i) => (
+              <button type="button" data-theme={theme.id} aria-pressed={String(i === 0)} class="theme-tile">
+                <iframe title="" srcdoc={theme.tileSrcdoc} loading="lazy" tabindex="-1" aria-hidden="true" />
+                <span class="block px-1 pt-1.5 text-sm">{theme.name}</span>
+              </button>
+            ))
+          }
+          <span class="theme-more">and more</span>
+        </div>
       </figure>
     </div>
   </section>
@@ -576,24 +586,71 @@ const defaultLanguage = languages.find((l) => l.code === "en-GB")!;
       color: #f85961
       font-weight: 700
 
-  // The previews are stacked so the slideshow can crossfade between them
-  #theme-previews
+  // Wide enough to drop below its header, so all the themes fit side by side
+  .browser-source
+    width: min(1100px, 100vw - 2rem)
+
+  // The big previews are stacked so the slideshow can crossfade between them
+  #theme-stage
     position: relative
-    height: 380px
+    aspect-ratio: 2 / 1
+    max-height: 380px
+    width: 100%
     background: #2e3440
 
-  .browser-source iframe
-    position: absolute
-    inset: 0
-    display: block
-    width: 100%
-    height: 100%
-    border: 0
-    opacity: 0
-    transition: opacity .6s ease
+    iframe
+      position: absolute
+      inset: 0
+      width: 100%
+      height: 100%
+      opacity: 0
+      transition: opacity .6s ease
 
-    &.active
-      opacity: 1
+      &.active
+        opacity: 1
+
+  .browser-source iframe
+    display: block
+    border: 0
+
+  #theme-picker
+    display: grid
+    grid-template-columns: repeat(2, 1fr)
+    gap: 8px
+    padding: 8px
+
+    @media (min-width: 768px)
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr))
+      gap: 12px
+      padding: 16px
+
+  .theme-tile
+    text-align: left
+    border-radius: 10px
+    padding: 4px
+    transition: background .2s
+
+    &:hover
+      background: rgba(255,255,255,.08)
+
+    &[aria-pressed="true"]
+      background: #f85961
+
+    iframe
+      width: 100%
+      aspect-ratio: 16 / 9
+      border-radius: 6px
+      background: #2e3440
+      pointer-events: none
+
+  // Lines up with the tile previews, leaving room below for where a name would be
+  .theme-more
+    display: flex
+    align-items: center
+    justify-content: center
+    aspect-ratio: 16 / 9
+    margin: 4px
+    color: rgba(255,255,255,.6)
 
   .flag :global(svg)
     display: block
