@@ -86,7 +86,8 @@ body {
   --life: #d81e14, #ee5a22;
 }
 
-/* Gold lettering like the player label. */
+/* Lettered like the player labels: your own stats in Player 1's cyan, and losses and the
+   opponent's stats in Player 2's gold. */
 .stat-title {
   grid-column: 2;
   grid-row: 1;
@@ -96,10 +97,14 @@ body {
   font-weight: 900;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  background: linear-gradient(to bottom, #fffbe0, #f6d77a 55%, #c98f2a);
+  background: linear-gradient(to bottom, #ffffff, #c9f5f0 50%, #52bfb9);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+}
+
+.stat-item:is([data-stat="losses"], [data-stat^="opponent"]) .stat-title {
+  background-image: linear-gradient(to bottom, #fffbe0, #f6d77a 55%, #c98f2a);
 }
 
 /* The timer: a dark glassy box with a chrome rim and a red glow inside, the number cream with a
