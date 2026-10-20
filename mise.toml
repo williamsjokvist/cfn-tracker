@@ -2,3 +2,7 @@ monorepo_root = true
 
 [monorepo]
 config_roots = ["app", "web"]
+
+[tasks.dev]
+description = "Run the app and website dev servers together"
+depends = ["//app:dev", "//web:dev"]
