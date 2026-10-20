@@ -1,0 +1,79 @@
+@import url("https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&display=swap");
+
+/* The dim blue haze of a night stage behind the HUD. Fixed to the viewport, so it covers the whole
+   source once instead of repeating every time the stats end. */
+body {
+  background: radial-gradient(ellipse at 50% 0, #34425f, #0e131e 70%) fixed;
+}
+
+.stat-list {
+  display: inline-grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 28px;
+  padding: 12px 20px;
+  font-family: "Barlow Condensed", "Arial Narrow", sans-serif;
+  white-space: nowrap;
+}
+
+/* Each stat colours its value like one of the HUD's gauges: the golden health bar by default, the
+   red of low health for losses and the opponent, the blue Heat gauge for rank, and the purple of
+   Rage for a win streak. */
+.stat-item {
+  --hi: #fff6d2;
+  --mid: #ffc247;
+  --lo: #d9520c;
+  --glow: rgba(255, 150, 40, 0.7);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-item:is([data-stat="losses"], [data-stat^="opponent"]) {
+  --hi: #ffe3de;
+  --mid: #ff5b48;
+  --lo: #9e101b;
+  --glow: rgba(255, 50, 40, 0.7);
+}
+
+.stat-item:is([data-stat^="mr"], [data-stat^="lp"]) {
+  --hi: #eef3ff;
+  --mid: #8eaeff;
+  --lo: #3549d4;
+  --glow: rgba(90, 130, 255, 0.75);
+}
+
+.stat-item[data-stat="winStreak"] {
+  --hi: #f7eaff;
+  --mid: #c48bff;
+  --lo: #6524cc;
+  --glow: rgba(170, 90, 255, 0.75);
+}
+
+/* Lettered like "TEKKEN PROWESS" over the health bar. */
+.stat-title {
+  color: #ffffff;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  text-shadow: 0 1px 2px #000000, 0 0 6px rgba(0, 0, 0, 0.6);
+}
+
+/* The value is the round timer: tall numerals standing on their own, with a chrome rim, filled
+   with the stat's gauge colour and glowing in it. The dark outline keeps them readable over
+   whatever is behind the source. */
+.stat-value {
+  background: linear-gradient(to bottom, var(--hi) 12%, var(--mid) 50%, var(--lo) 90%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(255, 246, 236, 0.85);
+  font-size: 3.4rem;
+  font-weight: 800;
+  line-height: 1;
+  filter:
+    drop-shadow(0 0 1px rgba(0, 0, 0, 0.95))
+    drop-shadow(0 1px 1px rgba(0, 0, 0, 0.8))
+    drop-shadow(0 0 8px var(--glow));
+}

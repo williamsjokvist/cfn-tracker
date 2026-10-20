@@ -4,8 +4,6 @@ import MockTracker from "./MockTracker.astro";
 import * as flagSvgs from "country-flag-icons/string/3x2";
 
 import terminalTheme from "../../../app/pkg/server/static/themes/terminal.css?raw";
-import decoTheme from "../../../app/pkg/server/static/themes/deco.css?raw";
-import notebookTheme from "../../../app/pkg/server/static/themes/notebook.css?raw";
 import comicTheme from "../../../app/pkg/server/static/themes/comic.css?raw";
 import tickerTheme from "../../../app/pkg/server/static/themes/ticker.css?raw";
 import stickerTheme from "../../../app/pkg/server/static/themes/sticker.css?raw";
@@ -15,7 +13,6 @@ import bannerTheme from "../../../app/pkg/server/static/themes/banner.css?raw";
 import flashPortalTheme from "../../../app/pkg/server/static/themes/flash-portal.css?raw";
 import linkTheme from "../../../app/pkg/server/static/themes/link.css?raw";
 import blackoutTheme from "../../../app/pkg/server/static/themes/blackout.css?raw";
-import silverTheme from "../../../app/pkg/server/static/themes/silver.css?raw";
 import zebraTheme from "../../../app/pkg/server/static/themes/zebra.css?raw";
 import crimsonTheme from "../../../app/pkg/server/static/themes/crimson.css?raw";
 import webcoreTheme from "../../../app/pkg/server/static/themes/webcore.css?raw";
@@ -24,6 +21,7 @@ import pivotTheme from "../../../app/pkg/server/static/themes/pivot.css?raw";
 import velvetTheme from "../../../app/pkg/server/static/themes/velvet.css?raw";
 import vaporTheme from "../../../app/pkg/server/static/themes/vapor.css?raw";
 import ultraTheme from "../../../app/pkg/server/static/themes/ultra.css?raw";
+import prowessTheme from "../../../app/pkg/server/static/themes/prowess.css?raw";
 
 const mrHistory = [1482, 1501, 1494, 1530, 1521, 1548, 1539, 1566, 1581, 1573, 1592, 1604];
 const chart = { width: 560, height: 80, pad: 6 };
@@ -87,8 +85,6 @@ new ResizeObserver(() => {
 }).observe(list);
 <\/script>`;
 const themes = [
-  { id: "ticker", name: "Ticker", css: tickerTheme },
-  { id: "sticker", name: "Sticker", css: stickerTheme },
   { id: "chips", name: "Chips", css: chipsTheme },
   { id: "velvet", name: "Velvet", css: velvetTheme },
   { id: "vapor", name: "Vapor", css: vaporTheme },
@@ -97,17 +93,17 @@ const themes = [
   { id: "pivot", name: "Pivot", css: pivotTheme },
   { id: "flash-portal", name: "Flash Portal", css: flashPortalTheme },
   { id: "ultra", name: "Ultra", css: ultraTheme },
+  { id: "prowess", name: "Prowess", css: prowessTheme },
+  { id: "webcore", name: "Webcore", css: webcoreTheme },
+  { id: "top-8", name: "Top 8", css: top8Theme },
   { id: "terminal", name: "Terminal", css: terminalTheme },
-  { id: "deco", name: "Art Deco", css: decoTheme },
-  { id: "notebook", name: "Notebook", css: notebookTheme },
   { id: "banner", name: "Banner", css: bannerTheme },
   { id: "link", name: "Link", css: linkTheme },
   { id: "blackout", name: "Blackout", css: blackoutTheme },
-  { id: "silver", name: "Silver", css: silverTheme },
-  { id: "top-8", name: "Top 8", css: top8Theme },
   { id: "crimson", name: "Crimson", css: crimsonTheme },
-  { id: "webcore", name: "Webcore", css: webcoreTheme },
   { id: "comic", name: "Comic", css: comicTheme },
+  { id: "ticker", name: "Ticker", css: tickerTheme },
+  { id: "sticker", name: "Sticker", css: stickerTheme },
 ].map((theme) => ({
   ...theme,
   srcdoc: `<!doctype html><html><head><style>*{margin:0}body{padding:24px;overflow:hidden}</style><style>${theme.css}</style></head><body>${statListHtml}${fitScript}</body></html>`,

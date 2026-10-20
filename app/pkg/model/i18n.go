@@ -123,6 +123,7 @@ type Localization struct {
 	BrowserSourceThemeCrimson         string `json:"browserSourceThemeCrimson"`
 	BrowserSourceThemeWebcore         string `json:"browserSourceThemeWebcore"`
 	BrowserSourceThemeUltra           string `json:"browserSourceThemeUltra"`
+	BrowserSourceThemeProwess         string `json:"browserSourceThemeProwess"`
 	CreateYourOwnTheme                string `json:"createYourOwnTheme"`
 	UserId                            string `json:"userId"`
 	UserName                          string `json:"userName"`
