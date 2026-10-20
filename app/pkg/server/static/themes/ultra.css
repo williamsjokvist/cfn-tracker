@@ -1,0 +1,72 @@
+@import url("https://fonts.googleapis.com/css2?family=Rubik:wght@700;900&display=swap");
+
+/* The grey tiles of a training stage. */
+body {
+  background:
+    linear-gradient(rgba(40, 30, 25, 0.35) 1px, transparent 1px) 0 0 / 56px 56px,
+    linear-gradient(90deg, rgba(40, 30, 25, 0.35) 1px, transparent 1px) 0 0 / 56px 56px,
+    #8e8880;
+}
+
+.stat-list {
+  display: inline-grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 12px;
+  padding: 10px;
+  font-family: "Rubik", "Arial Black", sans-serif;
+  white-space: nowrap;
+}
+
+/* Each stat is a timer box with its name above it, the way "K.O." sits over the timer. The cards
+   sit side by side in equal columns, so they're all as wide as the widest. The drop shadow gives
+   the box and the text one shared dark outline. */
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  filter: drop-shadow(0 0 1px #1a0d0a) drop-shadow(0 2px 2px rgba(0, 0, 0, 0.45));
+}
+
+/* Lettered like the player labels: your own stats in Player 1's cyan, and losses and the
+   opponent's stats in Player 2's gold. */
+.stat-title {
+  align-self: center;
+  padding-bottom: 3px;
+  font-size: 1.05rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: linear-gradient(to bottom, #ffffff, #c9f5f0 50%, #52bfb9);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.stat-item:is([data-stat="losses"], [data-stat^="opponent"]) .stat-title {
+  background-image: linear-gradient(to bottom, #fffbe0, #f6d77a 55%, #c98f2a);
+}
+
+/* The timer: a dark glassy box with a chrome rim and a red glow inside, the number cream with a
+   red halo. */
+.stat-value {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 64px;
+  padding: 8px 14px 6px;
+  border: 2px solid #b9aca6;
+  border-radius: 10px;
+  background: linear-gradient(to bottom, rgba(110, 70, 66, 0.92), rgba(48, 24, 22, 0.94));
+  box-shadow:
+    inset 0 0 0 2px #c4241a,
+    inset 0 0 14px rgba(255, 70, 40, 0.65);
+  color: #fff4d8;
+  font-size: 2.3rem;
+  font-weight: 900;
+  line-height: 1;
+  text-shadow:
+    0 0 2px #e0281a,
+    0 0 6px #ff3b22,
+    0 0 14px rgba(255, 60, 30, 0.7);
+}

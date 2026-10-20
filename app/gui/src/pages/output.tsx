@@ -62,6 +62,7 @@ const themeLabels: Record<string, LocalizationKey> = {
   'text-only': 'browserSourceThemeTextOnly',
   ticker: 'browserSourceThemeTicker',
   'top-8': 'browserSourceThemeTop8',
+  ultra: 'browserSourceThemeUltra',
   vapor: 'browserSourceThemeVapor',
   velvet: 'browserSourceThemeVelvet',
   versus: 'browserSourceThemeVersus',
@@ -80,6 +81,7 @@ const sideBySideThemes = new Set([
   'sticker',
   'ticker',
   'top-8',
+  'ultra',
   'velvet'
 ])
 
