@@ -97,26 +97,27 @@ const themeDoc = (css: string, padding: number, body: string) =>
   `<!doctype html><html><head><style>*{margin:0}body{padding:${padding}px;overflow:hidden}</style><style>${css}</style></head><body>${body}</body></html>`;
 // The tiles show a single stat so each theme's look stays legible at thumbnail size
 const tileStat = outputStats.find(([key]) => key === "mr")!;
+// Grouped by layout, side-by-side themes before the ones that stack their stats in rows
 const themes = [
   { id: "chips", name: "Chips", css: chipsTheme },
   { id: "velvet", name: "Velvet", css: velvetTheme },
-  { id: "vapor", name: "Vapor", css: vaporTheme },
-  { id: "zebra", name: "Zebra", css: zebraTheme },
   { id: "most-wanted-strip", name: "Most Wanted", css: mostWantedStripTheme },
-  { id: "pivot", name: "Pivot", css: pivotTheme },
   { id: "flash-portal", name: "Flash Portal", css: flashPortalTheme },
   { id: "ultra", name: "Ultra", css: ultraTheme },
   { id: "prowess", name: "Prowess", css: prowessTheme },
-  { id: "webcore", name: "Webcore", css: webcoreTheme },
   { id: "top-8", name: "Top 8", css: top8Theme },
-  { id: "terminal", name: "Terminal", css: terminalTheme },
   { id: "banner", name: "Banner", css: bannerTheme },
   { id: "link", name: "Link", css: linkTheme },
+  { id: "ticker", name: "Ticker", css: tickerTheme },
+  { id: "sticker", name: "Sticker", css: stickerTheme },
+  { id: "vapor", name: "Vapor", css: vaporTheme },
+  { id: "zebra", name: "Zebra", css: zebraTheme },
+  { id: "pivot", name: "Pivot", css: pivotTheme },
+  { id: "webcore", name: "Webcore", css: webcoreTheme },
+  { id: "terminal", name: "Terminal", css: terminalTheme },
   { id: "blackout", name: "Blackout", css: blackoutTheme },
   { id: "crimson", name: "Crimson", css: crimsonTheme },
   { id: "comic", name: "Comic", css: comicTheme },
-  { id: "ticker", name: "Ticker", css: tickerTheme },
-  { id: "sticker", name: "Sticker", css: stickerTheme },
 ].map((theme) => ({
   ...theme,
   srcdoc: themeDoc(theme.css, 24, statListHtml(outputStats) + fitScript(1.5)),
