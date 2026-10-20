@@ -30,43 +30,60 @@ body {
   filter: drop-shadow(0 0 1px #1a0d0a) drop-shadow(0 2px 2px rgba(0, 0, 0, 0.45));
 }
 
-/* The bar is thick at the timer and steps down halfway along, like it's leaning away. The frame
-   and the fill share the step, the fill drawn 3px in from the frame so the gold shows round it. */
+/* The bar is thick at the timer and curves down to thinner halfway along, like it's leaning away.
+   The frame and the fill share the curve, the fill drawn 3px in from the frame so it shows round
+   it as a pale rim. The last points round off the bar's far top corner, which the clip would
+   otherwise leave square. */
 .stat-item::before,
 .stat-item::after {
   content: "";
   grid-column: 2;
   grid-row: 2;
-  clip-path: polygon(0 0, 50% 0, calc(50% + 40px) 6px, 100% 6px, 100% 100%, 0 100%);
+  clip-path: polygon(
+    0 0,
+    40% 0,
+    44% 0.5px,
+    48% 2px,
+    52% 4px,
+    56% 5.5px,
+    60% 6px,
+    calc(100% - 4px) 6px,
+    calc(100% - 1px) 7px,
+    100% 10px,
+    100% 100%,
+    0 100%
+  );
 }
 
 .stat-item::before {
-  border-radius: 0 4px 4px 0;
-  background: linear-gradient(to bottom, #fff3a8, #d6a73c 50%, #f3d877);
+  border-radius: 0 6px 6px 0;
+  background: linear-gradient(to bottom, #f6f2e6, #cfc7b4 50%, #efe9da);
 }
 
-/* Red health, then the orange pinstripes of damage that hasn't drained yet, then the empty bar.
-   Each row stops at its own point so they don't look copied. */
+/* The life runs from the timer, pinstriped all the way along. A full bar is plain yellow, and the
+   less there is the more it runs from red at the timer through orange. Each row is at its own
+   point so they don't look copied. */
 .stat-item::after {
-  --hp: 55%;
-  --dmg: 72%;
+  --hp: 100%;
+  --life: #f4e33c, #f4e33c;
   margin: 3px;
-  border-radius: 0 2px 2px 0;
+  border-radius: 0 4px 4px 0;
+  box-shadow: inset 0 0 0 1px rgba(60, 30, 10, 0.55);
   background:
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.3), transparent 45%, rgba(0, 0, 0, 0.15)),
-    linear-gradient(to bottom, #ff6a48, #d81e10 55%, #ee3a22) 0 0 / var(--hp) 100% no-repeat,
-    repeating-linear-gradient(to bottom, #ffb23a 0 1px, #f0601e 1px 3px) 0 0 / var(--dmg) 100% no-repeat,
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.28), transparent 45%, rgba(0, 0, 0, 0.12)),
+    repeating-linear-gradient(to bottom, rgba(120, 40, 0, 0.3) 0 1px, transparent 1px 3px) 0 0 / var(--hp) 100% no-repeat,
+    linear-gradient(90deg, var(--life)) 0 0 / var(--hp) 100% no-repeat,
     linear-gradient(to bottom, #4a2e2a, #2c1a18);
 }
 
 .stat-item:nth-child(3n + 2)::after {
-  --hp: 78%;
-  --dmg: 86%;
+  --hp: 72%;
+  --life: #e2261c, #f07a26 50%, #f4d43a;
 }
 
 .stat-item:nth-child(3n + 3)::after {
   --hp: 34%;
-  --dmg: 58%;
+  --life: #d81e14, #ee5a22;
 }
 
 /* Gold lettering like the player label. */
