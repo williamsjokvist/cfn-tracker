@@ -209,6 +209,7 @@ export namespace model {
 	    browserSourceThemeCrimson: string;
 	    browserSourceThemeWebcore: string;
 	    browserSourceThemeUltra: string;
+	    browserSourceThemeProwess: string;
 	    createYourOwnTheme: string;
 	    userId: string;
 	    userName: string;

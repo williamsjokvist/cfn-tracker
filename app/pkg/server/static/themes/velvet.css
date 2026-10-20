@@ -5,7 +5,6 @@ body {
 }
 
 .stat-list {
-  position: relative;
   display: inline-flex;
   margin: 6px;
   overflow: hidden;
@@ -13,18 +12,7 @@ body {
   white-space: nowrap;
 }
 
-/* Violet light pooling at the far end of the strip. */
-.stat-list::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: radial-gradient(ellipse at 100% 30%, rgba(170, 110, 255, 0.3), transparent 55%);
-}
-
-/* Each stat is a band, stepping lighter and more violet along the strip. */
 .stat-item {
-  --band: #2e1534;
   --specks:
     radial-gradient(circle at 78% 22%, rgba(255, 130, 230, 0.8) 0 2px, transparent 3.5px),
     radial-gradient(circle at 34% 12%, rgba(255, 130, 230, 0.5) 0 1.5px, transparent 3px);
@@ -36,13 +24,9 @@ body {
   gap: 4px;
   min-width: 96px;
   padding: 12px 18px;
-  background:
-    linear-gradient(to bottom, transparent 45%, rgba(210, 60, 170, 0.22)),
-    linear-gradient(90deg, rgba(0, 0, 0, 0.18), transparent 12%),
-    var(--band);
 }
 
-/* The out-of-focus specks float on their own layer behind the text, each band to its own beat. */
+/* The out-of-focus specks float on their own layer behind the text, each stat to its own beat. */
 .stat-item::before {
   content: "";
   position: absolute;
@@ -65,13 +49,11 @@ body {
 
 .stat-item:nth-child(5n + 2) {
   --drift: 9s;
-  --band: #3a1a44;
   --specks: radial-gradient(circle at 70% 38%, rgba(255, 130, 230, 0.6) 0 1.5px, transparent 3px);
 }
 
 .stat-item:nth-child(5n + 3) {
   --drift: 6s;
-  --band: #482056;
   --specks:
     radial-gradient(circle at 86% 50%, rgba(255, 130, 230, 0.9) 0 3px, rgba(255, 130, 230, 0.25) 4px, transparent 7px),
     radial-gradient(circle at 20% 14%, rgba(255, 130, 230, 0.6) 0 1.5px, transparent 3px);
@@ -79,13 +61,11 @@ body {
 
 .stat-item:nth-child(5n + 4) {
   --drift: 8s;
-  --band: #58296c;
   --specks: radial-gradient(circle at 60% 18%, rgba(220, 180, 255, 0.85) 0 2px, transparent 3.5px);
 }
 
 .stat-item:nth-child(5n + 5) {
   --drift: 10s;
-  --band: #683486;
   --specks: radial-gradient(circle at 84% 34%, rgba(255, 130, 230, 0.7) 0 2.5px, transparent 4.5px);
 }
 
