@@ -60,17 +60,18 @@ const csvRows = [
 ];
 
 // The app's own browser source themes, rendered against the same markup it serves to OBS.
+// Each stat's raw value, then how the overlay displays it
 const outputStats = [
-  ["wins", "Wins", "4"],
-  ["losses", "Losses", "2"],
-  ["winRate", "Win Rate", "67%"],
-  ["mr", "MR", "1604"],
-  ["mrGain", "MR Gain", "+12"],
-];
+  ["wins", "Wins", 4, "4"],
+  ["losses", "Losses", 2, "2"],
+  ["winRate", "Win Rate", 67, "67%"],
+  ["mr", "MR", 1604, "1604"],
+  ["mrGain", "MR Gain", 12, "+12"],
+] as const;
 const statListHtml = `<dl class="stat-list">${outputStats
   .map(
-    ([key, title, value]) =>
-      `<div class="stat-item" data-stat="${key}"><dt class="stat-title">${title}</dt><dd class="stat-value">${value}</dd></div>`,
+    ([key, title, raw, value]) =>
+      `<div class="stat-item" data-stat="${key}" data-stat-value="${raw}" style="--stat-value: ${raw}"><dt class="stat-title">${title}</dt><dd class="stat-value">${value}</dd></div>`,
   )
   .join("")}</dl>`;
 // Wide themes are scaled down to fit the preview rather than cut off. The list is measured

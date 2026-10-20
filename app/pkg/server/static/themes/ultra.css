@@ -60,30 +60,35 @@ body {
   background: linear-gradient(to bottom, #f6f2e6, #cfc7b4 50%, #efe9da);
 }
 
-/* The life runs from the timer, pinstriped all the way along. A full bar is plain yellow, and the
-   less there is the more it runs from red at the timer through orange. Each row is at its own
-   point so they don't look copied. */
-.stat-item::after {
+/* How full each bar is. Stats with nothing to measure stay full, the win rate fills to itself, and
+   a lost match or a negative gain shows as a bar that's taken a beating. */
+.stat-item {
   --hp: 100%;
-  --life: #f4e33c, #f4e33c;
+}
+
+.stat-item[data-stat="winRate"] {
+  --hp: calc(var(--stat-value, 100) * 1%);
+}
+
+.stat-item:is([data-stat="victory"][data-stat-value="false"], [data-stat$="Gain"][data-stat-value^="-"]) {
+  --hp: 25%;
+}
+
+/* The life runs from the timer, pinstriped all the way along. A full bar is plain yellow, and the
+   emptier it gets the more it runs from red at the timer through orange. Each stop turns from
+   yellow at its own point, the one at the timer first. */
+.stat-item::after {
+  --red: color-mix(in srgb, #f4e33c clamp(0%, (var(--hp) - 80%) * 5, 100%), #d81e14);
+  --orange: color-mix(in srgb, #f4e33c clamp(0%, (var(--hp) - 50%) * 2, 100%), #f07a26);
+  --tip: color-mix(in srgb, #f4e33c clamp(0%, (var(--hp) - 20%) * 1.25, 100%), #ee5a22);
   margin: 3px;
   border-radius: 4px;
   box-shadow: inset 0 0 0 1px rgba(60, 30, 10, 0.55);
   background:
     linear-gradient(to bottom, rgba(255, 255, 255, 0.28), transparent 45%, rgba(0, 0, 0, 0.12)),
     repeating-linear-gradient(to bottom, rgba(120, 40, 0, 0.3) 0 1px, transparent 1px 3px) 0 0 / var(--hp) 100% no-repeat,
-    linear-gradient(90deg, var(--life)) 0 0 / var(--hp) 100% no-repeat,
+    linear-gradient(90deg, var(--red), var(--orange) 50%, var(--tip)) 0 0 / var(--hp) 100% no-repeat,
     linear-gradient(to bottom, #4a2e2a, #2c1a18);
-}
-
-.stat-item:nth-child(3n + 2)::after {
-  --hp: 72%;
-  --life: #e2261c, #f07a26 50%, #f4d43a;
-}
-
-.stat-item:nth-child(3n + 3)::after {
-  --hp: 34%;
-  --life: #d81e14, #ee5a22;
 }
 
 /* Lettered like the player labels: your own stats in Player 1's cyan, and losses and the

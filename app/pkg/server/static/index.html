@@ -131,6 +131,12 @@
             const el = statElements[stat]
             if (el !== undefined) {
               el.innerHTML = formatValue(stat, value)
+              // Lets themes style a stat by its value, like a bar filled to the win rate
+              const item = el.parentElement
+              item.dataset.statValue = String(value)
+              if (typeof value === "number") {
+                item.style.setProperty("--stat-value", value)
+              }
             }
           }
         })
