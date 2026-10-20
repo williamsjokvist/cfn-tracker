@@ -122,6 +122,7 @@ type Localization struct {
 	BrowserSourceThemeZebra           string `json:"browserSourceThemeZebra"`
 	BrowserSourceThemeCrimson         string `json:"browserSourceThemeCrimson"`
 	BrowserSourceThemeWebcore         string `json:"browserSourceThemeWebcore"`
+	BrowserSourceThemeUltra           string `json:"browserSourceThemeUltra"`
 	CreateYourOwnTheme                string `json:"createYourOwnTheme"`
 	UserId                            string `json:"userId"`
 	UserName                          string `json:"userName"`

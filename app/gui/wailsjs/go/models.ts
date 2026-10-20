@@ -208,6 +208,7 @@ export namespace model {
 	    browserSourceThemeZebra: string;
 	    browserSourceThemeCrimson: string;
 	    browserSourceThemeWebcore: string;
+	    browserSourceThemeUltra: string;
 	    createYourOwnTheme: string;
 	    userId: string;
 	    userName: string;

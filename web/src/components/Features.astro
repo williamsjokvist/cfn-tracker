@@ -23,6 +23,7 @@ import top8Theme from "../../../app/pkg/server/static/themes/top-8.css?raw";
 import pivotTheme from "../../../app/pkg/server/static/themes/pivot.css?raw";
 import velvetTheme from "../../../app/pkg/server/static/themes/velvet.css?raw";
 import vaporTheme from "../../../app/pkg/server/static/themes/vapor.css?raw";
+import ultraTheme from "../../../app/pkg/server/static/themes/ultra.css?raw";
 
 const mrHistory = [1482, 1501, 1494, 1530, 1521, 1548, 1539, 1566, 1581, 1573, 1592, 1604];
 const chart = { width: 560, height: 80, pad: 6 };
@@ -88,6 +89,7 @@ new ResizeObserver(() => {
 const themes = [
   { id: "ticker", name: "Ticker", css: tickerTheme },
   { id: "sticker", name: "Sticker", css: stickerTheme },
+  { id: "ultra", name: "Ultra", css: ultraTheme },
   { id: "chips", name: "Chips", css: chipsTheme },
   { id: "velvet", name: "Velvet", css: velvetTheme },
   { id: "vapor", name: "Vapor", css: vaporTheme },
