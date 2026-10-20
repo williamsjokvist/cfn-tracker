@@ -60,18 +60,17 @@ const csvRows = [
 ];
 
 // The app's own browser source themes, rendered against the same markup it serves to OBS.
-// Each stat's raw value, then how the overlay displays it
 const outputStats = [
-  ["wins", "Wins", 4, "4"],
-  ["losses", "Losses", 2, "2"],
-  ["winRate", "Win Rate", 67, "67%"],
-  ["mr", "MR", 1604, "1604"],
-  ["mrGain", "MR Gain", 12, "+12"],
-] as const;
+  ["wins", "Wins", "4"],
+  ["losses", "Losses", "2"],
+  ["winRate", "Win Rate", "67%"],
+  ["mr", "MR", "1604"],
+  ["mrGain", "MR Gain", "+12"],
+];
 const statListHtml = `<dl class="stat-list">${outputStats
   .map(
-    ([key, title, raw, value]) =>
-      `<div class="stat-item" data-stat="${key}" data-stat-value="${raw}" style="--stat-value: ${raw}"><dt class="stat-title">${title}</dt><dd class="stat-value">${value}</dd></div>`,
+    ([key, title, value]) =>
+      `<div class="stat-item" data-stat="${key}"><dt class="stat-title">${title}</dt><dd class="stat-value">${value}</dd></div>`,
   )
   .join("")}</dl>`;
 // Wide themes are scaled down to fit the preview rather than cut off. The list is measured
@@ -90,7 +89,6 @@ new ResizeObserver(() => {
 const themes = [
   { id: "ticker", name: "Ticker", css: tickerTheme },
   { id: "sticker", name: "Sticker", css: stickerTheme },
-  { id: "ultra", name: "Ultra", css: ultraTheme },
   { id: "chips", name: "Chips", css: chipsTheme },
   { id: "velvet", name: "Velvet", css: velvetTheme },
   { id: "vapor", name: "Vapor", css: vaporTheme },
@@ -98,6 +96,7 @@ const themes = [
   { id: "most-wanted-strip", name: "Most Wanted", css: mostWantedStripTheme },
   { id: "pivot", name: "Pivot", css: pivotTheme },
   { id: "flash-portal", name: "Flash Portal", css: flashPortalTheme },
+  { id: "ultra", name: "Ultra", css: ultraTheme },
   { id: "terminal", name: "Terminal", css: terminalTheme },
   { id: "deco", name: "Art Deco", css: decoTheme },
   { id: "notebook", name: "Notebook", css: notebookTheme },

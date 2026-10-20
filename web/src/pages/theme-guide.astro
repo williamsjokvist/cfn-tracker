@@ -60,12 +60,7 @@ import Layout from "../components/Layout.astro";
         <li>
           <b>.stat-list</b> - the container for all of the stats
         </li>
-        <li>
-          <b>.stat-item</b> - container for each individual stat. Its <b>data-stat</b> attribute says which stat
-          it is, like <b>winRate</b>, and <b>data-stat-value</b> holds the stat's raw value, like <b>67</b>. Number
-          values are also set as the <b>--stat-value</b> custom property, so they can be used in
-          <b>calc()</b>, e.g. <b>width: calc(var(--stat-value) * 1%)</b>
-        </li>
+        <li><b>.stat-item</b> - container for each individual stat</li>
         <li><b>.stat-title</b> - the text that says "Wins", "Losses", Win Rate", "LP Gain" etc</li>
         <li><b>.stat-value</b> - the value of the stat</li>
       </ul>

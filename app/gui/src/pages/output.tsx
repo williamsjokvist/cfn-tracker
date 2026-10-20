@@ -81,6 +81,7 @@ const sideBySideThemes = new Set([
   'sticker',
   'ticker',
   'top-8',
+  'ultra',
   'velvet'
 ])
 
