@@ -14,6 +14,12 @@ type GameTracker interface {
 	Authenticate(ctx context.Context, statusChan chan AuthStatus)
 }
 
+// GameLister is implemented by trackers for platforms with many games, where a
+// session tracks one of them.
+type GameLister interface {
+	GetPlayedGames(ctx context.Context, userId string) ([]model.PlayedGame, error)
+}
+
 type AuthStatus struct {
 	Done   bool
 	Err    error

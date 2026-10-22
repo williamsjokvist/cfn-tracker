@@ -35,6 +35,7 @@ export namespace model {
 	    errUnknown = "errUnknown",
 	}
 	export enum GameType {
+	    FIGHTCADE = "fightcade",
 	    STREET_FIGHTER_6 = "sf6",
 	    TEKKEN_8 = "t8",
 	}
@@ -99,6 +100,7 @@ export namespace model {
 	    startTracking: string;
 	    cfnName: string;
 	    tekkenId: string;
+	    fightcadeName: string;
 	    start: string;
 	    opponent: string;
 	    character: string;
@@ -113,6 +115,9 @@ export namespace model {
 	    files: string;
 	    enterCfnName: string;
 	    enterTekkenId: string;
+	    enterFightcadeName: string;
+	    pickFightcadeGame: string;
+	    noPlayedGames: string;
 	    comparisonMetric: string;
 	    comparisonTopAvg: string;
 	    comparisonCheckingLogin: string;
@@ -161,6 +166,8 @@ export namespace model {
 	    stopComparisonDescription: string;
 	    follow: string;
 	    continueStep: string;
+	    continueWithGame: string;
+	    otherGames: string;
 	    placement: string;
 	    cfnError: string;
 	    output: string;
@@ -320,6 +327,8 @@ export namespace model {
 	    authRestartingBrowser: string;
 	    authVerifyingLogin: string;
 	    authInterrupted: string;
+	    authOpeningFightcade: string;
+	    authFightcadeCheck: string;
 	    errAuthManualLoginFailed: string;
 	    saveData: string;
 	    changeFolder: string;
@@ -341,6 +350,7 @@ export namespace model {
 	    userId: string;
 	    userName: string;
 	    sessionId: number;
+	    gameId: string;
 	    replayId: string;
 	    character: string;
 	    lp: number;
@@ -359,6 +369,12 @@ export namespace model {
 	    wins: number;
 	    losses: number;
 	    winRate: number;
+	}
+	export interface PlayedGame {
+	    id: string;
+	    name: string;
+	    matches: number;
+	    rank: string;
 	}
 	export interface SF6BattleStatsMetric {
 	    key: string;
@@ -384,6 +400,7 @@ export namespace model {
 	    id: number;
 	    userId: string;
 	    userName: string;
+	    gameId: string;
 	    createdAt: string;
 	    lp: number;
 	    mr: number;

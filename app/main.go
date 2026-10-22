@@ -38,6 +38,7 @@ import (
 	cfgDb "github.com/williamsjokvist/cfn-tracker/pkg/storage/config"
 	"github.com/williamsjokvist/cfn-tracker/pkg/storage/sql"
 	"github.com/williamsjokvist/cfn-tracker/pkg/storage/txt"
+	"github.com/williamsjokvist/cfn-tracker/pkg/tracker/fightcade/fcapi"
 	"github.com/williamsjokvist/cfn-tracker/pkg/tracker/sf6/cfn"
 	"github.com/williamsjokvist/cfn-tracker/pkg/tracker/t8/wavu"
 	"github.com/williamsjokvist/cfn-tracker/pkg/update/github"
@@ -55,6 +56,8 @@ var wailsJson []byte
 var cfg config.BuildConfig
 
 var appBrowser *browser.Browser
+
+var fcClient *fcapi.Client
 
 type WailsJson struct {
 	Info WailsJsonInfo `json:"info"`
@@ -76,6 +79,11 @@ func init() {
 func closeBrowser() {
 	if err := appBrowser.Page.Browser().Close(); err != nil {
 		slog.Warn("close browser", slog.Any("error", err))
+	}
+	if fcClient != nil {
+		if err := fcClient.Close(); err != nil {
+			slog.Warn("close fightcade window", slog.Any("error", err))
+		}
 	}
 }
 
@@ -194,9 +202,11 @@ func main() {
 	)
 
 	cfnClient := cfn.NewClient(appBrowser)
+	fcClient = fcapi.NewClient()
 	trackingHandler := cmd.NewTrackingHandler(
 		wavu.NewClient(),
 		cfnClient,
+		fcClient,
 		sqlDb,
 		noSqlDb,
 		txtDb,
