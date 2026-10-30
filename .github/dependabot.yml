@@ -18,7 +18,7 @@ updates:
         dependency-type: production
         applies-to: security-updates
 
-  - package-ecosystem: "npm"
+  - package-ecosystem: "bun"
     directory: "/app/gui"
     allow:
     - dependency-type: "direct"
