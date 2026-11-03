@@ -2,7 +2,10 @@ package sql
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/jmoiron/sqlx"
@@ -11,20 +14,22 @@ import (
 )
 
 type SessionStorage interface {
-	CreateSession(ctx context.Context, userId string) error
+	CreateSession(ctx context.Context, userId string, gameId string) (*model.Session, error)
 	GetSessions(ctx context.Context, userId string, date string, limit uint8, offset uint16) ([]*model.Session, error)
 	GetSessionsStatistics(ctx context.Context, userId string) (*model.SessionsStatistics, error)
 	UpdateSession(ctx context.Context, session *model.Session) error
+	DeleteSessionIfEmpty(ctx context.Context, id uint16) (bool, error)
 }
 
-func (s *Storage) CreateSession(ctx context.Context, userId string) (*model.Session, error) {
+func (s *Storage) CreateSession(ctx context.Context, userId string, gameId string) (*model.Session, error) {
 	sesh := model.Session{
 		UserId:    userId,
+		GameId:    gameId,
 		CreatedAt: time.Now().Format(time.RFC3339),
 	}
 	query := `
-		INSERT OR IGNORE INTO sessions (user_id, created_at)
-		VALUES (:user_id, :created_at)
+		INSERT OR IGNORE INTO sessions (user_id, game_id, created_at)
+		VALUES (:user_id, :game_id, :created_at)
 	`
 	res, err := s.db.NamedExecContext(ctx, query, sesh)
 	if err != nil {
@@ -98,23 +103,38 @@ func (s *Storage) GetSessionsStatistics(ctx context.Context, userId string) (*mo
 }
 
 func (s *Storage) GetSessions(ctx context.Context, userId string, date string, limit uint8, offset uint16) ([]*model.Session, error) {
+	return s.getSessions(ctx, sessionFilter{userId: userId, month: date}, limit, offset)
+}
+
+type sessionFilter struct {
+	userId string
+	gameId string
+	// Formatted as 2006-01.
+	month string
+}
+
+func (s *Storage) getSessions(ctx context.Context, filter sessionFilter, limit uint8, offset uint16) ([]*model.Session, error) {
 	pagination := ``
 	if limit != 0 || offset != 0 {
 		pagination = fmt.Sprintf(`LIMIT %d OFFSET %d`, limit, offset)
 	}
-	where := ``
+	whereStmts := []string{}
 	var whereArgs []interface{}
-	if userId != "" {
-		where = `WHERE s.user_id = (?)`
-		whereArgs = append(whereArgs, userId)
+	if filter.userId != "" {
+		whereStmts = append(whereStmts, `s.user_id = (?)`)
+		whereArgs = append(whereArgs, filter.userId)
 	}
-	if date != "" {
-		if where == "" {
-			where = `WHERE STRFTIME('%Y-%m', s.created_at) = (?)`
-		} else {
-			where = ` AND STRFTIME('%Y-%m', s.created_at) = (?)`
-		}
-		whereArgs = append(whereArgs, date)
+	if filter.gameId != "" {
+		whereStmts = append(whereStmts, `s.game_id = (?)`)
+		whereArgs = append(whereArgs, filter.gameId)
+	}
+	if filter.month != "" {
+		whereStmts = append(whereStmts, `STRFTIME('%Y-%m', s.created_at) = (?)`)
+		whereArgs = append(whereArgs, filter.month)
+	}
+	where := ``
+	if len(whereStmts) > 0 {
+		where = `WHERE ` + strings.Join(whereStmts, ` AND `)
 	}
 	query, args, err := sqlx.In(fmt.Sprintf(`
 		SELECT
@@ -122,6 +142,7 @@ func (s *Storage) GetSessions(ctx context.Context, userId string, date string, l
 			s.created_at,
 			u.display_name as user_name,
 			s.user_id,
+			s.game_id,
 			COUNT(IIF(m.victory, 1, NULL)) as matches_won,
 			COUNT(IIF(m.victory = false, 1, NULL)) as matches_lost,
 			m.lp as starting_lp,
@@ -164,7 +185,7 @@ func (s *Storage) GetSessions(ctx context.Context, userId string, date string, l
 func (s *Storage) GetSession(ctx context.Context, id uint16) (*model.Session, error) {
 	var sesh model.Session
 	err := s.db.GetContext(ctx, &sesh, `
-		SELECT s.id, s.created_at, s.user_id, u.display_name AS user_name
+		SELECT s.id, s.created_at, s.user_id, s.game_id, u.display_name AS user_name
 		FROM sessions AS s
 		JOIN users u ON u.code = s.user_id
 		WHERE s.id = ?
@@ -190,19 +211,57 @@ func (s *Storage) UpdateSession(ctx context.Context, session *model.Session) err
 	return nil
 }
 
-func (s *Storage) GetLatestSession(ctx context.Context, userId string) (*model.Session, error) {
-	sessions, err := s.GetSessions(ctx, userId, "", 1, 0)
+// DeleteSessionIfEmpty checks for matches in the same statement as the delete, so a
+// match saved right before can't be orphaned.
+func (s *Storage) DeleteSessionIfEmpty(ctx context.Context, id uint16) (bool, error) {
+	res, err := s.db.ExecContext(ctx, `
+		DELETE FROM sessions
+		WHERE id = ? AND NOT EXISTS (SELECT 1 FROM matches WHERE session_id = ?)
+	`, id, id)
 	if err != nil {
-		return nil, fmt.Errorf("get session: %w", err)
+		return false, fmt.Errorf("delete empty session: %w", err)
 	}
-	if len(sessions) == 0 {
+	deleted, err := res.RowsAffected()
+	if err != nil {
+		return false, fmt.Errorf("delete empty session: %w", err)
+	}
+	return deleted > 0, nil
+}
+
+// GetLatestSession only resumes a session of the same game, since a Fightcade user
+// has sessions for many games.
+//
+// It's looked up without getSessions, which only lists sessions with matches, so a
+// session stopped before its first match can still be resumed.
+func (s *Storage) GetLatestSession(ctx context.Context, userId string, gameId string) (*model.Session, error) {
+	// Without a game, the user's latest session of any game is resumed.
+	var sesh model.Session
+	err := s.db.GetContext(ctx, &sesh, `
+		SELECT s.id, s.created_at, s.user_id, s.game_id, u.display_name AS user_name,
+			s.lp AS ending_lp, s.mr AS ending_mr
+		FROM sessions AS s
+		JOIN users u ON u.code = s.user_id
+		WHERE s.user_id = ? AND (? = '' OR s.game_id = ?)
+		ORDER BY s.id DESC
+		LIMIT 1
+	`, userId, gameId, gameId)
+	if errors.Is(err, sql.ErrNoRows) {
 		return nil, nil
 	}
-	sesh := sessions[0]
+	if err != nil {
+		return nil, fmt.Errorf("get latest session: %w", err)
+	}
 	matches, err := s.GetMatches(ctx, sesh.Id, userId, 0, 0)
 	if err != nil {
 		return nil, fmt.Errorf("get matches by session: %w", err)
 	}
 	sesh.Matches = matches
-	return sesh, nil
+	for _, m := range matches {
+		if m.Victory {
+			sesh.MatchesWon++
+		} else {
+			sesh.MatchesLost++
+		}
+	}
+	return &sesh, nil
 }

@@ -51,6 +51,7 @@ func TestMain(m *testing.M) {
 		// todo mock api clients
 		wavu.NewClient(),
 		cfn.NewClient(nil),
+		nil,
 		sqlDb,
 		cfgDb,
 		txtDb,

@@ -18,15 +18,15 @@ func TestGetUserStatistics(t *testing.T) {
 			t.Fatalf("SaveUser() error = %v", err)
 		}
 	}
-	first, err := storage.CreateSession(ctx, "123456789")
+	first, err := storage.CreateSession(ctx, "123456789", "sf6")
 	if err != nil {
 		t.Fatalf("CreateSession() error = %v", err)
 	}
-	second, err := storage.CreateSession(ctx, "123456789")
+	second, err := storage.CreateSession(ctx, "123456789", "sf6")
 	if err != nil {
 		t.Fatalf("CreateSession() error = %v", err)
 	}
-	other, err := storage.CreateSession(ctx, "987654321")
+	other, err := storage.CreateSession(ctx, "987654321", "sf6")
 	if err != nil {
 		t.Fatalf("CreateSession() error = %v", err)
 	}

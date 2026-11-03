@@ -7,6 +7,7 @@ import { TrackingMachineContext } from '@/state/tracking-machine'
 
 import { Button } from '@/ui/button'
 import { Checkbox } from '@/ui/checkbox'
+import * as Select from '@/ui/select'
 import * as Page from '@/ui/page'
 import { cn } from '@/helpers/cn'
 
@@ -16,6 +17,7 @@ import { useSelector } from '@xstate/react'
 
 import { TrackingBreadcrumbs } from './tracking-breadcrumbs'
 import { GetGuiConfig, GetUsers } from '@cmd/CommandHandler'
+import { GetPlayedGames } from '@cmd/TrackingHandler'
 import { useErrorPopup } from '@/main/error-popup'
 
 export function TrackingForm() {
@@ -29,6 +31,10 @@ export function TrackingForm() {
   const playerIdInputRef = React.useRef<HTMLInputElement>(null)
   const restoreRef = React.useRef<HTMLInputElement>(null)
   const [playerIdInput, setPlayerIdInput] = React.useState('')
+  const isFightcade = game === model.GameType.FIGHTCADE
+  // null until the user's games have loaded
+  const [playedGames, setPlayedGames] = React.useState<model.PlayedGame[] | null>(null)
+  const [gameId, setGameId] = React.useState('')
 
   React.useEffect(() => {
     if (!game) return
@@ -50,15 +56,39 @@ export function TrackingForm() {
   const userCode =
     game === model.GameType.TEKKEN_8 ? playerIdInput.replaceAll('-', '') : playerIdInput
 
+  // Fetched once the user stops typing, as each lookup goes through the Fightcade window
+  React.useEffect(() => {
+    if (!isFightcade) return
+    setPlayedGames(null)
+    setGameId('')
+    if (userCode === '') return
+    let stale = false
+    const timeout = setTimeout(() => {
+      GetPlayedGames(userCode)
+        .then(games => {
+          if (stale) return
+          setPlayedGames(games ?? [])
+          setGameId(games?.[0]?.id ?? '')
+        })
+        // A name that's still being typed isn't a user yet, which isn't worth an error popup
+        .catch(() => !stale && setPlayedGames([]))
+    }, 600)
+    return () => {
+      stale = true
+      clearTimeout(timeout)
+    }
+  }, [isFightcade, userCode])
+
   const onSubmit: React.FormEventHandler<HTMLFormElement> = e => {
     e.preventDefault()
-    if (userCode == '') return
+    if (userCode == '' || (isFightcade && gameId === '')) return
     trackingActor.send({
       type: 'submit',
       user: {
         displayName: users.find(old => old.code == userCode)?.displayName ?? userCode,
         code: userCode
       },
+      gameId: isFightcade ? gameId : '',
       restore: restoreRef.current && restoreRef.current.checked
     })
   }
@@ -90,7 +120,11 @@ export function TrackingForm() {
         onSubmit={onSubmit}
       >
         <h3 className='text-lg'>
-          {game === model.GameType.STREET_FIGHTER_6 ? t('enterCfnName') : t('enterTekkenId')}
+          {game === model.GameType.STREET_FIGHTER_6
+            ? t('enterCfnName')
+            : isFightcade
+              ? t('enterFightcadeName')
+              : t('enterTekkenId')}
         </h3>
         <div className='relative'>
           <input
@@ -98,7 +132,13 @@ export function TrackingForm() {
             onChange={e => setPlayerIdInput(e.target.value)}
             className='block w-full border-0 border-b-2 border-b-[rgba(255,255,255,0.275)] bg-transparent px-4 pe-12 pt-4 pb-3 text-lg text-gray-300 outline-hidden transition-colors hover:border-white hover:text-white focus:border-white focus:ring-transparent focus:ring-offset-transparent focus:outline-none'
             type='text'
-            placeholder={game === model.GameType.STREET_FIGHTER_6 ? t('cfnName') : t('tekkenId')}
+            placeholder={
+              game === model.GameType.STREET_FIGHTER_6
+                ? t('cfnName')
+                : isFightcade
+                  ? t('fightcadeName')
+                  : t('tekkenId')
+            }
             autoCapitalize='off'
             autoComplete='off'
             autoCorrect='off'
@@ -133,6 +173,31 @@ export function TrackingForm() {
             ))}
           </div>
         )}
+        {isFightcade && userCode !== '' && (
+          <div className='flex items-center gap-4'>
+            <span className='shrink-0 text-lg whitespace-nowrap text-gray-300'>
+              {t('pickFightcadeGame')}
+            </span>
+            {playedGames?.length === 0 ? (
+              <span className='text-lg text-gray-400'>{t('noPlayedGames')}</span>
+            ) : (
+              <Select.Root
+                size='sm'
+                loading={playedGames === null}
+                value={gameId}
+                onValueChange={setGameId}
+                className='w-md min-w-0 gap-3'
+              >
+                {playedGames?.map(played => (
+                  <Select.Item key={played.id} value={played.id} className='flex min-w-0 gap-3'>
+                    <span className='truncate'>{played.name}</span>
+                    {played.rank && <span className='shrink-0 text-gray-400'>{played.rank}</span>}
+                  </Select.Item>
+                ))}
+              </Select.Root>
+            )}
+          </div>
+        )}
         <footer className='flex w-full items-center'>
           {users.some(old => old.code === userCode) && (
             <div className='group flex items-center gap-4'>
@@ -145,7 +210,12 @@ export function TrackingForm() {
               </label>
             </div>
           )}
-          <Button type='submit' style={{ filter: 'hue-rotate(-65deg)' }} className='ms-auto'>
+          <Button
+            type='submit'
+            style={{ filter: 'hue-rotate(-65deg)' }}
+            className='ms-auto'
+            disabled={isFightcade && gameId === ''}
+          >
             {t('start')}
           </Button>
         </footer>

@@ -67,7 +67,7 @@ func runTracking(t *testing.T, fake *fakeTracker, emit func(string, ...interface
 	testSuite.trackingHandler.SetGameTracker(fake)
 	testSuite.trackingHandler.SetEventEmitter(emit)
 	done := make(chan error, 1)
-	go func() { done <- testSuite.trackingHandler.StartTracking("test", false) }()
+	go func() { done <- testSuite.trackingHandler.StartTracking("test", "", false) }()
 	return done
 }
 

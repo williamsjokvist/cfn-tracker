@@ -25,7 +25,7 @@ import type { LocalizationKey } from '@/main/i18n'
 import { LanguageSelect } from '@/main/language-select'
 import { cn } from '@/helpers/cn'
 
-type StatOptions = Omit<Record<keyof model.Match, boolean>, 'replayId' | 'sessionId'> & {
+type StatOptions = Omit<Record<keyof model.Match, boolean>, 'replayId' | 'sessionId' | 'gameId'> & {
   theme: string
 }
 

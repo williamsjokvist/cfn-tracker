@@ -26,7 +26,7 @@ func (f *authTestCFNClient) Authenticate(ctx context.Context, statuses chan trac
 }
 
 func authTestHandler(authenticate func(context.Context, chan tracker.AuthStatus)) *TrackingHandler {
-	return NewTrackingHandler(nil, &authTestCFNClient{authenticate: authenticate}, nil, nil, nil, &config.BuildConfig{})
+	return NewTrackingHandler(nil, &authTestCFNClient{authenticate: authenticate}, nil, nil, nil, nil, &config.BuildConfig{})
 }
 
 func TestSelectGameEmitsAuthActionRequired(t *testing.T) {

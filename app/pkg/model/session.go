@@ -1,9 +1,11 @@
 package model
 
 type Session struct {
-	Id          uint16   `db:"id" json:"id"`
-	UserId      string   `db:"user_id" json:"userId"`
-	UserName    string   `db:"user_name" json:"userName"`
+	Id       uint16 `db:"id" json:"id"`
+	UserId   string `db:"user_id" json:"userId"`
+	UserName string `db:"user_name" json:"userName"`
+	// The game the session tracks, which for Fightcade is one of its emulated games.
+	GameId      string   `db:"game_id" json:"gameId"`
 	CreatedAt   string   `db:"created_at" json:"createdAt"`
 	LP          int      `db:"lp" json:"lp"`
 	MR          int      `db:"mr" json:"mr"`

@@ -23,7 +23,7 @@ type liveTracking struct {
 
 func newGameHandler(t *testing.T, wavuClient *wavutest.Client, cfnClient *cfntest.Client, game model.GameType) *cmd.TrackingHandler {
 	t.Helper()
-	handler := cmd.NewTrackingHandler(wavuClient, cfnClient, testSuite.sqlDb, testSuite.cfgDb, testSuite.txtDb, &config.BuildConfig{})
+	handler := cmd.NewTrackingHandler(wavuClient, cfnClient, nil, testSuite.sqlDb, testSuite.cfgDb, testSuite.txtDb, &config.BuildConfig{})
 	if err := handler.SelectGame(game); err != nil {
 		t.Fatalf("SelectGame(%s) error = %v", game, err)
 	}
@@ -38,7 +38,7 @@ func startLiveTracking(t *testing.T, handler *cmd.TrackingHandler, userCode stri
 			lt.matches <- data[0].(model.Match)
 		}
 	})
-	go func() { lt.done <- handler.StartTracking(userCode, restore) }()
+	go func() { lt.done <- handler.StartTracking(userCode, "", restore) }()
 	t.Cleanup(lt.stop)
 
 	// Tracking announces the session, and when restoring its latest match, before any new match.
@@ -132,7 +132,7 @@ func TestTrackingT8(t *testing.T) {
 	lt.stop()
 
 	assertSavedForGame(t, polarisId, model.GameTypeT8)
-	stored, err := testSuite.sqlDb.GetLatestSession(context.Background(), polarisId)
+	stored, err := testSuite.sqlDb.GetLatestSession(context.Background(), polarisId, "")
 	if err != nil || stored == nil || len(stored.Matches) != 3 {
 		t.Fatalf("GetLatestSession() = %+v, %v, want 3 matches", stored, err)
 	}
@@ -162,7 +162,7 @@ func TestTrackingSF6(t *testing.T) {
 	lt.stop()
 
 	assertSavedForGame(t, userCode, model.GameTypeSF6)
-	stored, err := testSuite.sqlDb.GetLatestSession(context.Background(), userCode)
+	stored, err := testSuite.sqlDb.GetLatestSession(context.Background(), userCode, "")
 	if err != nil || stored == nil || len(stored.Matches) != 4 || stored.EndingLP != 10070 {
 		t.Fatalf("GetLatestSession() = %+v, %v, want 4 matches ending at 10070 LP", stored, err)
 	}
@@ -170,4 +170,17 @@ func TestTrackingSF6(t *testing.T) {
 	lt = startLiveTracking(t, handler, userCode, true)
 	cfnClient.Play(cfntest.Match{Won: true, Opponent: "Punk", Character: "Ken", LPChange: 40})
 	assertStats(t, lt.next(), wantStats{"Ken", 2, 0, 2, 40})
+}
+
+func TestTrackingDeletesSessionWithoutMatches(t *testing.T) {
+	polarisId := uniqueUserCode("t8")
+	handler := newGameHandler(t, wavutest.NewClient(polarisId, "Tekk!"), nil, model.GameTypeT8)
+
+	lt := startLiveTracking(t, handler, polarisId, false)
+	lt.stop()
+
+	stored, err := testSuite.sqlDb.GetLatestSession(context.Background(), polarisId, "")
+	if err != nil || stored != nil {
+		t.Fatalf("GetLatestSession() = %+v, %v, want the session without matches deleted", stored, err)
+	}
 }

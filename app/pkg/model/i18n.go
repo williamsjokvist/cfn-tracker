@@ -13,6 +13,7 @@ type Localization struct {
 	StartTracking                     string `json:"startTracking"`
 	CFNName                           string `json:"cfnName"`
 	TekkenId                          string `json:"tekkenId"`
+	FightcadeName                     string `json:"fightcadeName"`
 	Start                             string `json:"start"`
 	Opponent                          string `json:"opponent"`
 	Character                         string `json:"character"`
@@ -27,6 +28,9 @@ type Localization struct {
 	Files                             string `json:"files"`
 	EnterCfnName                      string `json:"enterCfnName"`
 	EnterTekkenId                     string `json:"enterTekkenId"`
+	EnterFightcadeName                string `json:"enterFightcadeName"`
+	PickFightcadeGame                 string `json:"pickFightcadeGame"`
+	NoPlayedGames                     string `json:"noPlayedGames"`
 	ComparisonMetric                  string `json:"comparisonMetric"`
 	ComparisonTopAvg                  string `json:"comparisonTopAvg"`
 	ComparisonCheckingLogin           string `json:"comparisonCheckingLogin"`
@@ -75,6 +79,8 @@ type Localization struct {
 	StopComparisonDescription         string `json:"stopComparisonDescription"`
 	Follow                            string `json:"follow"`
 	ContinueStep                      string `json:"continueStep"`
+	ContinueWithGame                  string `json:"continueWithGame"`
+	OtherGames                        string `json:"otherGames"`
 	Placement                         string `json:"placement"`
 	CFNError                          string `json:"cfnError"`
 	Output                            string `json:"output"`
@@ -236,6 +242,8 @@ type Localization struct {
 	AuthRestartingBrowser        string `json:"authRestartingBrowser"`
 	AuthVerifyingLogin           string `json:"authVerifyingLogin"`
 	AuthInterrupted              string `json:"authInterrupted"`
+	AuthOpeningFightcade         string `json:"authOpeningFightcade"`
+	AuthFightcadeCheck           string `json:"authFightcadeCheck"`
 	ErrAuthManualLoginFailed     string `json:"errAuthManualLoginFailed"`
 	SaveData                     string `json:"saveData"`
 	ChangeFolder                 string `json:"changeFolder"`
