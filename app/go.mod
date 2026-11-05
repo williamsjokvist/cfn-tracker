@@ -9,9 +9,9 @@ require (
 	github.com/hashicorp/go-version v1.9.0
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/samber/lo v1.53.0
-	github.com/wailsapp/wails/v2 v2.17.0
+	github.com/wailsapp/wails/v2 v2.17.1
 	gopkg.in/ini.v1 v1.67.3
-	modernc.org/sqlite v1.61.0
+	modernc.org/sqlite v1.61.1
 )
 
 require (
