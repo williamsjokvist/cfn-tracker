@@ -7,6 +7,8 @@ import { EventsOff, EventsOn } from '@runtime'
 
 type TrackingMachineContextProps = {
   user: model.User | null
+  // Only set for platforms like Fightcade, where a session tracks one of many games
+  gameId: string
   restore: boolean
   isTracking: boolean
   match: model.Match
@@ -24,7 +26,7 @@ export const TRACKING_MACHINE = setup({
   actions: {
     startTracking: ({ context, self }) => {
       context.user &&
-        StartTracking(context.user.code, context.restore).catch(error =>
+        StartTracking(context.user.code, context.gameId, context.restore).catch(error =>
           self.send({ type: 'error', error })
         )
     },
@@ -52,6 +54,7 @@ export const TRACKING_MACHINE = setup({
   context: {
     user: null,
     error: null,
+    gameId: '',
     restore: false,
     isTracking: false,
     match: <model.Match>{},
@@ -66,6 +69,7 @@ export const TRACKING_MACHINE = setup({
           actions: [
             assign({
               user: ({ event }) => event.user,
+              gameId: ({ event }) => event.gameId ?? '',
               restore: ({ event }) => event.restore,
               isTracking: true,
               error: null

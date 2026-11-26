@@ -15,6 +15,8 @@ import (
 	"github.com/williamsjokvist/cfn-tracker/pkg/storage/sql"
 	"github.com/williamsjokvist/cfn-tracker/pkg/storage/txt"
 	"github.com/williamsjokvist/cfn-tracker/pkg/tracker"
+	"github.com/williamsjokvist/cfn-tracker/pkg/tracker/fightcade"
+	"github.com/williamsjokvist/cfn-tracker/pkg/tracker/fightcade/fcapi"
 	"github.com/williamsjokvist/cfn-tracker/pkg/tracker/sf6"
 	"github.com/williamsjokvist/cfn-tracker/pkg/tracker/sf6/cfn"
 	"github.com/williamsjokvist/cfn-tracker/pkg/tracker/t8"
@@ -52,6 +54,7 @@ type TrackingHandler struct {
 	txtDb      *txt.Storage
 	wavuClient wavu.WavuClient
 	cfnClient  cfn.CFNClient
+	fcClient   fcapi.FightcadeClient
 	cfg        *config.BuildConfig
 	matchChans []chan model.Match
 
@@ -65,8 +68,8 @@ type TrackingHandler struct {
 	cancelAuth *context.CancelFunc
 }
 
-func NewTrackingHandler(wavuClient wavu.WavuClient, cfnClient cfn.CFNClient, sqlDb *sql.Storage, nosqlDb *cfgDb.Storage, txtDb *txt.Storage, cfg *config.BuildConfig, matchChans ...chan model.Match) *TrackingHandler {
-	return &TrackingHandler{wavuClient: wavuClient, cfnClient: cfnClient, sqlDb: sqlDb, nosqlDb: nosqlDb, txtDb: txtDb, cfg: cfg, matchChans: matchChans}
+func NewTrackingHandler(wavuClient wavu.WavuClient, cfnClient cfn.CFNClient, fcClient fcapi.FightcadeClient, sqlDb *sql.Storage, nosqlDb *cfgDb.Storage, txtDb *txt.Storage, cfg *config.BuildConfig, matchChans ...chan model.Match) *TrackingHandler {
+	return &TrackingHandler{wavuClient: wavuClient, cfnClient: cfnClient, fcClient: fcClient, sqlDb: sqlDb, nosqlDb: nosqlDb, txtDb: txtDb, cfg: cfg, matchChans: matchChans}
 }
 
 func (ch *TrackingHandler) SetEventEmitter(eventEmitter EventEmitFn) { ch.eventEmitter = eventEmitter }
@@ -77,8 +80,10 @@ func (ch *TrackingHandler) emit(name string, data ...interface{}) {
 	}
 }
 
-func (ch *TrackingHandler) StartTracking(userCodeInput string, restore bool) error {
-	slog.Info("started tracking", slog.String("user_code", userCodeInput), slog.Bool("restoring", restore))
+// StartTracking takes a game ID for platforms with many games, like Fightcade. Other
+// games only have one, so their session's game ID is the game itself.
+func (ch *TrackingHandler) StartTracking(userCodeInput string, gameId string, restore bool) error {
+	slog.Info("started tracking", slog.String("user_code", userCodeInput), slog.String("game_id", gameId), slog.Bool("restoring", restore))
 	ctx, cancel := context.WithCancel(context.Background())
 	forcePoll := make(chan struct{}, 1)
 	ch.mu.Lock()
@@ -100,6 +105,11 @@ func (ch *TrackingHandler) StartTracking(userCodeInput string, restore bool) err
 		ch.emit("tracking-error", model.FormatError(err))
 		return err
 	}
+	if _, ok := ch.gameTracker.(tracker.GameLister); !ok {
+		gameId = string(ch.game)
+	} else if gameId == "" {
+		return ch.terminalError(model.WrapError(model.ErrCreateSession, errors.New("no game picked for the session")))
+	}
 	user, err := ch.gameTracker.GetUser(ctx, userCodeInput)
 	if err != nil {
 		return ch.terminalError(model.WrapError(model.ErrGetUser, err))
@@ -110,9 +120,9 @@ func (ch *TrackingHandler) StartTracking(userCodeInput string, restore bool) err
 	ch.rememberLastUser(user.Code)
 	var session *model.Session
 	if restore {
-		session, err = ch.sqlDb.GetLatestSession(ctx, user.Code)
+		session, err = ch.sqlDb.GetLatestSession(ctx, user.Code, gameId)
 	} else {
-		session, err = ch.sqlDb.CreateSession(ctx, user.Code)
+		session, err = ch.sqlDb.CreateSession(ctx, user.Code, gameId)
 	}
 	if err != nil {
 		if restore {
@@ -123,6 +133,10 @@ func (ch *TrackingHandler) StartTracking(userCodeInput string, restore bool) err
 	if session == nil {
 		return ch.terminalError(model.ErrCreateSession)
 	}
+	// A session without matches has nothing to show, so it isn't kept once tracking
+	// stops. This runs before stopped-tracking is sent, so the sessions list never
+	// shows it.
+	defer ch.deleteIfEmpty(session.Id)
 	session.LP, session.MR, session.Character, session.UserName = user.LP, user.MR, user.Character, user.DisplayName
 	ch.emit("match", model.Match{UserName: session.UserName, LP: session.LP, MR: session.MR, SessionId: session.Id, UserId: session.UserId})
 
@@ -146,6 +160,18 @@ func (ch *TrackingHandler) StartTracking(userCodeInput string, restore bool) err
 		ch.emit("match", match)
 		return nil
 	})
+}
+
+// Tracking's own context is cancelled by the time this runs.
+func (ch *TrackingHandler) deleteIfEmpty(sessionId uint16) {
+	deleted, err := ch.sqlDb.DeleteSessionIfEmpty(context.Background(), sessionId)
+	if err != nil {
+		slog.Warn("delete empty session", slog.Any("session_id", sessionId), slog.Any("error", err))
+		return
+	}
+	if deleted {
+		slog.Info("deleted session without matches", slog.Any("session_id", sessionId))
+	}
 }
 
 func (ch *TrackingHandler) terminalError(err error) error {
@@ -356,8 +382,16 @@ func (ch *TrackingHandler) SelectGame(game model.GameType) error {
 		ch.gameTracker = t8.NewT8Tracker(ch.wavuClient)
 	case model.GameTypeSF6:
 		ch.gameTracker = sf6.NewSF6Tracker(ch.cfnClient)
+	case model.GameTypeFightcade:
+		ch.gameTracker = fightcade.NewFightcadeTracker(ch.fcClient)
 	default:
 		return model.WrapError(model.ErrSelectGame, fmt.Errorf("game does not exist"))
+	}
+	// The Fightcade window stays open while Fightcade is the game, and no longer.
+	if game != model.GameTypeFightcade && ch.fcClient != nil {
+		if err := ch.fcClient.Close(); err != nil {
+			slog.Warn("close fightcade window", slog.Any("error", err))
+		}
 	}
 	ch.game = game
 
@@ -393,6 +427,21 @@ func (ch *TrackingHandler) SelectGame(game model.GameType) error {
 		ch.emit("auth-success")
 	}
 	return err
+}
+
+// GetPlayedGames lists the games a user can track a session of, for platforms with many games.
+func (ch *TrackingHandler) GetPlayedGames(userCode string) ([]model.PlayedGame, error) {
+	lister, ok := ch.gameTracker.(tracker.GameLister)
+	if !ok {
+		return nil, model.WrapError(model.ErrGetUser, errors.New("the selected game has no games to pick from"))
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), pollTimeout)
+	defer cancel()
+	games, err := lister.GetPlayedGames(ctx, userCode)
+	if err != nil {
+		return nil, model.WrapError(model.ErrGetUser, err)
+	}
+	return games, nil
 }
 
 // Remembering is a convenience for the next start, so failing to save it

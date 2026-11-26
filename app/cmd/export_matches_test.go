@@ -30,11 +30,11 @@ func TestExportUserMatches(t *testing.T) {
 			t.Fatalf("SaveUser() error = %v", err)
 		}
 	}
-	session, err := sqlDb.CreateSession(ctx, "123456789")
+	session, err := sqlDb.CreateSession(ctx, "123456789", "sf6")
 	if err != nil {
 		t.Fatalf("CreateSession() error = %v", err)
 	}
-	other, err := sqlDb.CreateSession(ctx, "987654321")
+	other, err := sqlDb.CreateSession(ctx, "987654321", "sf6")
 	if err != nil {
 		t.Fatalf("CreateSession() error = %v", err)
 	}
