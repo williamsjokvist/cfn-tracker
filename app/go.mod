@@ -11,7 +11,7 @@ require (
 	github.com/samber/lo v1.53.0
 	github.com/wailsapp/wails/v2 v2.17.1
 	gopkg.in/ini.v1 v1.68.0
-	modernc.org/sqlite v1.62.0
+	modernc.org/sqlite v1.63.0
 )
 
 require (
